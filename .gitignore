@@ -1,3 +1,2 @@
-# wow
-# such empty
-# much nothing
+# exclude .exe
+*.exe
