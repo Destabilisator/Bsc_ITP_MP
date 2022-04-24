@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-const short N = 16;
+const short N = 3;
 const int size = (int) pow(2, N);
 
 void printBits(int a) {
@@ -47,6 +47,7 @@ void saveHamilton(float** hamilton, std::string filename, std::string header) {
 
 }
 
+// naiver Ansatz: direkt füllen, ohne zu ordnen
 void fillHamilton1(float** hamilton) {
     for (int a = 0; a <= size -1; a++) {
         //std::cout << "a: ";
@@ -66,6 +67,7 @@ void fillHamilton1(float** hamilton) {
     }
 }
 
+// findet alle Zustände mit der Magnetisierung m_z = n
 void fillStates(std::vector<int> *states, int n) {
     for (int s = 0; s <= size - 1; s++) {
         if (bitSum(s) == n) {
@@ -76,7 +78,7 @@ void fillStates(std::vector<int> *states, int n) {
     } states->shrink_to_fit();
 }
 
-
+// findet einen Zustand in der Zustandsliste
 int findState(std::vector<int> *states, int s, int M) {
     int pos, pos_min = 0, pos_max = M-1;
     while (true) {
@@ -91,6 +93,7 @@ int findState(std::vector<int> *states, int s, int M) {
     }
 }
 
+// füllt einen Hamiltonblock aus Zuständen mit gegebener Magnetisierung aus
 void fillHamiltonBlock(std::vector<int> *states, float** hamilton, int M) {
     for (int k = 0; k < M; k++) {
         //std::cout << k << ": ";
@@ -112,6 +115,7 @@ void fillHamiltonBlock(std::vector<int> *states, float** hamilton, int M) {
     }
 }
 
+// einzelne Blöcke Zusammensetzen
 void writeHamiltonBlockToFull(float** hamiltonBlock, float** hamilton, int dimension, int offset) {
     for (int i = 0; i < dimension; i++) {
         for (int j = 0; j < dimension; j++) {
@@ -120,7 +124,8 @@ void writeHamiltonBlockToFull(float** hamiltonBlock, float** hamilton, int dimen
     }
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+
     std::cout << "N: " << N << "; size: " << size << std::endl;
 
     // Methode 1
