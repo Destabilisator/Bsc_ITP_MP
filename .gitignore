@@ -1,3 +1,8 @@
+# directories
+.idea
+/cmake-build-debug
+/cmake-build-release
+
 # executables
 *.exe
 *.elf
