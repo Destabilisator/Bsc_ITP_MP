@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 
-const short N = 3;
-int size = (int) pow(2, N);
+const short N = 16;
+const int size = (int) pow(2, N);
 
 void printBits(int a) {
     std::bitset<N> x(a);
@@ -20,12 +20,13 @@ int bitSum(int s) {
     } return sum;
 }
 
-void saveHamilton(float** hamilton, std::string filename) {
+void saveHamilton(float** hamilton, std::string filename, std::string header) {
     std::cout << "saving to file '" << filename << "'..." << std::endl;
 
     std::ofstream file;
     try {
         file.open(filename);
+        file << header << "\n";
         for (int i = 0; i <= size -1; i++) {
             for (int j = 0; j <= size-1; j++) {
                 if (hamilton[i][j] < 0.1 && hamilton[i][j] > -0.1) {
@@ -124,7 +125,7 @@ int main() {
 
     // Methode 1
 
-    std::cout << "declaring array" << std::endl;
+    std::cout << "naiver Ansatz" << std::endl;
     static auto **hamilton1 = new float*[size];
     for (int i = 0; i < size; i++) {
         hamilton1[i] = new float[size];
@@ -133,11 +134,12 @@ int main() {
         }
     }
 
-    std::cout << "writing to array" << std::endl;
     fillHamilton1(hamilton1);
-    saveHamilton(hamilton1, "Hamilton1.txt");
+    saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N));
+
 
     // Using fixed-magnetization blocks.
+    std::cout << "blockdiagonale m_z" << std::endl;
 
     static auto **hamilton2 = new float*[size];
     for (int i = 0; i < size; i++) {
@@ -175,7 +177,7 @@ int main() {
         } delete[] hamiltonBlock;
     }
 
-    saveHamilton(hamilton2, "Hamilton2.txt");
+    saveHamilton(hamilton2, "Hamilton2.txt", "Blöcke konstanter Magnetisierung für N = " + std::to_string(N));
 
     return 0;
 }
