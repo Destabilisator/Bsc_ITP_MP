@@ -48,17 +48,17 @@ void saveHamilton(float** hamilton, std::string filename) {
 
 void fillHamilton1(float** hamilton) {
     for (int a = 0; a <= size -1; a++) {
-        std::cout << "a: ";
-        printBits(a);
+        //std::cout << "a: ";
+        //printBits(a);
         for (int i = 0; i <= N-1; i++) {
             int j = (i+1) % N;
             if (((a >> i) & 1) == ((a >> j) & 1)) {
-                std::cout << "on " <<  a << "\n";
+                //std::cout << "on " <<  a << "\n";
                 hamilton[a][a] += 0.25;
             } else {
                 hamilton[a][a] -= 0.25;
                 int b = a ^ (1 << i) ^ (1 << j);
-                std::cout << "off " <<  a << " " << b << "\n";
+                //std::cout << "off " <<  a << " " << b << "\n";
                 hamilton[a][b] = 0.5;
             }
         }
