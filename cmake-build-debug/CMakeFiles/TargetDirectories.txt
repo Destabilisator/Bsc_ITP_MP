@@ -1,3 +1,0 @@
-F:/Uni/Bsc_ITP_MX/cmake-build-debug/CMakeFiles/Bsc_ITP_MX.dir
-F:/Uni/Bsc_ITP_MX/cmake-build-debug/CMakeFiles/edit_cache.dir
-F:/Uni/Bsc_ITP_MX/cmake-build-debug/CMakeFiles/rebuild_cache.dir
