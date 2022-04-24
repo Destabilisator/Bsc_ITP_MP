@@ -1,2 +1,7 @@
-# exclude .exe
+# executables
 *.exe
+*.elf
+
+# results
+hamilton1.txt
+hamilton2.txt
