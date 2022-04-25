@@ -4,11 +4,12 @@
 #include <math.h>
 #include <string>
 #include <vector>
+#include <Eigen/Eigenvalues>
 
 //#define naiv
 //#define magnetization
 
-const short N = 4;
+const short N = 3;
 const int size = (int) pow(2, N);
 
 void printBits(int a) {
