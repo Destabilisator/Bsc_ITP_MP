@@ -6,11 +6,11 @@
 #include <vector>
 #include <Eigen/Eigenvalues>
 
-//#define naiv
+#define naiv
 //#define magnetization
-#define momentum
+//#define momentum
 
-const short N = 3;
+const short N = 8;
 const int size = (int) pow(2, N);
 
 void printBits(int a) {
@@ -185,14 +185,16 @@ int main(int argc, char* argv[]) {
     }
 
     fillHamilton1(hamilton1);
-    saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N));
+    //saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N));
 
     Eigen::MatrixXf H1(size, size);
     for (int i = 0; i < size; i++) {
         H1.row(i) = Eigen::VectorXf::Map(&hamilton1[i][0], size);
     }
-    std::cout << H1 << std::endl;
+    //std::cout << H1 << std::endl;
+    std::cout << "solving... ";
     Eigen::EigenSolver<Eigen::MatrixXf> solver1(H1);
+    std::cout << "done\n";
     std::cout << solver1.eigenvalues() << std::endl;
 
 #endif
@@ -245,7 +247,8 @@ int main(int argc, char* argv[]) {
     }
     std::cout << H2 << std::endl;
     Eigen::EigenSolver<Eigen::MatrixXf> solver2(H2);
-    std::cout << solver2.eigenvalues() << std::endl;
+    Eigen::VectorXf H2EiVal = solver2.eigenvalues();
+    std::cout << H2EiVal << std::endl;
 
 
 #endif
