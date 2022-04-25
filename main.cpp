@@ -8,8 +8,8 @@
 
 #define PI  3.14159265358979323846
 
-//#define naiv
-//#define magnetization
+#define naiv
+#define magnetization
 #define momentum
 
 const short N = 3;
@@ -92,10 +92,10 @@ void fillHamilton1(float** hamilton) {
     }
 }
 
-// findet alle Zustände mit der Magnetisierung m_z = n
-void fillStates(std::vector<int> *states, int n) {
+// findet alle Zustände mit der Magnetisierung m_z = m
+void fillStates(std::vector<int> *states, int m) {
     for (int s = 0; s <= size - 1; s++) {
-        if (bitSum(s) == n) {
+        if (bitSum(s) == m) {
             //std::cout << bitSum(s) << ": ";
             states->push_back(s);
             //printBits(s);
@@ -173,32 +173,6 @@ int checkState(int s, int k) {
     return -1;
 }
 
-void getMomentumStates(std::vector<int> *statesList, std::vector<int> *statesPerio) {
-    auto *states = new std::vector<int>;
-    for (int k = 0; k <= N; k++) {
-        fillStates(states, k);
-        for (int a : *states) {
-            //std::cout << "found state: ";
-            //printBits(a);
-            int perio = checkState(a, k);
-            if (perio >= 0) {
-                //std::cout << perio << "\n";
-                statesList->push_back(a);
-                //std::cout << statesList->at(0) << ": ";
-                statesPerio->push_back(perio);
-                //std::cout << statesPerio->at(0) << "\n";
-            }
-        } states->clear();
-    }
-
-    delete states;
-
-    for (int i = 0; i < statesList->size(); i++) {
-        std::cout << statesPerio->at(i) << ": ";
-        printBits(statesList->at(i));
-    }
-}
-
 void representative(int s, int *r, int *l) {
     int t = s; *r = s; *l = 0;
     for (int i = 1; i < N; i++) {
@@ -210,7 +184,7 @@ void representative(int s, int *r, int *l) {
     }
 }
 
-void fillHamiltonMomentumBlock(std::complex<double> **hamilton, std::vector<int> *states, std::vector<int> *R_vals) {
+void fillHamiltonMomentumBlock(std::complex<double> **hamilton, std::vector<int> *states, std::vector<int> *R_vals, int k_moment) {
     for (int k = 0; k < states->size(); k++) {
         //std::cout << "a: ";
         int a = states->at(k);
@@ -229,8 +203,9 @@ void fillHamiltonMomentumBlock(std::complex<double> **hamilton, std::vector<int>
                 //std::cout << "findstate: \n";
                 int b = findState(states, r, states->size());
                 if (b >= 0) {
-                    std::complex<double> numC(0.0, 2 * PI * (double) l * (double) bitSum(a) / (double) N );
-                    hamilton[k][b] +=  (std::complex<double>) (0.5 * sqrt(R_vals->at(k)/R_vals->at(b)) * exp(numC));
+                    //std::complex<double> numC(0.0, 2 * PI * (double) (bitSum(a) - N/2 ) * (double) l / (double) N );
+                    std::complex<double> numC(0.0, 2 * PI * (double) k_moment * (double) l / (double) N );
+                    hamilton[k][b] +=  (std::complex<double>) (0.5 * sqrt((double) R_vals->at(k) / (double) R_vals->at(b)) * exp(numC));
                 }
             }
         }
@@ -240,6 +215,7 @@ void fillHamiltonMomentumBlock(std::complex<double> **hamilton, std::vector<int>
 void writeHamiltonMomentumBlockToFull(std::complex<double> **hamiltonBlock, std::complex<double> **hamilton, int dimension, int offset) {
     for (int i = 0; i < dimension; i++) {
         for (int j = 0; j < dimension; j++) {
+            //std::cout << i << " " << j << "\n";
             hamilton[i+offset][j+offset] = hamiltonBlock[i][j];
         }
     }
@@ -297,7 +273,9 @@ int main(int argc, char* argv[]) {
     }
     std::cout << H1 << std::endl;
     std::cout << "solving...\n";
-    Eigen::EigenSolver<Eigen::MatrixXf> solver1(H1);
+    Eigen::ComplexEigenSolver<Eigen::MatrixXf> solver1(H1);
+
+    //Eigen::EigenSolver<Eigen::MatrixXf> solver1(H1);
 //    Eigen::VectorXf H1EiVal = solver1.eigenvalues();
 //    std::cout << std::endl << H1EiVal << std::endl;
     std::cout << std::endl << solver1.eigenvalues() << std::endl;
@@ -355,7 +333,8 @@ int main(int argc, char* argv[]) {
     }
     std::cout << H2 << std::endl;
     std::cout << "solving...\n";
-    Eigen::EigenSolver<Eigen::MatrixXf> solver2(H2);
+    Eigen::ComplexEigenSolver<Eigen::MatrixXf> solver2(H2);
+//    Eigen::EigenSolver<Eigen::MatrixXf> solver2(H2);
 //    Eigen::VectorXf H2EiVal = solver2.eigenvalues();
 //    std::cout << std::endl << H2EiVal << std::endl;
     std::cout << std::endl << solver2.eigenvalues() << std::endl;
@@ -376,42 +355,111 @@ int main(int argc, char* argv[]) {
         }
     }
 
+
     auto *states = new std::vector<int>;
+    auto *statesList = new std::vector<int>;
     auto *statesPerio = new std::vector<int>;
     offset = 0;
-    for (int n = 0; n <= N; n++) {
-        //std::cout << "m_z: " << n << "\n";
-        //std::cout << "filling states\n";
-        fillStates(states, n);
-        int M = states->size();
-        for (int s : *states) {
-            int perio = checkState(s, n);
-            statesPerio->push_back(perio);
-        }
-        //std::cout << "statesBlock size: " << M << "\n";
-        auto **hamiltonBlock = new std::complex<double>*[M];
-        for (int i = 0; i < M; i++) {
-            hamiltonBlock[i] = new std::complex<double>[M];
-            for (int j = 0; j < M; j++) {
-                hamiltonBlock[i][j] = std::complex<double> (0.0, 0.0);
+    for (int k = -N/2; k <= N/2 ; k++) { // <---------------------------------------------------------------- Problemski
+        //std::cout << "k: " << k << "\n";
+        for (int m = 0; m <= N; m++) {
+            fillStates(states, m);
+            for (int a : *states) {
+                //std::cout << "found state: ";
+                //printBits(a);
+                int perio = checkState(a, k);
+                if (perio >= 0) {
+                    //std::cout << perio << "\n";
+                    statesList->push_back(a);
+                    //std::cout << statesList->at(0) << ": ";
+                    statesPerio->push_back(perio);
+                    //printBits(a);
+                    //std::cout << statesPerio->at(0) << "\n";
+                }
             }
-        }
-        //std::cout << "filling hamilton block\n";
-        fillHamiltonMomentumBlock(hamiltonBlock, states, statesPerio);
-        //std::cout << "writing hamilton block to full\n";
-        writeHamiltonMomentumBlockToFull(hamiltonBlock, hamilton3, M, offset);
-        offset += M;
+            int M = statesList->size();
+            auto **hamiltonBlock = new std::complex<double>*[M];
+            for (int i = 0; i < M; i++) {
+                hamiltonBlock[i] = new std::complex<double>[M];
+                for (int j = 0; j < M; j++) {
+                    hamiltonBlock[i][j] = std::complex<double> (0.0, 0.0);
+                }
+            }
+            //std::cout << "filling hamilton block\n";
+            fillHamiltonMomentumBlock(hamiltonBlock, statesList, statesPerio, k);
+            //std::cout << "writing hamilton block to full\n";
+            writeHamiltonMomentumBlockToFull(hamiltonBlock, hamilton3, M, offset);
+            offset += M;
 
-        //std::cout << "clean up\n";
-        states->clear();
-        statesPerio->clear();
-        for (int i = 0; i < M; i++) {
-            delete hamiltonBlock[i];
-        } delete[] hamiltonBlock;
+            //std::cout << "clean up\n";
+            states->clear();
+            statesList->clear();
+            statesPerio->clear();
+            for (int i = 0; i < M; i++) {
+                delete hamiltonBlock[i];
+            } delete[] hamiltonBlock;
+        }
+
     }
 
-    saveComplexHamilton(hamilton3, "Hamilton3.txt", "momentum states");
+    //std::cout << offset << "\n";
 
+    //delete states;
+
+//    for (int i = 0; i < statesList->size(); i++) {
+//        std::cout << statesPerio->at(i) << ": ";
+//        printBits(statesList->at(i));
+//    }
+
+//    auto *statesAll = new std::vector<int>;
+//
+//    for (int s = 0; s < size; s++) {
+//        //for (int k = - N / 2 + 1; k <= N/2; k++) {
+//            if (checkState(s, 0) >= 0) {
+//                //std::cout << "k " << k << "\n";
+//                statesAll->push_back(s);
+//                printBits(s);
+//            }
+//        //}
+//    }
+
+
+//    auto *states = new std::vector<int>;
+//    auto *statesPerio = new std::vector<int>;
+//    offset = 0;
+//    for (int n = 0; n <= N; n++) {
+//        //std::cout << "m_z: " << n << "\n";
+//        //std::cout << "filling states\n";
+//        fillStates(states, n);
+//        int M = states->size();
+//        for (int s : *states) {
+//            int perio = checkState(s, n);
+//            statesPerio->push_back(perio);
+//        }
+//        //std::cout << "statesBlock size: " << M << "\n";
+//        auto **hamiltonBlock = new std::complex<double>*[M];
+//        for (int i = 0; i < M; i++) {
+//            hamiltonBlock[i] = new std::complex<double>[M];
+//            for (int j = 0; j < M; j++) {
+//                hamiltonBlock[i][j] = std::complex<double> (0.0, 0.0);
+//            }
+//        }
+//        //std::cout << "filling hamilton block\n";
+//        fillHamiltonMomentumBlock(hamiltonBlock, states, statesPerio);
+//        //std::cout << "writing hamilton block to full\n";
+//        writeHamiltonMomentumBlockToFull(hamiltonBlock, hamilton3, M, offset);
+//        offset += M;
+//
+//        //std::cout << "clean up\n";
+//        states->clear();
+//        statesPerio->clear();
+//        for (int i = 0; i < M; i++) {
+//            delete hamiltonBlock[i];
+//        } delete[] hamiltonBlock;
+//    }
+
+    saveComplexHamilton(hamilton3, "Hamilton3.txt", "momentum states");
+//
     Eigen::MatrixXcd H3(size, size);
     for (int i = 0; i < size; i++) {
         H3.row(i) = Eigen::RowVectorXcd::Map(&hamilton3[i][0], size);
