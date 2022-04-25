@@ -8,6 +8,7 @@
 
 //#define naiv
 //#define magnetization
+#define momentum
 
 const short N = 3;
 const int size = (int) pow(2, N);
@@ -185,6 +186,15 @@ int main(int argc, char* argv[]) {
 
     fillHamilton1(hamilton1);
     saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N));
+
+    Eigen::MatrixXf H1(size, size);
+    for (int i = 0; i < size; i++) {
+        H1.row(i) = Eigen::VectorXf::Map(&hamilton1[i][0], size);
+    }
+    std::cout << H1 << std::endl;
+    Eigen::EigenSolver<Eigen::MatrixXf> solver1(H1);
+    std::cout << solver1.eigenvalues() << std::endl;
+
 #endif
 
 #ifdef magnetization
@@ -228,8 +238,19 @@ int main(int argc, char* argv[]) {
     }
 
     saveHamilton(hamilton2, "Hamilton2.txt", "Blöcke konstanter Magnetisierung für N = " + std::to_string(N));
+
+    Eigen::MatrixXf H2(size, size);
+    for (int i = 0; i < size; i++) {
+        H2.row(i) = Eigen::VectorXf::Map(&hamilton2[i][0], size);
+    }
+    std::cout << H2 << std::endl;
+    Eigen::EigenSolver<Eigen::MatrixXf> solver2(H2);
+    std::cout << solver2.eigenvalues() << std::endl;
+
+
 #endif
 
+#ifdef momentum
     auto *statesList = new std::vector<int>;
     auto *states = new std::vector<int>;
     auto *statesPerio = new std::vector<int>;
@@ -254,6 +275,8 @@ int main(int argc, char* argv[]) {
         std::cout << statesPerio->at(i) << ": ";
         printBits(statesList->at(i));
     }
+
+#endif
 
     return 0;
 }
