@@ -5,7 +5,10 @@
 #include <string>
 #include <vector>
 
-const short N = 3;
+//#define naiv
+//#define magnetization
+
+const short N = 4;
 const int size = (int) pow(2, N);
 
 void printBits(int a) {
@@ -13,18 +16,21 @@ void printBits(int a) {
     std::cout << x << '\n';
 }
 
-// cyclicly translate bits in s by n
-int translate(int s, int n) {
+// cyclicly translate bits in s by n to the right
+int translateRight(int s, int n) {
     for (int _ = 0; _ < n; _++) {
         int bit = s & 1;
         s = (s>>1) | (bit << (N-1));
     } return s;
 }
 
-int translate(int s) {
-    int bit = s & 1;
-    s = (s>>1) | (bit << (N-1));
-    return s;
+// cyclicly translate bits in s by n to the left
+int translateLeft(int s, int n) {
+    for (int _ = 0; _ < n; _++) {
+        int bit = (s >> (N-1)) & 1;
+        s = (s<<1) | bit;
+        s &= ~(1 << N);
+    } return s;
 }
 
 // sum up all bits in s
@@ -139,12 +145,34 @@ void writeHamiltonBlockToFull(float** hamiltonBlock, float** hamilton, int dimen
     }
 }
 
+// if s is the smallest state integer, returns its periodicity
+int checkState(int s, int k) {
+    int t = s;
+    for (int i = 1; i <= N + 1; i++) {
+        t = translateLeft(t, 1);
+        //printBits(t);
+        if (t < s) {
+            //std::cout << "found smaller\n";
+            return -1;
+        } else if (t == s) {
+            if (k % (N/i) != 0) {
+                //std::cout << "not compatible\n";
+                return -1;
+            } else {
+                //std::cout << "found compatible state\n";
+                return i;
+            }
+        }
+    }
+    return -1;
+}
+
 int main(int argc, char* argv[]) {
 
     std::cout << "N: " << N << "; size: " << size << std::endl;
 
     // Methode 1
-
+#ifdef naiv
     std::cout << "naiver Ansatz" << std::endl;
     static auto **hamilton1 = new float*[size];
     for (int i = 0; i < size; i++) {
@@ -156,8 +184,9 @@ int main(int argc, char* argv[]) {
 
     fillHamilton1(hamilton1);
     saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N));
+#endif
 
-
+#ifdef magnetization
     // Using fixed-magnetization blocks.
     std::cout << "blockdiagonale m_z" << std::endl;
 
@@ -198,6 +227,32 @@ int main(int argc, char* argv[]) {
     }
 
     saveHamilton(hamilton2, "Hamilton2.txt", "Blöcke konstanter Magnetisierung für N = " + std::to_string(N));
+#endif
+
+    auto *statesList = new std::vector<int>;
+    auto *states = new std::vector<int>;
+    auto *statesPerio = new std::vector<int>;
+    for (int k = 0; k <= N; k++) {
+        fillStates(states, k);
+        for (int i = 0; i < states->size(); i++) {
+            int a = states->at(i);
+            //std::cout << "found state: ";
+            //printBits(a);
+            int perio = checkState(a, k);
+            if (perio >= 0) {
+                //std::cout << perio << "\n";
+                statesList->push_back(a);
+                //std::cout << statesList->at(0) << ": ";
+                statesPerio->push_back(perio);
+                //std::cout << statesPerio->at(0) << "\n";
+            }
+        } states->clear();
+    }
+
+    for (int i = 0; i < statesList->size(); i++) {
+        std::cout << statesPerio->at(i) << ": ";
+        printBits(statesList->at(i));
+    }
 
     return 0;
 }
