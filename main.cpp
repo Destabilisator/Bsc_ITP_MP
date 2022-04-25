@@ -13,6 +13,21 @@ void printBits(int a) {
     std::cout << x << '\n';
 }
 
+// cyclicly translate bits in s by n
+int translate(int s, int n) {
+    for (int _ = 0; _ < n; _++) {
+        int bit = s & 1;
+        s = (s>>1) | (bit << (N-1));
+    } return s;
+}
+
+int translate(int s) {
+    int bit = s & 1;
+    s = (s>>1) | (bit << (N-1));
+    return s;
+}
+
+// sum up all bits in s
 int bitSum(int s) {
     int sum = 0;
     for (int i = 0; i < N; i++) {
