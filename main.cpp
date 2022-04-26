@@ -14,7 +14,7 @@
 #define magnetization
 #define momentum
 
-const short N = 3;
+const short N = 4;
 const int size = (int) pow(2, N);
 
 void printBits(int a) {
@@ -361,7 +361,7 @@ int main(int argc, char* argv[]) {
     auto *statesList = new std::vector<int>;
     auto *statesPerio = new std::vector<int>;
     offset = 0;
-    for (int k = -N/2; k <= N/2 ; k++) { // <---------------------------------------------------------------- Problemski
+    for (int k = -(N-1)/2; k <= N/2 ; k++) { // <---------------------------------------------------------------- Problemski
         //std::cout << "k: " << k << "\n";
         for (int m = 0; m <= N; m++) {
             fillStates(states, m);
