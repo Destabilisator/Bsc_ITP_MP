@@ -8,6 +8,8 @@
 
 #define PI  3.14159265358979323846
 
+#define calculateEigenvalues
+
 #define naiv
 #define magnetization
 #define momentum
@@ -45,7 +47,7 @@ int bitSum(int s) {
     } return sum;
 }
 
-void saveHamilton(float** hamilton, std::string filename, std::string header) {
+void saveHamilton(float** hamilton, std::string filename, std::string header, Eigen::VectorXcf eiVal) {
     std::cout << "saving to file '" << filename << "'..." << std::endl;
 
     std::ofstream file;
@@ -62,7 +64,8 @@ void saveHamilton(float** hamilton, std::string filename, std::string header) {
             }
             file << std::endl;
         }
-
+        file << "\nEigenvalues:\n";
+        file << eiVal;
     } catch (...) {
         std::cout << "failed to save to file\n";
     }
@@ -221,7 +224,7 @@ void writeHamiltonMomentumBlockToFull(std::complex<double> **hamiltonBlock, std:
     }
 }
 
-void saveComplexHamilton(std::complex<double> **hamilton, std::string filename, std::string header) {
+void saveComplexHamilton(std::complex<double> **hamilton, std::string filename, std::string header, Eigen::VectorXcd eiVal) {
     std::cout << "saving to file '" << filename << "'..." << std::endl;
 
     std::ofstream file;
@@ -239,7 +242,8 @@ void saveComplexHamilton(std::complex<double> **hamilton, std::string filename, 
             }
             file << std::endl;
         }
-
+        file << "\nEigenvalues:\n";
+        file << eiVal;
     } catch (...) {
         std::cout << "failed to save to file\n";
     }
@@ -255,7 +259,7 @@ int main(int argc, char* argv[]) {
 
 #ifdef naiv
     // Methode 1
-    std::cout << "naiver Ansatz" << std::endl;
+    std::cout << "\nnaiver Ansatz" << std::endl;
     static auto **hamilton1 = new float*[size];
     for (int i = 0; i < size; i++) {
         hamilton1[i] = new float[size];
@@ -265,20 +269,20 @@ int main(int argc, char* argv[]) {
     }
 
     fillHamilton1(hamilton1);
-    //saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N));
 
     Eigen::MatrixXf H1(size, size);
     for (int i = 0; i < size; i++) {
         H1.row(i) = Eigen::VectorXf::Map(&hamilton1[i][0], size);
     }
     std::cout << H1 << std::endl;
-    std::cout << "solving...\n";
-    Eigen::ComplexEigenSolver<Eigen::MatrixXf> solver1(H1);
+#ifdef calculateEigenvalues
+    std::cout << "solving...";
+    Eigen::EigenSolver<Eigen::MatrixXf> solver1(H1);
+    Eigen::VectorXcf H1EiVal = solver1.eigenvalues();
+    std::cout << H1EiVal << std::endl;
+    saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N), H1EiVal);
 
-    //Eigen::EigenSolver<Eigen::MatrixXf> solver1(H1);
-//    Eigen::VectorXf H1EiVal = solver1.eigenvalues();
-//    std::cout << std::endl << H1EiVal << std::endl;
-    std::cout << std::endl << solver1.eigenvalues() << std::endl;
+#endif
 
 #endif
 
@@ -286,8 +290,7 @@ int main(int argc, char* argv[]) {
 
 #ifdef magnetization
     // Using fixed-magnetization blocks.
-    std::cout << "blockdiagonale m_z" << std::endl;
-
+    std::cout << "\nblockdiagonale m_z" << std::endl;
     static auto **hamilton2 = new float*[size];
     for (int i = 0; i < size; i++) {
         hamilton2[i] = new float[size];
@@ -325,26 +328,24 @@ int main(int argc, char* argv[]) {
         } delete[] hamiltonBlock;
     }
 
-    saveHamilton(hamilton2, "Hamilton2.txt", "Blöcke konstanter Magnetisierung für N = " + std::to_string(N));
-
     Eigen::MatrixXf H2(size, size);
     for (int i = 0; i < size; i++) {
         H2.row(i) = Eigen::VectorXf::Map(&hamilton2[i][0], size);
     }
     std::cout << H2 << std::endl;
+#ifdef calculateEigenvalues
     std::cout << "solving...\n";
-    Eigen::ComplexEigenSolver<Eigen::MatrixXf> solver2(H2);
-//    Eigen::EigenSolver<Eigen::MatrixXf> solver2(H2);
-//    Eigen::VectorXf H2EiVal = solver2.eigenvalues();
-//    std::cout << std::endl << H2EiVal << std::endl;
-    std::cout << std::endl << solver2.eigenvalues() << std::endl;
-
+    Eigen::EigenSolver<Eigen::MatrixXf> solver2(H2);
+    Eigen::VectorXcf H2EiVal = solver2.eigenvalues();
+    std::cout << H2EiVal << std::endl;
+    saveHamilton(hamilton2, "Hamilton2.txt", "Blöcke konstanter Magnetisierung für N = " + std::to_string(N), H2EiVal);
+#endif
 
 #endif
 
 #ifdef momentum
     // Using momentum states.
-    std::cout << "momentum states" << std::endl;
+    std::cout << "\nmomentum states" << std::endl;
 
     //std::cout << "allocating matrix\n";
     static auto **hamilton3 = new std::complex<double>*[size];
@@ -402,74 +403,18 @@ int main(int argc, char* argv[]) {
 
     }
 
-    //std::cout << offset << "\n";
-
-    //delete states;
-
-//    for (int i = 0; i < statesList->size(); i++) {
-//        std::cout << statesPerio->at(i) << ": ";
-//        printBits(statesList->at(i));
-//    }
-
-//    auto *statesAll = new std::vector<int>;
-//
-//    for (int s = 0; s < size; s++) {
-//        //for (int k = - N / 2 + 1; k <= N/2; k++) {
-//            if (checkState(s, 0) >= 0) {
-//                //std::cout << "k " << k << "\n";
-//                statesAll->push_back(s);
-//                printBits(s);
-//            }
-//        //}
-//    }
-
-
-//    auto *states = new std::vector<int>;
-//    auto *statesPerio = new std::vector<int>;
-//    offset = 0;
-//    for (int n = 0; n <= N; n++) {
-//        //std::cout << "m_z: " << n << "\n";
-//        //std::cout << "filling states\n";
-//        fillStates(states, n);
-//        int M = states->size();
-//        for (int s : *states) {
-//            int perio = checkState(s, n);
-//            statesPerio->push_back(perio);
-//        }
-//        //std::cout << "statesBlock size: " << M << "\n";
-//        auto **hamiltonBlock = new std::complex<double>*[M];
-//        for (int i = 0; i < M; i++) {
-//            hamiltonBlock[i] = new std::complex<double>[M];
-//            for (int j = 0; j < M; j++) {
-//                hamiltonBlock[i][j] = std::complex<double> (0.0, 0.0);
-//            }
-//        }
-//        //std::cout << "filling hamilton block\n";
-//        fillHamiltonMomentumBlock(hamiltonBlock, states, statesPerio);
-//        //std::cout << "writing hamilton block to full\n";
-//        writeHamiltonMomentumBlockToFull(hamiltonBlock, hamilton3, M, offset);
-//        offset += M;
-//
-//        //std::cout << "clean up\n";
-//        states->clear();
-//        statesPerio->clear();
-//        for (int i = 0; i < M; i++) {
-//            delete hamiltonBlock[i];
-//        } delete[] hamiltonBlock;
-//    }
-
-    saveComplexHamilton(hamilton3, "Hamilton3.txt", "momentum states");
-//
     Eigen::MatrixXcd H3(size, size);
     for (int i = 0; i < size; i++) {
         H3.row(i) = Eigen::RowVectorXcd::Map(&hamilton3[i][0], size);
     }
     std::cout << H3 << std::endl;
+#ifdef calculateEigenvalues
     std::cout << "solving...\n";
     Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver3(H3);
-//    Eigen::RowVectorXcd H3EiVal = solver3.eigenvalues();
-//    std::cout << std::endl << H3EiVal << std::endl;
-    std::cout << std::endl << solver3.eigenvalues() << std::endl;
+    Eigen::VectorXcd H3EiVal = solver3.eigenvalues();
+    std::cout << H3EiVal << std::endl;
+    saveComplexHamilton(hamilton3, "Hamilton3.txt", "momentum states", H3EiVal);
+#endif
 
 #endif
 
