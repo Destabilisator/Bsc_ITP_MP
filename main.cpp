@@ -11,7 +11,7 @@
 // output
 #define calculateEigenvalues
 #define saveOnlyEiVal
-//#define showMatrix
+#define showMatrix
 
 // methods
 #define naiv
@@ -282,23 +282,34 @@ double helement(int a, int b, int l, int q, int k, int p, std::vector<int> *R_va
     double Na = getNa(sigma_a, m_a, R_a, k, p);
     double Nb = getNa(sigma_b, m_b, R_b, k, p);
 
+    std::cout << "\t" << k << " " << l << " " << sigma_a << " " << sigma_b<< " " << p << " " << m_b << "\n";
+
     double val = 0.5 * (double) pow(sigma_a * p, q) * sqrt(Na / Nb);// <--------- für h_j(a) = 0.5 einsetzen????
     //std::cout << val << "\n";
     //std::cout << "\t" << Na << " " << Nb << " " << sigma_a << " " << p << " " << q << " " << pow(sigma_a * p, q) << "\n";
 
-//    if (sigma_a == sigma_b) { // same sigma
-//        if (m_b != -1) {
-//            val *= (cos(k*l) + sigma_a * p * cos(k*(l-m_b))) / (1 + sigma_a * p * cos(k*m_b));
-//        } else {
-//            val *= cos(k*l);
-//        }
-//    } else {
-//        if (m_b != -1) {
-//            val *= (-sigma_a * sin(k*l) + p * sin(k*(l-m_b))) / (1 - sigma_a * p * cos(k*m_b));
-//        } else {
-//            val *= -sigma_a * sin(k*l);
-//        }
-//    }
+    if (sigma_a == sigma_b) { // same sigma
+        if (m_b != -1) {
+            std::cout << "same sigma, m != -1, changed from " << val;
+            val *= (cos(k*l) + sigma_a * p * cos(k*(l-m_b))) / (1 + sigma_a * p * cos(k*m_b));
+            std::cout << " to " << val << " by multiplaying ";
+            std::cout << (cos(k*l) + sigma_a * p * cos(k*(l-m_b))) / (1 + sigma_a * p * cos(k*m_b));
+        } else {
+            std::cout << "same sigma changed from " << val;
+            val *= cos(k*l);
+            std::cout << " to " << val << " by multiplaying " << cos(k*l) << "\n";
+        }
+    } else {
+        if (m_b != -1) {
+            std::cout << "different sigma, m != -1, changed from " << val;
+            val *= (-sigma_a * sin(k*l) + p * sin(k*(l-m_b))) / (1 - sigma_a * p * cos(k*m_b));
+            std::cout << " to " << val << " by multiplaying " << (-sigma_a * sin(k*l) + p * sin(k*(l-m_b))) / (1 - sigma_a * p * cos(k*m_b)) << "\n";
+        } else {
+            std::cout << "different sigma changed from " << val;
+            val *= -sigma_a * sin(k*l);
+            std::cout << " to " << val << " by multiplaying " << -sigma_a * sin(k*l) << "\n";
+        }
+    }
     std::cout << "helement returned: " << val << "\n";
     return val;
 }
@@ -401,6 +412,7 @@ void fillHamiltonParityBlock(std::complex<double> **hamilton, std::vector<int> *
                 representative(s, &r, &l, &q);
                 //std::cout << "findState\n";
                 int b = findState(states, r, states->size());
+                std::cout << k_moment << " " << r << " " << b << "\n";
                 int m;
                 if (b >= 0) {
                     //std::cout << "setting m\n";
@@ -414,7 +426,7 @@ void fillHamiltonParityBlock(std::complex<double> **hamilton, std::vector<int> *
                     for (int nested_j = b; nested_j < b + m; nested_j++) {
                         for (int nested_i = k; nested_i < k + n; nested_i++) {
                             //std::cout << "changed element " << nested_i << " " << nested_j << "from " << hamilton[nested_i][nested_j];
-                            hamilton[nested_i][nested_j] += (std::complex<double>) helement(nested_i, nested_j, l, q, k, p, R_vals, m_vals);
+                            hamilton[nested_i][nested_j] += (std::complex<double>) helement(nested_i, nested_j, l, q, k_moment, p, R_vals, m_vals);
                             //std::cout << " to " << hamilton[nested_i][nested_j] << "\n";
                             //std::cout << nested_i << " " << nested_j << " " << (std::complex<double>) helement(nested_i, nested_j, l, q, k, p, R_vals, m_vals) << "\n";
                         }
@@ -622,13 +634,14 @@ int main(int argc, char* argv[]) {
     auto *statesTransP = new std::vector<int>;
     offset = 0;
     for (int k = -(N-1)/2; k <= N/2 ; k++) { // go though momentums
-        //std::cout << "momentum k: " << k << "\n";
+        std::cout << "momentum k: " << k << "\n";
         for (int m = 0; m <= N; m++) { // go though magnetizations
             //std::cout << "magnetization m: " << m << "\n";
             fillStates(statesP, m);
             for (int a : *statesP) {
                 //std::cout << "found state: ";
                 //printBits(a);
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 int perio = 0, m_trans = 0;
                 checkState(a, &perio, &m_trans, k);
                 //std::cout << "checked state\n";
@@ -651,7 +664,7 @@ int main(int argc, char* argv[]) {
                             //std::cout << "parity p: " << p << "\n";
                             //std::cout << "sigma: " << sigma << "\n";
                             //std::cout << "m_trans: " << m_trans << "\n";
-                            //printBits(a);
+                            printBits(a);
                             //std::cout << "adding to statesList\n";
                             statesListP->push_back(a);
                             statesPerioP->push_back(sigma * perio);
