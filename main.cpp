@@ -14,7 +14,7 @@
 #define showMatrix
 
 // methods
-#define naiv
+//#define naiv
 //#define magnetization
 //#define momentum
 #define parity
@@ -555,7 +555,7 @@ int main(int argc, char* argv[]) {
     auto *statesPerioM = new std::vector<int>;
     offset = 0;
     for (int k = -(N-1)/2; k <= N/2 ; k++) {
-        //std::cout << "k: " << k << "\n";
+        std::cout << "k: " << k << "\n";
         for (int m = 0; m <= N; m++) {
             fillStates(statesM, m);
             for (int a : *statesM) {
@@ -567,7 +567,7 @@ int main(int argc, char* argv[]) {
                     statesListM->push_back(a);
                     //std::cout << statesList->at(0) << ": ";
                     statesPerioM->push_back(perio);
-                    //printBits(a);
+                    printBits(a);
                     //std::cout << statesPerio->at(0) << "\n";
                 }
             }
@@ -644,6 +644,8 @@ int main(int argc, char* argv[]) {
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 int perio = 0, m_trans = 0;
                 checkState(a, &perio, &m_trans, k);
+                //std::cout << perio << " " << m_trans << " \n";
+                //printBits(a);
                 //std::cout << "checked state\n";
                 for (int p : {-1, 1}) {
                     if ((k != 0) && (k != N/2) && p == -1) {
@@ -656,14 +658,17 @@ int main(int argc, char* argv[]) {
                         if (m_trans != -1) {
                             std::complex<double> cosArg(0.0, k * m_trans * 2 * PI / N);
                             std::complex<double> val = (double) sigma * (double) p * cos(cosArg);
+                            //std::cout << sigma << " " << cosArg << " " << val << "\n";
                             //std::cout << "val: " << val << "\n";
                             if ( (abs((double) 1 + val) < 0.001) | (sigma == -1 && abs((double) 1 - val) > 0.001)) {
+                                //std::cout << "invalid\n";
                                 perio = -1;
                             }
                         } if (perio > 0) {
                             //std::cout << "parity p: " << p << "\n";
                             //std::cout << "sigma: " << sigma << "\n";
                             //std::cout << "m_trans: " << m_trans << "\n";
+                            std::cout << "valid state: ";
                             printBits(a);
                             //std::cout << "adding to statesList\n";
                             statesListP->push_back(a);
