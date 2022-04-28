@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 #include <Eigen/Eigenvalues>
+#include <iterator>
+#include <list>
 
 #define PI  3.14159265358979323846
 
@@ -14,17 +16,17 @@
 #define showMatrix
 
 // methods
-//#define naiv
+#define naiv
 //#define magnetization
 //#define momentum
-#define parity
 
-const short N = 3;
-const int size = (int) pow(2, N);
+int N = 3;
+int size;
 
 void printBits(int a) {
-    std::bitset<N> x(a);
-    std::cout << x << '\n';
+    for (int n = N-1; n >= 0; n--) {
+        std::cout << ( (a >> n) & 1 );
+    } std::cout << "\n";
 }
 
 // cyclicly translate bits in s by n to the right
@@ -47,11 +49,14 @@ int translateLeft(int s, int n) {
 // spiegelt die bits
 int reflectBits(int s) {
     int t = 0;
-    //printBits(s);
     for (int i = 0; i < N; i++) {
         t |= ((s >> (N - 1 - i)) & 1) << i;
-    } //printBits(t);
+    }
     return t;
+}
+
+int invertBits(int s) {
+    return s ^ (int) pow(2,N)-1;
 }
 
 // sum up all bits in s
@@ -62,14 +67,12 @@ int bitSum(int s) {
     } return sum;
 }
 
-void saveHamilton(float** hamilton, std::string filename, std::string header, Eigen::VectorXcf eiVal) {
-    std::cout << "saving to file '" << filename << "'..." << std::endl;
-
+void saveHamilton(double** hamilton, const std::string &filename, const std::string &header) {
+    std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
         file.open(filename);
         file << header << "\n";
-#ifndef saveOnlyEiVal
         for (int i = 0; i <= size -1; i++) {
             for (int j = 0; j <= size-1; j++) {
                 if (hamilton[i][j] < 0.001 && hamilton[i][j] > -0.001) {
@@ -80,33 +83,44 @@ void saveHamilton(float** hamilton, std::string filename, std::string header, Ei
             }
             file << std::endl;
         }
-#endif
-        file << "\nEigenvalues:\n";
-        file << eiVal;
+
     } catch (...) {
+        file.close();
         std::cout << "failed to save to file\n";
     }
+    file.close();
+}
 
+void saveEiVals(const std::string &filename, const std::string &header, const std::list<double> &eiVals) {
+    std::cout << "saving to file '" << filename << "'..." << std::endl;
+    std::ofstream file;
+    try {
+        file.open(filename);
+        file << header << "\n";
+        file << "\nEigenvalues:\n";
+        for (double ev : eiVals) {
+            file << ev << "\n";
+        }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
     std::cout << "done\n";
     file.close();
-
 }
 
 // naiver Ansatz: direkt füllen, ohne zu ordnen
-void fillHamilton1(float** hamilton) {
-    for (int a = 0; a <= size -1; a++) {
-        //std::cout << "a: ";
-        //printBits(a);
+void fillHamiltonNaiv(double** hamilton, double J1, double J2) {
+    for (int s = 0; s <= size -1; s++) {
         for (int i = 0; i <= N-1; i++) {
-            int j = (i+1) % N;
-            if (((a >> i) & 1) == ((a >> j) & 1)) {
-                //std::cout << "on " <<  a << "\n";
-                hamilton[a][a] += 0.25;
+            int j = (i+2) % N;
+            if (((s >> i) & 1) == ((s >> j) & 1)) {
+                hamilton[s][s] += 0.25 * J1;
             } else {
-                hamilton[a][a] -= 0.25;
-                int b = a ^ (1 << i) ^ (1 << j);
+                hamilton[s][s] -= 0.25 * J1;
+                int b = s ^ (1 << i) ^ (1 << j);
                 //std::cout << "off " <<  a << " " << b << "\n";
-                hamilton[a][b] = 0.5;
+                hamilton[s][b] = 0.5;
             }
         }
     }
@@ -248,74 +262,6 @@ void representative(int s, int *r, int *l, int *q) {
     }
 }
 
-/////////////////////////???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
-double get_gk(int k) {
-    if (k == 0 | k == N/2) {
-        return 2.0;
-    } else {
-        return 1.0;
-    }
-}
-
-/////////////////////////???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
-double getNa(int sigma, int m, int Ra, int k, int p) {
-    //std::cout << sigma << " " << m << " " << Ra  << " " << k  << " " << p << "\n";
-    double Na = pow(N, 2) * get_gk(k) / abs(Ra);
-    //std::cout <<  "N: " << Na << "\n";
-    if (m != -1) {
-        Na *= 1 + sigma * p * cos(k*m);
-        //std::cout << "\t" << Na << "\n";
-    } return Na;
-}
-
-/////////////////////////???????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????????
-double helement(int a, int b, int l, int q, int k, int p, std::vector<int> *R_vals, std::vector<int> *m_vals) {
-//    if (a == b) {
-//        std::cout << "helement same state\n";
-//    }
-    int sigma_a = R_vals->at(a) / abs(R_vals->at(a));
-    int m_a = m_vals->at(a);
-    int R_a = R_vals->at(a);
-    int sigma_b = R_vals->at(b) / abs(R_vals->at(b));
-    int m_b = m_vals->at(b);
-    int R_b = R_vals->at(b);
-    double Na = getNa(sigma_a, m_a, R_a, k, p);
-    double Nb = getNa(sigma_b, m_b, R_b, k, p);
-
-    std::cout << "\t" << k << " " << l << " " << sigma_a << " " << sigma_b<< " " << p << " " << m_b << "\n";
-
-    double val = 0.5 * (double) pow(sigma_a * p, q) * sqrt(Na / Nb);// <--------- für h_j(a) = 0.5 einsetzen????
-    //std::cout << val << "\n";
-    //std::cout << "\t" << Na << " " << Nb << " " << sigma_a << " " << p << " " << q << " " << pow(sigma_a * p, q) << "\n";
-
-    if (sigma_a == sigma_b) { // same sigma
-        if (m_b != -1) {
-            std::cout << "same sigma, m != -1, changed from " << val;
-            val *= (cos(k*l) + sigma_a * p * cos(k*(l-m_b))) / (1 + sigma_a * p * cos(k*m_b));
-            std::cout << " to " << val << " by multiplaying ";
-            std::cout << (cos(k*l) + sigma_a * p * cos(k*(l-m_b))) / (1 + sigma_a * p * cos(k*m_b));
-        } else {
-            std::cout << "same sigma changed from " << val;
-            val *= cos(k*l);
-            std::cout << " to " << val << " by multiplaying " << cos(k*l) << "\n";
-        }
-    } else {
-        if (m_b != -1) {
-            std::cout << "different sigma, m != -1, changed from " << val;
-            val *= (-sigma_a * sin(k*l) + p * sin(k*(l-m_b))) / (1 - sigma_a * p * cos(k*m_b));
-            std::cout << " to " << val << " by multiplaying " << (-sigma_a * sin(k*l) + p * sin(k*(l-m_b))) / (1 - sigma_a * p * cos(k*m_b)) << "\n";
-        } else {
-            std::cout << "different sigma changed from " << val;
-            val *= -sigma_a * sin(k*l);
-            std::cout << " to " << val << " by multiplaying " << -sigma_a * sin(k*l) << "\n";
-        }
-    }
-    std::cout << "helement returned: " << val << "\n";
-    return val;
-}
-
-
-
 void fillHamiltonMomentumBlock(std::complex<double> **hamilton, std::vector<int> *states, std::vector<int> *R_vals, int k_moment) {
     for (int k = 0; k < states->size(); k++) {
         //std::cout << "a: ";
@@ -353,14 +299,12 @@ void writeHamiltonMomentumBlockToFull(std::complex<double> **hamiltonBlock, std:
     }
 }
 
-void saveComplexHamilton(std::complex<double> **hamilton, std::string filename, std::string header, Eigen::VectorXcd eiVal) {
+void saveComplexHamilton(std::complex<double> **hamilton,const std::string &filename, const std::string &header) {
     std::cout << "saving to file '" << filename << "'..." << std::endl;
-
     std::ofstream file;
     try {
         file.open(filename);
         file << header << "\n";
-#ifndef saveOnlyEiVal
         for (int i = 0; i <= size -1; i++) {
             for (int j = 0; j <= size-1; j++) {
                 if (hamilton[i][j].real() < 0.001 && hamilton[i][j].real() > -0.001
@@ -372,111 +316,84 @@ void saveComplexHamilton(std::complex<double> **hamilton, std::string filename, 
             }
             file << std::endl;
         }
-#endif
-        file << "\nEigenvalues:\n";
-        file << eiVal;
     } catch (...) {
+        file.close();
         std::cout << "failed to save to file\n";
     }
-
-    std::cout << "done\n";
     file.close();
-
 }
 
-void fillHamiltonParityBlock(std::complex<double> **hamilton, std::vector<int> *states, std::vector<int> *R_vals, std::vector<int> *m_vals, int k_moment, int p) {
-    for (int k = 0; k < states->size(); k++) {
-        //std::cout << "setting n\n";
-        int n = 1;
-        if (k > 0 && states->at(k-1) == states->at(k)) {
-            continue;
-        } else if (k < states->size() - 1 && states->at(k) == states->at(k+1)) {
-            n = 2;
+void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals) {
+    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::ofstream file;
+    try {
+        file.open(filename);
+        file << header << "\n";
+        file << "\nEigenvalues:\n";
+        for (std::complex<double> ev : eiVals) {
+            file << ev << "\n";
         }
-
-        //std::cout << "getting state\n";
-        int a = states->at(k);
-        std::complex<double> Ez(0.0, 0.0);
-
-        for (int i = 0; i <= N-1; i++) {
-            //std::cout << "loop" << i << "\n";
-            int j = (i+1) % N;
-            if (((a >> i) & 1) == ((a >> j) & 1)) {
-                Ez += std::complex<double> (0.25, 0.0);
-            } else {
-                Ez -= std::complex<double> (0.25, 0.0);
-                /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                int s = a ^ (1 << i) ^ (1 << j);
-                int r = 0, l = 0, q = 0;
-                //std::cout << "representative\n";
-                representative(s, &r, &l, &q);
-                //std::cout << "findState\n";
-                int b = findState(states, r, states->size());
-                std::cout << k_moment << " " << r << " " << b << "\n";
-                int m;
-                if (b >= 0) {
-                    //std::cout << "setting m\n";
-                    if (b > 1 && states->at(b) == states->at(b - 1)) {
-                        m = 2, b = b - 1;
-                    } else if (b < states->size() - 1 && states->at(b) == states->at(b + 1)) {
-                        m = 2;
-                    } else {
-                        m = 1;
-                    }
-                    for (int nested_j = b; nested_j < b + m; nested_j++) {
-                        for (int nested_i = k; nested_i < k + n; nested_i++) {
-                            //std::cout << "changed element " << nested_i << " " << nested_j << "from " << hamilton[nested_i][nested_j];
-                            hamilton[nested_i][nested_j] += (std::complex<double>) helement(nested_i, nested_j, l, q, k_moment, p, R_vals, m_vals);
-                            //std::cout << " to " << hamilton[nested_i][nested_j] << "\n";
-                            //std::cout << nested_i << " " << nested_j << " " << (std::complex<double>) helement(nested_i, nested_j, l, q, k, p, R_vals, m_vals) << "\n";
-                        }
-                    }
-                }
-            }
-        }
-        //std::cout << hamilton[k][k] << " " << n << " " << Ez << "\n";
-        hamilton[k][k] += (double) n * Ez;
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
     }
+    file.close();
 }
 
-int main(int argc, char* argv[]) {
-
-    std::cout << "N: " << N << "; size: " << size << std::endl;
-
-#ifdef naiv
-    // Methode 1
+void naiverAnatz(double J1, double J2, std::list<std::complex<double>> &H1EiValList) {
     std::cout << "\nnaiver Ansatz:..." << std::endl;
-    static auto **hamilton1 = new float*[size];
+    static auto **hamilton1 = new double*[size];
     for (int i = 0; i < size; i++) {
-        hamilton1[i] = new float[size];
+        hamilton1[i] = new double[size];
         for (int j = 0; j < size; j++) {
             hamilton1[i][j] = 0.0;
         }
     }
-
-    fillHamilton1(hamilton1);
-
-    Eigen::MatrixXf H1(size, size);
+    fillHamiltonNaiv(hamilton1, J1, J2);
+    Eigen::MatrixXd H1(size, size);
     for (int i = 0; i < size; i++) {
-        H1.row(i) = Eigen::VectorXf::Map(&hamilton1[i][0], size);
+        H1.row(i) = Eigen::VectorXd::Map(&hamilton1[i][0], size);
     }
 #ifdef showMatrix
     std::cout << H1 << std::endl;
+    saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N));
 #endif
 #ifdef calculateEigenvalues
     std::cout << "solving...\n";
-    Eigen::EigenSolver<Eigen::MatrixXf> solver1(H1);
-    Eigen::VectorXcf H1EiVal = solver1.eigenvalues();
-    std::cout << H1EiVal << std::endl;
-    saveHamilton(hamilton1, "Hamilton1.txt", "naiver Ansatz für N = " + std::to_string(N), H1EiVal);
+    Eigen::EigenSolver<Eigen::MatrixXd> solver1(H1);
+    const Eigen::VectorXcd &H1EiVal = solver1.eigenvalues();
+    for (std::complex<double> ev : H1EiVal) {
+        H1EiValList.push_back(ev);
+    }
+    saveComplexEiVals("EV_naiv.txt", "naiver Ansatz für N = " + std::to_string(N), H1EiValList);
 #endif
     for (int i = 0; i < size; i++) {
         delete hamilton1[i];
     } delete[] hamilton1;
+}
+
+int main(int argc, char* argv[]) {
+
+    if (argc == 2) {
+        std::cout << "N from args\n";
+        N = std::stoi(argv[1]);
+    }
+    std::cout << "no or invalid args given, default N\n";
+    size = (int) pow(2, N);
+    std::cout << "N: " << N << "; size: " << size << std::endl;
+
+#ifdef naiv
+    std::list<std::complex<double>> H1EiValList;
+    naiverAnatz(1, 1, H1EiValList);
+    std::cout << "eigenvalues:\n";
+    for (std::complex<double> ev : H1EiValList) {
+        std::cout << ev << "\n";
+    }
 #endif
 
     int offset;
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef magnetization
     // Using fixed-magnetization blocks.
     std::cout << "\nblockdiagonale m_z" << std::endl;
@@ -536,6 +453,8 @@ int main(int argc, char* argv[]) {
     } delete[] hamilton2;
 #endif
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef momentum
     // Using momentum states.
     std::cout << "\nmomentum states:..." << std::endl;
@@ -555,7 +474,7 @@ int main(int argc, char* argv[]) {
     auto *statesPerioM = new std::vector<int>;
     offset = 0;
     for (int k = -(N-1)/2; k <= N/2 ; k++) {
-        std::cout << "k: " << k << "\n";
+        //std::cout << "k: " << k << "\n";
         for (int m = 0; m <= N; m++) {
             fillStates(statesM, m);
             for (int a : *statesM) {
@@ -567,7 +486,7 @@ int main(int argc, char* argv[]) {
                     statesListM->push_back(a);
                     //std::cout << statesList->at(0) << ": ";
                     statesPerioM->push_back(perio);
-                    printBits(a);
+                    //printBits(a);
                     //std::cout << statesPerio->at(0) << "\n";
                 }
             }
@@ -614,114 +533,6 @@ int main(int argc, char* argv[]) {
     } delete[] hamilton3;
 #endif
 
-#ifdef  parity
-    // Using the parity operator reflectBits()
-    std::cout << "\nparity operator:..." << std::endl;
-
-    //std::cout << "allocating matrix\n";
-    static auto **hamilton4 = new std::complex<double>*[size];
-    for (int i = 0; i < size; i++) {
-        hamilton4[i] = new std::complex<double>[size];
-        for (int j = 0; j < size; j++) {
-            hamilton4[i][j] = std::complex<double> (0.0, 0.0);
-        }
-    }
-
-
-    auto *statesP = new std::vector<int>;
-    auto *statesListP = new std::vector<int>;
-    auto *statesPerioP = new std::vector<int>;
-    auto *statesTransP = new std::vector<int>;
-    offset = 0;
-    for (int k = -(N-1)/2; k <= N/2 ; k++) { // go though momentums
-        std::cout << "momentum k: " << k << "\n";
-        for (int m = 0; m <= N; m++) { // go though magnetizations
-            //std::cout << "magnetization m: " << m << "\n";
-            fillStates(statesP, m);
-            for (int a : *statesP) {
-                //std::cout << "found state: ";
-                //printBits(a);
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                int perio = 0, m_trans = 0;
-                checkState(a, &perio, &m_trans, k);
-                //std::cout << perio << " " << m_trans << " \n";
-                //printBits(a);
-                //std::cout << "checked state\n";
-                for (int p : {-1, 1}) {
-                    if ((k != 0) && (k != N/2) && p == -1) {
-                        continue;
-                    }
-                    for (int sigma : {-1, 1}) {
-                        if ((k != 0) && (k != N/2) && sigma == 1) {
-                            continue;
-                        }
-                        if (m_trans != -1) {
-                            std::complex<double> cosArg(0.0, k * m_trans * 2 * PI / N);
-                            std::complex<double> val = (double) sigma * (double) p * cos(cosArg);
-                            //std::cout << sigma << " " << cosArg << " " << val << "\n";
-                            //std::cout << "val: " << val << "\n";
-                            if ( (abs((double) 1 + val) < 0.001) | (sigma == -1 && abs((double) 1 - val) > 0.001)) {
-                                //std::cout << "invalid\n";
-                                perio = -1;
-                            }
-                        } if (perio > 0) {
-                            //std::cout << "parity p: " << p << "\n";
-                            //std::cout << "sigma: " << sigma << "\n";
-                            //std::cout << "m_trans: " << m_trans << "\n";
-                            std::cout << "valid state: ";
-                            printBits(a);
-                            //std::cout << "adding to statesList\n";
-                            statesListP->push_back(a);
-                            statesPerioP->push_back(sigma * perio);
-                            statesTransP->push_back(m_trans);
-                        }
-                    }
-                    int M = statesListP->size();
-                    auto **hamiltonBlock = new std::complex<double>*[M];
-                    for (int i = 0; i < M; i++) {
-                        hamiltonBlock[i] = new std::complex<double>[M];
-                        for (int j = 0; j < M; j++) {
-                            hamiltonBlock[i][j] = std::complex<double> (0.0, 0.0);
-                        }
-                    }
-                    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                    //std::cout << "filling hamilton block" << M << "\n";
-                    fillHamiltonParityBlock(hamiltonBlock, statesListP, statesPerioP, statesTransP, k, p);
-                    //std::cout << "writing hamilton block to full\n";
-                    writeHamiltonMomentumBlockToFull(hamiltonBlock, hamilton4, M, offset);
-                    offset += M;
-                    //std::cout << offset << "\n";
-                    //std::cout << "clean up\n";
-                    statesP->clear();
-                    statesListP->clear();
-                    statesPerioP->clear();
-                    statesTransP->clear();
-                    for (int i = 0; i < M; i++) {
-                        delete hamiltonBlock[i];
-                    } delete[] hamiltonBlock;
-                }
-            }
-        }
-    }
-
-    Eigen::MatrixXcd H4(size, size);
-    for (int i = 0; i < size; i++) {
-        H4.row(i) = Eigen::RowVectorXcd::Map(&hamilton4[i][0], size);
-    }
-#ifdef showMatrix
-    std::cout << H4 << std::endl;
-#endif
-#ifdef calculateEigenvalues
-    std::cout << "solving...\n";
-    Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver4(H4);
-    Eigen::VectorXcd H4EiVal = solver4.eigenvalues();
-    std::cout << H4EiVal << std::endl;
-    saveComplexHamilton(hamilton4, "Hamilton4.txt", "momentum states", H4EiVal);
-#endif
-    for (int i = 0; i < size; i++) {
-        delete hamilton4[i];
-    } delete[] hamilton4;
-#endif
 
     return 0;
 }

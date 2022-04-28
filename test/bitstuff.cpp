@@ -13,22 +13,36 @@ void printBits(int a) {
     std::cout << x << '\n';
 }
 
+void printBits2(int a) {
+    for (int n = 8-1; n >= 0; n--) {
+        //printBits((a >> n));
+        std::cout << ( (a >> n) & 1 );
+    } std::cout << "\n";
+}
+
+int invert(int s, int N) {
+    //printBits(s);
+    int a = pow(2,N)-1;
+    //printBits(a);
+    return s ^ a;
+}
+
 // cyclicly translate bits in s by n
-int translate(int s, int n) {
+int translate(int s, int n, int N) {
     for (int _ = 0; _ < n; _++) {
         int bit = s & 1;
         s = (s>>1) | (bit << (N-1));
     } return s;
 }
 
-int translate(int s) {
+int translate(int s, int N) {
     int bit = s & 1;
     s = (s>>1) | (bit << (N-1));
     return s;
 }
 
 // sum up all bits in s
-int bitSum(int s) {
+int bitSum(int s, int N) {
     int sum = 0;
     for (int i = 0; i < N; i++) {
         sum += ((s >> i) & 1 );
@@ -39,8 +53,10 @@ void bitsStuff() {
     int a = 5, b = 9;
     std::cout << "a = " << a << " = ";
     printBits(a);
+    printBits2(a);
     std::cout << "b = " << b << " = ";
     printBits(b);
+    printBits2(b);
 
     std::cout << "\n";
 
@@ -123,7 +139,13 @@ void bitsStuff() {
 
 int main() {
 
-    bitsStuff();
+    //bitsStuff();
+
+//    printBits(invert(1, 8));
+//    printBits2(invert(1, 8));
+
+    printBits(34);
+    printBits2(34);
 
     return 0;
 }

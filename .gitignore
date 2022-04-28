@@ -8,5 +8,5 @@
 *.elf
 
 # results
-hamilton1.txt
-hamilton2.txt
+hamilton*.txt
+EV*.txt
