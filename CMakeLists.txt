@@ -8,5 +8,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
 
 set(EIGEN_DIR "./Eigen/eigen-3.4.0")
 include_directories(${EIGEN_DIR})
+set(HEADER_DIR "./headers")
+include_directories(${HEADER_DIR})
 
-add_executable(Bsc_ITP_MX main.cpp)
+include_directories("./src")
+
+add_executable(Bsc_ITP_MX main.h main.cpp
+        headers/helpers.h
+        headers/helpers.cpp)
