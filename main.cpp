@@ -1,25 +1,8 @@
-//#include "main.h"
-
-#include <iostream>
-#include <fstream>
-#include <bitset>
-#include <cmath>
-#include <string>
-#include <vector>
-#include <Eigen/Eigenvalues>
-#include <iterator>
-#include <list>
-#include "headers/helpers.h"
-//#include <algorithm>
-#include <thread>
-#include <mutex>
-#include <ctime>
-
-#define PI  3.14159265358979323846
+#include "main.h"
 
 // output
 #define calculateEigenvalues
-//#define showMatrix
+#define showMatrix
 #define showEigenvalues
 
 // methods
@@ -27,17 +10,13 @@
 #define magnetization
 //#define momentum
 
-// multi threading stuff
-const auto cpu_cnt = std::thread::hardware_concurrency();
-std::mutex EiValWriterMutex;
-std::mutex coutMutex;
-
 // global variables
 int N = 2*2; // has to be odd to conserve delta shape
 int size;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
+#ifdef naiv
 void fillHamiltonNaiv(double** hamilton, double J1, double J2) {
     for (int s = 0; s <= size -1; s++) {
         for (int n = 0; n < N/2; n++) {
@@ -106,9 +85,11 @@ void naiverAnatz(double J1, double J2, std::list<std::complex<double>> &HEiValLi
         delete hamilton1[i];
     } delete[] hamilton1;
 }
+#endif
 
 /////////////////////////////// fixed magnetization states (unfinished) ///////////////////////////////
 
+#ifdef magnetization
 void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, double **hamiltonBlock) {
     for (int i = 0; i < states.size(); i++) {
         //std::cout << "filling for sate " << i << " out of " << states.size()-1 << ": ";
@@ -161,10 +142,10 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
     //std::cout << "hamiltonBlock filled\n";
 }
 
-void magBlock_getEiVal(double J1, double J2, int m, std::list<std::complex<double>> &HEiValList) {//std::vector<std::complex<double>> *HEiValList) {//
-    coutMutex.lock();
+void magBlock_getEiVal(double J1, double J2, int m, std::list<std::complex<double>> &HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
+    //coutMutex.lock();
     //std::cout << "number of up spins: " << m << " out of " << N << "\n";
-    coutMutex.unlock();
+    //coutMutex.unlock();
     auto *states = new std::vector<int>;
     fillStates(states, m, N, size);
     const int statesCount = states->size();
@@ -183,7 +164,9 @@ void magBlock_getEiVal(double J1, double J2, int m, std::list<std::complex<doubl
         H.row(i) = Eigen::VectorXd::Map(&hamiltonBlock[i][0], size);
     }
 
-    //std::cout << "\n" << H << "\n";
+#ifdef showMatrix
+    matrixBlocks->push_back(H);
+#endif
 
 #ifdef calculateEigenvalues
     Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
@@ -201,6 +184,7 @@ void magBlock_getEiVal(double J1, double J2, int m, std::list<std::complex<doubl
     }
     delete[] hamiltonBlock;
 }
+#endif
 
 /////////////////////////////// MAIN ///////////////////////////////
 
@@ -237,15 +221,11 @@ int main(int argc, char* argv[]) {
 #ifdef magnetization
     const clock_t begin_time_MAGNETIZATION = clock();
     int J1 = 1, J2 = 2;
-//    int used_cores = cpu_cnt;
     std::cout << "\nblockdiagonale m_z" << std::endl;
-//    if (cpu_cnt > N+1){
-//        used_cores = N+1;
-//    }
-//    std::thread myThreads[used_cores];
     std::list<std::complex<double>> H_mag_EiVals;
+    auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
     for (int m = 0; m <= N; m++) {
-        magBlock_getEiVal(1, 1, m, H_mag_EiVals);
+        magBlock_getEiVal(1, 1, m, H_mag_EiVals, matrixBlocks);
     }
     // sort List
     H_mag_EiVals.sort([](const std::complex<double> &c1, const std::complex<double> &c2) {
@@ -261,12 +241,27 @@ int main(int argc, char* argv[]) {
     saveComplexEiVals("EigenvaluesMagnetization.txt", "magnetisierungs Ansatz für N = " + std::to_string(N) +
                       "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), H_mag_EiVals);
 #ifdef showMatrix
-    //std::cout << H2 << std::endl;
-    ///////////// TO DO
+    int offset_mag_blocks = 0;
+    Eigen::SparseMatrix<double> H_mag_Block(size, size);;
+    //Eigen::MatrixXd H_mag_Block = Eigen::MatrixXd::Zero(size, size);
+    //H_mag_Block << Eigen::MatrixXd::Zero(size, size);
+    for (const Eigen::MatrixXd& M : *matrixBlocks) {//////// https://localcoder.org/eigen-library-how-do-i-create-a-block-diagonal-sparse-matrix-out-of-existing-s#solution_1
+        H_mag_Block.block(offset_mag_blocks, offset_mag_blocks, M.rows(), M.cols()) = M;
+        offset_mag_blocks += M.rows();
+    }
+//    for (int i = 0; i < H_mag_Block.rows(); i++) {
+//        for (int j = 0; j < H_mag_Block.cols(); j++) {
+//            if (abs(H_mag_Block.row(i)[j]) < 0.0001) {
+//                H_mag_Block.row(i)[j] = 0.0;
+//            }
+//        }
+//    }
+
+    std::cout << H_mag_Block << "\n";
 #endif
     auto time_MAGNETIZATION = float( clock () - begin_time_MAGNETIZATION ) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
-
+    delete matrixBlocks;
 #endif
 
 /////////////////////////////// momentum states (not started) ///////////////////////////////
