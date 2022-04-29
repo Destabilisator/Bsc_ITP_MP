@@ -142,8 +142,8 @@ void saveEiVals(const std::string &filename, const std::string &header, const st
     std::cout << "saving to file '" << filename << "'..." << std::endl;
     std::ofstream file;
     try {
-        file.open(filename);
-        file << header <<".\n";
+        file.open("./results/" + filename);
+        file << header <<"\n\n";
         file << "Eigenvalues:\n";
         for (double ev : eiVals) {
             file << ev << "\n";
@@ -160,8 +160,8 @@ void saveComplexEiVals(const std::string &filename, const std::string &header, c
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
-        file.open(filename);
-        file << header << ".\n";
+        file.open("./results/" + filename);
+        file << header << "\n\n";
         file << "Eigenvalues:\n";
         for (std::complex<double> ev : eiVals) {
             file << ev << "\n";
@@ -177,8 +177,8 @@ void saveHamilton(double** hamilton, const std::string &filename, const std::str
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
-        file.open(filename);
-        file << header << "\n";
+        file.open("./results/" + filename);
+        file << header << "\n\n";
         for (int i = 0; i <= size -1; i++) {
             for (int j = 0; j <= size-1; j++) {
                 //if (hamilton[i][j] < 0.001 && hamilton[i][j] > -0.001) {
@@ -201,8 +201,8 @@ void saveComplexHamilton(std::complex<double> **hamilton,const std::string &file
     std::cout << "saving to file '" << filename << "'..." << std::endl;
     std::ofstream file;
     try {
-        file.open(filename);
-        file << header << "\n";
+        file.open("./results/" + filename);
+        file << header << "\n\n";
         for (int i = 0; i <= size -1; i++) {
             for (int j = 0; j <= size-1; j++) {
                 if (hamilton[i][j].real() < 0.001 && hamilton[i][j].real() > -0.001
@@ -214,6 +214,20 @@ void saveComplexHamilton(std::complex<double> **hamilton,const std::string &file
             }
             file << "\n";
         }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
+void saveMatrixToFile(Eigen::MatrixXd matrix, const std::string &filename, const std::string &header) {
+    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::ofstream file;
+    try {
+        file.open("./results/" + filename);
+        file << header << "\n\n";
+        file << matrix;
     } catch (...) {
         file.close();
         std::cout << "failed to save to file\n";

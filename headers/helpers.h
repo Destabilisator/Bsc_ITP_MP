@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <complex>
+#include <Eigen/Eigenvalues>
 
 /////////////////////////////// bits ///////////////////////////////
 
@@ -56,8 +57,11 @@ void saveEiVals(const std::string &filename, const std::string &header, const st
 // saves complex (std::complex<double>) eigenvalues in ist eiVals to file filename and adds the header inscription above
 void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals);
 
-// saves a real matrix (double**) of size size wo the file filename and adds the header inscription above
+// saves a real matrix (double**) of size size to the file filename and adds the header inscription above
 void saveHamilton(double** hamilton, const std::string &filename, const std::string &header, int size);
 
-// saves a complex matrix (std::complex<double>**) of size size wo the file filename and adds the header inscription above
+// saves a complex matrix (std::complex<double>**) of size size to the file filename and adds the header inscription above
 void saveComplexHamilton(std::complex<double> **hamilton,const std::string &filename, const std::string &header, int size);
+
+// saves a real matrix (Eigen::MatrixXd) of arbitrary size to the file filename and adds the header inscription above
+void saveMatrixToFile(Eigen::MatrixXd matrix, const std::string &filename, const std::string &header);
