@@ -52,13 +52,13 @@ void fillStates(std::vector<int> *states, int m, int N, int size) {
     } states->shrink_to_fit();
 }
 
-int findState(std::vector<int> *states, int s) {
-    int pos, pos_min = 0, pos_max = states->size()-1;
+int findState(const std::vector<int>& states, int s) {
+    int pos, pos_min = 0, pos_max = states.size()-1;
     while (true) {
         pos = pos_min + (pos_max - pos_min ) / 2;
-        if (s < states->at(pos)) {
+        if (s < states.at(pos)) {
             pos_max = pos - 1;
-        } else if (s > states->at(pos)) {
+        } else if (s > states.at(pos)) {
             pos_min = pos + 1;
         } else {
             return pos;

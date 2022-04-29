@@ -32,7 +32,7 @@ int bitSum(int s, int N);
 void fillStates(std::vector<int> *states, int m, int N, int size);
 
 // returns the index of the state s in the vector states
-int findState(std::vector<int> *states, int s, int M);
+int findState(const std::vector<int>& states, int s);
 
 // if s is the smallest state integer, returns its periodicity else -1
 int checkState(int s, int k, int N);
