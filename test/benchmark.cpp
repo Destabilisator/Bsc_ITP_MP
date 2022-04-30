@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <string>
 #include <vector>
@@ -25,7 +26,7 @@ int bitSum(int s, int N) {
     } return sum;
 }
 
-void fillStates(std::vector<int> *states, int m, int N, int size) {
+void fillStatesVector(std::vector<int> *states, int m, int N, int size) {
     for (int s = 0; s <= size - 1; s++) {
         if (bitSum(s, N) == m) {
             states->push_back(s);
@@ -33,40 +34,82 @@ void fillStates(std::vector<int> *states, int m, int N, int size) {
     } states->shrink_to_fit();
 }
 
+void fillStatesList(std::list<int> *states, int m, int N, int size) {
+    for (int s = 0; s <= size - 1; s++) {
+        if (bitSum(s, N) == m) {
+            states->push_back(s);
+        }
+    }
+}
+
 int main() {
 
-    for (int N = 0; N <= 32 ; N ++) {
-        std::cout << "benchmarking N = " << N << std::endl;
-        size = pow(2, N);
-        // fill states
-        const clock_t begin_time_BENCH_1 = clock();
-        for (int m = 0; m <= N; m++) {
-            auto *states = new std::vector<int>;
-            fillStates(states, m, N, size);
-        }
+    std::ofstream file;
+    try {
+        file.open("benchmarkResults.txt");
+        file << "N\t" << "fillstatesVector | " << "fillstatesList | " << "assign states vector | "
+             << "assign states vector list" << "\n\n";
 
-        auto time_BENCH_1 = float( clock () - begin_time_BENCH_1 ) /  CLOCKS_PER_SEC;
-        std::cout << "benchmark 1 (filling states) done; this took: " << time_BENCH_1 << " seconds\n";
+        for (int N = 0; N <= 32; N++) {
 
+            std::cout << "benchmarking N = " << N << std::endl;
+            size = pow(2, N);
+            file << N << "\t";
 
-        // assigning states
-        const clock_t begin_time_BENCH_2 = clock();
-        auto *states = new std::vector<std::vector<int>>(N+1);
-        for (int s = 0; s < size; s++) {
-            states->at(bitSum(s, N)).push_back(s);
-        }
-
-        auto time_BENCH_2 = float( clock () - begin_time_BENCH_2 ) /  CLOCKS_PER_SEC;
-        std::cout << "benchmark 2 (assigning states) done; this took: " << time_BENCH_2 << " seconds\n";
-
-        std::cout << std::endl;
-
-        /*
-        for (std::vector<int> vec : *states) {
-            for (int s : vec) {
-                printBits(s, N);
+            // fill states
+            const clock_t begin_time_BENCH_1 = clock();
+            for (int m = 0; m <= N; m++) {
+                auto *states = new std::vector<int>;
+                fillStatesVector(states, m, N, size);
             }
-        }*/
+
+            double time_BENCH_1 = float(clock() - begin_time_BENCH_1) / CLOCKS_PER_SEC;
+            std::cout << "benchmark 1 (filling states vector) done; this took: " << time_BENCH_1 << " seconds\n";
+            file << time_BENCH_1 << "\t";
+
+
+            // fill states
+            const clock_t begin_time_BENCH_1_1 = clock();
+            for (int m = 0; m <= N; m++) {
+                auto *states = new std::list<int>;
+                fillStatesList(states, m, N, size);
+            }
+
+            double time_BENCH_1_1 = float(clock() - begin_time_BENCH_1_1) / CLOCKS_PER_SEC;
+            std::cout << "benchmark 1_1 (filling states list) done; this took: " << time_BENCH_1_1 << " seconds\n";
+            file << time_BENCH_1_1 << "\t";
+
+
+            // assigning states
+            const clock_t begin_time_BENCH_2 = clock();
+            auto *states = new std::vector<std::vector<int>>(N + 1);
+            for (int s = 0; s < size; s++) {
+                states->at(bitSum(s, N)).push_back(s);
+            }
+
+            double time_BENCH_2 = float(clock() - begin_time_BENCH_2) / CLOCKS_PER_SEC;
+            std::cout << "benchmark 2 (assigning states vector) done; this took: " << time_BENCH_2 << " seconds\n";
+            file << time_BENCH_2 << "\t";
+
+
+            // assigning states
+            const clock_t begin_time_BENCH_2_1 = clock();
+            auto *statesList = new std::vector<std::list<int>>(N + 1);
+            for (int s = 0; s < size; s++) {
+                statesList->at(bitSum(s, N)).push_back(s);
+            }
+
+            double time_BENCH_2_1 = float(clock() - begin_time_BENCH_2_1) / CLOCKS_PER_SEC;
+            std::cout << "benchmark 2_1 (assigning states vector list) done; this took: " << time_BENCH_2_1
+                      << " seconds\n";
+            file << time_BENCH_2_1 << "\n";
+
+            std::cout << std::endl;
+
+        }
+    } catch (...) {
+        std::cout << "interrupted, closing file...\n";
+        file.close();
     }
 
     return 0;
