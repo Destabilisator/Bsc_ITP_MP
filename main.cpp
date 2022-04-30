@@ -1,18 +1,18 @@
 #include "main.h"
 
+// methods
+#define naiv
+#define magnetization
+//#define momentum
+
 // output
 //#define showMatrix
 //#define saveMatrix
 #define showEigenvalues
 //#define saveEigenvalues
 
-// methods
-//#define naiv
-#define magnetization
-//#define momentum
-
 // global variables
-int N = 2*7; // has to be odd to conserve delta shape
+int N = 2*2; // has to be odd to conserve delta shape
 int size;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
@@ -81,6 +81,12 @@ void naiverAnatz(double J1, double J2, std::list<std::complex<double>> &HEiValLi
     HEiValList.sort([](const std::complex<double> &c1, const std::complex<double> &c2) {
        return std::real(c1) < std::real(c2);
     });
+#ifdef showEigenvalues
+    std::cout << "eigenvalues:\n";
+    for (std::complex<double> ev : HEiValList) {
+        std::cout << ev << "\n";
+    }
+#endif
 #ifdef saveEigenvalues
     saveComplexEiVals("EigenvaluesNaiv.txt", "naiver Ansatz für N = " + std::to_string(N), HEiValList);
 #endif
@@ -164,20 +170,19 @@ void magBlock_getEiVal(double J1, double J2, int m, std::list<std::complex<doubl
 
     Eigen::MatrixXd H(statesCount, statesCount);
     for (int i = 0; i < statesCount; i++) {
-        H.row(i) = Eigen::VectorXd::Map(&hamiltonBlock[i][0], size);
+        H.row(i) = Eigen::VectorXd::Map(&hamiltonBlock[i][0], statesCount);
     }
 
 #if defined(showMatrix) || defined(saveMatrix)
     matrixBlocks->push_back(H);
 #endif
-
     Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
     const Eigen::VectorXcd& H1EiVal = solver.eigenvalues();
-    EiValWriterMutex.lock();
+    //EiValWriterMutex.lock();
     for (std::complex<double> ev : H1EiVal) {
         HEiValList.push_back(ev);
     }
-    EiValWriterMutex.unlock();
+    //EiValWriterMutex.unlock();
 
     states->clear();
     delete states;
@@ -185,6 +190,45 @@ void magBlock_getEiVal(double J1, double J2, int m, std::list<std::complex<doubl
         delete hamiltonBlock[i];
     }
     delete[] hamiltonBlock;
+}
+
+void magnetisierungsAnsatz(double J1, double J2, std::list<std::complex<double>> &HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
+    for (int m = 0; m <= N; m++) {
+        magBlock_getEiVal(J1, J2, m, HEiValList, matrixBlocks);
+    }
+    // sort List
+    HEiValList.sort([](const std::complex<double> &c1, const std::complex<double> &c2) {
+        return std::real(c1) < std::real(c2);
+    });
+#if defined(showMatrix) || defined(saveMatrix)
+    int offset_mag_blocks = 0;
+    Eigen::MatrixXd H_mag_Block = Eigen::MatrixXd::Zero(size, size);
+    for (const Eigen::MatrixXd& M : *matrixBlocks) {
+        H_mag_Block.block(offset_mag_blocks, offset_mag_blocks, M.rows(), M.cols()) = M;
+        offset_mag_blocks += M.rows();
+    }
+#endif
+#ifdef showMatrix
+    coutMutex.lock();
+    std::cout << H_mag_Block << "\n";
+    coutMutex.unlock();
+#endif
+#ifdef saveMatrix
+    saveMatrixToFile(H_mag_Block, "HamiltonMagnetization.txt", "Magnetisierungs Ansatz für N = " + std::to_string(N) +
+                                                         "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2));
+#endif
+#ifdef showEigenvalues
+    coutMutex.lock();
+    std::cout << "eigenvalues:\n";
+    for (std::complex<double> ev : HEiValList) {
+        std::cout << ev << "\n";
+    }
+    coutMutex.unlock();
+#endif
+#ifdef saveEigenvalues
+    saveComplexEiVals("EigenvaluesMagnetization.txt", "Magnetisierungs Ansatz für N = " + std::to_string(N) +
+                      "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), H_mag_EiVals);
+#endif
 }
 #endif
 
@@ -202,63 +246,30 @@ int main(int argc, char* argv[]) {
     size = (int) pow(2, N);
     std::cout << "N: " << N << "; size: " << size << std::endl;
 
+    int J1 = 1, J2 = 1;
+
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 #ifdef naiv
     const clock_t begin_time_NAIV = clock();
+
     std::list<std::complex<double>> H_naiv_EiVals;
-    naiverAnatz(1, 1, H_naiv_EiVals);
-#ifdef showEigenvalues
-    std::cout << "eigenvalues:\n";
-    for (std::complex<double> ev : H_naiv_EiVals) {
-        std::cout << ev << "\n";
-    }
-#endif
+    naiverAnatz(J1, J2, H_naiv_EiVals);
+
     auto time_NAIV = float( clock () - begin_time_NAIV ) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_NAIV << " seconds\n";
 #endif
 
-/////////////////////////////// fixed magnetization states (unfinished) ///////////////////////////////
+/////////////////////////////// fixed magnetization states ///////////////////////////////
 
 #ifdef magnetization
     const clock_t begin_time_MAGNETIZATION = clock();
-    int J1 = 1, J2 = 2;
+
     std::cout << "\nblockdiagonale m_z:..." << std::endl;
     std::list<std::complex<double>> H_mag_EiVals;
     auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
-    for (int m = 0; m <= N; m++) {
-        magBlock_getEiVal(1, 1, m, H_mag_EiVals, matrixBlocks);
-    }
-    // sort List
-    H_mag_EiVals.sort([](const std::complex<double> &c1, const std::complex<double> &c2) {
-        return std::real(c1) < std::real(c2);
-    });
-#if defined(showMatrix) || defined(saveMatrix)
-    int offset_mag_blocks = 0;
-    Eigen::MatrixXd H_mag_Block = Eigen::MatrixXd::Zero(size, size);
-    for (const Eigen::MatrixXd& M : *matrixBlocks) {
+    magnetisierungsAnsatz(J1, J2, H_mag_EiVals, matrixBlocks);
 
-        H_mag_Block.block(offset_mag_blocks, offset_mag_blocks, M.rows(), M.cols()) = M;
-        offset_mag_blocks += M.rows();
-    }
-#endif
-#ifdef showMatrix
-        std::cout << H_mag_Block << "\n";
-#endif
-#ifdef saveMatrix
-    saveMatrixToFile(H_mag_Block, "HamiltonMagnetization.txt", "Magnetisierungs Ansatz für N = " + std::to_string(N) +
-                                                         "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2));
-#endif
-#ifdef showEigenvalues
-    std::cout << "eigenvalues:\n";
-    for (std::complex<double> ev : H_mag_EiVals) {
-        std::cout << ev << "\n";
-    }
-#endif
-#ifdef saveEigenvalues
-    saveComplexEiVals("EigenvaluesMagnetization.txt", "Magnetisierungs Ansatz für N = " + std::to_string(N) +
-                      "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), H_mag_EiVals);
-#endif
     auto time_MAGNETIZATION = float( clock () - begin_time_MAGNETIZATION ) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
     delete matrixBlocks;

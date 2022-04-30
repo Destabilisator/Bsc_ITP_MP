@@ -8,7 +8,7 @@
 #include <ctime>
 #include <complex>
 #include <Eigen/Eigenvalues>
-#include <Eigen/SparseCore>
+//#include <Eigen/SparseCore>
 #include "headers/helpers.h"
 
 #define PI  3.14159265358979323846
