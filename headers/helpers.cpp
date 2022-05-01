@@ -68,6 +68,22 @@ int findState(const std::vector<int>& states, int s) {
     }
 }
 
+int findState(const std::vector<std::tuple<int, int>>& states, int s) {
+    int pos, pos_min = 0, pos_max = states.size()-1;
+    while (true) {
+        pos = pos_min + (pos_max - pos_min ) / 2;
+        if (s < std::get<0>(states.at(pos))) {
+            pos_max = pos - 1;
+        } else if (s > std::get<0>(states.at(pos))) {
+            pos_min = pos + 1;
+        } else {
+            return pos;
+        } if (pos_min > pos_max) {
+            return -1;
+        }
+    }
+}
+
 int checkState(int s, int k, int N) {
     int t = s;
     for (int i = 1; i <= N; i++) {
@@ -173,6 +189,23 @@ void saveComplexEiVals(const std::string &filename, const std::string &header, c
     file.close();
 }
 
+void saveComplexEiVals(const std::string &filename, const std::string &header, const std::vector<std::complex<double>> &eiVals) {
+    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::ofstream file;
+    try {
+        file.open("./results/" + filename);
+        file << header << "\n\n";
+        file << "Eigenvalues:\n";
+        for (std::complex<double> ev : eiVals) {
+            file << ev << "\n";
+        }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
 void saveHamilton(double** hamilton, const std::string &filename, const std::string &header, int size) {
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
@@ -221,7 +254,21 @@ void saveComplexHamilton(std::complex<double> **hamilton,const std::string &file
     file.close();
 }
 
-void saveMatrixToFile(Eigen::MatrixXd matrix, const std::string &filename, const std::string &header) {
+void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename, const std::string &header) {
+    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::ofstream file;
+    try {
+        file.open("./results/" + filename);
+        file << header << "\n\n";
+        file << matrix;
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
+void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &filename, const std::string &header) {
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {

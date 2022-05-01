@@ -35,6 +35,8 @@ void fillStates(std::vector<int> *states, int m, int N, int size);
 // returns the index of the state s in the vector states
 int findState(const std::vector<int>& states, int s);
 
+int findState(const std::vector<std::tuple<int, int>>& states, int s);
+
 // if s is the smallest state integer, returns its periodicity else -1
 int checkState(int s, int k, int N);
 
@@ -57,6 +59,8 @@ void saveEiVals(const std::string &filename, const std::string &header, const st
 // saves complex (std::complex<double>) eigenvalues in ist eiVals to file filename and adds the header inscription above
 void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals);
 
+void saveComplexEiVals(const std::string &filename, const std::string &header, const std::vector<std::complex<double>> &eiVals);
+
 // saves a real matrix (double**) of size size to the file filename and adds the header inscription above
 void saveHamilton(double** hamilton, const std::string &filename, const std::string &header, int size);
 
@@ -64,4 +68,7 @@ void saveHamilton(double** hamilton, const std::string &filename, const std::str
 void saveComplexHamilton(std::complex<double> **hamilton,const std::string &filename, const std::string &header, int size);
 
 // saves a real matrix (Eigen::MatrixXd) of arbitrary size to the file filename and adds the header inscription above
-void saveMatrixToFile(Eigen::MatrixXd matrix, const std::string &filename, const std::string &header);
+void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename, const std::string &header);
+
+// saves a complex matrix (Eigen::MatrixXcd) of arbitrary size to the file filename and adds the header inscription above
+void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &filename, const std::string &header);

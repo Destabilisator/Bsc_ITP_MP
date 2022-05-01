@@ -3,7 +3,7 @@
 //// methods ////
 //#define naiv
 #define magnetization
-//#define momentum
+#define momentum
 
 //// output ////
 //#define showMatrix
@@ -101,7 +101,7 @@ void naiverAnatz(double J1, double J2, std::list<std::complex<double>> &HEiValLi
 /////////////////////////////// fixed magnetization states ///////////////////////////////
 
 #ifdef magnetization
-void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, double **hamiltonBlock) {
+void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, double **hamiltonBlock) { // remove continue; after else
     for (int i = 0; i < states.size(); i++) {
         int s = states.at(i);
         for (int n = 0; n < N/2; n++) {
@@ -114,6 +114,7 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
                 hamiltonBlock[i][i] += 0.25 * J1;
             } else {
                 hamiltonBlock[i][i] -= 0.25 * J1;
+                //continue;
                 int d = s ^ (1 << j_0) ^ (1 << j_2);
                 int pos_d = findState(states, d);
                 hamiltonBlock[i][pos_d] = 0.5 * J1;
@@ -122,6 +123,7 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
                 hamiltonBlock[i][i] += 0.25 * J2;
             } else {
                 hamiltonBlock[i][i] -= 0.25 * J2;
+                //continue;
                 int d = s ^ (1 << j_0) ^ (1 << j_1);
                 int pos_d = findState(states, d);
                 hamiltonBlock[i][pos_d] = 0.5 * J2;
@@ -130,6 +132,7 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
                 hamiltonBlock[i][i] += 0.25 * J2;
             } else {
                 hamiltonBlock[i][i] -= 0.25 * J2;
+                //continue;
                 int d = s ^ (1 << j_1) ^ (1 << j_2);
                 int pos_d = findState(states, d);
                 hamiltonBlock[i][pos_d] = 0.5 * J2;
@@ -163,6 +166,7 @@ void magBlock_getEiVal(double J1, double J2, int m, std::list<std::complex<doubl
 #if defined(showMatrix) || defined(saveMatrix)
     matrixBlocks->push_back(H);
 #endif
+
     Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
     const Eigen::VectorXcd& H1EiVal = solver.eigenvalues();
     //EiValWriterMutex.lock();
@@ -214,7 +218,7 @@ void magnetisierungsAnsatz(double J1, double J2, std::list<std::complex<double>>
 #endif
 #ifdef saveEigenvalues
     saveComplexEiVals("EigenvaluesMagnetization.txt", "Magnetisierungs Ansatz für N = " + std::to_string(N) +
-                      "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), H_mag_EiVals);
+                      "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), HEiValList);
 #endif
 }
 #endif
@@ -223,6 +227,169 @@ void magnetisierungsAnsatz(double J1, double J2, std::list<std::complex<double>>
 
 #ifdef momentum
 
+void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int> &states, const std::vector<int> &R_vals, std::complex<double> **hamiltonBlock) {
+    //std::cout << states.size() << "\n";
+    for (int a = 0; a < states.size(); a++) {
+        int s = states.at(a);
+        //printBits(s, N);
+        for (int n = 0; n < N/2; n++) {
+            // declaring indices
+            int j_0 = 2 * n;
+            int j_1 = (j_0+1) % N;
+            int j_2 = (j_0+2) % N;
+            // applying H to state s
+            if (((s >> j_0) & 1) == ((s >> j_2) & 1)) {
+                hamiltonBlock[a][a] += std::complex<double> (0.25 * J1, 0.0);
+            } else {
+                hamiltonBlock[a][a] -= std::complex<double> (0.25 * J1, 0.0);
+                int d = s ^ (1 << j_0) ^ (1 << j_2);
+                int r = 0, l = 0;
+                representative(d, &r, &l, N);
+                int b = findState(states, r);
+                if (b >= 0) {
+                    //continue;
+                    std::complex<double> numC(0.0, 2 * PI * (double) k * (double) l / (double) N );
+                    hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J1 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC);
+                }
+            }
+            if (((s >> j_0) & 1) == ((s >> j_1) & 1)) {
+                hamiltonBlock[a][a] += std::complex<double> (0.25 * J2, 0.0);
+            } else {
+                hamiltonBlock[a][a] -= std::complex<double> (0.25 * J2, 0.0);
+                int d = s ^ (1 << j_0) ^ (1 << j_1);
+                int r = 0, l = 0;
+                representative(d, &r, &l, N);
+                int b = findState(states, r);
+                if (b >= 0) {
+                    //continue;
+                    std::complex<double> numC(0.0, 2 * PI * (double) k * (double) l / (double) N );
+                    hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC);
+                }
+            }
+            if (((s >> j_1) & 1) == ((s >> j_2) & 1)) {
+                hamiltonBlock[a][a] += std::complex<double> (0.25 * J2, 0.0);
+            } else {
+                hamiltonBlock[a][a] -= std::complex<double> (0.25 * J2, 0.0);
+                int d = s ^ (1 << j_1) ^ (1 << j_2);
+                int r = 0, l = 0;
+                representative(d, &r, &l, N);
+                int b = findState(states, r);
+                if (b >= 0) {
+                    //continue;
+                    std::complex<double> numC(0.0, 2 * PI * (double) k * (double) l / (double) N );
+                    hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC);
+                }
+            }
+        }
+    }
+}
+
+void momentumBlockSolver(double J1, double J2, int k, const std::vector<int> &states, const std::vector<int> &R_vals, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXcd> *matrixBlocks) {
+    //    coutMutex.lock();
+    //    std::cout << "number of up spins: " << m << " out of " << N << "; moment " << k << "\n";
+    //    coutMutex.unlock();
+    const int statesCount = states.size();
+    //std::cout << statesCount << " " << R_vals.size() << "\n";
+    if (statesCount == 0) {
+        //std::cout << "empty block\n";
+        return;
+    }
+    auto **hamiltonBlock = new std::complex<double>*[statesCount];
+    for (int i = 0; i < statesCount; i++) {
+        hamiltonBlock[i] = new std::complex<double>[statesCount];
+        for (int j = 0; j < statesCount; j++) {
+            hamiltonBlock[i][j] = 0.0;
+        }
+    }
+    //std::cout << "filling block\n";
+    fillHamiltonMomentumBlock(J1, J2, k, states, R_vals, hamiltonBlock);
+
+    Eigen::MatrixXcd H(statesCount, statesCount);
+    for (int i = 0; i < statesCount; i++) {
+        H.row(i) = Eigen::VectorXcd::Map(&hamiltonBlock[i][0], statesCount);
+    }
+
+#if defined(showMatrix) || defined(saveMatrix)
+    matrixBlocks->push_back(H);
+#endif
+
+    Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(H);
+    //Eigen::EigenSolver<Eigen::MatrixXcd> solver(H);
+    const Eigen::VectorXcd& H1EiVal = solver.eigenvalues();
+    //EiValWriterMutex.lock();
+    for (std::complex<double> ev : H1EiVal) {
+        HEiValList->push_back(ev);
+    }
+    //EiValWriterMutex.unlock();
+
+    for (int i = 0; i < statesCount; i++) {
+        delete hamiltonBlock[i];
+    }
+    delete[] hamiltonBlock;
+}
+
+void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXcd> *matrixBlocks) {
+    std::vector<std::vector<std::vector<int>>> vec1(N+1, std::vector<std::vector<int>>(N));
+    std::vector<std::vector<std::vector<int>>> vec2(N+1, std::vector<std::vector<int>>(N));
+    auto *states = &vec1;
+    auto *R_vals = &vec2;
+    for (int s = 0; s < size; s++) {
+        int m = bitSum(s, N);
+        for (int k = -N/2 + 1; k <= N/2; k++) {
+            int R = checkState(s, k, N);
+            if (R >= 0) {
+                //std::cout << "m = " << m << " k = " << k << "\n";
+                //std::cout << "R = " << R  << ": ";
+                //printBits(s, N);
+                states->at(m).at(k+N/2-1).push_back(s);
+                R_vals->at(m).at(k+N/2-1).push_back(R);
+            }
+        }
+    }
+
+    //std::cout << "calculating eigenvalues\n";
+    for (int m = 0; m <= N; m++) {
+        for (int k = -N/2 + 1; k <= N/2; k++) {
+            //std::cout << "m = " << m << " k = " << k << "\n";
+            momentumBlockSolver(J1, J2, k, states->at(m).at(k+N/2-1), R_vals->at(m).at(k+N/2-1), HEiValList, matrixBlocks);
+        }
+    }
+
+    // sort eigenvalues
+    std::sort(HEiValList->begin(), HEiValList->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+        return std::real(c1) < std::real(c2);
+    });
+
+#if defined(showMatrix) || defined(saveMatrix)
+    int offset_mag_blocks = 0;
+    Eigen::MatrixXcd H_moment_Block = Eigen::MatrixXcd::Zero(size, size);
+    for (const Eigen::MatrixXcd& M : *matrixBlocks) {
+        H_moment_Block.block(offset_mag_blocks, offset_mag_blocks, M.rows(), M.cols()) = M;
+        offset_mag_blocks += M.rows();
+    }
+#endif
+#ifdef showMatrix
+    coutMutex.lock();
+    std::cout << H_moment_Block << "\n";
+    coutMutex.unlock();
+#endif
+#ifdef saveMatrix
+    saveComplexMatrixToFile(H_moment_Block, "HamiltonMomentumStates.txt", "momentum state Ansatz für N = " + std::to_string(N) +
+                                                               "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2));
+#endif
+#ifdef showEigenvalues
+    coutMutex.lock();
+    std::cout << "eigenvalues:\n";
+    for (std::complex<double> ev : *HEiValList) {
+        std::cout << ev << "\n";
+    }
+    coutMutex.unlock();
+#endif
+#ifdef saveEigenvalues
+    saveComplexEiVals("EigenvaluesMomentumStates.txt", "momentum state Ansatz für N = " + std::to_string(N) +
+                                                      "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), *HEiValList);
+#endif
+}
 
 #endif
 
@@ -230,7 +397,7 @@ void magnetisierungsAnsatz(double J1, double J2, std::list<std::complex<double>>
 
 int main(int argc, char* argv[]) {
 
-    int J1 = 1, J2 = 1;
+    double J1 = 1.0, J2 = 1.0;
 
     if (argc >= 2) {
         std::cout << "N from args\n";
@@ -276,94 +443,30 @@ int main(int argc, char* argv[]) {
 
     std::cout << "\nblockdiagonale m_z:..." << std::endl;
     std::list<std::complex<double>> H_mag_EiVals;
-    auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
-    magnetisierungsAnsatz(J1, J2, H_mag_EiVals, matrixBlocks);
+    auto *matrixBlocks_m = new std::vector<Eigen::MatrixXd>;
+    magnetisierungsAnsatz(J1, J2, H_mag_EiVals, matrixBlocks_m);
 
     auto time_MAGNETIZATION = float( clock () - begin_time_MAGNETIZATION ) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
-    delete matrixBlocks;
+    delete matrixBlocks_m;
 #endif
 
 /////////////////////////////// momentum states (unfinished) ///////////////////////////////
 
 #ifdef momentum
-    // Using momentum states.
+    const clock_t begin_time_MOMENTUM = clock();
+
     std::cout << "\nmomentum states:..." << std::endl;
 
-    //std::cout << "allocating matrix\n";
-    static auto **hamilton3 = new std::complex<double>*[size];
-    for (int i = 0; i < size; i++) {
-        hamilton3[i] = new std::complex<double>[size];
-        for (int j = 0; j < size; j++) {
-            hamilton3[i][j] = std::complex<double> (0.0, 0.0);
-        }
-    }
+    auto *H_moment_EiVals = new std::vector<std::complex<double>>;
+    auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
 
+    momentumStateAnsatz(J1, J2, H_moment_EiVals, matrixBlocks);
 
-    auto *statesM = new std::vector<int>;
-    auto *statesListM = new std::vector<int>;
-    auto *statesPerioM = new std::vector<int>;
-    offset = 0;
-    for (int k = -(N-1)/2; k <= N/2 ; k++) {
-        //std::cout << "k: " << k << "\n";
-        for (int m = 0; m <= N; m++) {
-            fillStates(statesM, m);
-            for (int a : *statesM) {
-                //std::cout << "found state: ";
-                //printBits(a);
-                int perio = checkState(a, k);
-                if (perio >= 0) {
-                    //std::cout << perio << "\n";
-                    statesListM->push_back(a);
-                    //std::cout << statesList->at(0) << ": ";
-                    statesPerioM->push_back(perio);
-                    //printBits(a);
-                    //std::cout << statesPerio->at(0) << "\n";
-                }
-            }
-            int M = statesListM->size();
-            auto **hamiltonBlock = new std::complex<double>*[M];
-            for (int i = 0; i < M; i++) {
-                hamiltonBlock[i] = new std::complex<double>[M];
-                for (int j = 0; j < M; j++) {
-                    hamiltonBlock[i][j] = std::complex<double> (0.0, 0.0);
-                }
-            }
-            //std::cout << "filling hamilton block\n";
-            fillHamiltonMomentumBlock(hamiltonBlock, statesListM, statesPerioM, k);
-            //std::cout << "writing hamilton block to full\n";
-            writeHamiltonMomentumBlockToFull(hamiltonBlock, hamilton3, M, offset);
-            offset += M;
-
-            //std::cout << "clean up\n";
-            statesM->clear();
-            statesListM->clear();
-            statesPerioM->clear();
-            for (int i = 0; i < M; i++) {
-                delete hamiltonBlock[i];
-            } delete[] hamiltonBlock;
-        }
-    }
-
-    Eigen::MatrixXcd H3(size, size);
-    for (int i = 0; i < size; i++) {
-        H3.row(i) = Eigen::RowVectorXcd::Map(&hamilton3[i][0], size);
-    }
-#ifdef showMatrix
-    std::cout << H3 << std::endl;
+    auto time_MOMENTUM = float( clock () - begin_time_MOMENTUM ) /  CLOCKS_PER_SEC;
+    std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
+    delete matrixBlocks;
 #endif
-#ifdef calculateEigenvalues
-    std::cout << "solving...\n";
-    Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver3(H3);
-    Eigen::VectorXcd H3EiVal = solver3.eigenvalues();
-    std::cout << H3EiVal << std::endl;
-    saveComplexHamilton(hamilton3, "Hamilton3.txt", "momentum states", H3EiVal);
-#endif
-    for (int i = 0; i < size; i++) {
-        delete hamilton3[i];
-    } delete[] hamilton3;
-#endif
-
 
     return 0;
 }
