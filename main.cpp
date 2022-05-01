@@ -1,19 +1,21 @@
 #include "main.h"
 
-// methods
-#define naiv
+//// methods ////
+//#define naiv
 #define magnetization
 //#define momentum
 
-// output
+//// output ////
 //#define showMatrix
 //#define saveMatrix
 #define showEigenvalues
 //#define saveEigenvalues
 
-// global variables
-int N = 2*2; // has to be odd to conserve delta shape
+//// global variables ////
+int N = 2*2; // has to be even to preserve the periodic boundary conditions of the delta chain
 int size;
+double J_start, J_end;
+int J_count, J_current;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
@@ -96,14 +98,12 @@ void naiverAnatz(double J1, double J2, std::list<std::complex<double>> &HEiValLi
 }
 #endif
 
-/////////////////////////////// fixed magnetization states (unfinished) ///////////////////////////////
+/////////////////////////////// fixed magnetization states ///////////////////////////////
 
 #ifdef magnetization
 void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, double **hamiltonBlock) {
     for (int i = 0; i < states.size(); i++) {
-        //std::cout << "filling for sate " << i << " out of " << states.size()-1 << ": ";
         int s = states.at(i);
-        //printBits(s, N);
         for (int n = 0; n < N/2; n++) {
             // declaring indices
             int j_0 = 2 * n;
@@ -111,50 +111,37 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
             int j_2 = (j_0+2) % N;
             // applying H to state s
             if (((s >> j_0) & 1) == ((s >> j_2) & 1)) {
-                //std::cout << "j 0 2\n";
                 hamiltonBlock[i][i] += 0.25 * J1;
             } else {
-                //std::cout << "j 0 2\n";
                 hamiltonBlock[i][i] -= 0.25 * J1;
-                //continue;
                 int d = s ^ (1 << j_0) ^ (1 << j_2);
                 int pos_d = findState(states, d);
-                //std::cout << pos_d << "\n";
                 hamiltonBlock[i][pos_d] = 0.5 * J1;
             }
             if (((s >> j_0) & 1) == ((s >> j_1) & 1)) {
-                //std::cout << "j 0 1\n";
                 hamiltonBlock[i][i] += 0.25 * J2;
             } else {
-                //std::cout << "j 0 1\n";
                 hamiltonBlock[i][i] -= 0.25 * J2;
-                //continue;
                 int d = s ^ (1 << j_0) ^ (1 << j_1);
                 int pos_d = findState(states, d);
-                //std::cout << pos_d << "\n";
                 hamiltonBlock[i][pos_d] = 0.5 * J2;
             }
             if (((s >> j_1) & 1) == ((s >> j_2) & 1)) {
-                //std::cout << "j 1 2\n";
                 hamiltonBlock[i][i] += 0.25 * J2;
             } else {
-                //std::cout << "j 1 2\n";
                 hamiltonBlock[i][i] -= 0.25 * J2;
-                //continue;
                 int d = s ^ (1 << j_1) ^ (1 << j_2);
                 int pos_d = findState(states, d);
-                //std::cout << pos_d << "\n";
                 hamiltonBlock[i][pos_d] = 0.5 * J2;
             }
         }
     }
-    //std::cout << "hamiltonBlock filled\n";
 }
 
 void magBlock_getEiVal(double J1, double J2, int m, std::list<std::complex<double>> &HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
-    coutMutex.lock();
-    std::cout << "number of up spins: " << m << " out of " << N << "\n";
-    coutMutex.unlock();
+//    coutMutex.lock();
+//    std::cout << "number of up spins: " << m << " out of " << N << "\n";
+//    coutMutex.unlock();
     auto *states = new std::vector<int>;
     fillStates(states, m, N, size);
     const int statesCount = states->size();
@@ -232,21 +219,43 @@ void magnetisierungsAnsatz(double J1, double J2, std::list<std::complex<double>>
 }
 #endif
 
+/////////////////////////////// momentum states (unfinished) ///////////////////////////////
+
+#ifdef momentum
+
+
+#endif
+
 /////////////////////////////// MAIN ///////////////////////////////
 
 int main(int argc, char* argv[]) {
 
-    if (argc == 2) {
+    int J1 = 1, J2 = 1;
+
+    if (argc >= 2) {
         std::cout << "N from args\n";
-        if (std::stoi(argv[1]) % 2 == 0 | std::stoi(argv[1]) < 4) {
+        if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 4) ) {
              N = std::stoi(argv[1]);
-        } std::cout << "invalid chain size, must be even... defaulting to " << N << "\n";
+        } else {
+            std::cout << "invalid chain size, must be even and at least 4, defaulting to " << N << "\n";
+        }
     }
-    std::cout << "no or invalid args given, default N\n";
+    if (argc == 5) {
+        std::cout << "range given: ";
+        J_start = std::stod(argv[2]); J_end = std::stod(argv[3]); J_count = std::stoi(argv[4]);
+        if (J_start > J_end | J_count < 1) {
+            std::cout << "range invalid, defaulting...\n";
+            goto default_J;
+        }
+        std::cout << "J_start = " << J_start << ", J_end = " << J_end << " and J_count = " << J_count << " from args\n";
+    } else {
+        default_J:
+        J_start = 1; J_end = 1; J_count = 1;
+        std::cout << "J_start = " << J_start << ", J_end = " << J_end << " and J_count = " << J_count << " from default\n";
+    }
+
     size = (int) pow(2, N);
     std::cout << "N: " << N << "; size: " << size << std::endl;
-
-    int J1 = 1, J2 = 1;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
@@ -275,7 +284,7 @@ int main(int argc, char* argv[]) {
     delete matrixBlocks;
 #endif
 
-/////////////////////////////// momentum states (not started) ///////////////////////////////
+/////////////////////////////// momentum states (unfinished) ///////////////////////////////
 
 #ifdef momentum
     // Using momentum states.
