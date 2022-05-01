@@ -233,6 +233,7 @@ void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int
         int s = states.at(a);
         //printBits(s, N);
         for (int n = 0; n < N/2; n++) {
+            std::cout << "Periodizitaeten: Ra " << R_vals.at(a);
             // declaring indices
             int j_0 = 2 * n;
             int j_1 = (j_0+1) % N;
@@ -247,6 +248,7 @@ void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
+                    std::cout << ", Rb " << R_vals.at(b);
                     //continue;
                     std::complex<double> numC(0.0, 2 * PI * (double) k * (double) l / (double) N );
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J1 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC);
@@ -261,6 +263,7 @@ void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
+                    std::cout << ", Rb " << R_vals.at(b);
                     //continue;
                     std::complex<double> numC(0.0, 2 * PI * (double) k * (double) l / (double) N );
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC);
@@ -275,11 +278,13 @@ void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
+                    std::cout << ", Rb " << R_vals.at(b);
                     //continue;
                     std::complex<double> numC(0.0, 2 * PI * (double) k * (double) l / (double) N );
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC);
                 }
             }
+            std::cout << "\n";
         }
     }
 }
@@ -417,7 +422,7 @@ int main(int argc, char* argv[]) {
         std::cout << "J_start = " << J_start << ", J_end = " << J_end << " and J_count = " << J_count << " from args\n";
     } else {
         default_J:
-        J_start = 1; J_end = 1; J_count = 1;
+        J_start = 1.0; J_end = 1.0; J_count = 1;
         std::cout << "J_start = " << J_start << ", J_end = " << J_end << " and J_count = " << J_count << " from default\n";
     }
 
