@@ -86,12 +86,12 @@ int findState(const std::vector<std::tuple<int, int>>& states, int s) {
 
 int checkState(int s, int k, int N) {
     int t = s;
-    for (int i = 1; i <= N; i++) {
-        t = translateLeft(t, 1, N);
+    for (int i = 1; i <= N/2; i++) {
+        t = translateLeft(t, 2, N);
         if (t < s) {
             return -1;
         } else if (t == s) {
-            if (k % (N/i) != 0) {
+            if (k % (int) ((double) N / (double) i / 2.0) != 0) {
                 return -1;
             } else {
                 return i;
@@ -128,8 +128,8 @@ void checkState(int s, int *r, int *m, int k, int N) {
 
 void representative(int s, int *r, int *l, int N) {
     int t = s; *r = s; *l = 0;
-    for (int i = 1; i < N; i++) {
-        t = translateLeft(t, 1, N);
+    for (int i = 1; i < N/2; i++) {
+        t = translateLeft(t, 2, N);
         if (t < *r) {
             *r = t; *l = i;
         }

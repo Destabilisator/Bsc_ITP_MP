@@ -19,3 +19,4 @@ const auto cpu_cnt = std::thread::hardware_concurrency();
 std::mutex EiValWriterMutex;
 std::mutex MatrixAppenderMutex;
 std::mutex coutMutex;
+std::mutex nextJMutex;
