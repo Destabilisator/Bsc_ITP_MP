@@ -1,1 +1,1 @@
-here comes future data
+When using the start script all future results, data and plots will end up here.
