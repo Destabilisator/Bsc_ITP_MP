@@ -3,8 +3,10 @@ project(Bsc_ITP_MX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc -O3")
-#set(CMAKE_EXE_LINKER_FLAGS -static)
+if (WIN32)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc -O3")
+    set(CMAKE_EXE_LINKER_FLAGS -static)
+endif(WIN32)
 
 find_package(Threads)
 

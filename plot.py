@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-file = open("data.txt", 'r')
+file = open("results/data.txt", 'r')
 
 lines = file.readlines()
 
@@ -34,6 +34,6 @@ subfig1.set_ylabel('E1 - E0 in J2', fontsize = 14)
 
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
-plt.savefig("data.png")
+plt.savefig("results/data.png")
 
 plt.show()

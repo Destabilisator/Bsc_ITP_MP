@@ -1,0 +1,10 @@
+N: 6
+J1/J2 START_ 1
+J1/J2 END: 2
+datapoints: 3
+caculation time with 3 threads: 0
+
+J1/J2	Delta E in J2
+1	0.319266
+1.33333	0.322628
+1.66667	0.324698

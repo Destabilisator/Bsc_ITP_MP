@@ -1,7 +1,7 @@
 #include "main.h"
 
 //// methods ////
-#define naiv
+//#define naiv
 #define magnetization
 #define momentum
 
@@ -14,11 +14,11 @@
 //#define saveEigenvalues
 
 ///// global variables /////
-int N = 10; // has to be even to preserve the periodic boundary conditions of the delta chain
+int N = 4; // has to be even to preserve the periodic boundary conditions of the delta chain
 int SIZE;
 double J_START, J_END;
 int J_COUNT;
-int J_CURRENT = 0;
+int J_CURRENT = 1;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
@@ -514,7 +514,7 @@ int main(int argc, char* argv[]) {
         std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << " from args\n";
     } else {
         default_J:
-        J_START = 0.8; J_END = 1.4; J_COUNT = 2000;
+        J_START = 0.1; J_END = 5; J_COUNT = 30;
         std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << " from default\n";
     }
 
@@ -564,7 +564,7 @@ int main(int argc, char* argv[]) {
     try {
         file.open("./results/" + filename);
         file << "N: " << N << "\n";
-        file << "J1/J2 START_ " << J_START << "\n";
+        file << "J1/J2 START: " << J_START << "\n";
         file << "J1/J2 END: " << J_END << "\n";
         file << "datapoints: " << J_COUNT << "\n";
         file << "caculation time with " << cores << " threads: " << time << "\n\n";
@@ -582,7 +582,7 @@ int main(int argc, char* argv[]) {
     return 0;
 #endif
 
-    const double J1 = 1.0, J2 = 0.0;
+    const double J1 = 1.0, J2 = 1.0;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
