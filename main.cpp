@@ -5,12 +5,12 @@
 #define magnetization
 #define momentum
 
-#define multiCalc
+//#define multiCalc
 
 ///// output /////
 //#define showMatrix
 //#define saveMatrix
-//#define showEigenvalues
+#define showEigenvalues
 //#define saveEigenvalues
 
 ///// global variables /////
@@ -145,9 +145,7 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
 }
 
 void magBlock_getEiVal(double J1, double J2, int m, std::vector<std::complex<double>> &HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
-//    coutMutex.lock();
 //    std::cout << "number of up spins: " << m << " out of " << N << "\n";
-//    coutMutex.unlock();
     auto *states = new std::vector<int>;
     fillStates(states, m, N, SIZE);
     const int statesCount = states->size();
@@ -172,11 +170,9 @@ void magBlock_getEiVal(double J1, double J2, int m, std::vector<std::complex<dou
 
     Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
     const Eigen::VectorXcd& H1EiVal = solver.eigenvalues();
-    //EiValWriterMutex.lock();
     for (std::complex<double> ev : H1EiVal) {
         HEiValList.push_back(ev);
     }
-    //EiValWriterMutex.unlock();
 
     states->clear();
     delete states;
@@ -234,8 +230,8 @@ void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int
     //std::cout << "states.size(): " << states.size() << "\n";
     for (int a = 0; a < states.size(); a++) {
         int s = states.at(a);
-        std::cout << "state: ";
-        printBits(s, N);
+//        std::cout << "state: ";
+//        printBits(s, N);
         for (int n = 0; n < N/2; n++) {
             //std::cout << "Periodizitaeten: Ra " << R_vals.at(a);
             // declaring indices
@@ -243,83 +239,83 @@ void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int
             int j_1 = (j_0+1) % N;
             int j_2 = (j_0+2) % N;
             // applying H to state s
-            std::cout << "j_0 = " << j_0 << ", j_2 = " << j_2 << "\n";
+            //std::cout << "j_0 = " << j_0 << ", j_2 = " << j_2 << "\n";
             if (((s >> j_0) & 1) == ((s >> j_2) & 1)) {
 //                std::cout << "diagonal ";
 //                printBits(s, N);
-                std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
+                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] += std::complex<double> (0.25 * J1, 0.0);
-                std::cout << " to " << hamiltonBlock[a][a] << "\n";
+                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
             } else {
-                std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
+                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] -= std::complex<double> (0.25 * J1, 0.0);
-                std::cout << " to " << hamiltonBlock[a][a] << "\n";
+                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
                 int d = s ^ (1 << j_0) ^ (1 << j_2);
                 int r = 0, l = 0;
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
-                    std::cout << "off diagonal: ";
-                    printBits(r, N);
+                    //std::cout << "off diagonal: ";
+                    //printBits(r, N);
                     //std::cout << ", Rb " << R_vals.at(b);
                     //continue;
                     //std::complex<double> numC(0.0, PI * (double) k * (double) l / (double) N );
                     std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N );
-                    std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
+                    //std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J1 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
-                    std::cout << " to " << hamiltonBlock[a][b] << "\n";
+                    //std::cout << " to " << hamiltonBlock[a][b] << "\n";
                     //std::cout << (std::complex<double>) 0.5 * J1 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC) << "\n";
                 }
             }
-            std::cout << "j_0 = " << j_0 << ", j_1 = " << j_1 << "\n";
+            //std::cout << "j_0 = " << j_0 << ", j_1 = " << j_1 << "\n";
             if (((s >> j_0) & 1) == ((s >> j_1) & 1)) {
-                std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
+                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] += std::complex<double> (0.25 * J2, 0.0);
-                std::cout << " to " << hamiltonBlock[a][a] << "\n";
+                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
             } else {
-                std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
+                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] -= std::complex<double> (0.25 * J2, 0.0);
-                std::cout << " to " << hamiltonBlock[a][a] << "\n";
+                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
                 int d = s ^ (1 << j_0) ^ (1 << j_1);
                 int r = 0, l = 0;
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
-                    std::cout << "off diagonal: ";
-                    printBits(r, N);
+                    //std::cout << "off diagonal: ";
+                    //printBits(r, N);
                     //std::cout << ", Rb " << R_vals.at(b);
                     //continue;
                     //std::complex<double> numC(0.0, PI * (double) k * (double) l / (double) N );
                     std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N );
-                    std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
+                    //std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
-                    std::cout << " to " << hamiltonBlock[a][b] << "\n";
+                    //std::cout << " to " << hamiltonBlock[a][b] << "\n";
                     //std::cout << (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC) << "\n";
                 }
             }
-            std::cout << "j_1 = " << j_1 << ", j_2 = " << j_2 << "\n";
+            //std::cout << "j_1 = " << j_1 << ", j_2 = " << j_2 << "\n";
             if (((s >> j_1) & 1) == ((s >> j_2) & 1)) {
-                std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
-                std::cout << " to " << hamiltonBlock[a][a] << "\n";
+                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] += std::complex<double> (0.25 * J2, 0.0);
+                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
             } else {
-                std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
+                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] -= std::complex<double> (0.25 * J2, 0.0);
-                std::cout << " to " << hamiltonBlock[a][a] << "\n";
+                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
                 int d = s ^ (1 << j_1) ^ (1 << j_2);
                 int r = 0, l = 0;
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
-                    std::cout << "off diagonal: ";
-                    printBits(r, N);
+                    //std::cout << "off diagonal: ";
+                    //printBits(r, N);
                     //std::cout << ", Rb " << R_vals.at(b);
                     //continue;
                     //std::complex<double> numC(0.0, PI * (double) k * (double) l / (double) N );
                     std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N );
-                    std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
+                    //std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
-                    std::cout << " to " << hamiltonBlock[a][b] << "\n";
+                    //std::cout << " to " << hamiltonBlock[a][b] << "\n";
                     //std::cout << (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC) << "\n";
                 }
             }
@@ -355,13 +351,10 @@ void momentumBlockSolver(double J1, double J2, int k, const std::vector<int> &st
 #endif
 
     Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(H);
-    //Eigen::EigenSolver<Eigen::MatrixXcd> solver(H);
     const Eigen::VectorXcd& H1EiVal = solver.eigenvalues();
-    //EiValWriterMutex.lock();
     for (std::complex<double> ev : H1EiVal) {
         HEiValList->push_back(ev);
     }
-    //EiValWriterMutex.unlock();
 
     for (int i = 0; i < statesCount; i++) {
         delete hamiltonBlock[i];
@@ -376,37 +369,28 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
     auto *R_vals = &vec2;
     for (int s = 0; s < SIZE; s++) {
         int m = bitSum(s, N);
-        for (int k = -N/4 + 1; k <= N/4; k++) { // for (int k = -N/2 + 1; k <= N/2; k++) {
+        for (int k = -N/4 + 1; k <= N/4; k++) {
             int R = checkState(s, k, N);
             if (R >= 0) {
 //                std::cout << "m = " << m << " k = " << k << "\n";
 //                std::cout << "R = " << R  << ": ";
 //                printBits(s, N);
-                states->at(m).at(k+N/4-1).push_back(s); // states->at(m).at(k+N/2-1).push_back(s);
-                R_vals->at(m).at(k+N/4-1).push_back(R); // R_vals->at(m).at(k+N/2-1).push_back(R);
+                states->at(m).at(k+N/4-1).push_back(s);
+                R_vals->at(m).at(k+N/4-1).push_back(R);
             }
         }
     }
-//        for (int k = -N/2 + 1; k <= N/2; k++) { // for (int k = -N/2 + 1; k <= N/2; k++) {
-//            int R = checkState(s, k, N);
-//            if (R >= 0) {
-////                std::cout << "m = " << m << " k = " << k << "\n";
-////                std::cout << "R = " << R  << ": ";
-////                printBits(s, N);
-//                states->at(m).at(k+N/2-1).push_back(s); // states->at(m).at(k+N/2-1).push_back(s);
-//                R_vals->at(m).at(k+N/2-1).push_back(R); // R_vals->at(m).at(k+N/2-1).push_back(R);
-//            }
-//        }
-//    }
 
+    auto *statesM= new std::vector<std::vector<int>>(N + 1);
+    for (int s = 0; s < SIZE; s++) {
+        statesM->at(bitSum(s, N)).push_back(s);
+    }
 
-    std::cout << "calculating eigenvalues\n";
+    //std::cout << "calculating eigenvalues\n";
     for (int m = 0; m <= N; m++) {
         for (int k = -N/4 + 1; k <= N/4; k++) {
-        //for (int k = -N/2 + 1; k <= N/2; k++) {
-            std::cout << "m = " << m << " k = " << k << "\n";
+            //std::cout << "m = " << m << " k = " << k << "\n";
             momentumBlockSolver(J1, J2, k, states->at(m).at(k+N/4-1), R_vals->at(m).at(k+N/4-1), HEiValList, matrixBlocks);
-            //momentumBlockSolver(J1, J2, k, states->at(m).at(k+N/2-1), R_vals->at(m).at(k+N/2-1), HEiValList, matrixBlocks);
         }
     }
 
@@ -463,6 +447,7 @@ void threadfunc(double J, std::vector<std::tuple<double, std::complex<double>>> 
     auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
 
     magnetisierungsAnsatz(J, 1, eiVals, matrixBlocks);
+
     // sort eigenvalues
     std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
         return std::real(c1) < std::real(c2);

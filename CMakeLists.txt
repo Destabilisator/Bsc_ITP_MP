@@ -21,4 +21,6 @@ add_executable(Bsc_ITP_MX main.h main.cpp
         headers/helpers.h
         headers/helpers.cpp)
 
+#add_executable(Bsc_ITP_MX test/1DChain.cpp)
+
 target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT})

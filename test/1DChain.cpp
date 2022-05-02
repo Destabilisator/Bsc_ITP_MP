@@ -4,23 +4,23 @@
 #include <math.h>
 #include <string>
 #include <vector>
-#include <Eigen/Eigenvalues>
+#include "Eigen/Eigenvalues"
 
 #define PI  3.14159265358979323846
 
 // output
 #define calculateEigenvalues
 #define saveOnlyEiVal
-#define showMatrix
+//#define showMatrix
 
 // methods
-//#define naiv
-//#define magnetization
+#define naiv
+#define magnetization
 #define momentum
-//#define parity
+#define parity
 //#define SpinInversion
 
-const short N = 15;
+const short N = 4;
 const int size = (int) pow(2, N);
 
 void printBits(int a) {
@@ -75,7 +75,7 @@ void saveHamilton(float** hamilton, std::string filename, std::string header, Ei
 
     std::ofstream file;
     try {
-        file.open(filename);
+        file.open("./results/" + filename);
         file << header << "\n";
 #ifndef saveOnlyEiVal
         for (int i = 0; i <= size -1; i++) {
@@ -364,7 +364,7 @@ void saveComplexHamilton(std::complex<double> **hamilton, std::string filename, 
 
     std::ofstream file;
     try {
-        file.open(filename);
+        file.open("./results/" + filename);
         file << header << "\n";
 #ifndef saveOnlyEiVal
         for (int i = 0; i <= size -1; i++) {
