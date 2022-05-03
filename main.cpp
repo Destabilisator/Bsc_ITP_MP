@@ -481,7 +481,7 @@ void threadfunc(double J, std::vector<std::tuple<double, double>> *outData, int 
             std::cout << "#";
         } for (int _ = p; _ < PROGRASSBAR_SEGMENTS; _++) {
             std::cout << ".";
-        } std::cout << "] " << int( (float) J_pos / (float) J_COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << J_pos << "/" << J_COUNT << ")          ";
+        } std::cout << "] " << int( (float) J_pos / (float) J_COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << J_pos << "/" << J_COUNT << ")              ";
         coutMutex.unlock();
 
         auto *eiVals = new std::vector<std::complex<double>>;
@@ -500,29 +500,16 @@ void threadfunc(double J, std::vector<std::tuple<double, double>> *outData, int 
             return std::real(c1) < std::real(c2);
         });
 
-//        std::complex<double> E0 = eiVals->at(0);
-//        std::complex<double> E1;
-
         double E0 = std::real(eiVals->at(0));
-        double E1;
+        double E1 = std::real(eiVals->at(1));
 
-        for (int i = 1; i < eiVals->size(); i++) {
-            if (abs(std::real(eiVals->at(i))-E0) > 0.000001) {
-                E1 = std::real(eiVals->at(i));
-                break;
-            }
-//            if (abs(std::real(E0) - std::real(eiVals->at(i))) > 0.001) {
-//                coutMutex.lock();
-//                std::cout << "found E1: " << eiVals->at(i) << "\n";
-//                coutMutex.unlock();
-//                E1 = eiVals->at(i);
+//        for (int i = 1; i < eiVals->size(); i++) {
+//            //if (abs(std::real(eiVals->at(i))-E0) > 0.001) {
+//            if (abs(std::real(eiVals->at(i))-E0) > 0) {
+//                E1 = std::real(eiVals->at(i));
 //                break;
 //            }
-        }
-
-//        coutMutex.lock();
-//        std::cout << E0 << "\t" << eiVals->at(0) << "\t" << E1 << "\t" << E1-E0 << "\t" << J << "\n";
-//        coutMutex.unlock();
+//        }
 
         nextJMutex.lock();
         //outData->push_back({J, std::real(E1 - E0)});
@@ -574,9 +561,20 @@ int main(int argc, char* argv[]) {
         std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << " from default\n";
     }
 
-    if (argc == 6) {
+    int cores = cpu_cnt;
+    if (argc >= 6) {
+        int crs = std::stoi(argv[5]);
+        if (crs > 0 && crs <= cpu_cnt) {
+            cores = crs;
+            std::cout << "using " << cores << "cores\n";
+        } else {
+        std::cout << "defaulting to using all (" << cores << ") cores\n";
+        }
+    }
+
+    if (argc >= 7) {
         std::string s1 = "silent";
-        std::string s2 = argv[5];
+        std::string s2 = argv[6];
         if (s1 == s2) {
             silent = true;
         }
@@ -616,7 +614,7 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-*/
+    */
 
 /////////////////////////////// MULTITHREADING ///////////////////////////////
 
@@ -628,7 +626,6 @@ int main(int argc, char* argv[]) {
     //auto *outData = new std::vector<std::tuple<double, std::complex<double>>>;
     auto *outData = new std::vector<std::tuple<double, double>>;
 
-    int cores = cpu_cnt;
     if (J_COUNT < cpu_cnt) {
         cores = J_COUNT;
     }
@@ -647,7 +644,7 @@ int main(int argc, char* argv[]) {
     auto time = float(clock () - begin_time) /  CLOCKS_PER_SEC;
     std::cout << "\n" << "calculations done; this took: " << time << " seconds\n\n";
 
-    std::string filename = "data.txt";
+    std::string filename = "data_delta_E.txt";
     std::cout << "saving to file " << filename << "...\n";
 
     // sort datapoints
@@ -680,7 +677,7 @@ int main(int argc, char* argv[]) {
     return 0;
 #endif
 
-    const double J1 = 1.0, J2 = 1.0;
+    const double J1 = 0.9996, J2 = 1.0;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
