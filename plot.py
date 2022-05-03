@@ -19,6 +19,7 @@ def plot_delta_E():
     subfig1.set_ylabel(r'$\Delta E = E_1 - E_0$  in $J_2$', fontsize = 18)
     subfig1.set_title(r'Anregungsenergieren $\Delta E$ für N = ' + lines[0][len("N: "):-1], fontsize = 18)
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
+    subfig1.axhline(0, color = "grey")
     plt.savefig("results/data_delta_E.png")
     plt.show()
 
