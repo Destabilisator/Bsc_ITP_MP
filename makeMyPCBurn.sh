@@ -14,7 +14,7 @@ fi
 
 #case "$OSTYPE" in
 #  solaris*) echo "SOLARIS" ;;
-#  darwin*)  echo "OSX" ;; 
+#  darwin*)  echo "OSX" ;;
 #  linux*)   echo "LINUX" ;;
 #  bsd*)     echo "BSD" ;;
 #  msys*)    echo "WINDOWS" ;;
@@ -23,15 +23,15 @@ fi
 #esac
 
 
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT
+if [[ "$OSTYPE" == "linux" ]]; then
+    ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT silent
+    echo "plotting..."
+    python3 plot.py
 elif [[ "$OSTYPE" == "msys" ]]; then
-    ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT
+    ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT silent
+    echo "plotting..."
+    python plot.py
 else
     echo "What kind of place is this?!"
 	exit 1;
 fi
-
-echo "plotting..."
-
-python plot.py

@@ -1,25 +1,5 @@
 #include "main.h"
 
-//// methods ////
-//#define naiv
-#define magnetization
-#define momentum
-
-//#define multiCalc
-
-///// output /////
-//#define showMatrix
-//#define saveMatrix
-#define showEigenvalues
-//#define saveEigenvalues
-
-///// global variables /////
-int N = 4; // has to be even to preserve the periodic boundary conditions of the delta chain
-int SIZE;
-double J_START, J_END;
-int J_COUNT;
-int J_CURRENT = 1;
-
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 #ifdef naiv
@@ -117,7 +97,6 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
                 hamiltonBlock[i][i] += 0.25 * J1;
             } else {
                 hamiltonBlock[i][i] -= 0.25 * J1;
-                //continue;
                 int d = s ^ (1 << j_0) ^ (1 << j_2);
                 int pos_d = findState(states, d);
                 hamiltonBlock[i][pos_d] = 0.5 * J1;
@@ -126,7 +105,6 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
                 hamiltonBlock[i][i] += 0.25 * J2;
             } else {
                 hamiltonBlock[i][i] -= 0.25 * J2;
-                //continue;
                 int d = s ^ (1 << j_0) ^ (1 << j_1);
                 int pos_d = findState(states, d);
                 hamiltonBlock[i][pos_d] = 0.5 * J2;
@@ -135,7 +113,6 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
                 hamiltonBlock[i][i] += 0.25 * J2;
             } else {
                 hamiltonBlock[i][i] -= 0.25 * J2;
-                //continue;
                 int d = s ^ (1 << j_1) ^ (1 << j_2);
                 int pos_d = findState(states, d);
                 hamiltonBlock[i][pos_d] = 0.5 * J2;
@@ -145,7 +122,6 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
 }
 
 void magBlock_getEiVal(double J1, double J2, int m, std::vector<std::complex<double>> &HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
-//    std::cout << "number of up spins: " << m << " out of " << N << "\n";
     auto *states = new std::vector<int>;
     fillStates(states, m, N, SIZE);
     const int statesCount = states->size();
@@ -224,111 +200,62 @@ void magnetisierungsAnsatz(double J1, double J2, std::vector<std::complex<double
 
 /////////////////////////////// momentum states (unfinished) ///////////////////////////////
 
-#ifdef momentum
-
+#if defined(momentum) || defined(multiCalc)
 void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int> &states, const std::vector<int> &R_vals, std::complex<double> **hamiltonBlock) {
-    //std::cout << "states.size(): " << states.size() << "\n";
     for (int a = 0; a < states.size(); a++) {
         int s = states.at(a);
-//        std::cout << "state: ";
-//        printBits(s, N);
         for (int n = 0; n < N/2; n++) {
-            //std::cout << "Periodizitaeten: Ra " << R_vals.at(a);
             // declaring indices
             int j_0 = 2 * n;
             int j_1 = (j_0+1) % N;
             int j_2 = (j_0+2) % N;
             // applying H to state s
-            //std::cout << "j_0 = " << j_0 << ", j_2 = " << j_2 << "\n";
             if (((s >> j_0) & 1) == ((s >> j_2) & 1)) {
-//                std::cout << "diagonal ";
-//                printBits(s, N);
-                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] += std::complex<double> (0.25 * J1, 0.0);
-                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
             } else {
-                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] -= std::complex<double> (0.25 * J1, 0.0);
-                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
                 int d = s ^ (1 << j_0) ^ (1 << j_2);
                 int r = 0, l = 0;
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
-                    //std::cout << "off diagonal: ";
-                    //printBits(r, N);
-                    //std::cout << ", Rb " << R_vals.at(b);
-                    //continue;
-                    //std::complex<double> numC(0.0, PI * (double) k * (double) l / (double) N );
                     std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N );
-                    //std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J1 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
-                    //std::cout << " to " << hamiltonBlock[a][b] << "\n";
-                    //std::cout << (std::complex<double>) 0.5 * J1 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC) << "\n";
                 }
             }
-            //std::cout << "j_0 = " << j_0 << ", j_1 = " << j_1 << "\n";
             if (((s >> j_0) & 1) == ((s >> j_1) & 1)) {
-                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] += std::complex<double> (0.25 * J2, 0.0);
-                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
             } else {
-                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] -= std::complex<double> (0.25 * J2, 0.0);
-                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
                 int d = s ^ (1 << j_0) ^ (1 << j_1);
                 int r = 0, l = 0;
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
-                    //std::cout << "off diagonal: ";
-                    //printBits(r, N);
-                    //std::cout << ", Rb " << R_vals.at(b);
-                    //continue;
-                    //std::complex<double> numC(0.0, PI * (double) k * (double) l / (double) N );
                     std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N );
-                    //std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
-                    //std::cout << " to " << hamiltonBlock[a][b] << "\n";
-                    //std::cout << (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC) << "\n";
                 }
             }
-            //std::cout << "j_1 = " << j_1 << ", j_2 = " << j_2 << "\n";
             if (((s >> j_1) & 1) == ((s >> j_2) & 1)) {
-                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] += std::complex<double> (0.25 * J2, 0.0);
-                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
             } else {
-                //std::cout << "changes H(" << a << ", " << a << ") from " << hamiltonBlock[a][a];
                 hamiltonBlock[a][a] -= std::complex<double> (0.25 * J2, 0.0);
-                //std::cout << " to " << hamiltonBlock[a][a] << "\n";
                 int d = s ^ (1 << j_1) ^ (1 << j_2);
                 int r = 0, l = 0;
                 representative(d, &r, &l, N);
                 int b = findState(states, r);
                 if (b >= 0) {
-                    //std::cout << "off diagonal: ";
-                    //printBits(r, N);
-                    //std::cout << ", Rb " << R_vals.at(b);
-                    //continue;
-                    //std::complex<double> numC(0.0, PI * (double) k * (double) l / (double) N );
                     std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N );
-                    //std::cout << "changes H(" << a << ", " << b << ") from " << hamiltonBlock[a][b];
                     hamiltonBlock[a][b] += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
-                    //std::cout << " to " << hamiltonBlock[a][b] << "\n";
-                    //std::cout << (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * exp(numC) << "\n";
                 }
             }
-            //std::cout << "\n";
         }
     }
 }
 
 void momentumBlockSolver(double J1, double J2, int k, const std::vector<int> &states, const std::vector<int> &R_vals, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXcd> *matrixBlocks) {
     const int statesCount = states.size();
-    //std::cout << "statesCount: " << statesCount << " " << R_vals.size() << "\n";
     if (statesCount == 0) {
-        //std::cout << "empty block\n";
         return;
     }
     auto **hamiltonBlock = new std::complex<double>*[statesCount];
@@ -338,7 +265,7 @@ void momentumBlockSolver(double J1, double J2, int k, const std::vector<int> &st
             hamiltonBlock[i][j] = 0.0;
         }
     }
-    //std::cout << "filling block\n";
+
     fillHamiltonMomentumBlock(J1, J2, k, states, R_vals, hamiltonBlock);
 
     Eigen::MatrixXcd H(statesCount, statesCount);
@@ -363,20 +290,21 @@ void momentumBlockSolver(double J1, double J2, int k, const std::vector<int> &st
 }
 
 void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXcd> *matrixBlocks) {
+    int k_lower = -(N+2)/4+1;
+    int k_upper = N/4;
+
     std::vector<std::vector<std::vector<int>>> vec1(N+1, std::vector<std::vector<int>>(N));
     std::vector<std::vector<std::vector<int>>> vec2(N+1, std::vector<std::vector<int>>(N));
     auto *states = &vec1;
     auto *R_vals = &vec2;
+
     for (int s = 0; s < SIZE; s++) {
         int m = bitSum(s, N);
-        for (int k = -N/4 + 1; k <= N/4; k++) {
+        for (int k = k_lower; k <= k_upper; k++) {
             int R = checkState(s, k, N);
             if (R >= 0) {
-//                std::cout << "m = " << m << " k = " << k << "\n";
-//                std::cout << "R = " << R  << ": ";
-//                printBits(s, N);
-                states->at(m).at(k+N/4-1).push_back(s);
-                R_vals->at(m).at(k+N/4-1).push_back(R);
+                states->at(m).at(k-k_lower).push_back(s);
+                R_vals->at(m).at(k-k_lower).push_back(R);
             }
         }
     }
@@ -386,11 +314,9 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
         statesM->at(bitSum(s, N)).push_back(s);
     }
 
-    //std::cout << "calculating eigenvalues\n";
     for (int m = 0; m <= N; m++) {
-        for (int k = -N/4 + 1; k <= N/4; k++) {
-            //std::cout << "m = " << m << " k = " << k << "\n";
-            momentumBlockSolver(J1, J2, k, states->at(m).at(k+N/4-1), R_vals->at(m).at(k+N/4-1), HEiValList, matrixBlocks);
+        for (int k = k_lower; k <= k_upper; k++) {
+            momentumBlockSolver(J1, J2, k, states->at(m).at(k-k_lower), R_vals->at(m).at(k-k_lower), HEiValList, matrixBlocks);
         }
     }
 
@@ -429,7 +355,6 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
                                                       "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), *HEiValList);
 #endif
 }
-
 #endif
 
 /////////////////////////////// MULTITHREADING ///////////////////////////////
@@ -437,43 +362,56 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
 #ifdef multiCalc
 void threadfunc(double J, std::vector<std::tuple<double, std::complex<double>>> *outData, int J_pos) {
 
-    coutMutex.lock();
-    std::cout << "J1/J2 = " << J << " (" << J_pos << "/" << J_COUNT << ")\n";
-    coutMutex.unlock();
+    while (true) {
 
-    //auto *eiVals = new std::vector<std::complex<double>>;
-    //auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
-    std::vector<std::complex<double>> eiVals;
-    auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
+        int p = (int) ( (float) J_pos / (float) J_COUNT * (float) PROGRASSBAR_SEGMENTS);
+        coutMutex.lock();
+        std::cout << "\r[";
+        for (int _ = 0; _ < p; _++) {
+            std::cout << "#";
+        } for (int _ = p; _ < PROGRASSBAR_SEGMENTS; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) J_pos / (float) J_COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << J_pos << "/" << J_COUNT << ")          ";
+        coutMutex.unlock();
 
-    magnetisierungsAnsatz(J, 1, eiVals, matrixBlocks);
+        auto *eiVals = new std::vector<std::complex<double>>;
+        auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
 
-    // sort eigenvalues
-    std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
-        return std::real(c1) < std::real(c2);
-    });
+        momentumStateAnsatz(J, 1, eiVals, matrixBlocks);
 
-    std::complex<double> E0 = eiVals.at(0);
-    std::complex<double> E1;
+        // sort eigenvalues
+        std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+            return std::real(c1) < std::real(c2);
+        });
 
-    for (int i = 1; i < eiVals.size(); i++) {
-        if (abs(E0 - eiVals.at(i)) > 0.001) {
-            E1 = eiVals.at(i);
-            break;
+        std::complex<double> E0 = eiVals->at(0);
+        std::complex<double> E1;
+
+        for (int i = 1; i < eiVals->size(); i++) {
+            if (abs(E0 - eiVals->at(i)) > 0.001) {
+                E1 = eiVals->at(i);
+                break;
+            }
         }
+
+        nextJMutex.lock();
+        outData->push_back({J, E1 - E0});
+        J_pos = J_CURRENT;
+        J_CURRENT++;
+        nextJMutex.unlock();
+
+        if (J_pos > J_COUNT) {
+            delete eiVals;
+            delete matrixBlocks;
+            break;
+        } else {
+            J = J_START + (J_END-J_START)*J_pos/J_COUNT;
+        }
+        // clean up
+        eiVals->clear();
+        matrixBlocks->clear();
     }
 
-    nextJMutex.lock();
-    outData->push_back({J, E1 - E0});
-    J_pos = J_CURRENT;
-    J_CURRENT++;
-    nextJMutex.unlock();
-
-    if (J_pos > J_COUNT) {
-        return;
-    } else {
-        threadfunc( J_START + (J_END-J_START)*J_pos/J_COUNT, outData, J_pos);
-    }
 }
 #endif
 
@@ -481,30 +419,71 @@ void threadfunc(double J, std::vector<std::tuple<double, std::complex<double>>> 
 
 int main(int argc, char* argv[]) {
 
+    bool silent = false;
+
     if (argc >= 2) {
-        std::cout << "N from args\n";
-        if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 4) ) {
+        if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) ) {
              N = std::stoi(argv[1]);
         } else {
-            std::cout << "invalid chain SIZE, must be even and at least 4, defaulting to " << N << "\n";
+            std::cout << "invalid chain size, must be even and at least 6, defaulting to " << N << "\n";
         }
     }
+    SIZE = (int) pow(2, N);
+    std::cout << "N: " << N << "; size: " << SIZE << std::endl;
     if (argc == 5) {
         std::cout << "range given: ";
-        J_START = std::stod(argv[2]); J_END = std::stod(argv[3]); J_COUNT = std::stoi(argv[4]);
-        if (J_START > J_END | J_COUNT < 1) {
+        if (std::stod(argv[2]) > std::stod(argv[3]) || std::stoi(argv[4]) < 1) {
             std::cout << "range invalid, defaulting...\n";
-            goto default_J;
+        } else {
+            J_START = std::stod(argv[2]); J_END = std::stod(argv[3]); J_COUNT = std::stoi(argv[4]);
         }
         std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << " from args\n";
     } else {
-        default_J:
-        J_START = 0.1; J_END = 5; J_COUNT = 30;
+        std::cout << "no range given: ";
         std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << " from default\n";
     }
 
-    SIZE = (int) pow(2, N);
-    std::cout << "N: " << N << "; SIZE: " << SIZE << std::endl;
+    if (argc == 6) {
+        std::string s1 = "silent";
+        std::string s2 = argv[5];
+        if (s1 == s2) {
+            silent = true;
+        }
+    }
+
+    if (!silent) {
+        std::cout << "continue? (y/n):";
+        char c;
+        std::cin >> c;
+        if (c != 'y') {
+            wrong_N:
+            std::cout << "Enter new N (must be even ans >= 6):";
+            int N_usr;
+            std::cin >> N_usr;
+            if (N_usr >= 6 && N_usr % 2 == 0) {
+                N = N_usr;
+            } else {
+                goto wrong_N;
+            }
+            wrong_JRANGE:
+            std::cout << "Enter new J_START (J1/J2):";
+            double JSTART_usr;
+            std::cin >> JSTART_usr;
+            std::cout << "Enter new J_END (J1/J2):";
+            double JEND_usr;
+            std::cin >> JEND_usr;
+            std::cout << "Enter new J_COUNT (number of datapoints):";
+            int JCOUNT_usr;
+            std::cin >> JCOUNT_usr;
+            if (JSTART_usr <= JEND_usr && JCOUNT_usr >= 1) {
+                J_START = JSTART_usr;
+                J_END = JEND_usr;
+                J_COUNT = JCOUNT_usr;
+            } else {
+                goto wrong_JRANGE;
+            }
+        }
+    }
 
 /////////////////////////////// MULTITHREADING ///////////////////////////////
 
@@ -524,9 +503,6 @@ int main(int argc, char* argv[]) {
     J_CURRENT += cores;
 
     for (int i = 0; i < cores; i++) {
-//        coutMutex.lock();
-//        std::cout << "starting thread " << i << "\n";
-//        coutMutex.unlock();
         Threads[i] = std::thread(threadfunc, J_START + (J_END-J_START)*i/J_COUNT, outData, i+1);
     }
 
@@ -535,9 +511,9 @@ int main(int argc, char* argv[]) {
     }
 
     auto time = float(clock () - begin_time) /  CLOCKS_PER_SEC;
-    std::cout << "\n" << "calculations done; this took: " << time << " seconds\n";
+    std::cout << "\n" << "calculations done; this took: " << time << " seconds\n\n";
 
-    std::string filename = "data.txt";//_" + std::to_string(N) + "_" + std::to_string(J_START) + "_" + std::to_string(J_END) + "_" + std::to_string(J_COUNT) + ".txt";
+    std::string filename = "data.txt";
     std::cout << "saving to file " << filename << "...\n";
 
     // sort datapoints
@@ -552,7 +528,7 @@ int main(int argc, char* argv[]) {
         file << "J1/J2 START: " << J_START << "\n";
         file << "J1/J2 END: " << J_END << "\n";
         file << "datapoints: " << J_COUNT << "\n";
-        file << "caculation time with " << cores << " threads: " << time << "\n\n";
+        file << "caculation time with " << cores << " threads: " << time << " seconds\n\n";
         file << "J1/J2\tDelta E in J2\n";
         for (std::tuple<double, std::complex<double>> data : *outData) {
             file << std::get<0>(data) << "\t" << std::abs(std::get<1>(data)) << "\n";
@@ -567,7 +543,9 @@ int main(int argc, char* argv[]) {
     return 0;
 #endif
 
+#ifdef multiCalc
     const double J1 = 1.0, J2 = 1.0;
+#endif
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 

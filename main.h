@@ -14,7 +14,29 @@
 
 #define PI  3.14159265358979323846
 
-// multi threading stuff
+//// methods ////
+//#define naiv
+//#define magnetization
+#define momentum
+
+#define multiCalc
+
+///// output, turn off during multithreading /////
+//#define showMatrix
+//#define saveMatrix
+//#define showEigenvalues
+//#define saveEigenvalues
+
+///// global variables /////
+int N = 6; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
+int SIZE;
+double J_START = 0;
+double J_END = 2;
+int J_COUNT = 30;
+int J_CURRENT = 1;
+int PROGRASSBAR_SEGMENTS = 50;
+
+///// multi threading stuff /////
 const auto cpu_cnt = std::thread::hardware_concurrency();
 std::mutex EiValWriterMutex;
 std::mutex MatrixAppenderMutex;
