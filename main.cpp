@@ -1,9 +1,9 @@
 #include "main.h"
 
 //// methods ////
-#define naiv
-#define magnetization
-#define momentum
+//#define naiv
+//#define magnetization
+//#define momentum
 //#define parity
 
 #define multiCalc
@@ -309,6 +309,7 @@ void momentumBlockSolver(double J1, double J2, int k, const std::vector<int> &st
 }
 
 void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXcd> *matrixBlocks) {
+
     int k_lower = -(N+2)/4+1;
     int k_upper = N/4;
 
