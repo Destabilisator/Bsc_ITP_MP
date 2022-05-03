@@ -15,11 +15,11 @@
 #define PI  3.14159265358979323846
 
 ///// global variables /////
-int N = 10; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
+int N = 6; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
 int SIZE;
 double J_START = 0;
 double J_END = 2;
-int J_COUNT = 30;
+int J_COUNT = 50;
 int J_CURRENT = 1;
 int PROGRASSBAR_SEGMENTS = 50;
 
