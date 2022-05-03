@@ -103,16 +103,16 @@ int checkState(int s, int k, int N) {
 
 void checkState(int s, int *r, int *m, int k, int N) {
     int t = s; *r = -1;
-    for (int i = 1; i <= N; i++) {
-        t = translateLeft(t, 1, N);
+    for (int i = 1; i <= N/2; i++) {
+        t = translateLeft(t, 2, N);
         if (t < s) {
-            return;
+            break;
         } else if (t == s) {
-            if (k % (N / i) != 0) {
-                return;
+            if (k % (int) ((double) N / (double) i / 2.0) != 0) {
+                break;
             } else {
                 *r = i;
-                continue;
+                break;
             }
         }
     }
@@ -122,7 +122,7 @@ void checkState(int s, int *r, int *m, int k, int N) {
             *r = -1; return;
         } else if (t == s) {
             *m = i; return;
-        } t = translateLeft(t, 1, N);
+        } t = translateLeft(t, 2, N);
     }
 }
 
@@ -138,14 +138,15 @@ void representative(int s, int *r, int *l, int N) {
 
 void representative(int s, int *r, int *l, int *q, int N) {
     int t = s; *r = s; *l = 0;
-    for (int i = 1; i < N; i++) {
-        t = translateLeft(t, 1, N);
+    for (int i = 1; i < N/2; i++) {
+        t = translateLeft(t, 2, N);
         if (t < *r) {
-            *r = t; *l = i;
+            *r = t;
+            *l = i;
         }
     } t = reflectBits(s, N); *q = 0;
-    for (int i = 0; i < N; i ++) {
-        t = translateLeft(t, 1, N);
+    for (int i = 1; i < N/2; i ++) {
+        t = translateLeft(t, 2, N);
         if (t < *r) {
             *r = t; *l = i; *q = 1;
         }

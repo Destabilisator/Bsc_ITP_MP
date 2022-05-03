@@ -1,5 +1,19 @@
 #include "main.h"
 
+//// methods ////
+#define naiv
+#define magnetization
+#define momentum
+//#define parity
+
+#define multiCalc
+
+///// output, turn off during multithreading /////
+//#define showMatrix
+//#define saveMatrix
+//#define showEigenvalues
+//#define saveEigenvalues
+
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 #ifdef naiv
@@ -36,8 +50,7 @@ void fillHamiltonNaiv(double** hamilton, double J1, double J2) {
     }
 }
 
-void naiverAnatz(double J1, double J2, std::list<std::complex<double>> &HEiValList) {
-    std::cout << "\nnaiver Ansatz:..." << std::endl;
+void naiverAnatz(double J1, double J2, std::vector<std::complex<double>> *HEiValList) {
     static auto **hamilton1 = new double*[SIZE];
     for (int i = 0; i < SIZE; i++) {
         hamilton1[i] = new double[SIZE];
@@ -56,28 +69,31 @@ void naiverAnatz(double J1, double J2, std::list<std::complex<double>> &HEiValLi
 #ifdef saveMatrix
     saveHamilton(hamilton1, "HamiltonNaiv.txt", "naiver Ansatz für N = " + std::to_string(N), SIZE);
 #endif
-    std::cout << "solving...\n";
+    //std::cout << "solving...\n";
     Eigen::EigenSolver<Eigen::MatrixXd> solver1(H1);
     const Eigen::VectorXcd &H1EiVal = solver1.eigenvalues();
     for (std::complex<double> ev : H1EiVal) {
-        HEiValList.push_back(ev);
+        HEiValList->push_back(ev);
     }
-    // sort List
-    HEiValList.sort([](const std::complex<double> &c1, const std::complex<double> &c2) {
-       return std::real(c1) < std::real(c2);
+    // sort eigenvalues
+#if defined(showEigenvalues) || defined(saveEigenvalues)
+    HEiValList->shrink_to_fit();
+    std::sort(HEiValList->begin(), HEiValList->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+        return std::real(c1) < std::real(c2);
     });
+#endif
 #ifdef showEigenvalues
     std::cout << "eigenvalues:\n";
-    for (std::complex<double> ev : HEiValList) {
+    for (std::complex<double> ev : *HEiValList) {
         std::cout << ev << "\n";
     }
 #endif
 #ifdef saveEigenvalues
-    saveComplexEiVals("EigenvaluesNaiv.txt", "naiver Ansatz für N = " + std::to_string(N), HEiValList);
+    saveComplexEiVals("EigenvaluesNaiv.txt", "naiver Ansatz für N = " + std::to_string(N), *HEiValList);
 #endif
-    for (int i = 0; i < SIZE; i++) {
-        delete hamilton1[i];
-    } delete[] hamilton1;
+//    for (int i = 0; i < SIZE; i++) {
+//        delete hamilton1[i];
+//    } delete[] hamilton1;
 }
 #endif
 
@@ -121,7 +137,7 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
     }
 }
 
-void magBlock_getEiVal(double J1, double J2, int m, std::vector<std::complex<double>> &HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
+void magBlock_getEiVal(double J1, double J2, int m, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
     auto *states = new std::vector<int>;
     fillStates(states, m, N, SIZE);
     const int statesCount = states->size();
@@ -147,7 +163,7 @@ void magBlock_getEiVal(double J1, double J2, int m, std::vector<std::complex<dou
     Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
     const Eigen::VectorXcd& H1EiVal = solver.eigenvalues();
     for (std::complex<double> ev : H1EiVal) {
-        HEiValList.push_back(ev);
+        HEiValList->push_back(ev);
     }
 
     states->clear();
@@ -158,14 +174,10 @@ void magBlock_getEiVal(double J1, double J2, int m, std::vector<std::complex<dou
     delete[] hamiltonBlock;
 }
 
-void magnetisierungsAnsatz(double J1, double J2, std::vector<std::complex<double>> &HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
+void magnetisierungsAnsatz(double J1, double J2, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
     for (int m = 0; m <= N; m++) {
         magBlock_getEiVal(J1, J2, m, HEiValList, matrixBlocks);
     }
-    // sort eigenvalues
-    std::sort(HEiValList.begin(), HEiValList.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
-        return std::real(c1) < std::real(c2);
-    });
 #if defined(showMatrix) || defined(saveMatrix)
     int offset_mag_blocks = 0;
     Eigen::MatrixXd H_mag_Block = Eigen::MatrixXd::Zero(SIZE, SIZE);
@@ -183,22 +195,29 @@ void magnetisierungsAnsatz(double J1, double J2, std::vector<std::complex<double
     saveMatrixToFile(H_mag_Block, "HamiltonMagnetization.txt", "Magnetisierungs Ansatz für N = " + std::to_string(N) +
                                                          "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2));
 #endif
+#if defined(showEigenvalues) || defined(saveEigenvalues)
+    HEiValList->shrink_to_fit();
+    // sort eigenvalues
+    std::sort(HEiValList->begin(), HEiValList->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+        return std::real(c1) < std::real(c2);
+    });
+#endif
 #ifdef showEigenvalues
     coutMutex.lock();
     std::cout << "eigenvalues:\n";
-    for (std::complex<double> ev : HEiValList) {
+    for (std::complex<double> ev : *HEiValList) {
         std::cout << ev << "\n";
     }
     coutMutex.unlock();
 #endif
 #ifdef saveEigenvalues
     saveComplexEiVals("EigenvaluesMagnetization.txt", "Magnetisierungs Ansatz für N = " + std::to_string(N) +
-                      "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), HEiValList);
+                      "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), *HEiValList);
 #endif
 }
 #endif
 
-/////////////////////////////// momentum states (unfinished) ///////////////////////////////
+/////////////////////////////// momentum states ///////////////////////////////
 
 #if defined(momentum) || defined(multiCalc)
 void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int> &states, const std::vector<int> &R_vals, std::complex<double> **hamiltonBlock) {
@@ -309,28 +328,18 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
         }
     }
 
-    auto *statesM= new std::vector<std::vector<int>>(N + 1);
-    for (int s = 0; s < SIZE; s++) {
-        statesM->at(bitSum(s, N)).push_back(s);
-    }
-
     for (int m = 0; m <= N; m++) {
         for (int k = k_lower; k <= k_upper; k++) {
             momentumBlockSolver(J1, J2, k, states->at(m).at(k-k_lower), R_vals->at(m).at(k-k_lower), HEiValList, matrixBlocks);
         }
     }
 
-    // sort eigenvalues
-    std::sort(HEiValList->begin(), HEiValList->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
-        return std::real(c1) < std::real(c2);
-    });
-
 #if defined(showMatrix) || defined(saveMatrix)
-    int offset_mag_blocks = 0;
+    int offset_blocks = 0;
     Eigen::MatrixXcd H_moment_Block = Eigen::MatrixXcd::Zero(SIZE, SIZE);
     for (const Eigen::MatrixXcd& M : *matrixBlocks) {
-        H_moment_Block.block(offset_mag_blocks, offset_mag_blocks, M.rows(), M.cols()) = M;
-        offset_mag_blocks += M.rows();
+        H_moment_Block.block(offset_blocks, offset_blocks, M.rows(), M.cols()) = M;
+        offset_blocks += M.rows();
     }
 #endif
 #ifdef showMatrix
@@ -339,8 +348,15 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
     coutMutex.unlock();
 #endif
 #ifdef saveMatrix
-    saveComplexMatrixToFile(H_moment_Block, "HamiltonMomentumStates.txt", "momentum state Ansatz für N = " + std::to_string(N) +
+    saveComplexMatrixToFile(H_moment_Block, "HamiltonMomentumStates.txt", "momentum states Ansatz für N = " + std::to_string(N) +
                                                                "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2));
+#endif
+#if defined(showEigenvalues) || defined(saveEigenvalues)
+    HEiValList->shrink_to_fit();
+    // sort eigenvalues
+    std::sort(HEiValList->begin(), HEiValList->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+        return std::real(c1) < std::real(c2);
+    });
 #endif
 #ifdef showEigenvalues
     coutMutex.lock();
@@ -351,16 +367,110 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
     coutMutex.unlock();
 #endif
 #ifdef saveEigenvalues
-    saveComplexEiVals("EigenvaluesMomentumStates.txt", "momentum state Ansatz für N = " + std::to_string(N) +
+    saveComplexEiVals("EigenvaluesMomentumStates.txt", "momentum states Ansatz für N = " + std::to_string(N) +
                                                       "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), *HEiValList);
 #endif
 }
 #endif
 
+/////////////////////////////// parity states (unfinished) ///////////////////////////////
+#ifdef parity
+void parityStateAnsatz(double J1, double J2, std::vector<std::complex<double>> *eiVals, std::vector<Eigen::MatrixXcd> *matrixBlocks) {
+    int k_lower = -(N+2)/4+1;
+    int k_upper = N/4;
+
+    std::vector<std::vector<std::vector<int>>> vec(N+1, std::vector<std::vector<int>>(N));
+    auto *states_mk = &vec;
+
+    for (int s = 0; s < SIZE; s++) {
+        int m = bitSum(s, N);
+        for (int k = k_lower; k <= k_upper; k++) {
+            int R = checkState(s, k, N);
+            if (R >= 0) {
+                states_mk->at(m).at(k-k_lower).push_back(s);
+            }
+        }
+    }
+
+    auto *states = new std::vector<int>;
+    auto *R_vals = new std::vector<int>;
+    auto *m_vals = new std::vector<int>;
+
+    for (int m = 0; m <= N; m++) {
+        for (int k = k_lower; k <= k_upper; k++) {
+            for (int s : states_mk->at(m).at(k-k_lower)) {
+                int R, m_cs;
+                checkState(s, &R, &m_cs, k, N);
+                for (int p : {-1, 1}) {
+                    // p = +1 for k != 0, pi
+                    if (k != 0 && k != k_upper && p == -1 ) {
+                        continue;
+                    }
+                    for (int sigma : {-1, 1}) {
+                        // sigma = +1 if k == 0 or k == k_upper (N/4)
+                        if ((k == 0 || k == k_upper) && sigma == -1) {
+                            continue;
+                        }
+                        if (m_cs != -1) {
+                            std::complex<double> val  = (double) sigma * (double) p * std::cos(std::complex<double>(0, 4 * PI * (double) k * (double) m_cs / (double) N));
+                            if (abs(std::complex<double>(1,0) + val) < 0.0001) {R = -1;}
+                            if (sigma == -1 && abs(std::complex<double>(1,0) - val) > 0.0001) {R = -1;}
+                        } if (R > 0) {
+                            states->push_back(s);
+                            R_vals->push_back(sigma * R);
+                            m_vals->push_back(m_cs);
+                        }
+
+                    }
+                    // ??????????
+                }
+            }
+
+
+            parityBlockSolver(J1, J2, k, states->at(m).at(k-k_lower), R_vals->at(m).at(k-k_lower), eiVals, matrixBlocks);
+        }
+    }
+
+    // sort eigenvalues
+    std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+        return std::real(c1) < std::real(c2);
+    });
+
+#if defined(showMatrix) || defined(saveMatrix)
+    int offset_blocks = 0;
+    Eigen::MatrixXcd H_parity_Block = Eigen::MatrixXcd::Zero(SIZE, SIZE);
+    for (const Eigen::MatrixXcd& M : *matrixBlocks) {
+        H_parity_Block.block(offset_blocks, offset_blocks, M.rows(), M.cols()) = M;
+        offset_blocks += M.rows();
+    }
+#endif
+#ifdef showMatrix
+    coutMutex.lock();
+    std::cout << H_parity_Block << "\n";
+    coutMutex.unlock();
+#endif
+#ifdef saveMatrix
+    saveComplexMatrixToFile(H_parity_Block, "HamiltonParityStates.txt", "parity states Ansatz für N = " + std::to_string(N) +
+                                                               "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2));
+#endif
+#ifdef showEigenvalues
+    coutMutex.lock();
+    std::cout << "eigenvalues:\n";
+    for (std::complex<double> ev : *eiVals) {
+        std::cout << ev << "\n";
+    }
+    coutMutex.unlock();
+#endif
+#ifdef saveEigenvalues
+    saveComplexEiVals("EigenvaluesMParityStates.txt", "parity states Ansatz für N = " + std::to_string(N) +
+                                                       "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), *eiVals);
+#endif
+}
+#endif
 /////////////////////////////// MULTITHREADING ///////////////////////////////
 
 #ifdef multiCalc
-void threadfunc(double J, std::vector<std::tuple<double, std::complex<double>>> *outData, int J_pos) {
+void threadfunc(double J, std::vector<std::tuple<double, double>> *outData, int J_pos) {
 
     while (true) {
 
@@ -376,25 +486,46 @@ void threadfunc(double J, std::vector<std::tuple<double, std::complex<double>>> 
 
         auto *eiVals = new std::vector<std::complex<double>>;
         auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
+        //auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
 
-        momentumStateAnsatz(J, 1, eiVals, matrixBlocks);
+        //naiverAnatz(J, 1.0, eiVals);
+
+        //magnetisierungsAnsatz(J, 1.0, eiVals, matrixBlocks);
+
+        momentumStateAnsatz(J, 1.0, eiVals, matrixBlocks);
 
         // sort eigenvalues
+        eiVals->shrink_to_fit();
         std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
             return std::real(c1) < std::real(c2);
         });
 
-        std::complex<double> E0 = eiVals->at(0);
-        std::complex<double> E1;
+//        std::complex<double> E0 = eiVals->at(0);
+//        std::complex<double> E1;
+
+        double E0 = std::real(eiVals->at(0));
+        double E1;
 
         for (int i = 1; i < eiVals->size(); i++) {
-            if (abs(E0 - eiVals->at(i)) > 0.001) {
-                E1 = eiVals->at(i);
+            if (abs(std::real(eiVals->at(i))-E0) > 0.000001) {
+                E1 = std::real(eiVals->at(i));
                 break;
             }
+//            if (abs(std::real(E0) - std::real(eiVals->at(i))) > 0.001) {
+//                coutMutex.lock();
+//                std::cout << "found E1: " << eiVals->at(i) << "\n";
+//                coutMutex.unlock();
+//                E1 = eiVals->at(i);
+//                break;
+//            }
         }
 
+//        coutMutex.lock();
+//        std::cout << E0 << "\t" << eiVals->at(0) << "\t" << E1 << "\t" << E1-E0 << "\t" << J << "\n";
+//        coutMutex.unlock();
+
         nextJMutex.lock();
+        //outData->push_back({J, std::real(E1 - E0)});
         outData->push_back({J, E1 - E0});
         J_pos = J_CURRENT;
         J_CURRENT++;
@@ -430,7 +561,7 @@ int main(int argc, char* argv[]) {
     }
     SIZE = (int) pow(2, N);
     std::cout << "N: " << N << "; size: " << SIZE << std::endl;
-    if (argc == 5) {
+    if (argc >= 5) {
         std::cout << "range given: ";
         if (std::stod(argv[2]) > std::stod(argv[3]) || std::stoi(argv[4]) < 1) {
             std::cout << "range invalid, defaulting...\n";
@@ -451,6 +582,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
+/*
     if (!silent) {
         std::cout << "continue? (y/n):";
         char c;
@@ -484,6 +616,7 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+*/
 
 /////////////////////////////// MULTITHREADING ///////////////////////////////
 
@@ -492,7 +625,8 @@ int main(int argc, char* argv[]) {
 
     std::cout << "\ncalculating:..." << std::endl;
 
-    auto *outData = new std::vector<std::tuple<double, std::complex<double>>>;
+    //auto *outData = new std::vector<std::tuple<double, std::complex<double>>>;
+    auto *outData = new std::vector<std::tuple<double, double>>;
 
     int cores = cpu_cnt;
     if (J_COUNT < cpu_cnt) {
@@ -530,9 +664,12 @@ int main(int argc, char* argv[]) {
         file << "datapoints: " << J_COUNT << "\n";
         file << "caculation time with " << cores << " threads: " << time << " seconds\n\n";
         file << "J1/J2\tDelta E in J2\n";
-        for (std::tuple<double, std::complex<double>> data : *outData) {
-            file << std::get<0>(data) << "\t" << std::abs(std::get<1>(data)) << "\n";
+        for (std::tuple<double, double> data : *outData) {
+            file << std::get<0>(data) << "\t" << std::get<1>(data) << "\n";
         }
+//        for (std::tuple<double, std::complex<double>> data : *outData) {
+//            file << std::get<0>(data) << "\t" << std::abs(std::get<1>(data)) << "\n";
+//        }
     } catch (...) {
         file.close();
         std::cout << "failed to save to file\n";
@@ -543,16 +680,16 @@ int main(int argc, char* argv[]) {
     return 0;
 #endif
 
-#ifdef multiCalc
     const double J1 = 1.0, J2 = 1.0;
-#endif
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 #ifdef naiv
     const clock_t begin_time_NAIV = clock();
 
-    std::list<std::complex<double>> H_naiv_EiVals;
+    std::cout << "\nnaiver Ansatz:..." << std::endl;
+    //std::list<std::complex<double>> H_naiv_EiVals;
+    auto *H_naiv_EiVals = new std::vector<std::complex<double>>;
     naiverAnatz(J1, J2, H_naiv_EiVals);
 
     auto time_NAIV = float(clock () - begin_time_NAIV) /  CLOCKS_PER_SEC;
@@ -565,30 +702,50 @@ int main(int argc, char* argv[]) {
     const clock_t begin_time_MAGNETIZATION = clock();
 
     std::cout << "\nblockdiagonale m_z:..." << std::endl;
-    std::vector<std::complex<double>> H_mag_EiVals;
+    //std::vector<std::complex<double>> EiVals_m;
+    auto *EiVals_m = new std::vector<std::complex<double>>;
     auto *matrixBlocks_m = new std::vector<Eigen::MatrixXd>;
-    magnetisierungsAnsatz(J1, J2, H_mag_EiVals, matrixBlocks_m);
+    magnetisierungsAnsatz(J1, J2, EiVals_m, matrixBlocks_m);
 
     auto time_MAGNETIZATION = float(clock () - begin_time_MAGNETIZATION) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
     delete matrixBlocks_m;
 #endif
 
-/////////////////////////////// momentum states (unfinished) ///////////////////////////////
+/////////////////////////////// momentum states ///////////////////////////////
 
 #ifdef momentum
     const clock_t begin_time_MOMENTUM = clock();
 
     std::cout << "\nmomentum states:..." << std::endl;
 
-    auto *H_moment_EiVals = new std::vector<std::complex<double>>;
-    auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
+    auto *momentEiVals = new std::vector<std::complex<double>>;
+    auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
 
-    momentumStateAnsatz(J1, J2, H_moment_EiVals, matrixBlocks);
+    momentumStateAnsatz(J1, J2, momentEiVals, matrixMomentBlocks);
 
     auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
-    delete matrixBlocks;
+    delete momentEiVals;
+    delete matrixMomentBlocks;
+#endif
+
+/////////////////////////////// parity states (unfinished) ///////////////////////////////
+
+#ifdef parity
+    const clock_t begin_time_PARITY = clock();
+
+    std::cout << "\nparity states:..." << std::endl;
+
+    auto *parityEiVals = new std::vector<std::complex<double>>;
+    auto *matrixParityBlocks = new std::vector<Eigen::MatrixXcd>;
+
+    parityStateAnsatz(J1, J2, parityEiVals, matrixParityBlocks);
+
+    auto time_PARITY = float(clock () - begin_time_PARITY) /  CLOCKS_PER_SEC;
+    std::cout << "calculations done; this took: " << time_PARITY << " seconds\n";
+    delete parityEiVals;
+    delete matrixParityBlocks;
 #endif
 
     return 0;
