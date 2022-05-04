@@ -12,10 +12,10 @@
 // print out first N bits of the integer s
 void printBits(int s, int N);
 
-// cyclicly translate first N bits in s by n to the right and returns result
+// cyclically translate first N bits in s by n to the right and returns result
 int translateRight(int s, int n, int N);
 
-// cyclicly translate first N bits in s by n to the left and returns result
+// cyclically translate first N bits in s by n to the left and returns result
 int translateLeft(int s, int n, int N);
 
 // reflect first N bits of the integer s and returns result
@@ -29,7 +29,7 @@ int bitSum(int s, int N);
 
 /////////////////////////////// states ///////////////////////////////
 
-// finds all possible states with magnetization m_z = m and outputs to states
+// finds all possible states with magnetizationBlocksAnsatz m_z = m and outputs to states
 void fillStates(std::vector<int> *states, int m, int N, int size);
 
 // returns the index of the state s in the vector states
@@ -61,7 +61,7 @@ void saveComplexEiVals(const std::string &filename, const std::string &header, c
 
 void saveComplexEiVals(const std::string &filename, const std::string &header, const std::vector<std::complex<double>> &eiVals);
 
-// saves a real matrix (double**) of size size to the file filename and adds the header inscription above
+// saves a real matrix (double**) of size to the file filename and adds the header inscription above
 void saveHamilton(double** hamilton, const std::string &filename, const std::string &header, int size);
 
 // saves a complex matrix (std::complex<double>**) of size size to the file filename and adds the header inscription above
@@ -78,10 +78,11 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 
-// calculates the spefic heat of a system for a set og eigenvalues and a beta
+// calculates the spin heat of a system for a set og eigenvalues and a beta
 double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals, int N);
 
 /////////////////////////////// others ///////////////////////////////
 
 // check validity of user input
+// [executable] N J_START J_END J_COUNT CORES SILENT
 void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, double *J_END, int *J_COUNT, const unsigned int *cpu_cnt, bool *silent, int *cores, const double *J1, const double *J2);

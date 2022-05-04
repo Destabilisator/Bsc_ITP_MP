@@ -10,24 +10,17 @@
 #include <complex>
 #include <Eigen/Eigenvalues>
 
-#define PI  3.14159265358979323846
+#include "headers/helpers.h"
+#include "methods.h"
 
 //// methods ////
 #define multiCalc
-#define momentum
+#define momentumStateAnsatz
 
 #ifndef multiCalc
-    #define naiv
-    #define magnetization
-    //#define parity
-#endif
-
-///// output, turn off during multithreading /////
-#ifndef multiCalc
-    //#define showMatrix
-    #define saveMatrix
-    //#define showEigenvalues
-    #define saveEigenvalues
+    #define naiverAnsatz
+    #define magnetizationBlocksAnsatz
+    //#define parityStateAnsatz
 #endif
 
 ///// global variables /////
@@ -47,7 +40,5 @@ int BETA_COUNT = J_COUNT;
 
 ///// multi threading stuff /////
 const auto cpu_cnt = std::thread::hardware_concurrency();
-std::mutex EiValWriterMutex;
-std::mutex MatrixAppenderMutex;
 std::mutex coutMutex;
 std::mutex nextJMutex;

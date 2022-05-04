@@ -317,19 +317,18 @@ double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiV
 
 /////////////////////////////// others ///////////////////////////////
 
+// [executable] N J_START J_END J_COUNT CORES SILENT
 void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, double *J_END, int *J_COUNT, const unsigned int *cpu_cnt, bool *silent, int *cores, const double *J1, const double *J2) {
 
-    // [executable] N J_START J_END J_COUNT CORES SILENT
-
     if (argc >= 2) {
-        if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) ) {
+        if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) && (std::stoi(argv[1]) <= 32) ) {
             *N = std::stoi(argv[1]);
         } else {
             std::cout << "invalid chain size, must be even and at least 6, defaulting to " << N << "\n";
         }
     }
     *SIZE = (int) pow(2, *N);
-    std::cout << "N: " << N << "; size: " << SIZE << std::endl;
+    std::cout << "N: " << *N << "; size: " << *SIZE << std::endl;
     if (argc >= 5) {
         std::cout << "range given: ";
         if (std::stod(argv[2]) > std::stod(argv[3]) || std::stoi(argv[4]) < 1) {
@@ -379,18 +378,18 @@ void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, d
             }
             wrong_JRANGE:
             std::cout << "Enter new J_START (J1/J2):";
-            double JSTART_usr;
-            std::cin >> JSTART_usr;
+            double J_START_usr;
+            std::cin >> J_START_usr;
             std::cout << "Enter new J_END (J1/J2):";
-            double JEND_usr;
-            std::cin >> JEND_usr;
-            std::cout << "Enter new J_COUNT (number of datapoints):";
-            int JCOUNT_usr;
-            std::cin >> JCOUNT_usr;
-            if (JSTART_usr <= JEND_usr && JCOUNT_usr >= 1) {
-                *J_START = JSTART_usr;
-                *J_END = JEND_usr;
-                *J_COUNT = JCOUNT_usr;
+            double J_END_usr;
+            std::cin >> J_END_usr;
+            std::cout << "Enter new J_COUNT (number of data-points):";
+            int J_COUNT_usr;
+            std::cin >> J_COUNT_usr;
+            if (J_START_usr <= J_END_usr && J_COUNT_usr >= 1) {
+                *J_START = J_START_usr;
+                *J_END = J_END_usr;
+                *J_COUNT = J_COUNT_usr;
             } else {
                 goto wrong_JRANGE;
             }

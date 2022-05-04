@@ -24,15 +24,7 @@ else
 	SILENT=-
 fi
 
-#case "$OSTYPE" in
-#  solaris*) echo "SOLARIS" ;;
-#  darwin*)  echo "OSX" ;;
-#  linux*)   echo "LINUX" ;;
-#  bsd*)     echo "BSD" ;;
-#  msys*)    echo "WINDOWS" ;;
-#  cygwin*)  echo "ALSO WINDOWS" ;;
-#  *)        echo "unknown: $OSTYPE" ;;
-#esac
+
 
 if [[ "$OSTYPE" == "msys" ]]; then
     ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES $SILENT
