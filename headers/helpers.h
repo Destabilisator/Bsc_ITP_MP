@@ -72,3 +72,11 @@ void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename
 
 // saves a complex matrix (Eigen::MatrixXcd) of arbitrary size to the file filename and adds the header inscription above
 void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &filename, const std::string &header);
+
+// saves a vector of tuples (double) to be processed by python
+void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label, const std::string &y_label, const std::vector<std::tuple<double, double>> &outData);
+
+/////////////////////////////// calculate quantities ///////////////////////////////
+
+// calculates the spefic heat of a system for a set og eigenvalues and a beta
+double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals);

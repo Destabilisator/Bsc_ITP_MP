@@ -23,6 +23,10 @@ int J_COUNT = 50;
 int J_CURRENT = 1;
 int PROGRASSBAR_SEGMENTS = 50;
 
+double BETA_START = J_START;
+double BETA_END = J_END;
+int BETA_COUNT = J_COUNT;
+
 ///// multi threading stuff /////
 const auto cpu_cnt = std::thread::hardware_concurrency();
 std::mutex EiValWriterMutex;

@@ -3,7 +3,7 @@
 //// methods ////
 //#define naiv
 //#define magnetization
-//#define momentum
+#define momentum
 //#define parity
 
 #define multiCalc
@@ -471,7 +471,8 @@ void parityStateAnsatz(double J1, double J2, std::vector<std::complex<double>> *
 /////////////////////////////// MULTITHREADING ///////////////////////////////
 
 #ifdef multiCalc
-void threadfunc(double J, std::vector<std::tuple<double, double>> *outData, int J_pos) {
+void threadfunc(double J, int J_pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                double beta, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X) {
 
     while (true) {
 
@@ -501,22 +502,20 @@ void threadfunc(double J, std::vector<std::tuple<double, double>> *outData, int 
             return std::real(c1) < std::real(c2);
         });
 
+        // Delta E
         double E0 = std::real(eiVals->at(0));
         double E1 = std::real(eiVals->at(1));
 
-//        for (int i = 1; i < eiVals->size(); i++) {
-//            //if (abs(std::real(eiVals->at(i))-E0) > 0.001) {
-//            if (abs(std::real(eiVals->at(i))-E0) > 0) {
-//                E1 = std::real(eiVals->at(i));
-//                break;
-//            }
-//        }
+        ///// magnetic susceptibility /////
+        double magneticSusceptibility_X;
 
+        // write data
         nextJMutex.lock();
-        //outData->push_back({J, std::real(E1 - E0)});
-        outData->push_back({J, E1 - E0});
-        J_pos = J_CURRENT;
-        J_CURRENT++;
+            outDataDeltaE->push_back({J, E1 - E0});
+            outDataSpecificHeat_C->push_back({J, getSpecificHeat(beta, *eiVals)});
+            //outDataMagneticSusceptibility_X->push_back({J, magneticSusceptibility_X});
+            J_pos = J_CURRENT;
+            J_CURRENT++;
         nextJMutex.unlock();
 
         if (J_pos > J_COUNT) {
@@ -580,6 +579,11 @@ int main(int argc, char* argv[]) {
             silent = true;
         }
     }
+    
+    // syncing beta and J ranges
+    BETA_START = J_START;
+    BETA_END = J_END;
+    BETA_COUNT = J_COUNT;
 
 /*
     if (!silent) {
@@ -624,8 +628,12 @@ int main(int argc, char* argv[]) {
 
     std::cout << "\ncalculating:..." << std::endl;
 
-    //auto *outData = new std::vector<std::tuple<double, std::complex<double>>>;
-    auto *outData = new std::vector<std::tuple<double, double>>;
+    //auto *outDataDeltaE = new std::vector<std::tuple<double, std::complex<double>>>;
+    auto *outDataDeltaE = new std::vector<std::tuple<double, double>>;
+    auto *outDataSpecificHeat_C = new std::vector<std::tuple<double, double>>;
+    auto *outDataMagneticSusceptibility_X = new std::vector<std::tuple<double, double>>;
+
+    double beta = 1.0;
 
     if (J_COUNT < cpu_cnt) {
         cores = J_COUNT;
@@ -635,7 +643,7 @@ int main(int argc, char* argv[]) {
     J_CURRENT += cores;
 
     for (int i = 0; i < cores; i++) {
-        Threads[i] = std::thread(threadfunc, J_START + (J_END-J_START)*i/J_COUNT, outData, i+1);
+        Threads[i] = std::thread(threadfunc, J_START + (J_END-J_START)*i/J_COUNT, i + 1, outDataDeltaE, beta, outDataSpecificHeat_C, outDataMagneticSusceptibility_X);
     }
 
     for (int i = 0; i < cores; i++) {
@@ -645,40 +653,36 @@ int main(int argc, char* argv[]) {
     auto time = float(clock () - begin_time) /  CLOCKS_PER_SEC;
     std::cout << "\n" << "calculations done; this took: " << time << " seconds\n\n";
 
-    std::string filename = "data_delta_E.txt";
-    std::cout << "saving to file " << filename << "...\n";
-
     // sort datapoints
-    std::sort(outData->begin(), outData->end(), [](const std::tuple<double, std::complex<double>> &a, const std::tuple<double, std::complex<double>> &b) {
+    std::sort(outDataDeltaE->begin(), outDataDeltaE->end(), [](const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
         return std::get<0>(a) < std::get<0>(b);
     });
+    std::sort(outDataSpecificHeat_C->begin(), outDataSpecificHeat_C->end(), [](const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
+        return std::get<0>(a) < std::get<0>(b);
+    });
+//    std::sort(outDataMagneticSusceptibility_X->begin(), outDataMagneticSusceptibility_X->end(), [](const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
+//        return std::get<0>(a) < std::get<0>(b);
+//    });
 
-    std::ofstream file;
-    try {
-        file.open("./results/" + filename);
-        file << "N: " << N << "\n";
-        file << "J1/J2 START: " << J_START << "\n";
-        file << "J1/J2 END: " << J_END << "\n";
-        file << "datapoints: " << J_COUNT << "\n";
-        file << "caculation time with " << cores << " threads: " << time << " seconds\n\n";
-        file << "J1/J2\tDelta E in J2\n";
-        for (std::tuple<double, double> data : *outData) {
-            file << std::get<0>(data) << "\t" << std::get<1>(data) << "\n";
-        }
-//        for (std::tuple<double, std::complex<double>> data : *outData) {
-//            file << std::get<0>(data) << "\t" << std::abs(std::get<1>(data)) << "\n";
-//        }
-    } catch (...) {
-        file.close();
-        std::cout << "failed to save to file\n";
-        return 1;
-    }
-    file.close();
+    std::string filenameDeltaE = "data_delta_E.txt";
+    std::string filenameSpecificHeat_C = "data_specific_heat.txt";
+    std::string filenameMagneticSusceptibility_X = "data_magnetic_susceptibility.txt";
+    std::string header = "N: " + std::to_string(N) + "\n"
+                         + "J1/J2 START: " + std::to_string(J_START) + "\n"
+                         + "J1/J2 END: " + std::to_string(J_END) + "\n"
+                         + "datapoints: " + std::to_string(J_COUNT) + "\n"
+                         + "caculation time with " + std::to_string(cores) + " threads: " + std::to_string(time) + " seconds";
 
-    return 0;
+    std::string headerWithBeta = "beta = " + std::to_string(beta) +"\n" + header;
+
+    saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", *outDataDeltaE);
+    saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", *outDataSpecificHeat_C);
+    //saveOutData(filenameMagneticSusceptibility_X, headerWithBeta, "J1/J2", "magnetic susceptibility in J2", *outDataMagneticSusceptibility_X);
+
+    //return 0;
 #endif
 
-    const double J1 = 0.9996, J2 = 1.0;
+    const double J1 = 1.0, J2 = 1.0;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
@@ -721,6 +725,24 @@ int main(int argc, char* argv[]) {
     auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
 
     momentumStateAnsatz(J1, J2, momentEiVals, matrixMomentBlocks);
+
+    auto *specificHeat_momentum = new std::vector<std::tuple<double, double>>;
+
+    // specific heat plot
+    for (int i = 0; i < BETA_COUNT; i++) {
+        double current_beta = BETA_START + (BETA_END-BETA_START)*i/BETA_COUNT;
+        specificHeat_momentum->push_back({current_beta, getSpecificHeat(current_beta, *momentEiVals)});
+    }
+
+    std::string filenameSpecificHeat_C_momentum = "momentum_specific_heat.txt";
+    std::string header_momentum = "N: " + std::to_string(N) + "\n"
+                                + "beta START: " + std::to_string(BETA_START) + "\n"
+                                + "beta END: " + std::to_string(BETA_END) + "\n"
+                                + "datapoints: " + std::to_string(BETA_COUNT) + "\n"
+                                + "caculation time with " + std::to_string(cores) + " threads: " + std::to_string(time) + " seconds";
+
+    std::string headerWithJ_momentum = "J1/J2 = " + std::to_string(J1/J2) +"\n" + header;
+    saveOutData(filenameSpecificHeat_C_momentum, headerWithJ_momentum, "J1/J2", "specific heat in J2", *specificHeat_momentum);
 
     auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";

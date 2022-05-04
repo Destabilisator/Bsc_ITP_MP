@@ -282,3 +282,38 @@ void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &
     }
     file.close();
 }
+
+void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label, const std::string &y_label, const std::vector<std::tuple<double, double>> &outData) {
+    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::ofstream file;
+    try {
+        file.open("./results/" + filename);
+        file << header << "\n\n";
+        file << x_label << "\t" << y_label << "\n";
+        for (std::tuple<double, double> data : outData) {
+            file << std::get<0>(data) << "\t" << std::get<1>(data) << "\n";
+        }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
+/////////////////////////////// calculate quantities ///////////////////////////////
+
+double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals) {
+    double Z_sum;
+    for (std::complex<double> ev : eiVals) {
+        Z_sum += std::real(std::exp(- beta * ev));
+    }
+    double expectation_H, expectation_H_2;
+    for (std::complex<double> ev : eiVals) {
+        double ev_real = std::real(ev);
+        expectation_H += std::real(std::exp(- beta * ev_real) * ev_real);
+        expectation_H_2 += std::real(std::exp(- beta * ev_real) * ev_real * ev_real);
+    }
+    expectation_H /= Z_sum;
+    expectation_H_2 /= Z_sum;
+    return beta * beta * ( expectation_H_2 - expectation_H * expectation_H );
+}
