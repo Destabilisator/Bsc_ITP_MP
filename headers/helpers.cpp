@@ -53,7 +53,7 @@ void fillStates(std::vector<int> *states, int m, int N, int size) {
 }
 
 int findState(const std::vector<int>& states, int s) {
-    int pos, pos_min = 0, pos_max = states.size()-1;
+    int pos, pos_min = 0, pos_max = (int) states.size()-1;
     while (true) {
         pos = pos_min + (pos_max - pos_min ) / 2;
         if (s < states.at(pos)) {
@@ -69,7 +69,7 @@ int findState(const std::vector<int>& states, int s) {
 }
 
 int findState(const std::vector<std::tuple<int, int>>& states, int s) {
-    int pos, pos_min = 0, pos_max = states.size()-1;
+    int pos, pos_min = 0, pos_max = (int) states.size()-1;
     while (true) {
         pos = pos_min + (pos_max - pos_min ) / 2;
         if (s < std::get<0>(states.at(pos))) {
@@ -313,4 +313,87 @@ double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiV
     expectation_H /= Z_sum;
     expectation_H_2 /= Z_sum;
     return beta * beta * ( expectation_H_2 - expectation_H * expectation_H ) / N;
+}
+
+/////////////////////////////// others ///////////////////////////////
+
+void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, double *J_END, int *J_COUNT, const unsigned int *cpu_cnt, bool *silent, int *cores, const double *J1, const double *J2) {
+
+    // [executable] N J_START J_END J_COUNT CORES SILENT
+
+    if (argc >= 2) {
+        if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) ) {
+            *N = std::stoi(argv[1]);
+        } else {
+            std::cout << "invalid chain size, must be even and at least 6, defaulting to " << N << "\n";
+        }
+    }
+    *SIZE = (int) pow(2, *N);
+    std::cout << "N: " << N << "; size: " << SIZE << std::endl;
+    if (argc >= 5) {
+        std::cout << "range given: ";
+        if (std::stod(argv[2]) > std::stod(argv[3]) || std::stoi(argv[4]) < 1) {
+            std::cout << "range invalid, defaulting...\n";
+        } else {
+            *J_START = std::stod(argv[2]); *J_END = std::stod(argv[3]); *J_COUNT = std::stoi(argv[4]);
+        }
+        std::cout << "START = " << *J_START << ", END = " << *J_END << " and COUNT = " << *J_COUNT << " from args\n";
+    } else {
+        std::cout << "no range given: ";
+        std::cout << "START = " << *J_START << ", END = " << *J_END << " and COUNT = " << *J_COUNT << " from default\n";
+    }
+
+    std::cout << "default J1 and J2 for beta plot: J1 = " << *J1 << " and J2 = " << *J2 << " (currently unchangeable)\n";
+
+    if (argc >= 6) {
+        int crs = std::stoi(argv[5]);
+        if (crs > 0 && crs <= *cpu_cnt) {
+            *cores = crs;
+            std::cout << "using " << *cores << "cores\n";
+        } else {
+            std::cout << "defaulting to using all (" << *cores << ") cores\n";
+        }
+    }
+
+    if (argc >= 7) {
+        std::string s1 = "silent";
+        std::string s2 = argv[6];
+        if (s1 == s2) {
+            *silent = true;
+        }
+    }
+
+    if (!*silent) {
+        std::cout << "continue? (y/n):";
+        char c;
+        std::cin >> c;
+        if (c != 'y') {
+            wrong_N:
+            std::cout << "Enter new N (must be even ans >= 6):";
+            int N_usr;
+            std::cin >> N_usr;
+            if (N_usr >= 6 && N_usr % 2 == 0) {
+                *N = N_usr;
+            } else {
+                goto wrong_N;
+            }
+            wrong_JRANGE:
+            std::cout << "Enter new J_START (J1/J2):";
+            double JSTART_usr;
+            std::cin >> JSTART_usr;
+            std::cout << "Enter new J_END (J1/J2):";
+            double JEND_usr;
+            std::cin >> JEND_usr;
+            std::cout << "Enter new J_COUNT (number of datapoints):";
+            int JCOUNT_usr;
+            std::cin >> JCOUNT_usr;
+            if (JSTART_usr <= JEND_usr && JCOUNT_usr >= 1) {
+                *J_START = JSTART_usr;
+                *J_END = JEND_usr;
+                *J_COUNT = JCOUNT_usr;
+            } else {
+                goto wrong_JRANGE;
+            }
+        }
+    }
 }

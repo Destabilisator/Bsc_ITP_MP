@@ -9,20 +9,36 @@
 #include <ctime>
 #include <complex>
 #include <Eigen/Eigenvalues>
-//#include <Eigen/SparseCore>
-#include "headers/helpers.h"
 
 #define PI  3.14159265358979323846
+
+//// methods ////
+#define multiCalc
+#define momentum
+
+#ifndef multiCalc
+    #define naiv
+    #define magnetization
+    //#define parity
+#endif
+
+///// output, turn off during multithreading /////
+#ifndef multiCalc
+    //#define showMatrix
+    #define saveMatrix
+    //#define showEigenvalues
+    #define saveEigenvalues
+#endif
 
 ///// global variables /////
 int N = 6; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
 int SIZE;
-const double J1 = 1.0, J2 = 1.0;
+double J1 = 1.0, J2 = 1.0;
 double J_START = 0;
 double J_END = 2;
 int J_COUNT = 50;
 int J_CURRENT = 1;
-const int PROGRASSBAR_SEGMENTS = 50;
+const int PROGRESSBAR_SEGMENTS = 50;
 
 const double BETA = 1.0;
 double BETA_START = J_START;

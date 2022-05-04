@@ -80,3 +80,8 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 
 // calculates the spefic heat of a system for a set og eigenvalues and a beta
 double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals, int N);
+
+/////////////////////////////// others ///////////////////////////////
+
+// check validity of user input
+void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, double *J_END, int *J_COUNT, const unsigned int *cpu_cnt, bool *silent, int *cores, const double *J1, const double *J2);

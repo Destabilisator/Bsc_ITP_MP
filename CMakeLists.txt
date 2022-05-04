@@ -15,12 +15,15 @@ set(EIGEN_DIR "./Eigen/eigen-3.4.0")
 include_directories(${EIGEN_DIR})
 set(HEADER_DIR "./headers")
 include_directories(${HEADER_DIR})
+set(MAIN_DIR "./")
+include_directories(${MAIN_DIR})
 
 include_directories("./src")
 
 add_executable(Bsc_ITP_MX main.h main.cpp
         headers/helpers.h
-        headers/helpers.cpp)
+        headers/helpers.cpp
+)
 
 #add_executable(Bsc_ITP_MX test/1DChain.cpp)
 

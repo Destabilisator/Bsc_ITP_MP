@@ -1,19 +1,7 @@
 #include "main.h"
+#include "headers/helpers.h"
 
-//// methods ////
-//#define naiv
-//#define magnetization
-#define momentum
-//#define parity
-
-#define multiCalc
-
-///// output, turn off during multithreading /////
-//#define showMatrix
-//#define saveMatrix
-//#define showEigenvalues
-//#define saveEigenvalues
-
+namespace methods {
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 #ifdef naiv
@@ -50,7 +38,7 @@ void fillHamiltonNaiv(double** hamilton, double J1, double J2) {
     }
 }
 
-void naiverAnatz(double J1, double J2, std::vector<std::complex<double>> *HEiValList) {
+void naiverAnsatz(double J1, double J2, std::vector<std::complex<double>> *HEiValList) {
     static auto **hamilton1 = new double*[SIZE];
     for (int i = 0; i < SIZE; i++) {
         hamilton1[i] = new double[SIZE];
@@ -140,7 +128,7 @@ void fillHamiltonBlock(double J1, double J2, const std::vector<int>& states, dou
 void magBlock_getEiVal(double J1, double J2, int m, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks) {
     auto *states = new std::vector<int>;
     fillStates(states, m, N, SIZE);
-    const int statesCount = states->size();
+    const int statesCount = (int) states->size();
     auto **hamiltonBlock = new double*[statesCount];
     for (int i = 0; i < statesCount; i++) {
         hamiltonBlock[i] = new double[statesCount];
@@ -183,7 +171,7 @@ void magnetisierungsAnsatz(double J1, double J2, std::vector<std::complex<double
     Eigen::MatrixXd H_mag_Block = Eigen::MatrixXd::Zero(SIZE, SIZE);
     for (const Eigen::MatrixXd& M : *matrixBlocks) {
         H_mag_Block.block(offset_mag_blocks, offset_mag_blocks, M.rows(), M.cols()) = M;
-        offset_mag_blocks += M.rows();
+        offset_mag_blocks += (int) M.rows();
     }
 #endif
 #ifdef showMatrix
@@ -273,7 +261,7 @@ void fillHamiltonMomentumBlock(double J1, double J2, int k,const std::vector<int
 }
 
 void momentumBlockSolver(double J1, double J2, int k, const std::vector<int> &states, const std::vector<int> &R_vals, std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXcd> *matrixBlocks) {
-    const int statesCount = states.size();
+    const int statesCount = (int) states.size();
     if (statesCount == 0) {
         return;
     }
@@ -340,7 +328,7 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
     Eigen::MatrixXcd H_moment_Block = Eigen::MatrixXcd::Zero(SIZE, SIZE);
     for (const Eigen::MatrixXcd& M : *matrixBlocks) {
         H_moment_Block.block(offset_blocks, offset_blocks, M.rows(), M.cols()) = M;
-        offset_blocks += M.rows();
+        offset_blocks += (int) M.rows();
     }
 #endif
 #ifdef showMatrix
@@ -375,6 +363,7 @@ void momentumStateAnsatz(double J1, double J2, std::vector<std::complex<double>>
 #endif
 
 /////////////////////////////// parity states (unfinished) ///////////////////////////////
+
 #ifdef parity
 void parityStateAnsatz(double J1, double J2, std::vector<std::complex<double>> *eiVals, std::vector<Eigen::MatrixXcd> *matrixBlocks) {
     int k_lower = -(N+2)/4+1;
@@ -468,6 +457,7 @@ void parityStateAnsatz(double J1, double J2, std::vector<std::complex<double>> *
 #endif
 }
 #endif
+}
 /////////////////////////////// MULTITHREADING ///////////////////////////////
 
 #ifdef multiCalc
@@ -476,25 +466,25 @@ void threadfunc(double J, int J_pos, std::vector<std::tuple<double, double>> *ou
 
     while (true) {
 
-        int p = (int) ( (float) J_pos / (float) J_COUNT * (float) PROGRASSBAR_SEGMENTS);
+        int p = (int) ( (float) J_pos / (float) J_COUNT * (float) PROGRESSBAR_SEGMENTS);
         coutMutex.lock();
         std::cout << "\r[";
         for (int _ = 0; _ < p; _++) {
             std::cout << "#";
-        } for (int _ = p; _ < PROGRASSBAR_SEGMENTS; _++) {
+        } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
             std::cout << ".";
-        } std::cout << "] " << int( (float) J_pos / (float) J_COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << J_pos << "/" << J_COUNT << ")              ";
+        } std::cout << "] " << int( (float) J_pos / (float) J_COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << J_pos << "/" << J_COUNT << ")     ";
         coutMutex.unlock();
 
         auto *eiVals = new std::vector<std::complex<double>>;
         auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
         //auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
 
-        //naiverAnatz(J, 1.0, eiVals);
+        //methods::naiverAnatz(J, 1.0, eiVals);
 
-        //magnetisierungsAnsatz(J, 1.0, eiVals, matrixBlocks);
+        //methods::magnetisierungsAnsatz(J, 1.0, eiVals, matrixBlocks);
 
-        momentumStateAnsatz(J, 1.0, eiVals, matrixBlocks);
+        methods::momentumStateAnsatz(J, 1.0, eiVals, matrixBlocks);
 
         // sort eigenvalues
         eiVals->shrink_to_fit();
@@ -538,88 +528,14 @@ void threadfunc(double J, int J_pos, std::vector<std::tuple<double, double>> *ou
 int main(int argc, char* argv[]) {
 
     bool silent = false;
+    int cores = (int) cpu_cnt;
 
-    if (argc >= 2) {
-        if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) ) {
-             N = std::stoi(argv[1]);
-        } else {
-            std::cout << "invalid chain size, must be even and at least 6, defaulting to " << N << "\n";
-        }
-    }
-    SIZE = (int) pow(2, N);
-    std::cout << "N: " << N << "; size: " << SIZE << std::endl;
-    if (argc >= 5) {
-        std::cout << "range given: ";
-        if (std::stod(argv[2]) > std::stod(argv[3]) || std::stoi(argv[4]) < 1) {
-            std::cout << "range invalid, defaulting...\n";
-        } else {
-            J_START = std::stod(argv[2]); J_END = std::stod(argv[3]); J_COUNT = std::stoi(argv[4]);
-        }
-        std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << " from args\n";
-    } else {
-        std::cout << "no range given: ";
-        std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << " from default\n";
-    }
-
-    int cores = cpu_cnt;
-    if (argc >= 6) {
-        int crs = std::stoi(argv[5]);
-        if (crs > 0 && crs <= cpu_cnt) {
-            cores = crs;
-            std::cout << "using " << cores << "cores\n";
-        } else {
-        std::cout << "defaulting to using all (" << cores << ") cores\n";
-        }
-    }
-
-    if (argc >= 7) {
-        std::string s1 = "silent";
-        std::string s2 = argv[6];
-        if (s1 == s2) {
-            silent = true;
-        }
-    }
+    validateInput(argc, argv, &N, &SIZE, &J_START, &J_END, &J_COUNT, &cpu_cnt, &silent, &cores, &J1, &J2);
 
     // syncing BETA and J ranges
     BETA_START = J_START;
     BETA_END = J_END;
     BETA_COUNT = J_COUNT;
-
-/*
-    if (!silent) {
-        std::cout << "continue? (y/n):";
-        char c;
-        std::cin >> c;
-        if (c != 'y') {
-            wrong_N:
-            std::cout << "Enter new N (must be even ans >= 6):";
-            int N_usr;
-            std::cin >> N_usr;
-            if (N_usr >= 6 && N_usr % 2 == 0) {
-                N = N_usr;
-            } else {
-                goto wrong_N;
-            }
-            wrong_JRANGE:
-            std::cout << "Enter new J_START (J1/J2):";
-            double JSTART_usr;
-            std::cin >> JSTART_usr;
-            std::cout << "Enter new J_END (J1/J2):";
-            double JEND_usr;
-            std::cin >> JEND_usr;
-            std::cout << "Enter new J_COUNT (number of datapoints):";
-            int JCOUNT_usr;
-            std::cin >> JCOUNT_usr;
-            if (JSTART_usr <= JEND_usr && JCOUNT_usr >= 1) {
-                J_START = JSTART_usr;
-                J_END = JEND_usr;
-                J_COUNT = JCOUNT_usr;
-            } else {
-                goto wrong_JRANGE;
-            }
-        }
-    }
-    */
 
 /////////////////////////////// MULTITHREADING ///////////////////////////////
 
@@ -677,7 +593,6 @@ int main(int argc, char* argv[]) {
     saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", *outDataSpecificHeat_C);
     //saveOutData(filenameMagneticSusceptibility_X, headerWithBeta, "J1/J2", "magnetic susceptibility in J2", *outDataMagneticSusceptibility_X);
 
-    //return 0;
 #endif
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
@@ -686,9 +601,8 @@ int main(int argc, char* argv[]) {
     const clock_t begin_time_NAIV = clock();
 
     std::cout << "\nnaiver Ansatz:..." << std::endl;
-    //std::list<std::complex<double>> H_naiv_EiVals;
     auto *H_naiv_EiVals = new std::vector<std::complex<double>>;
-    naiverAnatz(J1, J2, H_naiv_EiVals);
+    methods::naiverAnsatz(J1, J2, H_naiv_EiVals);
 
     auto time_NAIV = float(clock () - begin_time_NAIV) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_NAIV << " seconds\n";
@@ -703,7 +617,7 @@ int main(int argc, char* argv[]) {
     //std::vector<std::complex<double>> EiVals_m;
     auto *EiVals_m = new std::vector<std::complex<double>>;
     auto *matrixBlocks_m = new std::vector<Eigen::MatrixXd>;
-    magnetisierungsAnsatz(J1, J2, EiVals_m, matrixBlocks_m);
+    methods::magnetisierungsAnsatz(J1, J2, EiVals_m, matrixBlocks_m);
 
     auto time_MAGNETIZATION = float(clock () - begin_time_MAGNETIZATION) /  CLOCKS_PER_SEC;
     std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
@@ -720,7 +634,7 @@ int main(int argc, char* argv[]) {
     auto *momentEiVals = new std::vector<std::complex<double>>;
     auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
 
-    momentumStateAnsatz(J1, J2, momentEiVals, matrixMomentBlocks);
+    methods::momentumStateAnsatz(J1, J2, momentEiVals, matrixMomentBlocks);
 
     auto *specificHeat_momentum = new std::vector<std::tuple<double, double>>;
 
@@ -730,18 +644,19 @@ int main(int argc, char* argv[]) {
         specificHeat_momentum->push_back({current_beta, getSpecificHeat(current_beta, *momentEiVals, N)});
     }
 
+    auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
+    std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
+
     std::string filenameSpecificHeat_C_momentum = "momentum_specific_heat.txt";
     std::string header_momentum = "N: " + std::to_string(N) + "\n"
                                 + "BETA START: " + std::to_string(BETA_START) + "\n"
                                 + "BETA END: " + std::to_string(BETA_END) + "\n"
                                 + "datapoints: " + std::to_string(BETA_COUNT) + "\n"
-                                + "caculation time with " + std::to_string(cores) + " threads: " + std::to_string(time) + " seconds";
+                                + "caculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_MOMENTUM) + " seconds";
 
-    std::string headerWithJ_momentum = "J1/J2 = " + std::to_string(J1/J2) +"\n" + header;
+    std::string headerWithJ_momentum = "J1/J2 = " + std::to_string(J1/J2) +"\n" + header_momentum;
     saveOutData(filenameSpecificHeat_C_momentum, headerWithJ_momentum, "J1/J2", "specific heat in J2", *specificHeat_momentum);
 
-    auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
-    std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
     delete momentEiVals;
     delete matrixMomentBlocks;
 #endif

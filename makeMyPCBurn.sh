@@ -18,6 +18,12 @@ else
 	CORES=-1
 fi
 
+if [[ "$#" -ge 6 ]]; then
+	SILENT=$6
+else
+	SILENT=-
+fi
+
 #case "$OSTYPE" in
 #  solaris*) echo "SOLARIS" ;;
 #  darwin*)  echo "OSX" ;;
@@ -29,11 +35,11 @@ fi
 #esac
 
 if [[ "$OSTYPE" == "msys" ]]; then
-    ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES
+    ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES $SILENT
     echo "plotting..."
     python plot.py
 else
-    ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES
+    ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES $SILENT
     echo "plotting..."
     python3 plot.py
 fi
