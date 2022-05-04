@@ -72,3 +72,4 @@ if __name__ == "__main__":
     print("plotting specific heat (constant J1/J2, funtion of beta) ...")
     plot_momentum_specific_heat()
     plt.show()
+    
