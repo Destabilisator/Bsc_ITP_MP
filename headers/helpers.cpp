@@ -302,18 +302,15 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 
-double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals) {
-    double Z_sum;
-    for (std::complex<double> ev : eiVals) {
-        Z_sum += std::real(std::exp(- beta * ev));
-    }
-    double expectation_H, expectation_H_2;
+double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals, int N) {
+    double Z_sum = 0.0, expectation_H = 0.0, expectation_H_2 = 0.0;
     for (std::complex<double> ev : eiVals) {
         double ev_real = std::real(ev);
-        expectation_H += std::real(std::exp(- beta * ev_real) * ev_real);
-        expectation_H_2 += std::real(std::exp(- beta * ev_real) * ev_real * ev_real);
+        Z_sum += std::exp(- beta * ev_real);
+        expectation_H += std::exp(- beta * ev_real) * ev_real;
+        expectation_H_2 += std::exp(- beta * ev_real) * ev_real * ev_real;
     }
     expectation_H /= Z_sum;
     expectation_H_2 /= Z_sum;
-    return beta * beta * ( expectation_H_2 - expectation_H * expectation_H );
+    return beta * beta * ( expectation_H_2 - expectation_H * expectation_H ) / N;
 }

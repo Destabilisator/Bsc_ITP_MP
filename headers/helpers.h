@@ -79,4 +79,4 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 /////////////////////////////// calculate quantities ///////////////////////////////
 
 // calculates the spefic heat of a system for a set og eigenvalues and a beta
-double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals);
+double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals, int N);

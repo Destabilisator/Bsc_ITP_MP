@@ -512,7 +512,7 @@ void threadfunc(double J, int J_pos, std::vector<std::tuple<double, double>> *ou
         // write data
         nextJMutex.lock();
             outDataDeltaE->push_back({J, E1 - E0});
-            outDataSpecificHeat_C->push_back({J, getSpecificHeat(beta, *eiVals)});
+            outDataSpecificHeat_C->push_back({J, getSpecificHeat(beta, *eiVals, N)});
             //outDataMagneticSusceptibility_X->push_back({J, magneticSusceptibility_X});
             J_pos = J_CURRENT;
             J_CURRENT++;
@@ -725,9 +725,9 @@ int main(int argc, char* argv[]) {
     auto *specificHeat_momentum = new std::vector<std::tuple<double, double>>;
 
     // specific heat plot
-    for (int i = 0; i < BETA_COUNT; i++) {
+    for (int i = 0; i <= BETA_COUNT; i++) {
         double current_beta = BETA_START + (BETA_END-BETA_START)*i/BETA_COUNT;
-        specificHeat_momentum->push_back({current_beta, getSpecificHeat(current_beta, *momentEiVals)});
+        specificHeat_momentum->push_back({current_beta, getSpecificHeat(current_beta, *momentEiVals, N)});
     }
 
     std::string filenameSpecificHeat_C_momentum = "momentum_specific_heat.txt";

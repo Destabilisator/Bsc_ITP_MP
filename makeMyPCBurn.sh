@@ -28,16 +28,12 @@ fi
 #  *)        echo "unknown: $OSTYPE" ;;
 #esac
 
-
-if [[ "$OSTYPE" == "linux" ]]; then
-    ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES
-    echo "plotting..."
-    python3 plot.py
-elif [[ "$OSTYPE" == "msys" ]]; then
+if [[ "$OSTYPE" == "msys" ]]; then
     ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES
     echo "plotting..."
     python plot.py
 else
-    echo "What kind of place is this?!"
-	exit 1;
+    ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES
+    echo "plotting..."
+    python3 plot.py
 fi
