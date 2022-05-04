@@ -579,8 +579,8 @@ int main(int argc, char* argv[]) {
             silent = true;
         }
     }
-    
-    // syncing beta and J ranges
+
+    // syncing BETA and J ranges
     BETA_START = J_START;
     BETA_END = J_END;
     BETA_COUNT = J_COUNT;
@@ -633,8 +633,6 @@ int main(int argc, char* argv[]) {
     auto *outDataSpecificHeat_C = new std::vector<std::tuple<double, double>>;
     auto *outDataMagneticSusceptibility_X = new std::vector<std::tuple<double, double>>;
 
-    double beta = 1.0;
-
     if (J_COUNT < cpu_cnt) {
         cores = J_COUNT;
     }
@@ -643,7 +641,7 @@ int main(int argc, char* argv[]) {
     J_CURRENT += cores;
 
     for (int i = 0; i < cores; i++) {
-        Threads[i] = std::thread(threadfunc, J_START + (J_END-J_START)*i/J_COUNT, i + 1, outDataDeltaE, beta, outDataSpecificHeat_C, outDataMagneticSusceptibility_X);
+        Threads[i] = std::thread(threadfunc, J_START + (J_END-J_START)*i/J_COUNT, i + 1, outDataDeltaE, BETA, outDataSpecificHeat_C, outDataMagneticSusceptibility_X);
     }
 
     for (int i = 0; i < cores; i++) {
@@ -673,7 +671,7 @@ int main(int argc, char* argv[]) {
                          + "datapoints: " + std::to_string(J_COUNT) + "\n"
                          + "caculation time with " + std::to_string(cores) + " threads: " + std::to_string(time) + " seconds";
 
-    std::string headerWithBeta = "beta = " + std::to_string(beta) +"\n" + header;
+    std::string headerWithBeta = "BETA = " + std::to_string(BETA) + "\n" + header;
 
     saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", *outDataDeltaE);
     saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", *outDataSpecificHeat_C);
@@ -681,8 +679,6 @@ int main(int argc, char* argv[]) {
 
     //return 0;
 #endif
-
-    const double J1 = 1.0, J2 = 1.0;
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
@@ -736,8 +732,8 @@ int main(int argc, char* argv[]) {
 
     std::string filenameSpecificHeat_C_momentum = "momentum_specific_heat.txt";
     std::string header_momentum = "N: " + std::to_string(N) + "\n"
-                                + "beta START: " + std::to_string(BETA_START) + "\n"
-                                + "beta END: " + std::to_string(BETA_END) + "\n"
+                                + "BETA START: " + std::to_string(BETA_START) + "\n"
+                                + "BETA END: " + std::to_string(BETA_END) + "\n"
                                 + "datapoints: " + std::to_string(BETA_COUNT) + "\n"
                                 + "caculation time with " + std::to_string(cores) + " threads: " + std::to_string(time) + " seconds";
 

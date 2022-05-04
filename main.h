@@ -17,12 +17,14 @@
 ///// global variables /////
 int N = 6; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
 int SIZE;
+const double J1 = 1.0, J2 = 1.0;
 double J_START = 0;
 double J_END = 2;
 int J_COUNT = 50;
 int J_CURRENT = 1;
-int PROGRASSBAR_SEGMENTS = 50;
+const int PROGRASSBAR_SEGMENTS = 50;
 
+const double BETA = 1.0;
 double BETA_START = J_START;
 double BETA_END = J_END;
 int BETA_COUNT = J_COUNT;
