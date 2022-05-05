@@ -26,17 +26,17 @@
 ///// global variables /////
 int N = 6; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
 int SIZE;
-double J1 = 0.0, J2 = 1.0;
-double J_START = 0;
-double J_END = 2;
+double J1 = 1.0, J2 = 1.0;
+double J_START = 0.0;
+double J_END = 2.0;
 int J_COUNT = 50;
 int J_CURRENT = 1;
 const int PROGRESSBAR_SEGMENTS = 50;
 
-const double BETA = 1.0;
-double BETA_START = J_START;
-double BETA_END = J_END;
-int BETA_COUNT = J_COUNT;
+const double T = 1.0;
+double T_START = J_START;
+double T_END = J_END;
+int T_COUNT = J_COUNT;
 
 ///// multi threading stuff /////
 const auto cpu_cnt = std::thread::hardware_concurrency();

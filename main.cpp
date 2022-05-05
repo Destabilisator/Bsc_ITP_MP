@@ -74,10 +74,10 @@ int main(int argc, char* argv[]) {
 
     validateInput(argc, argv, &N, &SIZE, &J_START, &J_END, &J_COUNT, &cpu_cnt, &silent, &cores, &J1, &J2);
 
-    // syncing BETA and J ranges
-    BETA_START = J_START;
-    BETA_END = J_END;
-    BETA_COUNT = J_COUNT;
+    // syncing T and J ranges
+    T_START = J_START;
+    T_END = J_END;
+    T_COUNT = J_COUNT;
 
 /////////////////////////////// MULTITHREADING ///////////////////////////////
 
@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
     J_CURRENT += cores;
 
     for (int i = 0; i < cores; i++) {
-        Threads[i] = std::thread(thread_function, J_START + (J_END - J_START) * i / J_COUNT, i + 1, outDataDeltaE, BETA,
+        Threads[i] = std::thread(thread_function, J_START + (J_END - J_START) * i / J_COUNT, i + 1, outDataDeltaE, T,
                                  outDataSpecificHeat_C, outDataMagneticSusceptibility_X);
     }
 
@@ -130,7 +130,7 @@ int main(int argc, char* argv[]) {
                          + "data-points: " + std::to_string(J_COUNT) + "\n"
                          + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time) + " seconds";
 
-    std::string headerWithBeta = "BETA = " + std::to_string(BETA) + "\n" + header;
+    std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
 
     saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", *outDataDeltaE, N);
     saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", *outDataSpecificHeat_C, N);
@@ -140,14 +140,14 @@ int main(int argc, char* argv[]) {
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 
-    momentumStates::startSpecificHeat(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
-    naiv::start(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
-    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
+    momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
+    //naiv::start(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
+    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 #ifdef naiverAnsatz
-    naiv::start(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
+    naiv::start(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
 #endif
 
 /////////////////////////////// fixed magnetization blocks ///////////////////////////////

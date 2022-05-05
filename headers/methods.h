@@ -18,8 +18,8 @@ namespace naiv {
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
                    const int &N, const int &SIZE);
 
-    void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
-               const double &BETA_END, const int &BETA_COUNT, const int &cores);
+    void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+               const double &END, const int &COUNT, const int &cores);
 }
 
 /////////////////////////////// fixed magnetization blocks ///////////////////////////////
@@ -40,8 +40,8 @@ namespace magnetizationBlocks {
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE);
 
-    void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
-                           const double &BETA_END, const int &BETA_COUNT, const int &cores);
+    void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+                             const double &END, const int &COUNT, const int &cores);
 }
 
 /////////////////////////////// momentum states ///////////////////////////////
@@ -60,8 +60,8 @@ namespace momentumStates {
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE);
 
-    void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
-                           const double &BETA_END, const int &BETA_COUNT, const int &cores);
+    void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+                           const double &END, const int &COUNT, const int &cores);
 }
 
 /////////////////////////////// parity states (unfinished) ///////////////////////////////

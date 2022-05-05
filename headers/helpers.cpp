@@ -343,29 +343,43 @@ Eigen::MatrixXd spinMatrix(const int &N, const std::vector<int> &states) {
     return S2;
 }
 
-double getSpecificHeat(const double &beta, const std::vector<std::complex<double>>& eiVals, const int &N) {
+double getSpecificHeat(const double &temp, const std::vector<std::complex<double>>& eiVals, const int &N) {
     double Z_sum = 0.0, expectation_H = 0.0, expectation_H_2 = 0.0;
     for (std::complex<double> ev : eiVals) {
         double ev_real = std::real(ev);
-        Z_sum += std::exp(- beta * ev_real);
-        expectation_H += std::exp(- beta * ev_real) * ev_real;
-        expectation_H_2 += std::exp(- beta * ev_real) * ev_real * ev_real;
+        Z_sum += std::exp(-1.0 / temp * ev_real);
+        expectation_H += std::exp(-1.0 / temp * ev_real) * ev_real;
+        expectation_H_2 += std::exp(-1.0 / temp * ev_real) * ev_real * ev_real;
     }
     expectation_H /= Z_sum;
     expectation_H_2 /= Z_sum;
-    return beta * beta * ( expectation_H_2 - expectation_H * expectation_H ) / N;
+    return 1.0 / temp * 1.0 /temp * ( expectation_H_2 - expectation_H * expectation_H ) / N;
 }
 
-double getSusceptibility(const double &beta, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N) {
+double getSusceptibility(const double &temp, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N) {
     double Z_sum = 0.0, expectation_mz_2 = 0.0;
     for (int i = 0; i < eiVals.size(); i++) {
         double ev_real = std::real(eiVals.at(i));
-        Z_sum += std::exp(- beta * ev_real);
-        expectation_mz_2 += std::exp(- beta * ev_real) * std::real(M(i, i));
+        Z_sum += std::exp(-1.0 / temp * ev_real);
+        expectation_mz_2 += std::exp(-1.0 / temp * ev_real) * std::real(M(i, i));
     }
     expectation_mz_2 /= Z_sum;
     expectation_mz_2 /= 3.0;
-    return beta * expectation_mz_2 / N;
+    return 1.0 / temp * expectation_mz_2 / N;
+}
+
+double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N) {
+    double Z_sum = 0.0, expectation_mz_2 = 0.0;
+    for (int i = 0; i < eiVals.size(); i++) {
+        double ev_real = std::real(eiVals.at(i));
+        double S_elem = std::real(M(i, i));
+        double S = - 0.5 + std::sqrt(0.25 + S_elem);
+        Z_sum += std::exp(-1.0 / temp * ev_real) * (2.0 * S + 1);
+        expectation_mz_2 += std::exp(-1.0 / temp * ev_real) * S_elem * (2.0 * S + 1);
+    }
+    expectation_mz_2 /= Z_sum;
+    expectation_mz_2 /= 3.0;
+    return 1.0 / temp * expectation_mz_2 / N;
 }
 
 /////////////////////////////// others ///////////////////////////////

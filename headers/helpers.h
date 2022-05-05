@@ -91,6 +91,8 @@ double getSpecificHeat(const double &beta, const std::vector<std::complex<double
 // calculates the magnetization of a system for a set og eigenvalues and a beta
 double getSusceptibility(const double &beta, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N);
 
+double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N);
+
 /////////////////////////////// others ///////////////////////////////
 
 // check validity of user input
