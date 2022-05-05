@@ -80,13 +80,16 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 /////////////////////////////// calculate quantities ///////////////////////////////
 
 // returns the Matrix S^2 for a system of a given size
-Eigen::MatrixXd spinMatrix(const int &N,const  int &SIZE);
+Eigen::MatrixXd spinMatrix(const int &N, const  int &SIZE);
+
+// returns the Matrix S^2 for a given set of states
+Eigen::MatrixXd spinMatrix(const int &N, const std::vector<int> &states);
 
 // calculates the specific heat of a system for a set og eigenvalues and a beta
 double getSpecificHeat(const double &beta, const std::vector<std::complex<double>>& eiVals, const int &N);
 
 // calculates the magnetization of a system for a set og eigenvalues and a beta
-double getMagnetization(const double &beta, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N);
+double getSusceptibility(const double &beta, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N);
 
 /////////////////////////////// others ///////////////////////////////
 

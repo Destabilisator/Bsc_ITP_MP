@@ -304,7 +304,7 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 
-Eigen::MatrixXd spinMatrix(const int &N,const  int &SIZE) {
+Eigen::MatrixXd spinMatrix(const int &N, const  int &SIZE) {
     Eigen::MatrixXd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(SIZE, SIZE);
     for (int s = 0; s < SIZE; s++) {
         for (int j = 0; j < N; j++) {
@@ -315,6 +315,27 @@ Eigen::MatrixXd spinMatrix(const int &N,const  int &SIZE) {
                     S2(s, s) -= 0.5;
                     int d = s ^ (1 << i) ^ (1 << j);
                     S2(s, d) = 1.0;
+                }
+            }
+        }
+    }
+    return S2;
+}
+
+Eigen::MatrixXd spinMatrix(const int &N, const std::vector<int> &states) {
+    int size = (int) states.size();
+    Eigen::MatrixXd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(size, size);
+    for (int k = 0; k < size; k++) {
+        for (int j = 0; j < N; j++) {
+            int s = states.at(k);
+            for (int i = 0; i < j; i++) {
+                if (((s >> i) & 1) == ((s >> j) & 1)) {
+                    S2(k, k) += 0.5;
+                } else {
+                    S2(k, k) -= 0.5;
+                    int d = s ^ (1 << i) ^ (1 << j);
+                    int b = findState(states, d);
+                    S2(k, b) = 1.0;
                 }
             }
         }
@@ -335,17 +356,16 @@ double getSpecificHeat(const double &beta, const std::vector<std::complex<double
     return beta * beta * ( expectation_H_2 - expectation_H * expectation_H ) / N;
 }
 
-double getMagnetization(const double &beta, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N) {
+double getSusceptibility(const double &beta, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N) {
     double Z_sum = 0.0, expectation_mz_2 = 0.0;
     for (int i = 0; i < eiVals.size(); i++) {
         double ev_real = std::real(eiVals.at(i));
-        Z_sum += std::exp(- 1.0 / beta * ev_real);
-        expectation_mz_2 += std::exp(- 1.0 / beta * ev_real) * std::real(M(i, i));
+        Z_sum += std::exp(- beta * ev_real);
+        expectation_mz_2 += std::exp(- beta * ev_real) * std::real(M(i, i));
     }
     expectation_mz_2 /= Z_sum;
     expectation_mz_2 /= 3.0;
-    return 1.0 / beta * expectation_mz_2 / N;
-
+    return beta * expectation_mz_2 / N;
 }
 
 /////////////////////////////// others ///////////////////////////////

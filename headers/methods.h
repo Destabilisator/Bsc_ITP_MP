@@ -35,7 +35,13 @@ namespace magnetizationBlocks {
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
                    std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N, const int &SIZE);
 
+    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
+                            Eigen::MatrixXcd &matrixBlockU, std::vector<int> *states, const int &N, const int &SIZE);
+
     void start(const double &J1, const double &J2, const int &N, const int &SIZE);
+
+    void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
+                           const double &BETA_END, const int &BETA_COUNT, const int &cores);
 }
 
 /////////////////////////////// momentum states ///////////////////////////////
@@ -52,8 +58,10 @@ namespace momentumStates {
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
                    std::vector<Eigen::MatrixXcd> *matrixBlocks, const int &N, const int &SIZE);
 
-    void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
-               const double &BETA_END, const int &BETA_COUNT, const int &cores);
+    void start(const double &J1, const double &J2, const int &N, const int &SIZE);
+
+    void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
+                           const double &BETA_END, const int &BETA_COUNT, const int &cores);
 }
 
 /////////////////////////////// parity states (unfinished) ///////////////////////////////

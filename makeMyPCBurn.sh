@@ -25,7 +25,6 @@ else
 fi
 
 
-
 if [[ "$OSTYPE" == "msys" ]]; then
     ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES $SILENT
     echo "plotting..."

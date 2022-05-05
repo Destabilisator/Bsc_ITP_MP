@@ -138,6 +138,12 @@ int main(int argc, char* argv[]) {
 
 #endif
 
+/////////////////////////////// calculate quantities ///////////////////////////////
+
+    momentumStates::startSpecificHeat(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
+    naiv::start(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
+    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
+
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 #ifdef naiverAnsatz
@@ -153,7 +159,7 @@ int main(int argc, char* argv[]) {
 /////////////////////////////// momentum states ///////////////////////////////
 
 #ifdef momentumStateAnsatz
-    momentumStates::start(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
+    momentumStates::start(J1, J2, N, SIZE);
 #endif
 
 /////////////////////////////// parity states (unfinished) ///////////////////////////////

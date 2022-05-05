@@ -65,6 +65,7 @@ namespace naiv {
 
         Matrix_U = solver.eigenvectors();
 
+        HEiValList->shrink_to_fit();
 #if defined(showEigenvalues) || defined(saveEigenvalues)
         HEiValList->shrink_to_fit();
         std::sort(HEiValList->begin(), HEiValList->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
@@ -94,9 +95,9 @@ namespace naiv {
         Eigen::MatrixXcd Matrix_U(SIZE, SIZE);
         getEiVals(J1, J2, H_naiv_EiVals, N, SIZE, Matrix_U);
 
-        ///// magnetization /////
+        ///// susceptibility /////
 
-        auto *magnetization_naiv = new std::vector<std::tuple<double, double>>;
+        auto *susceptibility_naiv = new std::vector<std::tuple<double, double>>;
 
         Eigen::MatrixXd S2 = spinMatrix(N, SIZE);
         Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(SIZE, SIZE);
@@ -104,23 +105,25 @@ namespace naiv {
 
         for (int i = 0; i <= BETA_COUNT; i++) {
             double current_beta = BETA_START + (BETA_END-BETA_START)*i/BETA_COUNT;
-            magnetization_naiv->push_back({current_beta, getMagnetization(current_beta, Matrix_U_inv_S2_U, *H_naiv_EiVals, N)});
+            //current_beta = 1 / current_beta;
+            susceptibility_naiv->push_back({current_beta,
+                                            getSusceptibility(current_beta, Matrix_U_inv_S2_U, *H_naiv_EiVals, N)});
         }
-
-        ///// save /////
 
         auto time_NAIV = float(clock () - begin_time_NAIV) /  CLOCKS_PER_SEC;
         std::cout << "calculations done; this took: " << time_NAIV << " seconds\n";
 
-        std::string filenameMagnetization_X = "naiv_magnetization.txt";
-        std::string headerMagnetization_X = "N: " + std::to_string(N) + "\n"
+        ///// save /////
+
+        std::string filenameSusceptibility_X = "naiv_susceptibility.txt";
+        std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
                                       + "BETA START: " + std::to_string(BETA_START) + "\n"
                                       + "BETA END: " + std::to_string(BETA_END) + "\n"
                                       + "data-points: " + std::to_string(BETA_COUNT) + "\n"
                                       + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_NAIV) + " seconds";
 
-        std::string headerWithJMagnetization_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerMagnetization_X;
-        saveOutData(filenameMagnetization_X, headerWithJMagnetization_X, "J1/J2", "specific heat in J2", *magnetization_naiv, N);
+        std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
+        saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_naiv, N);
         std::cout << "\n";
     }
 }
@@ -187,9 +190,9 @@ namespace magnetizationBlocks {
             H.row(i) = Eigen::VectorXd::Map(&hamiltonBlock[i][0], statesCount);
         }
 
-#if defined(showMatrix) || defined(saveMatrix)
+    #if defined(showMatrix) || defined(saveMatrix)
         matrixBlocks->push_back(H);
-#endif
+    #endif
 
         Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
         const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
@@ -247,6 +250,47 @@ namespace magnetizationBlocks {
     #endif
     }
 
+    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
+                   Eigen::MatrixXcd &matrixBlockU, std::vector<int> *states, const int &N, const int &SIZE) {
+
+        fillStates(states, N/2, N, SIZE);
+        const int statesCount = (int) states->size();
+        auto **hamiltonBlock = new double *[statesCount];
+        for (int i = 0; i < statesCount; i++) {
+            hamiltonBlock[i] = new double[statesCount];
+            for (int j = 0; j < statesCount; j++) {
+                hamiltonBlock[i][j] = 0.0;
+            }
+        }
+
+        fillHamiltonBlock(J1, J2, *states, hamiltonBlock, N, SIZE);
+
+        Eigen::MatrixXd H(statesCount, statesCount);
+        for (int i = 0; i < statesCount; i++) {
+            H.row(i) = Eigen::VectorXd::Map(&hamiltonBlock[i][0], statesCount);
+        }
+
+        Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
+        const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
+        for (std::complex<double> ev: H1EiVal) {
+            HEiValList->push_back(ev);
+        }
+
+        matrixBlockU = solver.eigenvectors();
+
+        for (int i = 0; i < statesCount; i++) {
+            delete hamiltonBlock[i];
+        }
+        delete[] hamiltonBlock;
+
+        HEiValList->shrink_to_fit();
+        // sort eigenvalues
+//        std::sort(HEiValList->begin(), HEiValList->end(),
+//                  [](const std::complex<double> &c1, const std::complex<double> &c2) {
+//                      return std::real(c1) < std::real(c2);
+//                  });
+    }
+
     void start(const double &J1, const double &J2, const int &N, const int &SIZE) {
         const clock_t begin_time_MAGNETIZATION = clock();
 
@@ -259,6 +303,50 @@ namespace magnetizationBlocks {
         auto time_MAGNETIZATION = float(clock () - begin_time_MAGNETIZATION) /  CLOCKS_PER_SEC;
         std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
         delete matrixBlocks_m;
+    }
+
+    void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
+                           const double &BETA_END, const int &BETA_COUNT, const int &cores) {
+
+        const clock_t begin_time_MAGNETIZATION = clock();
+        std::cout << "\nblock diagonale m_z:..." << std::endl;
+
+        auto *states = new std::vector<int>;
+        auto *eiVals = new std::vector<std::complex<double>>;
+        Eigen::MatrixXcd matrixBlockU;
+        magnetizationBlocks::getEiValsZeroBlock(J1, J2, eiVals, matrixBlockU, states, N, SIZE);
+
+        ///// susceptibility /////
+
+        auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;
+
+        Eigen::MatrixXd S2 = spinMatrix(N, *states);
+        Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(SIZE, SIZE);
+        Matrix_U_inv_S2_U = matrixBlockU.adjoint() * S2 * matrixBlockU;
+
+        for (int i = 0; i <= BETA_COUNT; i++) {
+            double current_beta = BETA_START + (BETA_END-BETA_START)*i/BETA_COUNT;
+            //current_beta = 1 / current_beta;
+            susceptibility_magnetization->push_back({current_beta,
+                                            getSusceptibility(current_beta, Matrix_U_inv_S2_U, *eiVals, N)});
+        }
+
+
+        auto time_MAGNETIZATION = float(clock () - begin_time_MAGNETIZATION) /  CLOCKS_PER_SEC;
+        std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
+
+        ///// save /////
+
+        std::string filenameSusceptibility_X = "magnetization_susceptibility.txt";
+        std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
+                                      + "BETA START: " + std::to_string(BETA_START) + "\n"
+                                      + "BETA END: " + std::to_string(BETA_END) + "\n"
+                                      + "data-points: " + std::to_string(BETA_COUNT) + "\n"
+                                      + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_MAGNETIZATION) + " seconds";
+
+        std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
+        saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_magnetization, N);
+        std::cout << "\n";
     }
 }
 
@@ -431,7 +519,27 @@ namespace momentumStates {
     #endif
     }
 
-    void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
+    void start(const double &J1, const double &J2, const int &N, const int &SIZE) {
+
+        const clock_t begin_time_MOMENTUM = clock();
+
+        std::cout << "\nmomentum states:..." << std::endl;
+
+        auto *momentEiVals = new std::vector<std::complex<double>>;
+        auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
+
+        getEiVals(J1, J2, momentEiVals, matrixMomentBlocks, N, SIZE);
+
+        auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
+        std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
+
+        std::cout << "\n";
+
+        delete momentEiVals;
+        delete matrixMomentBlocks;
+    }
+
+    void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
                const double &BETA_END, const int &BETA_COUNT, const int &cores) {
 
         const clock_t begin_time_MOMENTUM = clock();
@@ -460,10 +568,10 @@ namespace momentumStates {
 
         std::string filenameSpecificHeat_C = "momentum_specific_heat.txt";
         std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
-                                      + "BETA START: " + std::to_string(BETA_START) + "\n"
-                                      + "BETA END: " + std::to_string(BETA_END) + "\n"
-                                      + "data-points: " + std::to_string(BETA_COUNT) + "\n"
-                                      + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_MOMENTUM) + " seconds";
+                                           + "BETA START: " + std::to_string(BETA_START) + "\n"
+                                           + "BETA END: " + std::to_string(BETA_END) + "\n"
+                                           + "data-points: " + std::to_string(BETA_COUNT) + "\n"
+                                           + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_MOMENTUM) + " seconds";
 
         std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
         saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", *specificHeat_momentum, N);
