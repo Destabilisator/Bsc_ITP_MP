@@ -37,15 +37,10 @@ void thread_function(double J, int J_pos, std::vector<std::tuple<double, double>
         double E0 = std::real(eiVals->at(0));
         double E1 = std::real(eiVals->at(1));
 
-        ///// magnetic susceptibility ////////// magnetic susceptibility ////////// magnetic susceptibility /////
-        double magneticSusceptibility_X = 0.0;
-        outDataMagneticSusceptibility_X->push_back({J, magneticSusceptibility_X});
-
         // write data
         nextJMutex.lock();
             outDataDeltaE->push_back({J, E1 - E0});
             outDataSpecificHeat_C->push_back({J, getSpecificHeat(beta, *eiVals, N)});
-            //outDataMagneticSusceptibility_X->push_back({J, magneticSusceptibility_X});
             J_pos = J_CURRENT;
             J_CURRENT++;
         nextJMutex.unlock();

@@ -156,7 +156,7 @@ void representative(int s, int *r, int *l, int *q, int N) {
 /////////////////////////////// saving data ///////////////////////////////
 
 void saveEiVals(const std::string &filename, const std::string &header, const std::list<double> &eiVals, const int &N) {
-    std::cout << "saving to file '" << filename << "'..." << std::endl;
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
     std::ofstream file;
     try {
         file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -174,7 +174,7 @@ void saveEiVals(const std::string &filename, const std::string &header, const st
 }
 
 void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals, const int &N) {
-    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
     std::ofstream file;
     try {
         file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -191,7 +191,7 @@ void saveComplexEiVals(const std::string &filename, const std::string &header, c
 }
 
 void saveComplexEiVals(const std::string &filename, const std::string &header, const std::vector<std::complex<double>> &eiVals, const int &N) {
-    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
     std::ofstream file;
     try {
         file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -208,7 +208,7 @@ void saveComplexEiVals(const std::string &filename, const std::string &header, c
 }
 
 void saveHamilton(double** hamilton, const std::string &filename, const std::string &header, const int &size, const int &N) {
-    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
     std::ofstream file;
     try {
         file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -232,7 +232,7 @@ void saveHamilton(double** hamilton, const std::string &filename, const std::str
 }
 
 void saveComplexHamilton(std::complex<double> **hamilton,const std::string &filename, const std::string &header, const int &size, const int &N) {
-    std::cout << "saving to file '" << filename << "'..." << std::endl;
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
     std::ofstream file;
     try {
         file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -256,7 +256,7 @@ void saveComplexHamilton(std::complex<double> **hamilton,const std::string &file
 }
 
 void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename, const std::string &header, const int &N) {
-    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
     std::ofstream file;
     try {
         file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -270,7 +270,7 @@ void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename
 }
 
 void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &filename, const std::string &header, const int &N) {
-    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
     std::ofstream file;
     try {
         file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -286,7 +286,7 @@ void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &
 void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                  const std::string &y_label, const std::vector<std::tuple<double, double>> &outData, const int &N) {
 
-    std::cout << "saving to file '" << filename << "'..." << "\n";
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
     std::ofstream file;
     try {
         file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -416,7 +416,7 @@ void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, d
         int crs = std::stoi(argv[5]);
         if (crs > 0 && crs <= *cpu_cnt) {
             *cores = crs;
-            std::cout << "using " << *cores << "cores\n";
+            std::cout << "using " << *cores << " cores\n";
         } else {
             std::cout << "defaulting to using all (" << *cores << ") cores\n";
         }
