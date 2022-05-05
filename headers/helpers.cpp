@@ -339,12 +339,12 @@ double getMagnetization(const double &beta, const Eigen::MatrixXcd &M, const std
     double Z_sum = 0.0, expectation_mz_2 = 0.0;
     for (int i = 0; i < eiVals.size(); i++) {
         double ev_real = std::real(eiVals.at(i));
-        Z_sum += std::exp(- beta * ev_real);
-        expectation_mz_2 += std::exp(- beta * ev_real) * std::real(M(i, i));
+        Z_sum += std::exp(- 1.0 / beta * ev_real);
+        expectation_mz_2 += std::exp(- 1.0 / beta * ev_real) * std::real(M(i, i));
     }
     expectation_mz_2 /= Z_sum;
     expectation_mz_2 /= 3.0;
-    return beta * expectation_mz_2 / N;
+    return 1.0 / beta * expectation_mz_2 / N;
 
 }
 
