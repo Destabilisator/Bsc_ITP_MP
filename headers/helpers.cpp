@@ -155,11 +155,11 @@ void representative(int s, int *r, int *l, int *q, int N) {
 
 /////////////////////////////// saving data ///////////////////////////////
 
-void saveEiVals(const std::string &filename, const std::string &header, const std::list<double> &eiVals) {
+void saveEiVals(const std::string &filename, const std::string &header, const std::list<double> &eiVals, const int &N) {
     std::cout << "saving to file '" << filename << "'..." << std::endl;
     std::ofstream file;
     try {
-        file.open("./results/" + filename);
+        file.open("./results/" + std::to_string(N) + "_" + filename);
         file << header <<"\n\n";
         file << "Eigenvalues:\n";
         for (double ev : eiVals) {
@@ -173,11 +173,11 @@ void saveEiVals(const std::string &filename, const std::string &header, const st
     file.close();
 }
 
-void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals) {
+void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals, const int &N) {
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
-        file.open("./results/" + filename);
+        file.open("./results/" + std::to_string(N) + "_" + filename);
         file << header << "\n\n";
         file << "Eigenvalues:\n";
         for (std::complex<double> ev : eiVals) {
@@ -190,11 +190,11 @@ void saveComplexEiVals(const std::string &filename, const std::string &header, c
     file.close();
 }
 
-void saveComplexEiVals(const std::string &filename, const std::string &header, const std::vector<std::complex<double>> &eiVals) {
+void saveComplexEiVals(const std::string &filename, const std::string &header, const std::vector<std::complex<double>> &eiVals, const int &N) {
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
-        file.open("./results/" + filename);
+        file.open("./results/" + std::to_string(N) + "_" + filename);
         file << header << "\n\n";
         file << "Eigenvalues:\n";
         for (std::complex<double> ev : eiVals) {
@@ -207,11 +207,11 @@ void saveComplexEiVals(const std::string &filename, const std::string &header, c
     file.close();
 }
 
-void saveHamilton(double** hamilton, const std::string &filename, const std::string &header, int size) {
+void saveHamilton(double** hamilton, const std::string &filename, const std::string &header, const int &size, const int &N) {
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
-        file.open("./results/" + filename);
+        file.open("./results/" + std::to_string(N) + "_" + filename);
         file << header << "\n\n";
         for (int i = 0; i <= size -1; i++) {
             for (int j = 0; j <= size-1; j++) {
@@ -231,11 +231,11 @@ void saveHamilton(double** hamilton, const std::string &filename, const std::str
     file.close();
 }
 
-void saveComplexHamilton(std::complex<double> **hamilton,const std::string &filename, const std::string &header, int size) {
+void saveComplexHamilton(std::complex<double> **hamilton,const std::string &filename, const std::string &header, const int &size, const int &N) {
     std::cout << "saving to file '" << filename << "'..." << std::endl;
     std::ofstream file;
     try {
-        file.open("./results/" + filename);
+        file.open("./results/" + std::to_string(N) + "_" + filename);
         file << header << "\n\n";
         for (int i = 0; i <= size -1; i++) {
             for (int j = 0; j <= size-1; j++) {
@@ -255,11 +255,11 @@ void saveComplexHamilton(std::complex<double> **hamilton,const std::string &file
     file.close();
 }
 
-void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename, const std::string &header) {
+void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename, const std::string &header, const int &N) {
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
-        file.open("./results/" + filename);
+        file.open("./results/" + std::to_string(N) + "_" + filename);
         file << header << "\n\n";
         file << matrix;
     } catch (...) {
@@ -269,11 +269,11 @@ void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename
     file.close();
 }
 
-void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &filename, const std::string &header) {
+void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &filename, const std::string &header, const int &N) {
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
-        file.open("./results/" + filename);
+        file.open("./results/" + std::to_string(N) + "_" + filename);
         file << header << "\n\n";
         file << matrix;
     } catch (...) {
@@ -283,11 +283,13 @@ void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &
     file.close();
 }
 
-void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label, const std::string &y_label, const std::vector<std::tuple<double, double>> &outData) {
+void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
+                 const std::string &y_label, const std::vector<std::tuple<double, double>> &outData, const int &N) {
+
     std::cout << "saving to file '" << filename << "'..." << "\n";
     std::ofstream file;
     try {
-        file.open("./results/" + filename);
+        file.open("./results/" + std::to_string(N) + "_" + filename);
         file << header << "\n\n";
         file << x_label << "\t" << y_label << "\n";
         for (std::tuple<double, double> data : outData) {
@@ -302,7 +304,25 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 
-double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiVals, int N) {
+Eigen::MatrixXd spinMatrix(const int &N,const  int &SIZE) {
+    Eigen::MatrixXd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(SIZE, SIZE);
+    for (int s = 0; s < SIZE; s++) {
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i < j; i++) {
+                if (((s >> i) & 1) == ((s >> j) & 1)) {
+                    S2(s, s) += 0.5;
+                } else {
+                    S2(s, s) -= 0.5;
+                    int d = s ^ (1 << i) ^ (1 << j);
+                    S2(s, d) = 1.0;
+                }
+            }
+        }
+    }
+    return S2;
+}
+
+double getSpecificHeat(const double &beta, const std::vector<std::complex<double>>& eiVals, const int &N) {
     double Z_sum = 0.0, expectation_H = 0.0, expectation_H_2 = 0.0;
     for (std::complex<double> ev : eiVals) {
         double ev_real = std::real(ev);
@@ -315,10 +335,24 @@ double getSpecificHeat(double beta, const std::vector<std::complex<double>>& eiV
     return beta * beta * ( expectation_H_2 - expectation_H * expectation_H ) / N;
 }
 
+double getMagnetization(const double &beta, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N) {
+    double Z_sum = 0.0, expectation_mz_2 = 0.0;
+    for (int i = 0; i < eiVals.size(); i++) {
+        double ev_real = std::real(eiVals.at(i));
+        Z_sum += std::exp(- beta * ev_real);
+        expectation_mz_2 += std::exp(- beta * ev_real) * std::real(M(i, i));
+    }
+    expectation_mz_2 /= Z_sum;
+    expectation_mz_2 /= 3.0;
+    return beta * expectation_mz_2 / N;
+
+}
+
 /////////////////////////////// others ///////////////////////////////
 
 // [executable] N J_START J_END J_COUNT CORES SILENT
-void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, double *J_END, int *J_COUNT, const unsigned int *cpu_cnt, bool *silent, int *cores, const double *J1, const double *J2) {
+void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, double *J_END, int *J_COUNT,
+                   const unsigned int *cpu_cnt, bool *silent, int *cores, const double *J1, const double *J2) {
 
     if (argc >= 2) {
         if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) && (std::stoi(argv[1]) <= 32) ) {

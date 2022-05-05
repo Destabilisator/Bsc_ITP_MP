@@ -4,7 +4,8 @@
 
 #ifdef multiCalc
 void thread_function(double J, int J_pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
-                     double beta, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X) {
+                     double beta, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                     std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X) {
 
     while (true) {
 
@@ -23,9 +24,7 @@ void thread_function(double J, int J_pos, std::vector<std::tuple<double, double>
         //auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
 
         //naiv::getEiVals(J, 1.0, eiVals, N, SIZE);
-
         //magnetizationBlocks::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
-
         momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
 
         // sort eigenvalues
@@ -133,8 +132,8 @@ int main(int argc, char* argv[]) {
 
     std::string headerWithBeta = "BETA = " + std::to_string(BETA) + "\n" + header;
 
-    saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", *outDataDeltaE);
-    saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", *outDataSpecificHeat_C);
+    saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", *outDataDeltaE, N);
+    saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", *outDataSpecificHeat_C, N);
     //saveOutData(filenameMagneticSusceptibility_X, headerWithBeta, "J1/J2", "magnetic susceptibility in J2", *outDataMagneticSusceptibility_X);
 
 #endif
@@ -142,85 +141,25 @@ int main(int argc, char* argv[]) {
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 #ifdef naiverAnsatz
-    const clock_t begin_time_NAIV = clock();
-
-    std::cout << "\nnaiver Ansatz:..." << std::endl;
-    auto *H_naiv_EiVals = new std::vector<std::complex<double>>;
-    naiv::getEiVals(J1, J2, H_naiv_EiVals, N, SIZE);
-
-    auto time_NAIV = float(clock () - begin_time_NAIV) /  CLOCKS_PER_SEC;
-    std::cout << "calculations done; this took: " << time_NAIV << " seconds\n";
+    naiv::start(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
 #endif
 
 /////////////////////////////// fixed magnetization blocks ///////////////////////////////
 
 #ifdef magnetizationBlocksAnsatz
-    const clock_t begin_time_MAGNETIZATION = clock();
-
-    std::cout << "\nblock diagonale m_z:..." << std::endl;
-    //std::vector<std::complex<double>> EiVals_m;
-    auto *EiVals_m = new std::vector<std::complex<double>>;
-    auto *matrixBlocks_m = new std::vector<Eigen::MatrixXd>;
-    magnetizationBlocks::getEiVals(J1, J2, EiVals_m, matrixBlocks_m, N, SIZE);
-
-    auto time_MAGNETIZATION = float(clock () - begin_time_MAGNETIZATION) /  CLOCKS_PER_SEC;
-    std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
-    delete matrixBlocks_m;
+    magnetizationBlocks::start(J1, J2, N, SIZE);
 #endif
 
 /////////////////////////////// momentum states ///////////////////////////////
 
 #ifdef momentumStateAnsatz
-    const clock_t begin_time_MOMENTUM = clock();
-
-    std::cout << "\nmomentum states:..." << std::endl;
-
-    auto *momentEiVals = new std::vector<std::complex<double>>;
-    auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
-
-    momentumStates::getEiVals(J1, J2, momentEiVals, matrixMomentBlocks, N, SIZE);
-
-    auto *specificHeat_momentum = new std::vector<std::tuple<double, double>>;
-
-    ///// specific heat plot /////
-    for (int i = 0; i <= BETA_COUNT; i++) {
-        double current_beta = BETA_START + (BETA_END-BETA_START)*i/BETA_COUNT;
-        specificHeat_momentum->push_back({current_beta, getSpecificHeat(current_beta, *momentEiVals, N)});
-    }
-
-    auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
-    std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
-
-    std::string filenameSpecificHeat_C_momentum = "momentum_specific_heat.txt";
-    std::string header_momentum = "N: " + std::to_string(N) + "\n"
-                                + "BETA START: " + std::to_string(BETA_START) + "\n"
-                                + "BETA END: " + std::to_string(BETA_END) + "\n"
-                                + "data-points: " + std::to_string(BETA_COUNT) + "\n"
-                                + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_MOMENTUM) + " seconds";
-
-    std::string headerWithJ_momentum = "J1/J2 = " + std::to_string(J1/J2) +"\n" + header_momentum;
-    saveOutData(filenameSpecificHeat_C_momentum, headerWithJ_momentum, "J1/J2", "specific heat in J2", *specificHeat_momentum);
-
-    delete momentEiVals;
-    delete matrixMomentBlocks;
+    momentumStates::start(J1, J2, N, SIZE, BETA_START, BETA_END, BETA_COUNT, cores);
 #endif
 
 /////////////////////////////// parity states (unfinished) ///////////////////////////////
 
 #ifdef parityStateAnsatz
-    const clock_t begin_time_PARITY = clock();
-
-    std::cout << "\nparity states:..." << std::endl;
-
-    auto *parityEiVals = new std::vector<std::complex<double>>;
-    auto *matrixParityBlocks = new std::vector<Eigen::MatrixXcd>;
-
-    parityStateAnsatz(J1, J2, parityEiVals, matrixParityBlocks);
-
-    auto time_PARITY = float(clock () - begin_time_PARITY) /  CLOCKS_PER_SEC;
-    std::cout << "calculations done; this took: " << time_PARITY << " seconds\n";
-    delete parityEiVals;
-    delete matrixParityBlocks;
+    parityStates::start(J1, J2, N, SIZE);
 #endif
 
     return 0;

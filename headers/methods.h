@@ -17,6 +17,9 @@ namespace naiv {
 
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
                    const int &N, const int &SIZE);
+
+    void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
+               const double &BETA_END, const int &BETA_COUNT, const int &cores);
 }
 
 /////////////////////////////// fixed magnetization blocks ///////////////////////////////
@@ -31,6 +34,8 @@ namespace magnetizationBlocks {
 
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
                    std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N, const int &SIZE);
+
+    void start(const double &J1, const double &J2, const int &N, const int &SIZE);
 }
 
 /////////////////////////////// momentum states ///////////////////////////////
@@ -47,4 +52,15 @@ namespace momentumStates {
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
                    std::vector<Eigen::MatrixXcd> *matrixBlocks, const int &N, const int &SIZE);
 
+    void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &BETA_START,
+               const double &BETA_END, const int &BETA_COUNT, const int &cores);
+}
+
+/////////////////////////////// parity states (unfinished) ///////////////////////////////
+
+namespace parityStates {
+    void getEiVals(double J1, double J2, std::vector<std::complex<double>> *eiVals,
+                           std::vector<Eigen::MatrixXcd> *matrixBlocks, const int &N, const int &SIZE);
+
+    void start(const double &J1, const double &J2, const int &N, const int &SIZE);
 }

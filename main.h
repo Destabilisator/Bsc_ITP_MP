@@ -16,17 +16,17 @@
 //// methods ////
 #define multiCalc
 #define momentumStateAnsatz
+#define naiverAnsatz
 
 #ifndef multiCalc
-    #define naiverAnsatz
     #define magnetizationBlocksAnsatz
-    //#define parityStateAnsatz
+    #define parityStateAnsatz
 #endif
 
 ///// global variables /////
 int N = 6; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
 int SIZE;
-double J1 = 1.0, J2 = 1.0;
+double J1 = 2.0, J2 = 1.0;
 double J_START = 0;
 double J_END = 2;
 int J_COUNT = 50;

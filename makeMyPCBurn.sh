@@ -29,9 +29,9 @@ fi
 if [[ "$OSTYPE" == "msys" ]]; then
     ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES $SILENT
     echo "plotting..."
-    python plot.py
+    python plot.py $N
 else
     ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES $SILENT
     echo "plotting..."
-    python3 plot.py
+    python3 plot.py $N
 fi
