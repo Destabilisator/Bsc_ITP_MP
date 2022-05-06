@@ -91,7 +91,7 @@ namespace momentumStates {
         matrixBlocks->push_back(H);
 #endif
 
-        Eigen::ComplexEigenSolver<Eigen::MatrixXcd> solver(H);
+        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> solver(H);
         const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
         for (std::complex<double> ev: H1EiVal) {
             HEiValList->push_back(ev);

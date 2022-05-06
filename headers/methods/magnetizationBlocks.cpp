@@ -142,7 +142,7 @@ namespace magnetizationBlocks {
             H.row(i) = Eigen::VectorXd::Map(&hamiltonBlock[i][0], statesCount);
         }
 
-        Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
+        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(H);
         const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
         for (std::complex<double> ev: H1EiVal) {
             HEiValList->push_back(ev);
