@@ -11,7 +11,8 @@
 #include <Eigen/Eigenvalues>
 
 #include "headers/helpers.h"
-#include "methods.h"
+#include "headers/methods.h"
+#include "headers/methods/multithreading.h"
 
 //// methods ////
 #define multiCalc

@@ -24,6 +24,6 @@ add_executable(Bsc_ITP_MX main.h main.cpp
         headers/helpers.h
         headers/helpers.cpp
         headers/methods.h
-        headers/methods.cpp)
+        headers/methods/multithreading.cpp headers/methods/multithreading.h headers/methods/naiv.cpp headers/methods/naiv.h headers/methods/magnetizationBlocks.cpp headers/methods/magnetizationBlocks.h headers/methods/momentumStates.cpp headers/methods/momentumStates.h headers/methods/parityStates.cpp headers/methods/parityStates.h)
 
 target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT})
