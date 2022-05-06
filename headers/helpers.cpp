@@ -353,7 +353,7 @@ double getSpecificHeat(const double &temp, const std::vector<std::complex<double
     }
     expectation_H /= Z_sum;
     expectation_H_2 /= Z_sum;
-    return 1.0 / temp * 1.0 /temp * ( expectation_H_2 - expectation_H * expectation_H ) / N;
+    return 1.0 / temp * 1.0 / temp * ( expectation_H_2 - expectation_H * expectation_H ) / N;
 }
 
 double getSusceptibility(const double &temp, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N) {

@@ -30,8 +30,6 @@ double J1 = 1.0, J2 = 1.0;
 double J_START = 0.0;
 double J_END = 2.0;
 int J_COUNT = 50;
-int J_CURRENT = 1;
-const int PROGRESSBAR_SEGMENTS = 50;
 
 const double T = 1.0;
 double T_START = J_START;
@@ -40,5 +38,3 @@ int T_COUNT = J_COUNT;
 
 ///// multi threading stuff /////
 const auto cpu_cnt = std::thread::hardware_concurrency();
-std::mutex coutMutex;
-std::mutex nextJMutex;
