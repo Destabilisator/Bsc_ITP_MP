@@ -20,6 +20,7 @@ int main(int argc, char* argv[]) {
     momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
 //    //naiv::start(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
     magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
+    momentumStates::startDispersionPlot(J1, J2, N, SIZE);
 
     return 0;
 }

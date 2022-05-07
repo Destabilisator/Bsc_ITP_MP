@@ -65,7 +65,7 @@ namespace multi {
 
         const clock_t begin_time = clock();
 
-        std::cout << "\ncalculating:..." << std::endl;
+        std::cout << "\n" << "Delta E and C (T=const): calculating:..." << std::endl;
 
         auto *outDataDeltaE = new std::vector<std::tuple<double, double>>;
         auto *outDataSpecificHeat_C = new std::vector<std::tuple<double, double>>;
@@ -173,7 +173,7 @@ namespace multi {
 
         const clock_t begin_time = clock();
 
-        std::cout << "\ncalculating:..." << std::endl;
+        std::cout << "\n" << "X (T=const): calculating:..." << std::endl;
 
         auto *outDataMagneticSusceptibility_X = new std::vector<std::tuple<double, double>>;
 

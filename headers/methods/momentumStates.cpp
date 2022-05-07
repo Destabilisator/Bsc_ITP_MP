@@ -109,8 +109,8 @@ namespace momentumStates {
         int k_lower = -(N + 2) / 4 + 1;
         int k_upper = N / 4;
 
-        std::vector<std::vector<std::vector<int>>> vec1(N + 1, std::vector<std::vector<int>>(N));
-        std::vector<std::vector<std::vector<int>>> vec2(N + 1, std::vector<std::vector<int>>(N));
+        std::vector<std::vector<std::vector<int>>> vec1(N + 1, std::vector<std::vector<int>>(N/2));
+        std::vector<std::vector<std::vector<int>>> vec2(N + 1, std::vector<std::vector<int>>(N/2));
         auto *states = &vec1;
         auto *R_vals = &vec2;
 
@@ -194,7 +194,7 @@ namespace momentumStates {
 
         const clock_t begin_time_MOMENTUM = clock();
 
-        std::cout << "\nmomentum states:..." << std::endl;
+        std::cout << "\n" "specific heat (momentum states): calculating..." << std::endl;
 
         auto *momentEiVals = new std::vector<std::complex<double>>;
         auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
@@ -225,6 +225,63 @@ namespace momentumStates {
 
         std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
         saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", *specificHeat_momentum, N);
+
+        std::cout << "\n";
+
+        delete momentEiVals;
+        delete matrixMomentBlocks;
+    }
+
+    void startDispersionPlot(const double &J1, const double &J2, const int &N, const int &SIZE) {
+        const clock_t begin_time_MOMENTUM = clock();
+
+        std::cout << "\n" "dispersion (momentum states): calculating..." << std::endl;
+
+        auto *momentEiVals = new std::vector<std::vector<std::complex<double>>>(N/2);
+        auto *momentData = new std::vector<std::tuple<int, double>>;
+        auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
+
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
+
+        std::vector<std::vector<std::vector<int>>> vec1(N + 1, std::vector<std::vector<int>>(N/2));
+        std::vector<std::vector<std::vector<int>>> vec2(N + 1, std::vector<std::vector<int>>(N/2));
+        auto *states = &vec1;
+        auto *R_vals = &vec2;
+
+        for (int s = 0; s < SIZE; s++) {
+            int m = bitSum(s, N);
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = checkState(s, k, N);
+                if (R >= 0) {
+                    states->at(m).at(k - k_lower).push_back(s);
+                    R_vals->at(m).at(k - k_lower).push_back(R);
+                }
+            }
+        }
+
+        for (int m = 0; m <= N; m++) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                momentumBlockSolver(J1, J2, k, states->at(m).at(k-k_lower), R_vals->at(m).at(k-k_lower), &momentEiVals->at(k-k_lower),
+                                    matrixMomentBlocks, N, SIZE);
+            }
+        }
+
+        for (int k = k_lower; k <= k_upper; k++) {
+            for (std::complex<double> ev : momentEiVals->at(k-k_lower)) {
+                momentData->push_back({k, std::real(ev)});
+            }
+        }
+
+        ///// save /////
+
+        auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
+        std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
+
+        std::string filename = "momentum_energy_dispersion_J_const.txt";
+        std::string header = "N: " + std::to_string(N);
+        std::string headerWithJ = "J1/J2 = " + std::to_string(J1/J2) +"\n" + header;
+        saveOutData(filename, headerWithJ, "k", "E in J2", *momentData, N);
 
         std::cout << "\n";
 

@@ -73,9 +73,13 @@ void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename
 // saves a complex matrix (Eigen::MatrixXcd) of arbitrary size to the file filename and adds the header inscription above
 void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &filename, const std::string &header, const int &N);
 
-// saves a vector of tuples (double) to be processed by python
+// saves a vector of tuples (double, double) to be processed by python
 void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                  const std::string &y_label, const std::vector<std::tuple<double, double>> &outData, const int &N);
+
+// saves a vector of tuples (int, double) to be processed by python
+void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
+                 const std::string &y_label, const std::vector<std::tuple<int, double>> &outData, const int &N);
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 

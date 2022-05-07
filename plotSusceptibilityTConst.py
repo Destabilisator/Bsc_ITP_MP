@@ -87,4 +87,4 @@ subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = '
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
 plt.savefig("results/" + "susceptibility_T_const.png")
-#Splt.show()
+#plt.show()

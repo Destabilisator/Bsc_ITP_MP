@@ -181,7 +181,8 @@ namespace magnetizationBlocks {
                              const double &END, const int &COUNT, const int &cores) {
 
         const clock_t begin_time_MAGNETIZATION = clock();
-        std::cout << "\nblock diagonale m_z:..." << std::endl;
+
+        std::cout << "\n" "susceptibility (m_z blocks): calculating..." << std::endl;
 
         auto *states = new std::vector<int>;
         auto *eiVals = new std::vector<std::complex<double>>;
