@@ -123,7 +123,7 @@ def plot_k_dispersion_J_const(N):
         X += [float(x)]
         Y += [float(y)]
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
-    subfig1.scatter(X, Y, linewidth = 1, marker = "_", s = 50000, color = 'blue', label = lbl)
+    subfig1.scatter(X, Y, linewidth = 1, marker = "_", s = 500, color = 'blue', label = lbl)
     plt.ticklabel_format(style='plain', axis='x', useOffset=False)
     plt.gca().xaxis.set_major_locator(mticker.MultipleLocator(1))
     subfig1.set_xlabel(r'Impulsquantenzahl $k$', fontsize = 18)

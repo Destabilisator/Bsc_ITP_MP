@@ -16,10 +16,10 @@ if [[ "$OSTYPE" == "msys" ]]; then
     # python plotSusceptibilityTConst.py
     python plotDispersion.py
 else
-    ./cmake-build-release/Bsc_ITP_MX 6 0 2 500 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 8 0 2 500 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 10 0 2 500 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 12 0 2 50 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 6 0 2 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 8 0 2 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 10 0 2 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 12 0 2 500 -1 silent
     # ./cmake-build-release/Bsc_ITP_MX 14 0 2 50 -1 silent
     
     python3 plotDeltaE.py
