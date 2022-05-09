@@ -88,14 +88,9 @@ int checkState(int s, int k, int N) {
     int t = s;
     for (int i = 1; i <= N/2; i++) {
         t = translateLeft(t, 2, N);
-        if (t < s) {
-            return -1;
-        } else if (t == s) {
-            if (k % (int) ((double) N / (double) i / 2.0) != 0) {
-                return -1;
-            } else {
-                return i;
-            }
+        if (t < s) {return -1;} else if (t == s) {
+            if (k % (int) ((double) N / (double) i / 2.0) != 0) {return -1;}
+            else {return i;}
         }
     }
     return -1;
@@ -111,7 +106,9 @@ void checkState(int s, int *r, int *m, int k, int N) {
             else {*r = i; break;}
         }
     }
-    t = reflectBits(s, N);
+    //t = reflectBits(s, N);
+    t = reflectBits(translateLeft(s, 1, N), N);
+    //t = translateLeft(t, 1, N);
     for (int i = 0; i < *r; i++) {
         if (t < s) {*r = -1; return;}
         else if (t == s) {*m = i; return;}

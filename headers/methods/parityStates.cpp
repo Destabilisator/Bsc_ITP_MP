@@ -6,7 +6,7 @@ namespace parityStates {
 
 /////////////////////////????????????
     double get_gk(int k, int N) {
-        if (k == 0 | k == N/4) {
+        if (k == 0 || k == N/4) {
             return 2.0;
         } else {
             return 1.0;
@@ -19,16 +19,16 @@ namespace parityStates {
         double Na = pow(N, 2) * get_gk(k, N) / abs(Ra);
         //std::cout <<  "N: " << Na << "\n";
         if (m != -1) {
-            Na *= 1 + sigma * p * cos(k*m);
+            Na *= 1 + sigma * p * std::cos(k*m);
             //std::cout << "\t" << Na << "\n";
         } return Na;
     }
 
 /////////////////////////????????????
     double helement(int a, int b, int l, int q, int k, int p, const std::vector<int> &R_vals, const std::vector<int> &m_vals, int N) {
-//    if (a == b) {
-//        std::cout << "helement same state\n";
-//    }
+    //    if (a == b) {
+    //        std::cout << "helement same state\n";
+    //    }
         int sigma_a = R_vals.at(a) / abs(R_vals.at(a));
         int m_a = m_vals.at(a);
         int R_a = R_vals.at(a);
@@ -40,7 +40,7 @@ namespace parityStates {
 
         //std::cout << "\t" << k << " " << l << " " << sigma_a << " " << sigma_b<< " " << p << " " << m_b << "\n";
 
-        double val = 0.5 * (double) pow(sigma_a * p, q) * sqrt(Na / Nb);// <--------- für h_j(a) = 0.5 einsetzen????
+        double val = 0.5 * (double) pow(sigma_a * p, q) * sqrt(Na / Nb);
         //std::cout << val << "\n";
         //std::cout << "\t" << Na << " " << Nb << " " << sigma_a << " " << p << " " << q << " " << pow(sigma_a * p, q) << "\n";
 
@@ -78,11 +78,6 @@ namespace parityStates {
                                  Eigen::MatrixXcd &hamiltonBlock, const int &N, const int &SIZE) {
 
         int statesCount = (int) states.size();
-        //std::cout << statesCount << "\n";
-//
-//        if (statesCount == 0) {
-//            return;
-//        }
 
         for (int a; a < statesCount; a++) {
             //std::cout << "a = " << a << "\n";
@@ -112,7 +107,7 @@ namespace parityStates {
                     int b = findState(states, r);
                     if (b >= 0) {
                         int m = 1;
-                        if (b > 1 && states.at(b) == states.at(b - 1)) {
+                        if (b > 0 && states.at(b) == states.at(b - 1)) {
                             m = 2, b -= 1;
                         } else if (b < states.size() - 1 && states.at(b) == states.at(b + 1)) {
                             m = 2;
@@ -184,34 +179,13 @@ namespace parityStates {
                            std::vector<Eigen::MatrixXcd> *matrixBlocks, const int &N, const int &SIZE) {
 
         const int statesCount = (int) states.size();
-//        //std::cout << statesCount << "\n";
-//        if (statesCount == 0) {
-//            //std::cout << "empty\n";
-//            return;
-//        }
-
         Eigen::MatrixXcd hamiltonBlock(statesCount, statesCount);
-//        auto **hamiltonBlock = new std::complex<double> *[statesCount];
-//        for (int i = 0; i < statesCount; i++) {
-//            hamiltonBlock[i] = new std::complex<double>[statesCount];
-//            for (int j = 0; j < statesCount; j++) {
-//                hamiltonBlock[i][j] = 0.0;
-//            }
-//        }
-
-        //std::cout << "fillHamiltonParityBlock\n";
         fillHamiltonParityBlock(J1, J2, k, p, states, R_vals, m_vals, hamiltonBlock, N, SIZE);
-
-//        Eigen::MatrixXcd H(statesCount, statesCount);
-//        for (int i = 0; i < statesCount; i++) {
-//            H.row(i) = Eigen::VectorXcd::Map(&hamiltonBlock[i][0], statesCount);
-//        }
 
 #if defined(showMatrix) || defined(saveMatrix)
         matrixBlocks->push_back(hamiltonBlock);
 #endif
 
-        //Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> solver(H);
         //std::cout << "calculating eigenvalues...\n";
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> solver(hamiltonBlock);
         const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
@@ -224,43 +198,21 @@ namespace parityStates {
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *eiVals,
                    std::vector<Eigen::MatrixXcd> *matrixBlocks, const int &N, const int &SIZE) {
 
-//        int k_lower = 0;//-(N+2)/4+1;
-//        int k_upper = N/4;
-
-//        std::vector<std::vector<std::vector<int>>> vec(N+1, std::vector<std::vector<int>>(N));
-//        auto *states_mk = &vec;
-//
-//        //std::cout << "states:\n";
-//
-//        for (int s = 0; s < SIZE; s++) {
-//            int m = bitSum(s, N);
-//            for (int k = k_lower; k <= k_upper; k++) {
-//                int R = checkState(s, k, N);
-//                if (R >= 0) {
-//                    //printBits(s, N);
-//                    states_mk->at(m).at(k-k_lower).push_back(s);
-//                }
-//            }
-//        }
-
-        std::cout << "statesm\n";
         std::vector<std::vector<int>> states_m(N+1);
         for (int s = 0; s < SIZE; s++) {
             states_m.at(bitSum(s, N)).push_back(s);
         }
 
-//        auto *states = new std::vector<int>;
-//        auto *R_vals = new std::vector<int>;
-//        auto *m_vals = new std::vector<int>;
-
         std::vector<int> states;
         std::vector<int> R_vals;
         std::vector<int> m_vals;
 
-        for (int mag = 0; mag <= N; mag ++) {
+        int numberOfStates = 0;
+
+        for (int mag = 0; mag <= N; mag++) {
             for (int k = 0; k <= N/4; k++) {
                 for (int p : {-1, 1}) {
-                    if (k != 0 && k != N/4 && p == -1) {
+                    if (k != 0 && k != N/4 && p == -1) { //(k != 0 && k != N/4 && p == -1)
                         continue;
                     }
                     for (int s : states_m.at(mag)) {
@@ -272,8 +224,8 @@ namespace parityStates {
                             }
                             if (m != -1) {
                                 double val = std::real((double) sigma * (double) p * std::cos(std::complex<double>(0, 4 * PI * (double) k * (double) m / (double) N)));
-                                if ( std::abs(1.0 + val) < 0.0001) {R = -1;}
-                                if (sigma == -1 && abs(1.0 - val) > 0.0001) {R = -1;}
+                                if (std::abs(1.0 + val) < 1e-10) {R = -1;}
+                                if (sigma == -1 && abs(1.0 - val) > 1e-10) {R = -1;}
                             }
                             if (R > 0) {
                                 std::cout << "m = " << mag << ", k = " << k << ", p = " << p << ", sigma = " << sigma << ": ";
@@ -281,17 +233,13 @@ namespace parityStates {
                                 states.push_back(s);
                                 R_vals.push_back(sigma * R);
                                 m_vals.push_back(m);
-                            } //else {
-                                //std::cout << "m = " << mag << ", k = " << k << ", p = " << p << ", sigma = " << sigma << "\n";
-                            //}
-
+                                numberOfStates++;
+                            }
                         }
                     }
                     if (!states.empty()) {
-                        //std::cout << "parityblocksoler\n";
-                        //parityBlockSolver(J1, J2, k, p, states, R_vals, m_vals, eiVals, matrixBlocks, N, SIZE);
+                        parityBlockSolver(J1, J2, k, p, states, R_vals, m_vals, eiVals, matrixBlocks, N, SIZE);
                     }
-                    //std::cout << "clean up\n";
                     states.clear();
                     R_vals.clear();
                     m_vals.clear();
@@ -299,50 +247,7 @@ namespace parityStates {
             }
         }
 
-        return;
-
-//        for (int m = 0; m <= N; m++) {
-//            //std::cout << "m = " << m << "\n";
-//            for (int k = k_lower; k <= k_upper; k++) {
-//                //std::cout << "k = " << k << "\n";
-//                for (int p : {-1, 1}) {
-//                    //std::cout << "p = " << p << "\n";
-//                    // p = +1 for k != 0, pi
-//                    if (k != 0 && k != k_upper && p == -1) {
-//                        continue;
-//                    }
-//                    for (int s : states_mk->at(m).at(k-k_lower)) {
-//                        int R, m_cs;
-//                        checkState(s, &R, &m_cs, k, N);
-//                        for (int sigma : {-1, 1}) {
-//                            //std::cout << "sigma = " << sigma << "\n";
-//                            // sigma = +1 if k == 0 or k == k_upper (N/4)
-//                            if ((k == 0 || k == k_upper) && sigma == -1) {
-//                                continue;
-//                            }
-//                            if (m_cs != -1) {
-//                                double val = std::real((double) sigma * (double) p * std::cos(std::complex<double>(0, 4 * PI * (double) k * (double) m_cs / (double) N)));
-//                                if ( std::abs(1.0 + val) < 0.0001) {R = -1;}
-//                                if (sigma == -1 && abs(1.0 - val) > 0.0001) {R = -1;}
-//                            } if (R > 0) {
-//                                std::cout << "m = " << m << ", k = " << k << ", p = " << p << ", sigma = " << sigma << ": ";
-//                                printBits(s, N);
-//                                states->push_back(s);
-//                                R_vals->push_back(sigma * R);
-//                                m_vals->push_back(m_cs);
-//                            }
-//                        }
-//                    }
-//                    //std::cout << "parityBlockSolver...\n";
-//                    if (!states->empty()) {
-//                        parityBlockSolver(J1, J2, k, p, *states, *R_vals, *m_vals, eiVals, matrixBlocks, N, SIZE);
-//                    }
-//                    states->clear();
-//                    R_vals->clear();
-//                    m_vals->clear();
-//                }
-//            }
-//        }
+        std::cout << "Number of states: " << numberOfStates << "\n";
 
         return;
 
@@ -353,11 +258,11 @@ namespace parityStates {
 
 #if defined(showMatrix) || defined(saveMatrix)
         int offset_blocks = 0;
-    Eigen::MatrixXcd H_parity_Block = Eigen::MatrixXcd::Zero(SIZE, SIZE);
-    for (const Eigen::MatrixXcd& M : *matrixBlocks) {
-        H_parity_Block.block(offset_blocks, offset_blocks, M.rows(), M.cols()) = M;
-        offset_blocks += M.rows();
-    }
+        Eigen::MatrixXcd H_parity_Block = Eigen::MatrixXcd::Zero(SIZE, SIZE);
+        for (const Eigen::MatrixXcd& M : *matrixBlocks) {
+            H_parity_Block.block(offset_blocks, offset_blocks, M.rows(), M.cols()) = M;
+            offset_blocks += (int) M.rows();
+        }
 #endif
 #ifdef showMatrix
         std::cout << H_parity_Block << "\n";
