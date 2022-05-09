@@ -102,27 +102,20 @@ int checkState(int s, int k, int N) {
 }
 
 void checkState(int s, int *r, int *m, int k, int N) {
-    int t = s; *r = -1;
+    int t = s; *r = -1; *m = -1;
     for (int i = 1; i <= N/2; i++) {
         t = translateLeft(t, 2, N);
-        if (t < s) {
-            break;
-        } else if (t == s) {
-            if (k % (int) ((double) N / (double) i / 2.0) != 0) {
-                break;
-            } else {
-                *r = i;
-                break;
-            }
+        if (t < s) {return;}
+        else if (t == s) {
+            if (k % (int) ((double) N / (double) i / 2.0) != 0) {return;}
+            else {*r = i; break;}
         }
     }
-    t = reflectBits(s, N); *m = -1;
+    t = reflectBits(s, N);
     for (int i = 0; i < *r; i++) {
-        if (t < s) {
-            *r = -1; return;
-        } else if (t == s) {
-            *m = i; return;
-        } t = translateLeft(t, 2, N);
+        if (t < s) {*r = -1; return;}
+        else if (t == s) {*m = i; return;}
+        t = translateLeft(t, 2, N);
     }
 }
 
@@ -130,9 +123,7 @@ void representative(int s, int *r, int *l, int N) {
     int t = s; *r = s; *l = 0;
     for (int i = 1; i < N/2; i++) {
         t = translateLeft(t, 2, N);
-        if (t < *r) {
-            *r = t; *l = i;
-        }
+        if (t < *r) {*r = t; *l = i;}
     }
 }
 
@@ -140,16 +131,12 @@ void representative(int s, int *r, int *l, int *q, int N) {
     int t = s; *r = s; *l = 0;
     for (int i = 1; i < N/2; i++) {
         t = translateLeft(t, 2, N);
-        if (t < *r) {
-            *r = t;
-            *l = i;
-        }
-    } t = reflectBits(s, N); *q = 0;
+        if (t < *r) {*r = t; *l = i;}
+    }
+    t = reflectBits(s, N); *q = 0;
     for (int i = 1; i < N/2; i ++) {
         t = translateLeft(t, 2, N);
-        if (t < *r) {
-            *r = t; *l = i; *q = 1;
-        }
+        if (t < *r) {*r = t; *l = i; *q = 1;}
     }
 }
 
@@ -440,6 +427,8 @@ void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, d
             std::cout << "defaulting to using all (" << *cores << ") cores\n";
         }
     }
+
+    return;
 
     if (argc >= 7) {
         std::string s1 = "silent";

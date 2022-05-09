@@ -4,6 +4,7 @@
 #include "Eigen/Eigenvalues"
 #include <mutex>
 #include <thread>
+#include <chrono>
 
 #include "methods.h"
 #include "helpers.h"

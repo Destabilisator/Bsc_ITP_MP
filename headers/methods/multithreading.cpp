@@ -63,7 +63,7 @@ namespace multi {
     void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const unsigned int *cpu_cnt,
                                int *cores, const double &T, const int &N, const int &SIZE) {
 
-        const clock_t begin_time = clock();
+        auto start = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "Delta E and C (T=const): calculating:..." << std::endl;
 
@@ -86,8 +86,9 @@ namespace multi {
             Threads[i].join();
         }
 
-        auto time = float(clock () - begin_time) /  CLOCKS_PER_SEC;
-        std::cout << "\n" << "calculations done; this took: " << time << " seconds\n\n";
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
 
         // sort data-points
         std::sort(outDataDeltaE->begin(), outDataDeltaE->end(), [](
@@ -105,7 +106,8 @@ namespace multi {
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
                              + "data-points: " + std::to_string(COUNT) + "\n"
-                             + "calculation time with " + std::to_string(*cores) + " threads: " + std::to_string(time) + " seconds";
+                             + "calculation time with " + std::to_string(*cores) + " threads: " +
+                             std::to_string(elapsed_seconds.count()) + " seconds";
 
         std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
 
@@ -171,7 +173,7 @@ namespace multi {
     void start_XT_const(const int &COUNT, const double &START, const double &END, const unsigned int *cpu_cnt,
                         int *cores, const double &T, const int &N, const int &SIZE) {
 
-        const clock_t begin_time = clock();
+        auto start = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "X (T=const): calculating:..." << std::endl;
 
@@ -192,8 +194,9 @@ namespace multi {
             Threads[i].join();
         }
 
-        auto time = float(clock () - begin_time) /  CLOCKS_PER_SEC;
-        std::cout << "\n" << "calculations done; this took: " << time << " seconds\n\n";
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
 
         // sort data-points
         std::sort(outDataMagneticSusceptibility_X->begin(), outDataMagneticSusceptibility_X->end(), [](const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
@@ -205,7 +208,8 @@ namespace multi {
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
                              + "data-points: " + std::to_string(COUNT) + "\n"
-                             + "calculation time with " + std::to_string(*cores) + " threads: " + std::to_string(time) + " seconds";
+                             + "calculation time with " + std::to_string(*cores) + " threads: "
+                             + std::to_string(elapsed_seconds.count()) + " seconds";
 
         std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
 

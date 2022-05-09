@@ -164,7 +164,7 @@ namespace momentumStates {
 #endif
 #ifdef saveEigenvalues
         saveComplexEiVals("EigenvaluesMomentumStates.txt",
-                          "momentumStateAnsatz states Ansatz für N = " + std::to_string(N) +
+                          "momentum states Ansatz für N = " + std::to_string(N) +
                           "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), *HEiValList, N);
 #endif
     }

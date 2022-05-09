@@ -14,12 +14,15 @@ int main(int argc, char* argv[]) {
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 
-    multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, &cpu_cnt, &cores, T, N, SIZE);
-    multi::start_XT_const(J_COUNT, J_START, J_END, &cpu_cnt, &cores, T, N, SIZE);
+//    multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, &cpu_cnt, &cores, T, N, SIZE);
+//    multi::start_XT_const(J_COUNT, J_START, J_END, &cpu_cnt, &cores, T, N, SIZE);
+//
+//    momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
+//    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
+//    momentumStates::startDispersionPlot(J1, J2, N, SIZE);
 
-    momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
-    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
-    momentumStates::startDispersionPlot(J1, J2, N, SIZE);
+    //momentumStates::start(J1, J2, N, SIZE);
+    parityStates::start(J1, J2, N, SIZE);
 
     return 0;
 }
