@@ -66,7 +66,7 @@ namespace magnetizationBlocks {
         matrixBlocks->push_back(H);
 #endif
 
-        Eigen::EigenSolver<Eigen::MatrixXd> solver(H);
+        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(H);
         const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
         for (std::complex<double> ev: H1EiVal) {
             HEiValList->push_back(ev);

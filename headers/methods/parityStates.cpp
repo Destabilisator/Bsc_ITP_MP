@@ -19,7 +19,7 @@ namespace parityStates {
         double Na = pow(N, 2) * get_gk(k, N) / abs(Ra);
         //std::cout <<  "N: " << Na << "\n";
         if (m != -1) {
-            Na *= 1 + sigma * p * std::cos(k*m);
+            Na *= 1 + sigma * p * std::cos(k*m); /// 4 * PI * (double) k * (double) m / (double) N
             //std::cout << "\t" << Na << "\n";
         } return Na;
     }
@@ -222,10 +222,14 @@ namespace parityStates {
                             if ((k == 0 || k == N/4) && sigma == -1) {
                                 continue;
                             }
+//                            std::cout << "mag = " << mag << ", R = " << R << ", m = " << m << ", k = " << k << ", p = " << p << ", sigma = " << sigma << ": ";
+//                            printBits(s, N);
+//                            continue;
                             if (m != -1) {
-                                double val = std::real((double) sigma * (double) p * std::cos(std::complex<double>(0, 4 * PI * (double) k * (double) m / (double) N)));
+                                double val = (double) sigma * (double) p * std::cos(4 * PI * (double) k * (double) m / (double) N);
+                                //double val = std::real((double) sigma * (double) p * std::cos(std::complex<double>(0, 4 * PI * (double) k * (double) m / (double) N)));
                                 if (std::abs(1.0 + val) < 1e-10) {R = -1;}
-                                if (sigma == -1 && abs(1.0 - val) > 1e-10) {R = -1;}
+                                if (sigma == -1 && abs(1.0 - val) > 1e-10) {R = -1;} ///// warum "-" und nicht "+"?
                             }
                             if (R > 0) {
                                 std::cout << "m = " << mag << ", k = " << k << ", p = " << p << ", sigma = " << sigma << ": ";

@@ -108,7 +108,7 @@ void checkState(int s, int *r, int *m, int k, int N) {
     }
     //t = reflectBits(s, N);
     t = reflectBits(translateLeft(s, 1, N), N);
-    //t = translateLeft(t, 1, N);
+    //t = translateRight(t, 1, N);
     for (int i = 0; i < *r; i++) {
         if (t < s) {*r = -1; return;}
         else if (t == s) {*m = i; return;}

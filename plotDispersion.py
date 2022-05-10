@@ -88,4 +88,4 @@ subfig1.scatter(X, Y, linewidth = 1, marker = "_", s = 100, color = 'orange', la
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
 plt.savefig("results/" + "energy_dispersion_J_const.png")
-plt.show()
+#plt.show()
