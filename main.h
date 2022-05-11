@@ -25,7 +25,7 @@
 #endif
 
 ///// global variables /////
-int N = 6; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
+int N = 8; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
 int SIZE;
 double J1 = 1.0, J2 = 1.0;
 double J_START = 0.0;

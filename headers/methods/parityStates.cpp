@@ -216,9 +216,10 @@ namespace parityStates {
                         continue;
                     }
                     for (int s : states_m.at(mag)) {
-                        int R, m;
-                        checkState(s, &R, &m, k, N);
                         for (int sigma : {-1, 1}) {
+                            int R, m;
+                            checkState(s, &R, &m, k, N); ////// im sigma loop?!
+                            //if (k == N/4 && sigma == -1) {
                             if ((k == 0 || k == N/4) && sigma == -1) {
                                 continue;
                             }

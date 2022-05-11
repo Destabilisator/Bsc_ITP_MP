@@ -98,10 +98,13 @@ int checkState(int s, int k, int N) {
 
 void checkState(int s, int *r, int *m, int k, int N) {
     int t = s; *r = -1; *m = -1;
+    //for (int i = 1; i <= N; i++) {
     for (int i = 1; i <= N/2; i++) {
+        //t = translateLeft(t, 1, N);
         t = translateLeft(t, 2, N);
         if (t < s) {return;}
         else if (t == s) {
+            //if (k % (int) ((double) N / (double) i) != 0) {return;}
             if (k % (int) ((double) N / (double) i / 2.0) != 0) {return;}
             else {*r = i; break;}
         }
@@ -112,6 +115,7 @@ void checkState(int s, int *r, int *m, int k, int N) {
     for (int i = 0; i < *r; i++) {
         if (t < s) {*r = -1; return;}
         else if (t == s) {*m = i; return;}
+        //t = translateLeft(t, 1, N);
         t = translateLeft(t, 2, N);
     }
 }
