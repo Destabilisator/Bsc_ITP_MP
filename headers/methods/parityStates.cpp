@@ -26,9 +26,9 @@ namespace parityStates {
     }
 
     double helement(int a, int b, int l, int q, int k, int p, const std::vector<int> &R_vals, const std::vector<int> &m_vals, int N) {
-        if (a == b) {
-            std::cout << "helement same state, ";
-        }
+//        if (a == b) {
+//            std::cout << "helement same state, ";
+//        }
         int sigma_a = R_vals.at(a) / abs(R_vals.at(a));
         int m_a = m_vals.at(a);
         int R_a = R_vals.at(a);
@@ -69,12 +69,9 @@ namespace parityStates {
                 //std::cout << " to " << val << "\n";
             }
         }
-        std::cout << "helement returned: " << val << "\n";
+        //std::cout << "helement returned: " << val << "\n";
         return val;
     }
-
-
-/////////////////////////????????????
 
     void fillHamiltonParityBlock(const double &J1, const double &J2, const int &k, const int &p, const std::vector<int> &states,
                                  const std::vector<int> &R_vals, const std::vector<int> &m_vals,
@@ -220,9 +217,9 @@ namespace parityStates {
         Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
         fillHamiltonParityBlock(J1, J2, k, p, states, R_vals, m_vals, hamiltonBlock, N);
 
-#if defined(showMatrix) || defined(saveMatrix)
+    #if defined(showMatrix) || defined(saveMatrix)
         matrixBlocks->push_back(hamiltonBlock);
-#endif
+    #endif
 
         //std::cout << "calculating eigenvalues...\n";
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
@@ -304,7 +301,7 @@ namespace parityStates {
         std::cout << H_parity_Block << "\n";
 #endif
 #ifdef saveMatrix
-        saveMatrixToFile(H_parity_Block, "HamiltonParityStates.txt", "parityStateAnsatz states Ansatz für N = " + std::to_string(N) +
+        saveMatrixToFile(H_parity_Block, "HamiltonParityStates.txt", "parity states Ansatz für N = " + std::to_string(N) +
                                                                "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), N);
 #endif
 #ifdef showEigenvalues
