@@ -101,10 +101,16 @@ namespace parityStates {
                 // applying H to state s
                 if (((s >> j_0) & 1) == ((s >> j_2) & 1)) {
                     //hamiltonBlock(a, a) += (double) state_n * std::complex<double>(0.25 * J1, 0.0);
-                    hamiltonBlock(a, a) += (double) state_n * 0.25 * J1;
+                    //hamiltonBlock(a, a) += (double) state_n * 0.25 * J1;
+                    for (int i = a; i < a + state_n; i++) {
+                        hamiltonBlock(i, i) += 0.25 * J1;
+                    }
                 } else {
                     //hamiltonBlock(a, a) -= (double) state_n * std::complex<double>(0.25 * J1, 0.0);
-                    hamiltonBlock(a, a) -= (double) state_n * 0.25 * J1;
+                    for (int i = a; i < a + state_n; i++) {
+                        hamiltonBlock(i, i) -=  0.25 * J1;
+                    }
+                    //hamiltonBlock(a, a) -= (double) state_n * 0.25 * J1;
                     int d = s ^ (1 << j_0) ^ (1 << j_2);
                     int r = 0, l = 0, q = 0;
                     representative(d, &r, &l, &q, N);
@@ -129,10 +135,17 @@ namespace parityStates {
                 }
                 if (((s >> j_0) & 1) == ((s >> j_1) & 1)) {
                     //hamiltonBlock(a, a) += (double) state_n * std::complex<double>(0.25 * J2, 0.0);
-                    hamiltonBlock(a, a) += (double) state_n * 0.25 * J2;
+                    for (int i = a; i < a + state_n; i++) {
+                        hamiltonBlock(i, i) += 0.25 * J2;
+                    }
+
+                    //hamiltonBlock(a, a) += (double) state_n * 0.25 * J2;
                 } else {
                     //hamiltonBlock(a, a) -= (double) state_n * std::complex<double>(0.25 * J2, 0.0);
-                    hamiltonBlock(a, a) -= (double) state_n * 0.25 * J2;
+                    for (int i = a; i < a + state_n; i++) {
+                        hamiltonBlock(i, i) -= 0.25 * J2;
+                    }
+                    //hamiltonBlock(a, a) -= (double) state_n * 0.25 * J2;
                     int d = s ^ (1 << j_0) ^ (1 << j_2);
                     int r = 0, l = 0, q = 0;
                     representative(d, &r, &l, &q, N);
@@ -157,10 +170,16 @@ namespace parityStates {
                 }
                 if (((s >> j_1) & 1) == ((s >> j_2) & 1)) {
                     //hamiltonBlock(a, a) += (double) state_n * std::complex<double>(0.25 * J2, 0.0);
-                    hamiltonBlock(a, a) += (double) state_n * 0.25 * J2;
+                    for (int i = a; i < a + state_n; i++) {
+                        hamiltonBlock(i, i) += 0.25 * J2;
+                    }
+                    //hamiltonBlock(a, a) += (double) state_n * 0.25 * J2;
                 } else {
                     //hamiltonBlock(a, a) -= (double) state_n * std::complex<double>(0.25 * J2, 0.0);
-                    hamiltonBlock(a, a) -= (double) state_n * 0.25 * J2;
+                    for (int i = a; i < a + state_n; i++) {
+                        hamiltonBlock(i, i) -= 0.25 * J2;
+                    }
+                    //hamiltonBlock(a, a) -= (double) state_n * 0.25 * J2;
                     int d = s ^ (1 << j_0) ^ (1 << j_2);
                     int r = 0, l = 0, q = 0;
                     representative(d, &r, &l, &q, N);
