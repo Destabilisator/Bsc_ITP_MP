@@ -49,21 +49,23 @@ namespace parityStates {
         if (sigma_a == sigma_b) { // same sigma
             if (m_b != -1) {
                 //std::cout << "same sigma, m != -1, changed from " << val;
-                val *= (std::cos(k_moment*l) + (double) sigma_a * (double) p * std::cos(k_moment*(l-m_b))) / (1.0 + (double) sigma_a * (double) p * std::cos(k_moment*m_b));
+                val *= (std::cos(k_moment * (double) l) + (double) sigma_a * (double) p * std::cos(k_moment * (double) (l-m_b)))
+                        / (1.0 + (double) sigma_a * (double) p * std::cos(k_moment * (double) m_b));
                 //std::cout << " to " << val << "\n";
             } else {
                 //std::cout << "same sigma changed from " << val;
-                val *= std::cos(k_moment*l);
+                val *= std::cos(k_moment * (double) l);
                 //std::cout << " to " << val << "\n";
             }
         } else {
             if (m_b != -1) {
                 //std::cout << "different sigma, m != -1, changed from " << val;
-                val *= (- (double) sigma_a * std::sin(k_moment*l) + (double) p * std::sin(k_moment*(l-m_b))) / (1.0 - (double) sigma_a * (double) p * std::cos(k_moment*m_b));
+                val *= (- (double) sigma_a * std::sin(k_moment * (double) l) + (double) p * std::sin(k_moment * (double) (l-m_b)))
+                        / (1.0 - (double) sigma_a * (double) p * std::cos(k_moment * (double) m_b));
                 //std::cout << " to " << val << "\n";
             } else {
                 //std::cout << "different sigma changed from " << val;
-                val *= - (double) sigma_a * std::sin(k_moment*l);
+                val *= - (double) sigma_a * std::sin(k_moment * (double) l);
                 //std::cout << " to " << val << "\n";
             }
         }
