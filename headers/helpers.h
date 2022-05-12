@@ -56,6 +56,8 @@ void representative(int s, int *r, int *l, int *q, int N);
 // saves real (double) eigenvalues in ist eiVals to file filename and adds the header inscription above
 void saveEiVals(const std::string &filename, const std::string &header, const std::list<double> &eiVals, const int &N);
 
+void saveEiVals(const std::string &filename, const std::string &header, const std::vector<double> &eiVals, const int &N);
+
 // saves complex (std::complex<double>) eigenvalues in ist eiVals to file filename and adds the header inscription above
 void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals, const int &N);
 

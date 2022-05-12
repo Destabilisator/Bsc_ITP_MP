@@ -161,6 +161,23 @@ void saveEiVals(const std::string &filename, const std::string &header, const st
     file.close();
 }
 
+void saveEiVals(const std::string &filename, const std::string &header, const std::vector<double> &eiVals, const int &N) {
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+    std::ofstream file;
+    try {
+        file.open("./results/" + std::to_string(N) + "_" + filename);
+        file << header << "\n\n";
+        file << "Eigenvalues:\n";
+        for (double ev : eiVals) {
+            file << ev << "\n";
+        }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
 void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals, const int &N) {
     std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
     std::ofstream file;
