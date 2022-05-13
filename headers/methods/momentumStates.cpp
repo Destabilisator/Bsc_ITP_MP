@@ -183,8 +183,6 @@ namespace momentumStates {
         auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
         std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
 
-        std::cout << "\n";
-
         delete momentEiVals;
         delete matrixMomentBlocks;
     }

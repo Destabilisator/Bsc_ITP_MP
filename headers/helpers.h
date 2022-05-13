@@ -94,6 +94,8 @@ Eigen::MatrixXd spinMatrix(const int &N, const std::vector<int> &states);
 // calculates the specific heat of a system for a set og eigenvalues and a beta
 double getSpecificHeat(const double &beta, const std::vector<std::complex<double>>& eiVals, const int &N);
 
+double getSpecificHeat(const double &temp, const std::vector<double>& eiVals, const int &N);
+
 // calculates the magnetization of a system for a set og eigenvalues and a beta
 double getSusceptibility(const double &beta, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N);
 

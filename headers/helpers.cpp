@@ -112,7 +112,7 @@ void checkState(int s, int *r, int *m, int k, int N) {
     //t = reflectBits(s, N);
     t = reflectBits(translateLeft(s, 1, N), N);
     //t = translateRight(t, 1, N);
-    for (int i = 0; i < *r; i++) {
+    for (int i = 0; i <= *r; i++) { // for (int i = 0; i < *r; i++) {
         if (t < s) {*r = -1; return;}
         else if (t == s) {*m = i; return;}
         //t = translateLeft(t, 1, N);
@@ -130,14 +130,16 @@ void representative(int s, int *r, int *l, int N) {
 
 void representative(int s, int *r, int *l, int *q, int N) {
     int t = s; *r = s; *l = 0;
-    for (int i = 1; i < N/2; i++) {
+    for (int i = 1; i <= N/2; i++) {
         t = translateLeft(t, 2, N);
         if (t < *r) {*r = t; *l = i;}
     }
-    t = reflectBits(s, N); *q = 0;
-    for (int i = 1; i < N/2; i ++) {
-        t = translateLeft(t, 2, N);
+    t = reflectBits(translateLeft(s, 1, N), N);
+//    t = reflectBits(translateLeft(t, 1, N), N);
+    *q = 0;
+    for (int i = 0; i <= N/2; i++) {
         if (t < *r) {*r = t; *l = i; *q = 1;}
+        t = translateLeft(t, 2, N);
     }
 }
 
@@ -374,6 +376,18 @@ double getSpecificHeat(const double &temp, const std::vector<std::complex<double
         Z_sum += std::exp(-1.0 / temp * ev_real);
         expectation_H += std::exp(-1.0 / temp * ev_real) * ev_real;
         expectation_H_2 += std::exp(-1.0 / temp * ev_real) * ev_real * ev_real;
+    }
+    expectation_H /= Z_sum;
+    expectation_H_2 /= Z_sum;
+    return 1.0 / temp * 1.0 / temp * ( expectation_H_2 - expectation_H * expectation_H ) / N;
+}
+
+double getSpecificHeat(const double &temp, const std::vector<double>& eiVals, const int &N) {
+    double Z_sum = 0.0, expectation_H = 0.0, expectation_H_2 = 0.0;
+    for (double ev : eiVals) {
+        Z_sum += std::exp(-1.0 / temp * ev);
+        expectation_H += std::exp(-1.0 / temp * ev) * ev;
+        expectation_H_2 += std::exp(-1.0 / temp * ev) * ev * ev;
     }
     expectation_H /= Z_sum;
     expectation_H_2 /= Z_sum;

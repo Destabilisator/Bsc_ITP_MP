@@ -24,6 +24,10 @@ namespace multi {
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
 
+    void get_DeltaE_CT_const_parity(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                                    double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                    const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
+
     void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const unsigned int *cpu_cnt,
                                int *cores, const double &T, const int &N, const int &SIZE);
 
