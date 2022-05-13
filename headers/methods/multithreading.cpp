@@ -19,44 +19,44 @@ namespace multi {
             } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
             coutMutex.unlock();
 
-            auto *eiVals = new std::vector<std::complex<double>>;
-            auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
+            //auto *eiVals = new std::vector<std::complex<double>>;
+            std::vector<std::complex<double>> eiVals;
+            // *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
+            std::vector<Eigen::MatrixXcd> matrixBlocks;
 //            auto *eiVals = new std::vector<double>;
 //            auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
 
 //            naiv::getEiVals(J, 1.0, eiVals, N, SIZE);
 //            magnetizationBlocks::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
-            momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
+            momentumStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
 //            parityStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
 
             // sort eigenvalues
-            eiVals->shrink_to_fit();
-            std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+            eiVals.shrink_to_fit();
+            std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
                 return std::real(c1) < std::real(c2);
             });
 
             // Delta E
-            double E0 = std::real(eiVals->at(0));
-            double E1 = std::real(eiVals->at(1));
+            double E0 = std::real(eiVals.at(0));
+            double E1 = std::real(eiVals.at(1));
 
             // write data
             nextJMutex.lock();
             outDataDeltaE->push_back({J, E1 - E0});
-            outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, *eiVals, N)});
+            outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, eiVals, N)});
             pos = CURRENT;
             CURRENT++;
             nextJMutex.unlock();
 
             if (pos > COUNT) {
-                delete eiVals;
-                delete matrixBlocks;
                 break;
             } else {
                 J = START + (END - START) * pos / COUNT;
             }
             // clean up
-            eiVals->clear();
-            matrixBlocks->clear();
+            eiVals.clear();
+            matrixBlocks.clear();
 
         }
 
@@ -80,79 +80,82 @@ namespace multi {
 
 //            auto *eiVals = new std::vector<std::complex<double>>;
 //            auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
-            auto *eiVals = new std::vector<double>;
-            auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
+
+            std::vector<double> eiVals;
+            std::vector<Eigen::MatrixXd> matrixBlocks;
+//            auto *eiVals = new std::vector<double>;
+//            auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
 
 //            naiv::getEiVals(J, 1.0, eiVals, N, SIZE);
 //            magnetizationBlocks::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
 //            momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
-            parityStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
+            parityStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
 
             // sort eigenvalues
-            eiVals->shrink_to_fit();
-            std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+            eiVals.shrink_to_fit();
+            std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
                 return std::real(c1) < std::real(c2);
             });
 
             // Delta E
-            double E0 = std::real(eiVals->at(0));
-            double E1 = std::real(eiVals->at(1));
+            double E0 = std::real(eiVals.at(0));
+            double E1 = std::real(eiVals.at(1));
 
             // write data
             nextJMutex.lock();
             outDataDeltaE->push_back({J, E1 - E0});
-            outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, *eiVals, N)});
+            outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, eiVals, N)});
             pos = CURRENT;
             CURRENT++;
             nextJMutex.unlock();
 
             if (pos > COUNT) {
-                delete eiVals;
-                delete matrixBlocks;
                 break;
             } else {
                 J = START + (END - START) * pos / COUNT;
             }
             // clean up
-            eiVals->clear();
-            matrixBlocks->clear();
+            eiVals.clear();
+            matrixBlocks.clear();
 
         }
 
     }
 
-    void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const unsigned int *cpu_cnt,
-                               int *cores, const double &T, const int &N, const int &SIZE) {
+    void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const unsigned int &cpu_cnt,
+                               int &cores, const double &T, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "Delta E and C (T=const): calculating:..." << std::endl;
 
-        auto *outDataDeltaE = new std::vector<std::tuple<double, double>>;
-        auto *outDataSpecificHeat_C = new std::vector<std::tuple<double, double>>;
+        //auto *outDataDeltaE = new std::vector<std::tuple<double, double>>;
+        std::vector<std::tuple<double, double>> outDataDeltaE;
+        //auto *outDataSpecificHeat_C = new std::vector<std::tuple<double, double>>;
+        std::vector<std::tuple<double, double>> outDataSpecificHeat_C;
 
-        if (COUNT < *cpu_cnt) {
-            *cores = COUNT;
+        if (COUNT < cpu_cnt) {
+            cores = COUNT;
         }
-        std::thread Threads[*cores];
+        std::thread Threads[cores];
 
-        CURRENT += *cores;
+        CURRENT += cores;
 
         if (N%4 == 0) {
-            for (int i = 0; i < *cores; i++) {
-                Threads[i] = std::thread(get_DeltaE_CT_const_parity, START + (END - START) * i / COUNT, i + 1, outDataDeltaE, T,
-                                         outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+            for (int i = 0; i < cores; i++) {
+                Threads[i] = std::thread(get_DeltaE_CT_const_parity, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+                                         &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
             }
         } else {
-            for (int i = 0; i < *cores; i++) {
-                Threads[i] = std::thread(get_DeltaE_CT_const, START + (END - START) * i / COUNT, i + 1, outDataDeltaE, T,
-                                         outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+            for (int i = 0; i < cores; i++) {
+                Threads[i] = std::thread(get_DeltaE_CT_const, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+                                         &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
             }
         }
 
 
 
-        for (int i = 0; i < *cores; i++) {
+        for (int i = 0; i < cores; i++) {
             Threads[i].join();
         }
 
@@ -161,11 +164,11 @@ namespace multi {
         std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
 
         // sort data-points
-        std::sort(outDataDeltaE->begin(), outDataDeltaE->end(), [](
+        std::sort(outDataDeltaE.begin(), outDataDeltaE.end(), [](
                 const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
             return std::get<0>(a) < std::get<0>(b);
         });
-        std::sort(outDataSpecificHeat_C->begin(), outDataSpecificHeat_C->end(), [](
+        std::sort(outDataSpecificHeat_C.begin(), outDataSpecificHeat_C.end(), [](
                 const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
             return std::get<0>(a) < std::get<0>(b);
         });
@@ -176,16 +179,13 @@ namespace multi {
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
                              + "data-points: " + std::to_string(COUNT) + "\n"
-                             + "calculation time with " + std::to_string(*cores) + " threads: " +
+                             + "calculation time with " + std::to_string(cores) + " threads: " +
                              std::to_string(elapsed_seconds.count()) + " seconds";
 
         std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
 
-        saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", *outDataDeltaE, N);
-        saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", *outDataSpecificHeat_C, N);
-
-        delete outDataDeltaE;
-        delete outDataSpecificHeat_C;
+        saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", outDataDeltaE, N);
+        saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", outDataSpecificHeat_C, N);
 
     }
 
@@ -205,18 +205,20 @@ namespace multi {
             coutMutex.unlock();
 
 
-            auto *states = new std::vector<int>;
-            auto *eiVals = new std::vector<std::complex<double>>;
+//            auto *states = new std::vector<int>;
+//            auto *eiVals = new std::vector<std::complex<double>>;
+            std::vector<int> states;
+            std::vector<std::complex<double>> eiVals;
             Eigen::MatrixXcd matrixBlockU;
-            magnetizationBlocks::getEiValsZeroBlock(J, 1.0, eiVals, matrixBlockU, states, N, SIZE);
+            magnetizationBlocks::getEiValsZeroBlock(J, 1.0, &eiVals, matrixBlockU, &states, N, SIZE);
 
             ///// susceptibility /////
 
-            Eigen::MatrixXd S2 = spinMatrix(N, *states);
+            Eigen::MatrixXd S2 = spinMatrix(N, states);
             Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(SIZE, SIZE);
             Matrix_U_inv_S2_U = matrixBlockU.adjoint() * S2 * matrixBlockU;
 
-            double susceptibility = getSusceptibilityDegeneracy(T, Matrix_U_inv_S2_U, *eiVals, N);
+            double susceptibility = getSusceptibilityDegeneracy(T, Matrix_U_inv_S2_U, eiVals, N);
 
             // write data
             nextJMutex.lock();
@@ -226,41 +228,40 @@ namespace multi {
             nextJMutex.unlock();
 
             if (pos > COUNT) {
-                delete eiVals;
-                delete states;
                 break;
             } else {
                 J = START + (END - START) * pos / COUNT;
             }
             // clean up
-            eiVals->clear();
-            states->clear();
+            eiVals.clear();
+            states.clear();
 
         }
 
     }
 
-    void start_XT_const(const int &COUNT, const double &START, const double &END, const unsigned int *cpu_cnt,
-                        int *cores, const double &T, const int &N, const int &SIZE) {
+    void start_XT_const(const int &COUNT, const double &START, const double &END, const unsigned int &cpu_cnt,
+                        int &cores, const double &T, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "X (T=const): calculating:..." << std::endl;
 
-        auto *outDataMagneticSusceptibility_X = new std::vector<std::tuple<double, double>>;
+        //auto *outDataMagneticSusceptibility_X = new std::vector<std::tuple<double, double>>;
+        std::vector<std::tuple<double, double>> outDataMagneticSusceptibility_X;
 
-        if (COUNT < *cpu_cnt) {
-            *cores = COUNT;
+        if (COUNT < cpu_cnt) {
+            cores = COUNT;
         }
-        std::thread Threads[*cores];
+        std::thread Threads[cores];
 
-        CURRENT = 1 + *cores;
+        CURRENT = 1 + cores;
 
-        for (int i = 0; i < *cores; i++) {
-            Threads[i] = std::thread(get_XT_const, START + (END - START) * i / COUNT, i + 1, outDataMagneticSusceptibility_X, COUNT, START, END, N, SIZE, T);
+        for (int i = 0; i < cores; i++) {
+            Threads[i] = std::thread(get_XT_const, START + (END - START) * i / COUNT, i + 1, &outDataMagneticSusceptibility_X, COUNT, START, END, N, SIZE, T);
         }
 
-        for (int i = 0; i < *cores; i++) {
+        for (int i = 0; i < cores; i++) {
             Threads[i].join();
         }
 
@@ -269,7 +270,7 @@ namespace multi {
         std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
 
         // sort data-points
-        std::sort(outDataMagneticSusceptibility_X->begin(), outDataMagneticSusceptibility_X->end(), [](const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
+        std::sort(outDataMagneticSusceptibility_X.begin(), outDataMagneticSusceptibility_X.end(), [](const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
             return std::get<0>(a) < std::get<0>(b);
         });
 
@@ -278,14 +279,13 @@ namespace multi {
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
                              + "data-points: " + std::to_string(COUNT) + "\n"
-                             + "calculation time with " + std::to_string(*cores) + " threads: "
+                             + "calculation time with " + std::to_string(cores) + " threads: "
                              + std::to_string(elapsed_seconds.count()) + " seconds";
 
         std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
 
-        saveOutData(filenameMagneticSusceptibility_X, headerWithBeta, "J1/J2", "magnetic susceptibility in J2", *outDataMagneticSusceptibility_X, N);
+        saveOutData(filenameMagneticSusceptibility_X, headerWithBeta, "J1/J2", "magnetic susceptibility in J2", outDataMagneticSusceptibility_X, N);
 
-        delete outDataMagneticSusceptibility_X;
     }
 
 }

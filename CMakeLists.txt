@@ -1,22 +1,19 @@
 cmake_minimum_required(VERSION 3.21)
 project(Bsc_ITP_MX)
 
+set(CMAKE_CXX_STANDARD 20)
+
+find_package(Threads)
+
 if (WIN32)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc -O3 ")
     set(CMAKE_EXE_LINKER_FLAGS -static)
-endif(WIN32)
-
-find_package(Threads)
-set(MKLROOT /opt/intel/oneapi/mkl/latest) ##############
-
-set(CMAKE_CXX_STANDARD 20)
-
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL") ##############
-set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL")
-
-find_package(MKL REQUIRED)
+else()
+    find_package(MKL REQUIRED)
+    set(MKLROOT /opt/intel/oneapi/mkl/latest)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL") ##############
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL")
+endif()
 
 set(EIGEN_DIR "./Eigen/eigen-3.4.0")
 include_directories(${EIGEN_DIR})
@@ -43,7 +40,13 @@ add_executable(Bsc_ITP_MX main.h main.cpp
         headers/methods/parityStates.cpp)
 
 
-#target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT})
+if (WIN32)
+    target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT})
+else()
+    target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT} -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a
+            ${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lgomp -lpthread -lm -ldl)
+endif()
 
-target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT} -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a
-        ${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lgomp -lpthread -lm -ldl) ##############
+
+
+

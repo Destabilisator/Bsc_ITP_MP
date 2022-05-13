@@ -66,20 +66,35 @@ for i in range(8,len(lines)):
     Y += [float(y)]
 subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'orange', label = lbl)
 
-# N = "14"
+N = "14"
 
-# file = open("results/" + N + "_data_specific_heat.txt", 'r')
-# lines = file.readlines()
-# linesBeta = lines[0][len("T = "):-1]
-# lbl = "N = " + N
-# X = []
-# Y = []
-# for i in range(8,len(lines)):
-#     x, y = lines[i].split("\t")
-#     #print(x + " " + y + "\r")
-#     X += [float(x)]
-#     Y += [float(y)]
-# subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'brown', label = lbl)
+file = open("results/" + N + "_data_specific_heat.txt", 'r')
+lines = file.readlines()
+linesBeta = lines[0][len("T = "):-1]
+lbl = "N = " + N
+X = []
+Y = []
+for i in range(8,len(lines)):
+    x, y = lines[i].split("\t")
+    #print(x + " " + y + "\r")
+    X += [float(x)]
+    Y += [float(y)]
+subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'brown', label = lbl)
+
+N = "16"
+
+file = open("results/" + N + "_data_specific_heat.txt", 'r')
+lines = file.readlines()
+linesBeta = lines[0][len("T = "):-1]
+lbl = "N = " + N
+X = []
+Y = []
+for i in range(8,len(lines)):
+    x, y = lines[i].split("\t")
+    #print(x + " " + y + "\r")
+    X += [float(x)]
+    Y += [float(y)]
+subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'purple', label = lbl)
 
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
