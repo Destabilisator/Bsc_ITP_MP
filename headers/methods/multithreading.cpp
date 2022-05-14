@@ -43,13 +43,14 @@ namespace multi {
             // progressbar
             nextJMutex.lock();
             int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
+            int prg = std::min({CURRENT, COUNT});
             //coutMutex.lock();
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
                 std::cout << "#";
             } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
+            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << prg << "/" << COUNT << ")     ";
             std::cout.flush();
             //coutMutex.unlock();
 
@@ -114,13 +115,14 @@ namespace multi {
             // progressbar
             nextJMutex.lock();
             int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
+            int prg = std::min({CURRENT, COUNT});
             //coutMutex.lock();
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
                 std::cout << "#";
             } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
+            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << prg << "/" << COUNT << ")     ";
             std::cout.flush();
             //coutMutex.unlock();
 
@@ -163,7 +165,7 @@ namespace multi {
 
         std::thread Threads[cores];
 
-        CURRENT += cores;
+        CURRENT = 1 + cores;
 
         if (N%4 == 0) {
             for (int i = 0; i < cores; i++) {
@@ -176,7 +178,6 @@ namespace multi {
                                          &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
             }
         }
-
 
         for (int i = 0; i < cores; i++) {
             Threads[i].join();
@@ -245,13 +246,14 @@ namespace multi {
             // progressbar
             nextJMutex.lock();
             int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
-            //.lock();
+            int prg = std::min({CURRENT, COUNT});
+            //coutMutex.lock();
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
                 std::cout << "#";
             } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
+            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << prg << "/" << COUNT << ")     ";
             std::cout.flush();
             //coutMutex.unlock();
 
