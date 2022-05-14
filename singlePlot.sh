@@ -1,5 +1,7 @@
 #!/bin/bash
 
+start_time=$SECONDS
+
 if [[ "$#" -ge 4 ]]; then
 	N=$1
 	J_START=$2
@@ -34,3 +36,6 @@ else
     echo "plotting..."
     python3 plot.py $N
 fi
+
+elapsed=$(( SECONDS - start_time ))
+echo "all done, total elapsed time: $elapsed seconds"

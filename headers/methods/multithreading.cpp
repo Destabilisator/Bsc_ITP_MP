@@ -7,17 +7,16 @@ namespace multi {
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
 
-        while (true) {
+        // progressbar init
+        coutMutex.lock();
+        std::cout << "\r[";
+        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << 0 << "/" << COUNT << ")     ";
+        std::cout.flush();
+        coutMutex.unlock();
 
-            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
-            coutMutex.lock();
-            std::cout << "\r[";
-            for (int _ = 0; _ < p; _++) {
-                std::cout << "#";
-            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
-                std::cout << ".";
-            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
-            coutMutex.unlock();
+        while (true) {
 
             //auto *eiVals = new std::vector<std::complex<double>>;
             std::vector<std::complex<double>> eiVals;
@@ -41,8 +40,20 @@ namespace multi {
             double E0 = std::real(eiVals.at(0));
             double E1 = std::real(eiVals.at(1));
 
-            // write data
+            // progressbar
             nextJMutex.lock();
+            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
+            //coutMutex.lock();
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
+            std::cout.flush();
+            //coutMutex.unlock();
+
+            // write data
             outDataDeltaE->push_back({J, E1 - E0});
             outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, eiVals, N)});
             pos = CURRENT;
@@ -66,17 +77,16 @@ namespace multi {
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
 
-        while (true) {
+        // progressbar init
+        coutMutex.lock();
+        std::cout << "\r[";
+        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << pos << "/" << COUNT << ")     ";
+        std::cout.flush();
+        coutMutex.unlock();
 
-            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
-            coutMutex.lock();
-            std::cout << "\r[";
-            for (int _ = 0; _ < p; _++) {
-                std::cout << "#";
-            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
-                std::cout << ".";
-            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
-            coutMutex.unlock();
+        while (true) {
 
 //            auto *eiVals = new std::vector<std::complex<double>>;
 //            auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
@@ -101,8 +111,20 @@ namespace multi {
             double E0 = std::real(eiVals.at(0));
             double E1 = std::real(eiVals.at(1));
 
-            // write data
+            // progressbar
             nextJMutex.lock();
+            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
+            //coutMutex.lock();
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
+            std::cout.flush();
+            //coutMutex.unlock();
+
+            // write data
             outDataDeltaE->push_back({J, E1 - E0});
             outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, eiVals, N)});
             pos = CURRENT;
@@ -127,16 +149,18 @@ namespace multi {
 
         auto start = std::chrono::steady_clock::now();
 
-        std::cout << "\n" << "Delta E and C (T=const): calculating:..." << std::endl;
+        std::cout << "\n" << "Delta E and C (T=const): calculating:...";
 
         //auto *outDataDeltaE = new std::vector<std::tuple<double, double>>;
         std::vector<std::tuple<double, double>> outDataDeltaE;
         //auto *outDataSpecificHeat_C = new std::vector<std::tuple<double, double>>;
         std::vector<std::tuple<double, double>> outDataSpecificHeat_C;
 
-        if (COUNT < cpu_cnt) {
+        if (COUNT < cores) {
             cores = COUNT;
         }
+        std::cout << " (" << cores << ") cores\n";
+
         std::thread Threads[cores];
 
         CURRENT += cores;
@@ -152,7 +176,6 @@ namespace multi {
                                          &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
             }
         }
-
 
 
         for (int i = 0; i < cores; i++) {
@@ -194,18 +217,16 @@ namespace multi {
     void get_XT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
                       const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T) {
 
+        // progressbar init
+        coutMutex.lock();
+        std::cout << "\r[";
+        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << pos << "/" << COUNT << ")     ";
+        std::cout.flush();
+        coutMutex.unlock();
+
         while (true) {
-
-            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
-            coutMutex.lock();
-            std::cout << "\r[";
-            for (int _ = 0; _ < p; _++) {
-                std::cout << "#";
-            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
-                std::cout << ".";
-            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
-            coutMutex.unlock();
-
 
 //            auto *states = new std::vector<int>;
 //            auto *eiVals = new std::vector<std::complex<double>>;
@@ -221,8 +242,20 @@ namespace multi {
 
             double susceptibility = getSusceptibilityDegeneracy(T, Matrix_U_inv_S2_U, eiVals, N);
 
-            // write data
+            // progressbar
             nextJMutex.lock();
+            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
+            //.lock();
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) pos / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << pos << "/" << COUNT << ")     ";
+            std::cout.flush();
+            //coutMutex.unlock();
+
+            // write data
             outDataMagneticSusceptibility_X->push_back({J, susceptibility});
             pos = CURRENT;
             CURRENT++;
@@ -245,14 +278,16 @@ namespace multi {
 
         auto start = std::chrono::steady_clock::now();
 
-        std::cout << "\n" << "X (T=const): calculating:..." << std::endl;
+        std::cout << "\n" << "X (T=const): calculating:...";
 
         //auto *outDataMagneticSusceptibility_X = new std::vector<std::tuple<double, double>>;
         std::vector<std::tuple<double, double>> outDataMagneticSusceptibility_X;
 
-        if (COUNT < cpu_cnt) {
+        if (COUNT < cores) {
             cores = COUNT;
         }
+        std::cout << " (" << cores << ") cores\n";
+
         std::thread Threads[cores];
 
         CURRENT = 1 + cores;
