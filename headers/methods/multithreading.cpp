@@ -42,8 +42,8 @@ namespace multi {
 
             // progressbar
             nextJMutex.lock();
-            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
             int prg = std::min({CURRENT, COUNT});
+            int p = (int) ( (float) prg / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
             //coutMutex.lock();
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
@@ -114,8 +114,8 @@ namespace multi {
 
             // progressbar
             nextJMutex.lock();
-            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
             int prg = std::min({CURRENT, COUNT});
+            int p = (int) ( (float) prg / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
             //coutMutex.lock();
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
@@ -245,8 +245,8 @@ namespace multi {
 
             // progressbar
             nextJMutex.lock();
-            int p = (int) ( (float) pos / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
             int prg = std::min({CURRENT, COUNT});
+            int p = (int) ( (float) prg / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
             //coutMutex.lock();
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
