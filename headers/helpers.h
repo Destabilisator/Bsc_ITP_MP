@@ -101,9 +101,11 @@ double getSusceptibility(const double &beta, const Eigen::MatrixXcd &M, const st
 
 double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXcd &M, const std::vector<std::complex<double>>& eiVals, const int &N);
 
+double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M, const std::vector<double>& eiVals, const int &N);
+
 /////////////////////////////// others ///////////////////////////////
 
 // check validity of user input
 // [executable] N J_START J_END J_COUNT CORES SILENT
-void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, double *J_END, int *J_COUNT,
-                   const unsigned int *cpu_cnt, bool *silent, int *cores, const double *J1, const double *J2);
+void validateInput(int &argc, char* argv[], int &N, int &SIZE, double &J_START, double &J_END, int &J_COUNT,
+                   const unsigned int &cpu_cnt, bool &silent, int &cores, const double &J1, const double &J2, bool skipSilent);

@@ -174,6 +174,9 @@ namespace magnetizationBlocks {
 
         auto time_MAGNETIZATION = float(clock () - begin_time_MAGNETIZATION) /  CLOCKS_PER_SEC;
         std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
+
+        std::cout << "\n";
+
         delete matrixBlocks_m;
     }
 
@@ -219,6 +222,8 @@ namespace magnetizationBlocks {
 
         std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
         saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_magnetization, N);
+
         std::cout << "\n";
+
     }
 }

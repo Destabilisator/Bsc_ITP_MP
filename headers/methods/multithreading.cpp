@@ -187,6 +187,8 @@ namespace multi {
         saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", outDataDeltaE, N);
         saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", outDataSpecificHeat_C, N);
 
+        std::cout << "\n";
+
     }
 
     void get_XT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
@@ -207,12 +209,11 @@ namespace multi {
 
 //            auto *states = new std::vector<int>;
 //            auto *eiVals = new std::vector<std::complex<double>>;
+
             std::vector<int> states;
             std::vector<std::complex<double>> eiVals;
             Eigen::MatrixXcd matrixBlockU;
             magnetizationBlocks::getEiValsZeroBlock(J, 1.0, &eiVals, matrixBlockU, &states, N, SIZE);
-
-            ///// susceptibility /////
 
             Eigen::MatrixXd S2 = spinMatrix(N, states);
             Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(SIZE, SIZE);
@@ -230,12 +231,11 @@ namespace multi {
             if (pos > COUNT) {
                 break;
             } else {
-                J = START + (END - START) * pos / COUNT;
+                J = (double) START + (double) (END - START) * (double) pos / (double) COUNT;
             }
             // clean up
             eiVals.clear();
             states.clear();
-
         }
 
     }
@@ -285,6 +285,8 @@ namespace multi {
         std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
 
         saveOutData(filenameMagneticSusceptibility_X, headerWithBeta, "J1/J2", "magnetic susceptibility in J2", outDataMagneticSusceptibility_X, N);
+
+        std::cout << "\n";
 
     }
 

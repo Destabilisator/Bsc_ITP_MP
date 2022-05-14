@@ -5,7 +5,7 @@ int main(int argc, char* argv[]) {
     bool silent = false;
     int cores = (int) cpu_cnt;
 
-    validateInput(argc, argv, &N, &SIZE, &J_START, &J_END, &J_COUNT, &cpu_cnt, &silent, &cores, &J1, &J2);
+    validateInput(argc, argv, N, SIZE, J_START, J_END, J_COUNT, cpu_cnt, silent, cores, J1, J2, true);
 
     // syncing T and J ranges
     T_START = J_START;

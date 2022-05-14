@@ -420,57 +420,73 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXcd &M
     return 1.0 / temp * expectation_mz_2 / N;
 }
 
+double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M, const std::vector<double>& eiVals, const int &N) {
+    double Z_sum = 0.0, expectation_mz_2 = 0.0;
+    for (int i = 0; i < eiVals.size(); i++) {
+        double ev_real = eiVals.at(i);
+        double S_elem = M(i, i);
+        double S = - 0.5 + std::sqrt(0.25 + S_elem);
+        Z_sum += std::exp(-1.0 / temp * ev_real) * (2.0 * S + 1);
+        expectation_mz_2 += std::exp(-1.0 / temp * ev_real) * S_elem * (2.0 * S + 1);
+    }
+    expectation_mz_2 /= Z_sum;
+    expectation_mz_2 /= 3.0;
+    return 1.0 / temp * expectation_mz_2 / N;
+}
+
 /////////////////////////////// others ///////////////////////////////
 
 // [executable] N J_START J_END J_COUNT CORES SILENT
-void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, double *J_END, int *J_COUNT,
-                   const unsigned int *cpu_cnt, bool *silent, int *cores, const double *J1, const double *J2) {
+void validateInput(int &argc, char* argv[], int &N, int &SIZE, double &J_START, double &J_END, int &J_COUNT,
+                   const unsigned int &cpu_cnt, bool &silent, int &cores, const double &J1, const double &J2, bool skipSilent) {
 
     if (argc >= 2) {
         if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) && (std::stoi(argv[1]) <= 32) ) {
-            *N = std::stoi(argv[1]);
+            N = std::stoi(argv[1]);
         } else {
             std::cout << "invalid chain size, must be even and at least 6, defaulting to " << N << "\n";
         }
     }
-    *SIZE = (int) pow(2, *N);
-    std::cout << "N: " << *N << "; size: " << *SIZE << std::endl;
+    SIZE = (int) pow(2, N);
+    std::cout << "N: " << N << "; size: " << SIZE << std::endl;
     if (argc >= 5) {
         std::cout << "range given: ";
         if (std::stod(argv[2]) > std::stod(argv[3]) || std::stoi(argv[4]) < 1) {
             std::cout << "range invalid, defaulting...\n";
         } else {
-            *J_START = std::stod(argv[2]); *J_END = std::stod(argv[3]); *J_COUNT = std::stoi(argv[4]);
+            J_START = std::stod(argv[2]); J_END = std::stod(argv[3]); J_COUNT = std::stoi(argv[4]);
         }
-        std::cout << "START = " << *J_START << ", END = " << *J_END << " and COUNT = " << *J_COUNT << " from args\n";
+        std::cout << "START = " << J_START << ", END = " << J_END << " and COUNT = " << J_COUNT << " from args\n";
     } else {
         std::cout << "no range given: ";
-        std::cout << "START = " << *J_START << ", END = " << *J_END << " and COUNT = " << *J_COUNT << " from default\n";
+        std::cout << "START = " << J_START << ", END = " << J_END << " and COUNT = " << J_COUNT << " from default\n";
     }
 
-    std::cout << "default J1 and J2 for beta plot: J1 = " << *J1 << " and J2 = " << *J2 << " (currently unchangeable)\n";
+    std::cout << "default J1 and J2 for beta plot: J1 = " << J1 << " and J2 = " << J2 << " (currently unchangeable)\n";
 
     if (argc >= 6) {
         int crs = std::stoi(argv[5]);
-        if (crs > 0 && crs <= *cpu_cnt) {
-            *cores = crs;
-            std::cout << "using " << *cores << " cores\n";
+        if (crs > 0 && crs <= cpu_cnt) {
+            cores = crs;
+            std::cout << "using " << cores << " cores\n";
         } else {
-            std::cout << "defaulting to using all (" << *cores << ") cores\n";
+            std::cout << "defaulting to using all (" << cores << ") cores\n";
         }
     }
 
-    return;
+    if (skipSilent) {
+        return;
+    }
 
     if (argc >= 7) {
         std::string s1 = "silent";
         std::string s2 = argv[6];
         if (s1 == s2) {
-            *silent = true;
+            silent = true;
         }
     }
 
-    if (!*silent) {
+    if (!silent) {
         std::cout << "continue? (y/n):";
         char c;
         std::cin >> c;
@@ -480,7 +496,7 @@ void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, d
             int N_usr;
             std::cin >> N_usr;
             if (N_usr >= 6 && N_usr % 2 == 0) {
-                *N = N_usr;
+                N = N_usr;
             } else {
                 goto wrong_N;
             }
@@ -495,9 +511,9 @@ void validateInput(int argc, char* argv[], int *N, int *SIZE, double *J_START, d
             int J_COUNT_usr;
             std::cin >> J_COUNT_usr;
             if (J_START_usr <= J_END_usr && J_COUNT_usr >= 1) {
-                *J_START = J_START_usr;
-                *J_END = J_END_usr;
-                *J_COUNT = J_COUNT_usr;
+                J_START = J_START_usr;
+                J_END = J_END_usr;
+                J_COUNT = J_COUNT_usr;
             } else {
                 goto wrong_JRANGE;
             }

@@ -33,5 +33,8 @@ namespace parityStates {
     void getEiVals(const double &J1, const double &J2, std::vector<double> *eiVals,
                    std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N, const int &SIZE);
 
+    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<double> *eiVals,
+                            std::vector<Eigen::MatrixXd> *matrixBlocksU, std::vector<int> *statesList, const int &N, const int &SIZE);
+
     void start(const double &J1, const double &J2, const int &N, const int &SIZE);
 }
