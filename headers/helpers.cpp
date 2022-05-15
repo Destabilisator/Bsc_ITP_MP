@@ -520,3 +520,15 @@ void validateInput(int &argc, char* argv[], int &N, int &SIZE, double &J_START, 
         }
     }
 }
+
+std::string formatTime(std::chrono::duration<double> elapsed_seconds) {
+    double raw = elapsed_seconds.count();
+    int hours = (int) raw / 3600;
+    int minutes = (int) (raw - hours * 3600) / 60;
+    double seconds = raw - hours * 3600 - minutes *  60;
+    std::string ret;
+    if (hours > 0) {ret += std::to_string(hours) + " hours " + std::to_string(minutes) + " minutes ";}
+    else if (minutes > 0) {ret += std::to_string(minutes) + " minutes ";}
+    ret += std::to_string(seconds) + " seconds";
+    return ret;
+}

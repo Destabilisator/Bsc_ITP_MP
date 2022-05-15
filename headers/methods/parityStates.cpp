@@ -21,6 +21,7 @@ namespace parityStates {
     }
 
     double helement(int a, int b, int l, int q, int k, int p, const std::vector<int> &R_vals, const std::vector<int> &m_vals, int N) {
+
         int sigma_a = R_vals.at(a) / abs(R_vals.at(a));
         int m_a = m_vals.at(a);
         int R_a = R_vals.at(a);
@@ -53,6 +54,7 @@ namespace parityStates {
             val = 0.0;
         }
         return val;
+
     }
 
     void fillHamiltonParityBlock(const double &J1, const double &J2, const int &k, const int &p, const std::vector<int> &states,
@@ -330,21 +332,22 @@ namespace parityStates {
     }
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE) {
-        const clock_t begin_time_PARITY = clock();
 
-        std::cout << "\nparity states:..." << std::endl;
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "parity states:..." << std::endl;
 
         auto *parityEiVals = new std::vector<double>;
         auto *matrixParityBlocks = new std::vector<Eigen::MatrixXd>;
 
         getEiVals(J1, J2, parityEiVals, matrixParityBlocks, N, SIZE);
 
-        auto time_PARITY = float(clock () - begin_time_PARITY) /  CLOCKS_PER_SEC;
-        std::cout << "calculations done; this took: " << time_PARITY << " seconds\n";
-
-        std::cout << "\n";
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
 
         delete parityEiVals;
         delete matrixParityBlocks;
+
     }
 }

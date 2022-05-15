@@ -6,17 +6,17 @@ if [[ "$OSTYPE" == "msys" ]]; then
     ./cmake-build-release/Bsc_ITP_MX.exe 6 0 2 5000 -1 silent
     ./cmake-build-release/Bsc_ITP_MX.exe 8 0 2 5000 -1 silent
     ./cmake-build-release/Bsc_ITP_MX.exe 10 0 2 5000 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX.exe 12 0 2 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX.exe 12 0 2 500 -1 silent
     # ./cmake-build-release/Bsc_ITP_MX.exe 14 0 2 50 -1 silent
     # ./cmake-build-release/Bsc_ITP_MX.exe 16 0 2 16 -1 silent
 
     start_time_plots=$SECONDS
     python plotDeltaE.py
-    # python plotSpecificHeatJConst.py
+    python plotSpecificHeatJConst.py
     python plotSpecificHeatTConst.py
-    # python plotSusceptibilityJConst.py
-    # python plotSusceptibilityTConst.py
-    # python plotDispersion.py
+    python plotSusceptibilityJConst.py
+    python plotSusceptibilityTConst.py
+    python plotDispersion.py
 
 else
     ./cmake-build-release/Bsc_ITP_MX 6 0 2 10000 -1 silent
@@ -24,6 +24,7 @@ else
     ./cmake-build-release/Bsc_ITP_MX 10 0 2 5000 -1 silent
     ./cmake-build-release/Bsc_ITP_MX 12 0 2 5000 -1 silent
     # ./cmake-build-release/Bsc_ITP_MX 14 0 2 50 -1 silent
+    # ./cmake-build-release/Bsc_ITP_MX.exe 50 0 2 16 -1 silent
 
     start_time_plots=$SECONDS
     python3 plotDeltaE.py

@@ -20,6 +20,7 @@ namespace multi {
 
             std::vector<std::complex<double>> eiVals;
             std::vector<Eigen::MatrixXcd> matrixBlocks;
+
             momentumStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
 
             // sort eigenvalues
@@ -60,8 +61,8 @@ namespace multi {
                 J = START + (END - START) * pos / COUNT;
             }
             // clean up
-            eiVals.clear();
-            matrixBlocks.clear();
+//            eiVals.clear();
+//            matrixBlocks.clear();
 
         }
 
@@ -125,8 +126,8 @@ namespace multi {
                 J = START + (END - START) * pos / COUNT;
             }
             // clean up
-            eiVals.clear();
-            matrixBlocks.clear();
+//            eiVals.clear();
+//            matrixBlocks.clear();
 
         }
 
@@ -169,7 +170,8 @@ namespace multi {
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
+        //std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
 
         // sort data-points
         std::sort(outDataDeltaE.begin(), outDataDeltaE.end(), [](
@@ -215,15 +217,18 @@ namespace multi {
 
             std::vector<int> states;
             std::vector<std::complex<double>> eiVals;
+
+            fillStates(&states, N/2, N, SIZE);
+            const int statesCount = (int) states.size();
+
             Eigen::MatrixXcd matrixBlockU;
-            magnetizationBlocks::getEiValsZeroBlock(J, 1.0, &eiVals, matrixBlockU, &states, N, SIZE);
+            magnetizationBlocks::getEiValsZeroBlock(J, 1.0, &eiVals, matrixBlockU, states, N);
 
             Eigen::MatrixXd S2 = spinMatrix(N, states);
-            Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(SIZE, SIZE);
+            Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(statesCount, statesCount);
             Matrix_U_inv_S2_U = matrixBlockU.adjoint() * S2 * matrixBlockU;
 
             double susceptibility = getSusceptibilityDegeneracy(T, Matrix_U_inv_S2_U, eiVals, N);
-
             // progressbar
             nextJMutex.lock();
             int prg = std::min({CURRENT, COUNT});
@@ -245,14 +250,16 @@ namespace multi {
             CURRENT++;
             nextJMutex.unlock();
 
+            // clean up
+//            std::cout << eiVals.size() << " " << states.size() << std::endl;
+//            eiVals.clear();
+//            states.clear();
+
             if (pos > COUNT) {
                 break;
             } else {
                 J = (double) START + (double) (END - START) * (double) pos / (double) COUNT;
             }
-            // clean up
-            eiVals.clear();
-            states.clear();
         }
 
     }
@@ -285,7 +292,8 @@ namespace multi {
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
+        //std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
 
         // sort data-points
         std::sort(outDataMagneticSusceptibility_X.begin(), outDataMagneticSusceptibility_X.end(), [](const std::tuple<double, double> &a, const std::tuple<double, double> &b) {

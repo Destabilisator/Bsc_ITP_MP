@@ -21,7 +21,13 @@ else
 fi
 
 if [[ "$#" -ge 6 ]]; then
-	SILENT=$6
+	show=$6
+else
+	show=-
+fi
+
+if [[ "$#" -ge 7 ]]; then
+	SILENT=$7
 else
 	SILENT=-
 fi
@@ -30,11 +36,11 @@ fi
 if [[ "$OSTYPE" == "msys" ]]; then
     ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES $SILENT
     echo "plotting..."
-    python plot.py $N
+    python plot.py $N $show
 else
     ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES $SILENT
     echo "plotting..."
-    python3 plot.py $N
+    python3 plot.py $N $show
 fi
 
 elapsed=$(( SECONDS - start_time ))

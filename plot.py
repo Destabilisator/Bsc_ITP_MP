@@ -148,5 +148,6 @@ if __name__ == "__main__":
 
     print("plotting done. This took %.2f seconds" % (end_time - start_time) )
 
-    #plt.show()
+    if (sys.argv[2] == "show"):
+        plt.show()
         

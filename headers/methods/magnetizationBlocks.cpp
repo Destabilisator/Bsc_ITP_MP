@@ -4,7 +4,8 @@
 
 namespace magnetizationBlocks {
     void fillHamiltonBlock(const double &J1, const double &J2, const std::vector<int> &states, double **hamiltonBlock,
-                           const int &N, const int &SIZE) { // remove continue; after else
+                           const int &N) {
+
         for (int i = 0; i < states.size(); i++) {
             int s = states.at(i);
             for (int n = 0; n < N / 2; n++) {
@@ -44,6 +45,7 @@ namespace magnetizationBlocks {
     void getEiValsFromBlock(const double &J1, const double &J2, const int &m,
                             std::vector<std::complex<double>> *HEiValList, std::vector<Eigen::MatrixXd> *matrixBlocks,
                             const int &N, const int &SIZE) {
+
         auto *states = new std::vector<int>;
         fillStates(states, m, N, SIZE);
         const int statesCount = (int) states->size();
@@ -55,7 +57,7 @@ namespace magnetizationBlocks {
             }
         }
 
-        fillHamiltonBlock(J1, J2, *states, hamiltonBlock, N, SIZE);
+        fillHamiltonBlock(J1, J2, *states, hamiltonBlock, N);
 
         Eigen::MatrixXd H(statesCount, statesCount);
         for (int i = 0; i < statesCount; i++) {
@@ -82,6 +84,7 @@ namespace magnetizationBlocks {
 
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
                    std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N, const int &SIZE) {
+
         for (int m = 0; m <= N; m++) {
             getEiValsFromBlock(J1, J2, m, HEiValList, matrixBlocks, N, SIZE);
         }
@@ -123,10 +126,9 @@ namespace magnetizationBlocks {
     }
 
     void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
-                            Eigen::MatrixXcd &matrixBlockU, std::vector<int> *states, const int &N, const int &SIZE) {
+                            Eigen::MatrixXcd &matrixBlockU, const std::vector<int> &states, const int &N) {
 
-        fillStates(states, N/2, N, SIZE);
-        const int statesCount = (int) states->size();
+        const int statesCount = (int) states.size();
         auto **hamiltonBlock = new double *[statesCount];
         for (int i = 0; i < statesCount; i++) {
             hamiltonBlock[i] = new double[statesCount];
@@ -135,7 +137,7 @@ namespace magnetizationBlocks {
             }
         }
 
-        fillHamiltonBlock(J1, J2, *states, hamiltonBlock, N, SIZE);
+        fillHamiltonBlock(J1, J2, states, hamiltonBlock, N);
 
         Eigen::MatrixXd H(statesCount, statesCount);
         for (int i = 0; i < statesCount; i++) {
@@ -164,18 +166,17 @@ namespace magnetizationBlocks {
     }
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE) {
-        const clock_t begin_time_MAGNETIZATION = clock();
 
-        std::cout << "\nblock diagonale m_z:..." << std::endl;
-        //std::vector<std::complex<double>> EiVals_m;
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "block diagonale m_z:..." << std::endl;
         auto *EiVals_m = new std::vector<std::complex<double>>;
         auto *matrixBlocks_m = new std::vector<Eigen::MatrixXd>;
         magnetizationBlocks::getEiVals(J1, J2, EiVals_m, matrixBlocks_m, N, SIZE);
 
-        auto time_MAGNETIZATION = float(clock () - begin_time_MAGNETIZATION) /  CLOCKS_PER_SEC;
-        std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
-
-        std::cout << "\n";
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
 
         delete matrixBlocks_m;
     }
@@ -183,33 +184,36 @@ namespace magnetizationBlocks {
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                              const double &END, const int &COUNT, const int &cores) {
 
-        const clock_t begin_time_MAGNETIZATION = clock();
+        auto start = std::chrono::steady_clock::now();
 
-        std::cout << "\n" "susceptibility (m_z blocks): calculating..." << std::endl;
+        std::cout << "\n" << "susceptibility (m_z blocks): calculating..." << std::endl;
 
         auto *states = new std::vector<int>;
+        fillStates(states, N/2, N, SIZE);
+        const int statesCount = (int) states->size();
+
         auto *eiVals = new std::vector<std::complex<double>>;
         Eigen::MatrixXcd matrixBlockU;
-        magnetizationBlocks::getEiValsZeroBlock(J1, J2, eiVals, matrixBlockU, states, N, SIZE);
+        magnetizationBlocks::getEiValsZeroBlock(J1, J2, eiVals, matrixBlockU, *states, N);
 
         ///// susceptibility /////
 
         auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;
 
         Eigen::MatrixXd S2 = spinMatrix(N, *states);
-        Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(SIZE, SIZE);
+        Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(statesCount, statesCount);
         Matrix_U_inv_S2_U = matrixBlockU.adjoint() * S2 * matrixBlockU;
 
         for (int i = 0; i <= COUNT; i++) {
             double current = START + (END - START) * i / COUNT;
             //current_beta = 1 / current_beta;
-            susceptibility_magnetization->push_back({current,
-                                                     getSusceptibilityDegeneracy(current, Matrix_U_inv_S2_U, *eiVals, N)});
+            susceptibility_magnetization->push_back({current, getSusceptibilityDegeneracy(current, Matrix_U_inv_S2_U, *eiVals, N)});
         }
 
 
-        auto time_MAGNETIZATION = float(clock () - begin_time_MAGNETIZATION) /  CLOCKS_PER_SEC;
-        std::cout << "calculations done; this took: " << time_MAGNETIZATION << " seconds\n";
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         ///// save /////
 
@@ -218,7 +222,7 @@ namespace magnetizationBlocks {
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"
                                              + "data-points: " + std::to_string(COUNT) + "\n"
-                                             + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_MAGNETIZATION) + " seconds";
+                                             + "calculation time with " + std::to_string(cores) + " threads: " + formatTime(elapsed_seconds);
 
         std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
         saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_magnetization, N);

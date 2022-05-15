@@ -4,6 +4,7 @@
 
 namespace naiv {
     void fillHamilton(double **hamilton, const double &J1,const double &J2, const int &N, const int &SIZE) {
+
         for (int s = 0; s <= SIZE - 1; s++) {
             for (int n = 0; n < N / 2; n++) {
                 // declaring indices
@@ -34,10 +35,12 @@ namespace naiv {
                 }
             }
         }
+
     }
 
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
                    const int &N, const int &SIZE, Eigen::MatrixXcd &Matrix_U) {
+
         static auto **hamilton1 = new double*[SIZE];
         for (int i = 0; i < SIZE; i++) {
             hamilton1[i] = new double[SIZE];
@@ -88,9 +91,10 @@ namespace naiv {
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                const double &END, const int &COUNT, const int &cores) {
-        const clock_t begin_time_NAIV = clock();
 
-        std::cout << "\nnaiver Ansatz:..." << std::endl;
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "naiver Ansatz:..." << std::endl;
         auto *H_naiv_EiVals = new std::vector<std::complex<double>>;
         Eigen::MatrixXcd Matrix_U(SIZE, SIZE);
         getEiVals(J1, J2, H_naiv_EiVals, N, SIZE, Matrix_U);
@@ -110,8 +114,9 @@ namespace naiv {
                                             getSusceptibility(current, Matrix_U_inv_S2_U, *H_naiv_EiVals, N)});
         }
 
-        auto time_NAIV = float(clock () - begin_time_NAIV) /  CLOCKS_PER_SEC;
-        std::cout << "calculations done; this took: " << time_NAIV << " seconds\n";
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         ///// save /////
 
@@ -120,10 +125,11 @@ namespace naiv {
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"
                                              + "data-points: " + std::to_string(COUNT) + "\n"
-                                             + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_NAIV) + " seconds";
+                                             + "calculation time with " + std::to_string(cores) + " threads: " + formatTime(elapsed_seconds);
 
         std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
         saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_naiv, N);
         std::cout << "\n";
     }
+
 }

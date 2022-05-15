@@ -12,7 +12,7 @@
 static int CURRENT = 1;
 static const int PROGRESSBAR_SEGMENTS = 50;
 
-static std::mutex coutMutex;
+//static std::mutex coutMutex;
 static std::mutex nextJMutex;
 
 #define PI  3.14159265358979323846

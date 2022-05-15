@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include <complex>
+#include <chrono>
 #include <Eigen/Eigenvalues>
 
 /////////////////////////////// bits ///////////////////////////////
@@ -109,3 +110,6 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M,
 // [executable] N J_START J_END J_COUNT CORES SILENT
 void validateInput(int &argc, char* argv[], int &N, int &SIZE, double &J_START, double &J_END, int &J_COUNT,
                    const unsigned int &cpu_cnt, bool &silent, int &cores, const double &J1, const double &J2, bool skipSilent);
+
+// converts time in s in hh:mm:ss
+std::string formatTime(std::chrono::duration<double> elapsed_seconds);

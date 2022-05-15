@@ -171,19 +171,18 @@ namespace momentumStates {
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE) {
 
-        const clock_t begin_time_MOMENTUM = clock();
+        auto start = std::chrono::steady_clock::now();
 
-        std::cout << "\nmomentum states:..." << std::endl;
+        std::cout << "\n" << "momentum states:..." << std::endl;
 
         auto *momentEiVals = new std::vector<std::complex<double>>;
         auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
 
         getEiVals(J1, J2, momentEiVals, matrixMomentBlocks, N, SIZE);
 
-        auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
-        std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
-
-        std::cout << "\n";
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
 
         delete momentEiVals;
         delete matrixMomentBlocks;
@@ -192,9 +191,9 @@ namespace momentumStates {
     void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                            const double &END, const int &COUNT, const int &cores) {
 
-        const clock_t begin_time_MOMENTUM = clock();
+        auto start = std::chrono::steady_clock::now();
 
-        std::cout << "\n" "specific heat (momentum states): calculating..." << std::endl;
+        std::cout << "\n" << "specific heat (momentum states): calculating..." << std::endl;
 
         auto *momentEiVals = new std::vector<std::complex<double>>;
         auto *matrixMomentBlocks = new std::vector<Eigen::MatrixXcd>;
@@ -213,15 +212,16 @@ namespace momentumStates {
 
         ///// save /////
 
-        auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
-        std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         std::string filenameSpecificHeat_C = "momentum_specific_heat.txt";
         std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
                                            + "T START: " + std::to_string(START) + "\n"
                                            + "T END: " + std::to_string(END) + "\n"
                                            + "data-points: " + std::to_string(COUNT) + "\n"
-                                           + "calculation time with " + std::to_string(cores) + " threads: " + std::to_string(time_MOMENTUM) + " seconds";
+                                           + "calculation time with " + std::to_string(cores) + " threads: " + formatTime(elapsed_seconds);
 
         std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
         saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", *specificHeat_momentum, N);
@@ -230,12 +230,14 @@ namespace momentumStates {
 
         delete momentEiVals;
         delete matrixMomentBlocks;
+
     }
 
     void startDispersionPlot(const double &J1, const double &J2, const int &N, const int &SIZE) {
-        const clock_t begin_time_MOMENTUM = clock();
 
-        std::cout << "\n" "dispersion (momentum states): calculating..." << std::endl;
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "dispersion (momentum states): calculating..." << std::endl;
 
         auto *momentEiVals = new std::vector<std::vector<std::complex<double>>>(N/2);
         auto *momentData = new std::vector<std::tuple<int, double>>;
@@ -273,10 +275,11 @@ namespace momentumStates {
             }
         }
 
-        ///// save /////
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
-        auto time_MOMENTUM = float(clock () - begin_time_MOMENTUM) /  CLOCKS_PER_SEC;
-        std::cout << "calculations done; this took: " << time_MOMENTUM << " seconds\n";
+        ///// save /////
 
         std::string filename = "momentum_energy_dispersion_J_const.txt";
         std::string header = "N: " + std::to_string(N);
@@ -287,5 +290,6 @@ namespace momentumStates {
 
         delete momentEiVals;
         delete matrixMomentBlocks;
+
     }
 }
