@@ -18,17 +18,9 @@ namespace multi {
 
         while (true) {
 
-            //auto *eiVals = new std::vector<std::complex<double>>;
             std::vector<std::complex<double>> eiVals;
-            // *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
             std::vector<Eigen::MatrixXcd> matrixBlocks;
-//            auto *eiVals = new std::vector<double>;
-//            auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
-
-//            naiv::getEiVals(J, 1.0, eiVals, N, SIZE);
-//            magnetizationBlocks::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
             momentumStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
-//            parityStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
 
             // sort eigenvalues
             eiVals.shrink_to_fit();
@@ -50,7 +42,8 @@ namespace multi {
                 std::cout << "#";
             } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << prg << "/" << COUNT << ")     ";
+            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = "
+                        << START + (END - START) * prg / COUNT << " (" << prg << "/" << COUNT << ")     ";
             std::cout.flush();
             //coutMutex.unlock();
 
@@ -83,23 +76,15 @@ namespace multi {
         std::cout << "\r[";
         for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
             std::cout << ".";
-        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << pos << "/" << COUNT << ")     ";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << 0 << "/" << COUNT << ")     ";
         std::cout.flush();
         coutMutex.unlock();
 
         while (true) {
 
-//            auto *eiVals = new std::vector<std::complex<double>>;
-//            auto *matrixBlocks = new std::vector<Eigen::MatrixXcd>;
-
             std::vector<double> eiVals;
             std::vector<Eigen::MatrixXd> matrixBlocks;
-//            auto *eiVals = new std::vector<double>;
-//            auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
 
-//            naiv::getEiVals(J, 1.0, eiVals, N, SIZE);
-//            magnetizationBlocks::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
-//            momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
             parityStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
 
             // sort eigenvalues
@@ -122,7 +107,8 @@ namespace multi {
                 std::cout << "#";
             } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << prg << "/" << COUNT << ")     ";
+            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = "
+                        << START + (END - START) * prg / COUNT << " (" << prg << "/" << COUNT << ")     ";
             std::cout.flush();
             //coutMutex.unlock();
 
@@ -223,7 +209,7 @@ namespace multi {
         std::cout << "\r[";
         for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
             std::cout << ".";
-        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << pos << "/" << COUNT << ")     ";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << 0 << "/" << COUNT << ")     ";
         std::cout.flush();
         coutMutex.unlock();
 
@@ -253,7 +239,8 @@ namespace multi {
                 std::cout << "#";
             } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = " << J << " (" << prg << "/" << COUNT << ")     ";
+            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = "
+                        << START + (END - START) * prg / COUNT << " (" << prg << "/" << COUNT << ")     ";
             std::cout.flush();
             //coutMutex.unlock();
 
