@@ -8,13 +8,13 @@ namespace multi {
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
 
         // progressbar init
-        coutMutex.lock();
+        nextJMutex.lock();
         std::cout << "\r[";
         for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
             std::cout << ".";
         } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << 0 << "/" << COUNT << ")     ";
         std::cout.flush();
-        coutMutex.unlock();
+        nextJMutex.unlock();
 
         while (true) {
 
@@ -72,13 +72,13 @@ namespace multi {
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
 
         // progressbar init
-        coutMutex.lock();
+        nextJMutex.lock();
         std::cout << "\r[";
         for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
             std::cout << ".";
         } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << 0 << "/" << COUNT << ")     ";
         std::cout.flush();
-        coutMutex.unlock();
+        nextJMutex.unlock();
 
         while (true) {
 
@@ -139,9 +139,7 @@ namespace multi {
 
         std::cout << "\n" << "Delta E and C (T=const): calculating:...";
 
-        //auto *outDataDeltaE = new std::vector<std::tuple<double, double>>;
         std::vector<std::tuple<double, double>> outDataDeltaE;
-        //auto *outDataSpecificHeat_C = new std::vector<std::tuple<double, double>>;
         std::vector<std::tuple<double, double>> outDataSpecificHeat_C;
 
         if (COUNT < cores) {
@@ -205,18 +203,15 @@ namespace multi {
                       const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T) {
 
         // progressbar init
-        coutMutex.lock();
+        nextJMutex.lock();
         std::cout << "\r[";
         for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
             std::cout << ".";
         } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << 0 << "/" << COUNT << ")     ";
         std::cout.flush();
-        coutMutex.unlock();
+        nextJMutex.unlock();
 
         while (true) {
-
-//            auto *states = new std::vector<int>;
-//            auto *eiVals = new std::vector<std::complex<double>>;
 
             std::vector<int> states;
             std::vector<std::complex<double>> eiVals;
@@ -269,7 +264,6 @@ namespace multi {
 
         std::cout << "\n" << "X (T=const): calculating:...";
 
-        //auto *outDataMagneticSusceptibility_X = new std::vector<std::tuple<double, double>>;
         std::vector<std::tuple<double, double>> outDataMagneticSusceptibility_X;
 
         if (COUNT < cores) {
