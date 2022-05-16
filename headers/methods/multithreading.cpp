@@ -133,6 +133,71 @@ namespace multi {
 
     }
 
+    void get_DeltaE_CT_const_SI(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                                    double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                    const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
+
+        // progressbar init
+        nextJMutex.lock();
+        std::cout << "\r[";
+        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << 0 << "/" << COUNT << ")     ";
+        std::cout.flush();
+        nextJMutex.unlock();
+
+        while (true) {
+
+            std::vector<double> eiVals;
+            std::vector<Eigen::MatrixXd> matrixBlocks;
+
+            spinInversion::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
+
+            // sort eigenvalues
+            eiVals.shrink_to_fit();
+            std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+                return std::real(c1) < std::real(c2);
+            });
+
+            // Delta E
+            double E0 = std::real(eiVals.at(0));
+            double E1 = std::real(eiVals.at(1));
+
+            // progressbar
+            nextJMutex.lock();
+            int prg = std::min({CURRENT, COUNT});
+            int p = (int) ( (float) prg / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
+            //coutMutex.lock();
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = "
+                        << START + (END - START) * prg / COUNT << " (" << prg << "/" << COUNT << ")     ";
+            std::cout.flush();
+            //coutMutex.unlock();
+
+            // write data
+            outDataDeltaE->push_back({J, E1 - E0});
+            outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, eiVals, N)});
+            pos = CURRENT;
+            CURRENT++;
+            nextJMutex.unlock();
+
+            if (pos > COUNT) {
+                break;
+            } else {
+                J = START + (END - START) * pos / COUNT;
+            }
+            // clean up
+//            eiVals.clear();
+//            matrixBlocks.clear();
+
+        }
+
+    }
+
     void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const unsigned int &cpu_cnt,
                                int &cores, const double &T, const int &N, const int &SIZE) {
 
@@ -154,7 +219,8 @@ namespace multi {
 
         if (N%4 == 0) {
             for (int i = 0; i < cores; i++) {
-                Threads[i] = std::thread(get_DeltaE_CT_const_parity, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+                Threads[i] = std::thread(get_DeltaE_CT_const_SI, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+                //Threads[i] = std::thread(get_DeltaE_CT_const_parity, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
                                          &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
             }
         } else {

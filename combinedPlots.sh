@@ -19,10 +19,10 @@ if [[ "$OSTYPE" == "msys" ]]; then
     python plotDispersion.py
 
 else
-    ./cmake-build-release/Bsc_ITP_MX 6 0 2 10000 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 8 0 2 10000 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 10 0 2 5000 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 12 0 2 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 6 0 2 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 8 0 2 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 10 0 2 500 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 12 0 2 50 -1 silent
     # ./cmake-build-release/Bsc_ITP_MX 14 0 2 50 -1 silent
     # ./cmake-build-release/Bsc_ITP_MX.exe 50 0 2 16 -1 silent
 

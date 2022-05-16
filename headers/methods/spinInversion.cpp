@@ -12,7 +12,7 @@ namespace spinInversion {
         }
     }
 
-    int getClass_set_m_n(int &m, int &n, const int mp, const int mz, const int mpz, const int N) {
+    int getClass_set_m_n(int &m, int &n, const int mp, const int mz, const int mpz) {
 
         if (mp == -1 && mz == -1 && mpz == -1) {m = -1; return 1;}
         else if (mp != -1 && mz == -1 && mpz == -1) {m = mp; n = -1; return 2;}
@@ -128,7 +128,7 @@ namespace spinInversion {
 
     }
 
-    void fillHamiltonSIBlock(const double &J1, const double &J2, const int k, const int p, const int z, const std::vector<int> &states,
+    void fillHamiltonSIBlock(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
                                  const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
                                  const std::vector<int> &c_vals, Eigen::MatrixXd &hamiltonBlock, const int &N) {
 
@@ -233,7 +233,7 @@ namespace spinInversion {
 
     }
 
-    void SIBlockSolver(const double &J1, const double &J2, const int k, const int p, const int z, const std::vector<int> &states,
+    void SIBlockSolver(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
                            const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
                            const std::vector<int> &c_vals, std::vector<double> *eiVals, std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N) {
 
@@ -245,7 +245,12 @@ namespace spinInversion {
         matrixBlocks->push_back(hamiltonBlock);
     #endif
 
-        //Eigen::MatrixXd hamiltonBlockTransposed = hamiltonBlock.transpose();
+//        Eigen::MatrixXd hamiltonBlockTransposed = hamiltonBlock.transpose();
+//        if (!hamiltonBlock.isApprox(hamiltonBlockTransposed)) {
+//            std::cout << "ALARM: k: " << k << ", p: " << p << ", z: " << z << "\n";
+//        } else {
+//            std::cout << "all good\n";
+//        }
 
         //std::cout << "calculating eigenvalues...\n";
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
@@ -274,6 +279,7 @@ namespace spinInversion {
         const int k_upper = N/4;
 
         for (int mag = 0; mag <= N; mag++) {
+            //std::cout << "mag: " << mag << "\n";
             for (int k = 0; k <= k_upper; k++) {
                 for (int z : {-1, 1}) {
                     for (int p: {-1, 1}) {
@@ -282,16 +288,16 @@ namespace spinInversion {
                             for (int sigma: {-1, 1}) {
                                 int R, n, m, mp, mz, mpz;
                                 checkStateSI(s, R, mp, mz, mpz, k, N);
-                                int c = getClass_set_m_n(m, n, mp, mz, mpz, N);
+                                int c = getClass_set_m_n(m, n, mp, mz, mpz);
                                 if ((k == 0 || k == k_upper) && sigma == -1) {continue;}
                                 if (c == 2 || c == 4 || c == 5) {
                                     double Na = getNa(m, n, R, sigma, p, z, k, c, N);
                                     double Na_inv = getNa(m, n, R, -sigma, p, z, k, c, N);
-                                    if (Na < epsilon) {R = -1;}
-                                    if (sigma == -1 && Na_inv > epsilon) {R = -1;}
+                                    if (std::abs(Na) < epsilon) {R = -1;}
+                                    if (sigma == -1 && std::abs(Na_inv) > epsilon) {R = -1;}
                                 } else if (c == 3) {
                                     double val = 1.0 + (double) z * std::cos(4 * PI * (double) k * (double) m / (double) N);
-                                    if (val < epsilon) {R = -1;}
+                                    if (std::abs(val) < epsilon) {R = -1;}
                                 }
                                 if (R > 0) {
                                     //std::cout << getNa(m, n, R, sigma, p, z, k, c, N) << "\n";
@@ -317,7 +323,7 @@ namespace spinInversion {
             }
         }
 
-        std::cout << "number of states: " << numberOfStates << "\n";
+        //std::cout << "number of states: " << numberOfStates << "\n";
 
         // sort eigenvalues
         std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
