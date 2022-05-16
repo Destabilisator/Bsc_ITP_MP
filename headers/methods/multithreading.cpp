@@ -211,19 +211,29 @@ namespace multi {
         if (COUNT < cores) {
             cores = COUNT;
         }
-        std::cout << " (" << cores << ") cores\n";
+        std::cout << " (" << cores << ") cores";
 
         std::thread Threads[cores];
 
         CURRENT = 1 + cores;
 
         if (N%4 == 0) {
-            for (int i = 0; i < cores; i++) {
-                Threads[i] = std::thread(get_DeltaE_CT_const_SI, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
-                //Threads[i] = std::thread(get_DeltaE_CT_const_parity, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
-                                         &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+            if (N >= 16 || true) {
+                std::cout << ", spin inversion\n";
+                for (int i = 0; i < cores; i++) {
+                    Threads[i] = std::thread(get_DeltaE_CT_const_SI, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+                                             &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+                }
+            } else {
+                std::cout << ", parity states\n";
+                for (int i = 0; i < cores; i++) {
+                    Threads[i] = std::thread(get_DeltaE_CT_const_parity, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+                                             &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+                }
             }
+
         } else {
+            std::cout << ", momentum states\n";
             for (int i = 0; i < cores; i++) {
                 Threads[i] = std::thread(get_DeltaE_CT_const, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
                                          &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
@@ -237,7 +247,6 @@ namespace multi {
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
-        //std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
 
         // sort data-points
         std::sort(outDataDeltaE.begin(), outDataDeltaE.end(), [](
@@ -342,12 +351,13 @@ namespace multi {
         if (COUNT < cores) {
             cores = COUNT;
         }
-        std::cout << " (" << cores << ") cores\n";
+        std::cout << " (" << cores << ") cores";
 
         std::thread Threads[cores];
 
         CURRENT = 1 + cores;
 
+        std::cout << ", magnetization blocks\n";
         for (int i = 0; i < cores; i++) {
             Threads[i] = std::thread(get_XT_const, START + (END - START) * i / COUNT, i + 1, &outDataMagneticSusceptibility_X, COUNT, START, END, N, SIZE, T);
         }
@@ -359,7 +369,6 @@ namespace multi {
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
-        //std::cout << "\n" << "calculations done; this took: " << elapsed_seconds.count() << " seconds\n\n";
 
         // sort data-points
         std::sort(outDataMagneticSusceptibility_X.begin(), outDataMagneticSusceptibility_X.end(), [](const std::tuple<double, double> &a, const std::tuple<double, double> &b) {

@@ -96,7 +96,7 @@ subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = '
 #    Y += [float(y)]
 #subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'purple', label = lbl)
 
-#+subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
+subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
 plt.savefig("results/" + "specific_heat_T_const.png")
-plt.show()
+#plt.show()

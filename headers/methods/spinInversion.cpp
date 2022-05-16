@@ -14,7 +14,7 @@ namespace spinInversion {
 
     int getClass_set_m_n(int &m, int &n, const int mp, const int mz, const int mpz) {
 
-        if (mp == -1 && mz == -1 && mpz == -1) {m = -1; return 1;}
+        if (mp == -1 && mz == -1 && mpz == -1) {m = -1; n = -1; return 1;}
         else if (mp != -1 && mz == -1 && mpz == -1) {m = mp; n = -1; return 2;}
         else if (mp == -1 && mz != -1 && mpz == -1) {m = mz; n = -1; return 3;}
         else if (mp == -1 && mz == -1 && mpz != -1) {m = mpz; n = -1; return 4;}
@@ -90,7 +90,7 @@ namespace spinInversion {
                 case 2:
                 case 5:
                     val *= ( std::cos(k_moment * (double) l) + (double) sigma_a * (double) p * std::cos(k_moment * (double) (l-m_b)) )
-                            / ( 1.0 + (double) sigma_a * (double) p * std::cos(k_moment * (double)  m_b) );
+                            / ( 1.0 + (double) sigma_a * (double) p * std::cos(k_moment * (double) m_b) );
                     break;
                 case 4:
                     val *= ( std::cos(k_moment * (double) l) + (double) sigma_a * (double) p * (double) z * std::cos(k_moment * (double) (l-m_b)) )
@@ -245,12 +245,12 @@ namespace spinInversion {
         matrixBlocks->push_back(hamiltonBlock);
     #endif
 
-//        Eigen::MatrixXd hamiltonBlockTransposed = hamiltonBlock.transpose();
-//        if (!hamiltonBlock.isApprox(hamiltonBlockTransposed)) {
-//            std::cout << "ALARM: k: " << k << ", p: " << p << ", z: " << z << "\n";
-//        } else {
-//            std::cout << "all good\n";
-//        }
+        Eigen::MatrixXd hamiltonBlockTransposed = hamiltonBlock.transpose();
+        if (!hamiltonBlock.isApprox(hamiltonBlockTransposed)) {
+            std::cout << "\nALARM: k: " << k << ", p: " << p << ", z: " << z << "\n";
+        } else {
+            //std::cout << "all good\n";
+        }
 
         //std::cout << "calculating eigenvalues...\n";
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
@@ -281,49 +281,88 @@ namespace spinInversion {
         for (int mag = 0; mag <= N; mag++) {
             //std::cout << "mag: " << mag << "\n";
             for (int k = 0; k <= k_upper; k++) {
-                for (int z : {-1, 1}) {
-                    for (int p: {-1, 1}) {
+
+                if (mag == N/2) {
+                    for (int z : {-1, 1}) {
+                        for (int p: {-1, 1}) {
+                            //if (k != 0 && k != k_upper && p == -1) {continue;}
+                            for (int s: states_m.at(mag)) {
+                                for (int sigma: {-1, 1}) {
+                                    int R, n, m, mp, mz, mpz;
+                                    checkStateSI(s, R, mp, mz, mpz, k, N);
+                                    int c = getClass_set_m_n(m, n, mp, mz, mpz);
+                                    //std::cout << "case: " << c << "\n";
+                                    //std::cout << c;
+                                    if ((k == 0 || k == k_upper) && sigma == -1) {continue;}
+                                    if (c == 2 || c == 4 || c == 5) {
+                                        double Na = getNa(m, n, R, sigma, p, z, k, c, N);
+                                        double Na_inv = getNa(m, n, R, -sigma, p, z, k, c, N);
+                                        if (std::abs(Na) < epsilon) {R = -1;}
+                                        if (sigma == -1 && std::abs(Na_inv) > epsilon) {R = -1;}
+                                    } else if (c == 3) {
+                                        double val = 1.0 + (double) z * std::cos(4 * PI * (double) k * (double) m / (double) N);
+                                        if (std::abs(val) < epsilon) {R = -1;}
+                                    }
+                                    if (R > 0) {
+                                        //std::cout << getNa(m, n, R, sigma, p, z, k, c, N) << "\n";
+                                        states.push_back(s);
+                                        R_vals.push_back(sigma * R);
+                                        m_vals.push_back(m);
+                                        n_vals.push_back(n);
+                                        c_vals.push_back(c);
+                                        numberOfStates++;
+                                    }
+                                }
+                            }
+                            if (!states.empty()) {
+                                SIBlockSolver(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, matrixBlocks, N);
+                            }
+                            states.clear();
+                            R_vals.clear();
+                            m_vals.clear();
+                            n_vals.clear();
+                            c_vals.clear();
+                        }
+                    }
+                }
+                else {
+                    for (int p : {-1, 1}) {
                         //if (k != 0 && k != k_upper && p == -1) {continue;}
-                        for (int s: states_m.at(mag)) {
-                            for (int sigma: {-1, 1}) {
-                                int R, n, m, mp, mz, mpz;
-                                checkStateSI(s, R, mp, mz, mpz, k, N);
-                                int c = getClass_set_m_n(m, n, mp, mz, mpz);
+                        for (int s : states_m.at(mag)) {
+                            for (int sigma : {-1, 1}) {
+                                int R, m;
+                                checkState(s, &R, &m, k, N);
                                 if ((k == 0 || k == k_upper) && sigma == -1) {continue;}
-                                if (c == 2 || c == 4 || c == 5) {
-                                    double Na = getNa(m, n, R, sigma, p, z, k, c, N);
-                                    double Na_inv = getNa(m, n, R, -sigma, p, z, k, c, N);
-                                    if (std::abs(Na) < epsilon) {R = -1;}
-                                    if (sigma == -1 && std::abs(Na_inv) > epsilon) {R = -1;}
-                                } else if (c == 3) {
-                                    double val = 1.0 + (double) z * std::cos(4 * PI * (double) k * (double) m / (double) N);
-                                    if (std::abs(val) < epsilon) {R = -1;}
+                                if (m != -1) {
+                                    double val = (double) sigma * (double) p * std::cos(4 * PI * (double) k * (double) m / (double) N);
+                                    if (std::abs(1.0 + val) < 1e-10) {R = -1;}
+                                    if (sigma == -1 && abs(1.0 - val) > 1e-10) {R = -1;}
                                 }
                                 if (R > 0) {
-                                    //std::cout << getNa(m, n, R, sigma, p, z, k, c, N) << "\n";
                                     states.push_back(s);
                                     R_vals.push_back(sigma * R);
                                     m_vals.push_back(m);
-                                    n_vals.push_back(n);
-                                    c_vals.push_back(c);
                                     numberOfStates++;
                                 }
                             }
                         }
                         if (!states.empty()) {
-                            SIBlockSolver(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, matrixBlocks, N);
+                            parityStates::parityBlockSolver(J1, J2, k, p, states, R_vals, m_vals, eiVals, matrixBlocks, N);
                         }
                         states.clear();
                         R_vals.clear();
                         m_vals.clear();
-                        n_vals.clear();
-                        c_vals.clear();
                     }
                 }
+
+
             }
+            //std::cout << "\n";
         }
 
         //std::cout << "number of states: " << numberOfStates << "\n";
+
+        return;
 
         // sort eigenvalues
         std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {

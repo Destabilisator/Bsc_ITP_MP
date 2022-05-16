@@ -232,6 +232,8 @@ namespace parityStates {
             }
         }
 
+        std::cout << "number of states: " << numberOfStates << "\n";
+
         // sort eigenvalues
         std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
             return std::real(c1) < std::real(c2);

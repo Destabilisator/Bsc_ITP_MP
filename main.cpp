@@ -26,13 +26,13 @@ int main(int argc, char* argv[]) {
 //    momentumStates::start(J1, J2, N, SIZE);
 //    magnetizationBlocks::start(J1, J2, N, SIZE);
 
-//
-//    for (int n = 8; n <= 24; n += 4) {
+
+//    for (int n = 8; n <= 16; n += 4) {
 //        int size = (int) std::pow(2, n);
 //        std::cout << "N: " << n << ", size: " << size << "\n";
 //        spinInversion::start(J1, J2, n, size);
 //        parityStates::start(J1, J2, n, size);
-//        momentumStates::start(J1, J2, n, size);
+////        momentumStates::start(J1, J2, n, size);
 //        std::cout << "\n";
 //    }
 
