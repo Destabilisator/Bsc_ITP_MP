@@ -1,6 +1,6 @@
 #include "parityStates.h"
 
-/////////////////////////////// parity states (unfinished) ///////////////////////////////
+/////////////////////////////// parity states ///////////////////////////////
 
 namespace parityStates {
 
@@ -264,71 +264,6 @@ namespace parityStates {
         saveEiVals("EigenvaluesParityStates.txt", "parity states Ansatz für N = " + std::to_string(N) +
                                                        "\nJ1 = " + std::to_string(J1) + "\nJ2 = " + std::to_string(J2), *eiVals, N);
 #endif
-    }
-
-    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<double> *eiVals,
-                   std::vector<Eigen::MatrixXd> *matrixBlocksU, std::vector<int> *statesList, const int &N, const int &SIZE) {
-
-        std::vector<std::vector<int>> states_m(N+1);
-        for (int s = 0; s < SIZE; s++) {
-            states_m.at(bitSum(s, N)).push_back(s);
-        }
-
-        std::vector<int> states;
-        std::vector<int> R_vals;
-        std::vector<int> m_vals;
-
-        int numberOfStates = 0;
-        const int k_upper = N/4;
-
-        int mag = N/2;
-        for (int k = 0; k <= k_upper; k++) {
-            for (int p : {-1, 1}) {
-                for (int s : states_m.at(mag)) {
-                    for (int sigma : {-1, 1}) {
-                        int R, m;
-                        checkState(s, &R, &m, k, N);
-                        if ((k == 0 || k == k_upper) && sigma == -1) {continue;}
-                        if (m != -1) {
-                            double val = (double) sigma * (double) p * std::cos(4 * PI * (double) k * (double) m / (double) N);
-                            if (std::abs(1.0 + val) < 1e-10) {R = -1;}
-                            if (sigma == -1 && abs(1.0 - val) > 1e-10) {R = -1;}
-                        }
-                        if (R > 0) {
-                            statesList->push_back(s);
-                            states.push_back(s);
-                            R_vals.push_back(sigma * R);
-                            m_vals.push_back(m);
-                            numberOfStates++;
-                        }
-                    }
-                }
-                if (!states.empty()) {
-                    const int statesCount = (int) states.size();
-                    Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
-                    fillHamiltonParityBlock(J1, J2, k, p, states, R_vals, m_vals, hamiltonBlock, N);
-
-                    //std::cout << "calculating eigenvalues...\n";
-                    Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
-                    const Eigen::VectorXd &H1EiVal = solver.eigenvalues();
-                    for (double ev: H1EiVal) {
-                        eiVals->push_back(ev);
-                    }
-                    const Eigen::MatrixXd& M = solver.eigenvectors();
-                    //std::cout << M << "\n\n";
-                    matrixBlocksU->push_back(M);
-                }
-                states.clear();
-                R_vals.clear();
-                m_vals.clear();
-            }
-        }
-
-        // sort eigenvalues
-//        std::sort(eiVals->begin(), eiVals->end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
-//            return std::real(c1) < std::real(c2);
-//        });
-
     }
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE) {

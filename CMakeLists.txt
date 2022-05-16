@@ -47,7 +47,9 @@ add_executable(Bsc_ITP_MX main.h main.cpp
         headers/methods/momentumStates.h
         headers/methods/momentumStates.cpp
         headers/methods/parityStates.h
-        headers/methods/parityStates.cpp)
+        headers/methods/parityStates.cpp
+        headers/methods/spinInversion.h
+        headers/methods/spinInversion.cpp)
 
 if (WIN32)
     target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT})

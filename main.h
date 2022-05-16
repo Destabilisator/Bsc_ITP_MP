@@ -25,7 +25,8 @@
 #endif
 
 ///// global variables /////
-int N = 8; // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
+int N = 8;  // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
+            // has to be divisible by 4 to use parity and spin inversion
 int SIZE;
 double J1 = 1.0, J2 = 1.0;
 double J_START = 0.0;
@@ -38,4 +39,4 @@ double T_END = J_END;
 int T_COUNT = J_COUNT;
 
 ///// multi threading stuff /////
-const unsigned int cpu_cnt = (unsigned int) std::thread::hardware_concurrency() / 2;
+const unsigned int cpu_cnt = (unsigned int) std::thread::hardware_concurrency();

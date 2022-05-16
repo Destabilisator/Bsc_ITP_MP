@@ -42,6 +42,13 @@ int bitSum(int s, int N) {
     } return sum;
 }
 
+int invertBits(int &s, int &N) {
+    int t = 0;
+    for (int n = 0; n < N; n++) {
+        t |= ~( (s >> n) & 1 ) << n;
+    }
+}
+
 /////////////////////////////// states ///////////////////////////////
 
 void fillStates(std::vector<int> *states, int m, int N, int size) {
@@ -120,6 +127,40 @@ void checkState(int s, int *r, int *m, int k, int N) {
     }
 }
 
+void checkStateSI(const int &s, int &r, int &mp, int &mz, int &mpz, const int &k, const int &N) {
+    int t = s; r = -1;
+    // no Z or P
+    for (int i = 1; i <= N/2; i++) {
+        t = translateLeft(t, 2, N);
+        if (t < s) {return;}
+        else if (t == s) {
+            if (k % (int) ((double) N / (double) i / 2.0) != 0) {return;}
+            else {r = i; break;}
+        }
+    }
+    // only P
+    t = reflectBits(translateLeft(s, 1, N), N); mp = -1;
+    for (int i = 0; i <= r; i++) {
+        if (t < s) {r = -1; return;}
+        else if (t == s) {mp = i; break;}
+        t = translateLeft(t, 2, N);
+    }
+    // only Z
+    t = invertBits(s, N); mz = -1;
+    for (int i = 0; i <= r; i++) {
+        if (t < s) {r = -1; return;}
+        else if (t == s) {mz = i; break;}
+        t = translateLeft(t, 2, N);
+    }
+    // Z and P
+    t = reflectBits(translateLeft(invertBits(s, N), 1, N), N); mpz = -1;
+    for (int i = 0; i <= r; i++) {
+        if (t < s) {r = -1; return;}
+        else if (t == s) {mpz = i; break;}
+        t = translateLeft(t, 2, N);
+    }
+}
+
 void representative(int s, int *r, int *l, int N) {
     int t = s; *r = s; *l = 0;
     for (int i = 1; i < N/2; i++) {
@@ -139,6 +180,33 @@ void representative(int s, int *r, int *l, int *q, int N) {
     *q = 0;
     for (int i = 0; i <= N/2; i++) {
         if (t < *r) {*r = t; *l = i; *q = 1;}
+        t = translateLeft(t, 2, N);
+    }
+}
+
+void representative(const int &s, int &r, int &l, int &q, int &g, const int &N) {
+    int t = s; r = s; l = 0; q = 0; g = 0;
+    // no Z or P
+    for (int i = 1; i <= N/2; i++) {
+        t = translateLeft(t, 2, N);
+        if (t < r) {r = t; l = i; q = 0; g = 0;}
+    }
+    // only P
+    t = reflectBits(translateLeft(s, 1, N), N);
+    for (int i = 0; i <= N/2; i++) {
+        if (t < r) {r = t; l = i; q = 1; g = 0;}
+        t = translateLeft(t, 2, N);
+    }
+    // only Z
+    t = invertBits(s, N);
+    for (int i = 0; i <= N/2; i++) {
+        if (t < r) {r = t; l = i; q = 0; g = 1;}
+        t = translateLeft(t, 2, N);
+    }
+    // Z and P
+    t = reflectBits(translateLeft(invertBits(s, N), 1, N), N);
+    for (int i = 0; i <= N/2; i++) {
+        if (t < r) {r = t; l = i; q = 1; g = 1;}
         t = translateLeft(t, 2, N);
     }
 }

@@ -28,6 +28,9 @@ int invertBits(int s, int N);
 // sum up first N bits in s and returns result
 int bitSum(int s, int N);
 
+// inverts the first N bits of an integer s
+int invertBits(int &s, int &N);
+
 /////////////////////////////// states ///////////////////////////////
 
 // finds all possible states with magnetizationBlocksAnsatz m_z = m and outputs to states
@@ -45,12 +48,20 @@ int checkState(int s, int k, int N);
 // if a smaller state exists r = -1
 void checkState(int s, int *r, int *m, int k, int N);
 
+// checks whether a smaller in can be reached through translation r, reflection mp or inversion mz
+void checkStateSI(const int &s, int &r, int &mp, int &mz, int &mpz, const int &k, const int &N);
+
 // provides representative of s to r and number of needed translations in l
 void representative(int s, int *r, int *l, int N);
 
 // provides representative of s to r and number of needed translations in l
 // a possible reflection will be indicated by q
 void representative(int s, int *r, int *l, int *q, int N);
+
+// provides representative of s to r and number of needed translations in l
+// a possible reflection will be indicated by q
+// a possible spin inversion will be indicated by g
+void representative(const int &s, int &r, int &l, int &q, int &g, const int &N);
 
 /////////////////////////////// saving data ///////////////////////////////
 
