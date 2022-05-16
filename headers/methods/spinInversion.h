@@ -10,9 +10,9 @@
 
 ///// output, turn off during multithreading /////
 //#define showMatrix
-#define saveMatrix
-#define showEigenvalues
-#define saveEigenvalues
+//#define saveMatrix
+//#define showEigenvalues
+//#define saveEigenvalues
 
 /////////////////////////////// spin inversion (unfinished) ///////////////////////////////
 

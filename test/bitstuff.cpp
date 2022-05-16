@@ -27,6 +27,14 @@ int invert(int s, int N) {
     return s ^ a;
 }
 
+int invertBits(int s, int N) {
+    int t = 0;
+    for (int n = 0; n < N; n++) {
+        t |= ( (s >> n) & 1 ^ 1) << n;
+    }
+    return t;
+}
+
 // cyclicly translate bits in s by n
 int translate(int s, int n, int N) {
     for (int _ = 0; _ < n; _++) {
@@ -139,13 +147,36 @@ void bitsStuff() {
 
 int main() {
 
+    int N = 25;
+    int size = std::pow(2, N);
+
+    auto start1 = std::chrono::steady_clock::now();
+
+    for (int i = 0; i < size; i++) {
+        invert(i, N);
+    }
+
+    auto end1 = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed_seconds1 = end1-start1;
+    std::cout << "s^N: calculations done; this took: " << elapsed_seconds1.count() << "\n\n";
+
+    auto start2 = std::chrono::steady_clock::now();
+
+    for (int i = 0; i < size; i++) {
+        invertBits(i, N);
+    }
+
+    auto end2 = std::chrono::steady_clock::now();
+    std::chrono::duration<double> elapsed_seconds2 = end2-start2;
+    std::cout << "loop: calculations done; this took: " << elapsed_seconds2.count() << "\n\n";
+
     //bitsStuff();
 
 //    printBits(invert(1, 8));
 //    printBits2(invert(1, 8));
 
-    printBits(34);
-    printBits2(34);
+//    printBits(34);
+//    printBits2(34);
 
     return 0;
 }

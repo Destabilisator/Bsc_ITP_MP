@@ -9,9 +9,9 @@
 
 ///// output, turn off during multithreading /////
 //#define showMatrix
-#define saveMatrix
+//#define saveMatrix
 //#define showEigenvalues
-#define saveEigenvalues
+//#define saveEigenvalues
 
 /////////////////////////////// momentum states ///////////////////////////////
 

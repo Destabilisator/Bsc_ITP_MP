@@ -21,17 +21,18 @@ int main(int argc, char* argv[]) {
 //    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT, cores);
 //    momentumStates::startDispersionPlot(J1, J2, N, SIZE);
 
-    spinInversion::start(J1, J2, N, SIZE);
-    parityStates::start(J1, J2, N, SIZE);
-    momentumStates::start(J1, J2, N, SIZE);
-    magnetizationBlocks::start(J1, J2, N, SIZE);
+//    spinInversion::start(J1, J2, N, SIZE);
+//    parityStates::start(J1, J2, N, SIZE);
+//    momentumStates::start(J1, J2, N, SIZE);
+//    magnetizationBlocks::start(J1, J2, N, SIZE);
 
 //
-//    for (int n = 8; n <= 32; n += 4) {
-//        std::cout << "N: " << n << ", size: " << std::pow(2, n) << "\n";
-//        spinInversion::start(J1, J2, n, (int) std::pow(2, n));
-//        std::cout << "\n";
-//    }
+    for (int n = 8; n <= 24; n += 4) {
+        std::cout << "N: " << n << ", size: " << std::pow(2, n) << "\n";
+        spinInversion::start(J1, J2, n, (int) std::pow(2, n));
+        parityStates::start(J1, J2, N, SIZE);
+        std::cout << "\n";
+    }
 
 
     std::cout << "\n";

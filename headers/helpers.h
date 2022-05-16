@@ -22,14 +22,14 @@ int translateLeft(int s, int n, int N);
 // reflect first N bits of the integer s and returns result
 int reflectBits(int s, int N);
 
-// invert first N bits of the integer s and returns result
+// inverts first N bits of the integer s and returns result
 int invertBits(int s, int N);
 
 // sum up first N bits in s and returns result
 int bitSum(int s, int N);
 
 // inverts the first N bits of an integer s
-int invertBits(int &s, int &N);
+//int invertBits(int s, int N);
 
 /////////////////////////////// states ///////////////////////////////
 

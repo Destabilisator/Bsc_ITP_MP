@@ -42,12 +42,13 @@ int bitSum(int s, int N) {
     } return sum;
 }
 
-int invertBits(int &s, int &N) {
-    int t = 0;
-    for (int n = 0; n < N; n++) {
-        t |= ~( (s >> n) & 1 ) << n;
-    }
-}
+//int invertBits(int s, int N) {
+//    int t = 0;
+//    for (int n = 0; n < N; n++) {
+//        t |= ( (s >> n) & 1 ^ 1) << n;
+//    }
+//    return t;
+//}
 
 /////////////////////////////// states ///////////////////////////////
 
