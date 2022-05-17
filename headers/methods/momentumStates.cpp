@@ -189,7 +189,7 @@ namespace momentumStates {
     }
 
     void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
-                           const double &END, const int &COUNT, const int &cores) {
+                           const double &END, const int &COUNT) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -221,7 +221,7 @@ namespace momentumStates {
                                            + "T START: " + std::to_string(START) + "\n"
                                            + "T END: " + std::to_string(END) + "\n"
                                            + "data-points: " + std::to_string(COUNT) + "\n"
-                                           + "calculation time with " + std::to_string(cores) + " threads: " + formatTime(elapsed_seconds);
+                                           + "calculation time: " + formatTime(elapsed_seconds);
 
         std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
         saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", *specificHeat_momentum, N);

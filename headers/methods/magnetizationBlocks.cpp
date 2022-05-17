@@ -158,11 +158,7 @@ namespace magnetizationBlocks {
         delete[] hamiltonBlock;
 
         HEiValList->shrink_to_fit();
-        // sort eigenvalues
-//        std::sort(HEiValList->begin(), HEiValList->end(),
-//                  [](const std::complex<double> &c1, const std::complex<double> &c2) {
-//                      return std::real(c1) < std::real(c2);
-//                  });
+
     }
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE) {
@@ -182,7 +178,7 @@ namespace magnetizationBlocks {
     }
 
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
-                             const double &END, const int &COUNT, const int &cores) {
+                             const double &END, const int &COUNT) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -195,6 +191,10 @@ namespace magnetizationBlocks {
         auto *eiVals = new std::vector<std::complex<double>>;
         Eigen::MatrixXcd matrixBlockU;
         magnetizationBlocks::getEiValsZeroBlock(J1, J2, eiVals, matrixBlockU, *states, N);
+
+        for (std::complex<double> ev : *eiVals) {
+            std::cout << ev << "\n";
+        }
 
         ///// susceptibility /////
 
@@ -222,7 +222,7 @@ namespace magnetizationBlocks {
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"
                                              + "data-points: " + std::to_string(COUNT) + "\n"
-                                             + "calculation time with " + std::to_string(cores) + " threads: " + formatTime(elapsed_seconds);
+                                             + "calculation time: " + formatTime(elapsed_seconds);
 
         std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
         saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_magnetization, N);

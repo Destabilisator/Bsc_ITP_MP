@@ -1,6 +1,6 @@
 #include "spinInversion.h"
 
-/////////////////////////////// spin inversion (unfinished) ///////////////////////////////
+/////////////////////////////// spin inversion ///////////////////////////////
 
 namespace spinInversion {
 
@@ -413,4 +413,204 @@ namespace spinInversion {
         delete matrixSIBlocks;
 
     }
+
+    void SIBlockSolver_withSave(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
+                                const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
+                                const std::vector<int> &c_vals, std::vector<double> &eiVals, std::vector<Eigen::MatrixXd> &matrixBlocks, const int &N) {
+
+        const int statesCount = (int) states.size();
+        Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
+//        std::cout << "filling hamilton\n";
+        fillHamiltonSIBlock(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, hamiltonBlock, N);
+
+        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
+        const Eigen::VectorXd &H1EiVal = solver.eigenvalues();
+        for (double ev: H1EiVal) {
+            eiVals.push_back(ev);
+        }
+
+        eiVals.shrink_to_fit();
+
+//        std::cout << "saving U Block\n";
+        matrixBlocks.push_back(solver.eigenvectors());
+
+//        // sort eigenvalues
+//        std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+//            return std::real(c1) < std::real(c2);
+//        });
+
+    }
+
+    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<double> & eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
+                            std::vector<int> &Allstates, const int &N) {
+
+        std::vector<int> states;
+        std::vector<int> R_vals;
+        std::vector<int> m_vals;
+        std::vector<int> n_vals;
+        std::vector<int> c_vals;
+
+        const int k_upper = N / 4;
+
+        for (int k = 0; k <= k_upper; k++) {
+            for (int z: {-1, 1}) {
+                for (int p: {-1, 1}) {
+                    for (int s: Allstates) {
+                        for (int sigma: {-1, 1}) {
+                            int R, n, m, mp, mz, mpz;
+                            checkStateSI(s, R, mp, mz, mpz, k, N);
+                            int c = getClass_set_m_n(m, n, mp, mz, mpz);
+                            if ((k == 0 || k == k_upper) && sigma == -1) { continue; }
+                            if (c == 2 || c == 4 || c == 5) {
+                                double Na = getNa(m, n, R, sigma, p, z, k, c, N);
+                                double Na_inv = getNa(m, n, R, -sigma, p, z, k, c, N);
+                                if (std::abs(Na) < epsilon) { R = -1; }
+                                if (sigma == -1 && std::abs(Na_inv) > epsilon) { R = -1; }
+                            } else if (c == 3) {
+                                double val = 1.0 + (double) z * std::cos(4 * PI * (double) k * (double) m / (double) N);
+                                if (std::abs(val) < epsilon) { R = -1; }
+                            }
+                            if (R > 0) {
+                                states.push_back(s);
+                                R_vals.push_back(sigma * R);
+                                m_vals.push_back(m);
+                                n_vals.push_back(n);
+                                c_vals.push_back(c);
+                            }
+                        }
+                    }
+                    if (!states.empty()) {
+//                        std::cout << "solving block\n";
+                        SIBlockSolver_withSave(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, UBlocks, N);
+                    }
+//                    std::cout << "clearing vectors\n";
+                    states.clear();
+                    R_vals.clear();
+                    m_vals.clear();
+                    n_vals.clear();
+                    c_vals.clear();
+                }
+            }
+        }
+
+    }
+
+    void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+                             const double &END, const int &COUNT) {
+
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "susceptibility (spin inversion): calculating..." << std::endl;
+
+        std::vector<int> states;
+        fillStates(&states, N/2, N, SIZE);
+        const int statesCount = (int) states.size();
+
+        std::vector<double> eiVals;
+
+        std::vector<Eigen::MatrixXd> UBlocks;
+
+//        std::cout << "getting eiVals\n";
+        getEiValsZeroBlock(J1, J2, eiVals, UBlocks, states, N);
+
+        for (double ev : eiVals) {
+            std::cout << ev << "\n";
+        }
+
+        ///// susceptibility /////
+
+        auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;
+
+//        std::cout << "getting S2\n";
+        Eigen::MatrixXd S2 = spinMatrix(N, states);
+
+        Eigen::MatrixXd U = Eigen::MatrixXd::Zero(statesCount, statesCount);
+
+//        std::cout << "getting U\n";
+
+        int offset_blocks = 0;
+        for (const Eigen::MatrixXd& M : UBlocks) {
+            U.block(offset_blocks, offset_blocks, M.rows(), M.cols()) = M;
+            offset_blocks += (int) M.rows();
+        }
+
+
+//        std::cout << "getting U_inv_S2_U\n";
+        Eigen::MatrixXd U_inv_S2_U = Eigen::MatrixXd::Zero(statesCount, statesCount);
+        U_inv_S2_U = U.adjoint() * S2 * U;
+
+//        std::cout << "getting susceptibility\n";
+
+        for (int i = 0; i <= COUNT; i++) {
+            double current = START + (END - START) * i / COUNT;
+            //current_beta = 1 / current_beta;
+            susceptibility_magnetization->push_back({current, getSusceptibilityDegeneracy(current, U_inv_S2_U, eiVals, N)});
+        }
+
+
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+        ///// save /////
+
+        std::string filenameSusceptibility_X = "spininversion_susceptibility_J_const.txt";
+        std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
+                                             + "T START: " + std::to_string(START) + "\n"
+                                             + "T END: " + std::to_string(END) + "\n"
+                                             + "data-points: " + std::to_string(COUNT) + "\n"
+                                             + "calculation time: " + formatTime(elapsed_seconds);
+
+        std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
+        saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_magnetization, N);
+
+        std::cout << "\n";
+
+    }
+
+    void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+                           const double &END, const int &COUNT) {
+
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "specific heat (spin inversion): calculating..." << std::endl;
+
+        std::vector<double> eiVals;
+        std::vector<Eigen::MatrixXd> matrixBlocks;
+//        auto *eiVals = new std::vector<double>;
+//        auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
+
+        getEiVals(J1, J2, &eiVals, &matrixBlocks, N, SIZE);
+
+
+        ///// specific /////
+
+//        auto *specificHeat_momentum = new std::vector<std::tuple<double, double>>;
+        std::vector<std::tuple<double, double>> specificHeat_momentum;
+
+        for (int i = 0; i <= COUNT; i++) {
+            double current = START + (END - START) * i / COUNT;
+            specificHeat_momentum.emplace_back(current, getSpecificHeat(current, eiVals, N));
+        }
+
+        ///// save /////
+
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+        std::string filenameSpecificHeat_C = "spininversion_specific_heat.txt";
+        std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
+                                           + "T START: " + std::to_string(START) + "\n"
+                                           + "T END: " + std::to_string(END) + "\n"
+                                           + "data-points: " + std::to_string(COUNT) + "\n"
+                                           + "calculation time: " + formatTime(elapsed_seconds);
+
+        std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
+        saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", specificHeat_momentum, N);
+
+        std::cout << "\n";
+
+    }
+
 }
