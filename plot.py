@@ -52,7 +52,8 @@ def plot_specific_heat_T_const(N):
 def plot_specific_heat_J_const(N):
     print("plotting specific heat (constant J1/J2, funtion of T) ...")
     # file = open("results/" + N + "_momentum_specific_heat.txt", 'r')
-    file = open("results/" + N + "_spininversion_specific_heat.txt", 'r')
+    #file = open("results/" + N + "_spininversion_specific_heat.txt", 'r')
+    file = open("results/" + N + "_data_specific_heat_J_const.txt", 'r')
     lines = file.readlines()
     linesJ = lines[0][len("J1/J2 = "):-1]
     lbl = "N = " + N
@@ -177,12 +178,12 @@ if __name__ == "__main__":
 
     N = sys.argv[1]
     
-    # plot_delta_E(N)
-    # plot_specific_heat_T_const(N)
-    # plot_specific_heat_J_const(N)
-    # plot_susceptibility_T_const(N)
+    plot_delta_E(N)
+    plot_specific_heat_T_const(N)
+    plot_specific_heat_J_const(N)
+    plot_susceptibility_T_const(N)
     plot_susceptibility_J_const(N)
-    # plot_k_dispersion_J_const(N)
+    plot_k_dispersion_J_const(N)
 
     end_time = time.time()
 

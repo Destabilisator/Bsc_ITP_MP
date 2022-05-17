@@ -513,9 +513,9 @@ namespace spinInversion {
 //        std::cout << "getting eiVals\n";
         getEiValsZeroBlock(J1, J2, eiVals, UBlocks, states, N);
 
-        for (double ev : eiVals) {
-            std::cout << ev << "\n";
-        }
+//        for (double ev : eiVals) {
+//            std::cout << ev << "\n";
+//        }
 
         ///// susceptibility /////
 
@@ -554,7 +554,7 @@ namespace spinInversion {
 
         ///// save /////
 
-        std::string filenameSusceptibility_X = "spininversion_susceptibility_J_const.txt";
+        std::string filenameSusceptibility_X = "data_susceptibility_J_const.txt"; // spininversion_susceptibility_J_const.txt
         std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"
@@ -599,7 +599,7 @@ namespace spinInversion {
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
-        std::string filenameSpecificHeat_C = "spininversion_specific_heat.txt";
+        std::string filenameSpecificHeat_C = "data_specific_heat_J_const.txt"; // spininversion_specific_heat
         std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
                                            + "T START: " + std::to_string(START) + "\n"
                                            + "T END: " + std::to_string(END) + "\n"

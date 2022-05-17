@@ -192,9 +192,9 @@ namespace magnetizationBlocks {
         Eigen::MatrixXcd matrixBlockU;
         magnetizationBlocks::getEiValsZeroBlock(J1, J2, eiVals, matrixBlockU, *states, N);
 
-        for (std::complex<double> ev : *eiVals) {
-            std::cout << ev << "\n";
-        }
+//        for (std::complex<double> ev : *eiVals) {
+//            std::cout << ev << "\n";
+//        }
 
         ///// susceptibility /////
 
@@ -217,7 +217,7 @@ namespace magnetizationBlocks {
 
         ///// save /////
 
-        std::string filenameSusceptibility_X = "magnetization_susceptibility_J_const.txt";
+        std::string filenameSusceptibility_X = "data_susceptibility_J_const.txt"; // magnetization_susceptibility_J_const.txt
         std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"

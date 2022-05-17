@@ -216,7 +216,7 @@ namespace momentumStates {
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
-        std::string filenameSpecificHeat_C = "momentum_specific_heat.txt";
+        std::string filenameSpecificHeat_C = "data_specific_heat_J_const.txt"; // momentum_specific_heat
         std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
                                            + "T START: " + std::to_string(START) + "\n"
                                            + "T END: " + std::to_string(END) + "\n"
