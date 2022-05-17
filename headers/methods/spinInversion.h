@@ -36,7 +36,8 @@ namespace spinInversion {
                                 const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
                                 const std::vector<int> &c_vals, std::vector<double> &eiVals, std::vector<Eigen::MatrixXd> &matrixBlocks, const int &N);
 
-    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<double> & eiVals, std::vector<Eigen::MatrixXd> &UBlocks, std::vector<int> &states, const int &N);
+    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<double> & eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
+                            std::vector<int> &states, const int &N, const int &SIZE);
 
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                              const double &END, const int &COUNT);

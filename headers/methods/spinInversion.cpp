@@ -442,7 +442,10 @@ namespace spinInversion {
     }
 
     void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<double> & eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
-                            std::vector<int> &Allstates, const int &N) {
+                            std::vector<int> &allStates, const int &N, const int &SIZE) {
+
+        std::vector<int> states_m;
+        fillStates(&states_m, N/2, N, SIZE);
 
         std::vector<int> states;
         std::vector<int> R_vals;
@@ -450,12 +453,14 @@ namespace spinInversion {
         std::vector<int> n_vals;
         std::vector<int> c_vals;
 
+        int numberOfStates = 0;
+
         const int k_upper = N / 4;
 
         for (int k = 0; k <= k_upper; k++) {
             for (int z: {-1, 1}) {
                 for (int p: {-1, 1}) {
-                    for (int s: Allstates) {
+                    for (int s: states_m) {
                         for (int sigma: {-1, 1}) {
                             int R, n, m, mp, mz, mpz;
                             checkStateSI(s, R, mp, mz, mpz, k, N);
@@ -471,11 +476,13 @@ namespace spinInversion {
                                 if (std::abs(val) < epsilon) { R = -1; }
                             }
                             if (R > 0) {
+                                allStates.push_back(s);
                                 states.push_back(s);
                                 R_vals.push_back(sigma * R);
                                 m_vals.push_back(m);
                                 n_vals.push_back(n);
                                 c_vals.push_back(c);
+                                numberOfStates++;
                             }
                         }
                     }
@@ -493,6 +500,8 @@ namespace spinInversion {
             }
         }
 
+        std::cout << "number of states: " << numberOfStates << "\n";
+
     }
 
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
@@ -503,29 +512,45 @@ namespace spinInversion {
         std::cout << "\n" << "susceptibility (spin inversion): calculating..." << std::endl;
 
         std::vector<int> states;
-        fillStates(&states, N/2, N, SIZE);
-        const int statesCount = (int) states.size();
+        //fillStates(&states, N/2, N, SIZE);
 
         std::vector<double> eiVals;
 
         std::vector<Eigen::MatrixXd> UBlocks;
 
 //        std::cout << "getting eiVals\n";
-        getEiValsZeroBlock(J1, J2, eiVals, UBlocks, states, N);
+        getEiValsZeroBlock(J1, J2, eiVals, UBlocks, states, N, SIZE);
 
 //        for (double ev : eiVals) {
 //            std::cout << ev << "\n";
 //        }
+//
+//        for (int a : states) {
+//            printBits(a, N);
+//        }
+//
+//        for (const Eigen::MatrixXd& M : UBlocks) {
+//            std::cout << M << std::endl;
+//        }
 
         ///// susceptibility /////
+
+        const int statesCount = (int) states.size();
+
+//        std::cout << "statesCount: " << statesCount << "\n";
 
         auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;
 
 //        std::cout << "getting S2\n";
         Eigen::MatrixXd S2 = spinMatrix(N, states);
 
+//        std::cout << S2 << std::endl;
+
+//        std::cout << "defining U\n";
         Eigen::MatrixXd U = Eigen::MatrixXd::Zero(statesCount, statesCount);
 
+//        std::cout << U << std::endl;
+//
 //        std::cout << "getting U\n";
 
         int offset_blocks = 0;
@@ -534,12 +559,15 @@ namespace spinInversion {
             offset_blocks += (int) M.rows();
         }
 
+//        std::cout << U << std::endl;
 
 //        std::cout << "getting U_inv_S2_U\n";
         Eigen::MatrixXd U_inv_S2_U = Eigen::MatrixXd::Zero(statesCount, statesCount);
         U_inv_S2_U = U.adjoint() * S2 * U;
 
-//        std::cout << "getting susceptibility\n";
+//        std::cout << U_inv_S2_U << std::endl;
+
+//        std::cout << "getting susceptibility" << std::endl;
 
         for (int i = 0; i <= COUNT; i++) {
             double current = START + (END - START) * i / COUNT;
@@ -547,14 +575,13 @@ namespace spinInversion {
             susceptibility_magnetization->push_back({current, getSusceptibilityDegeneracy(current, U_inv_S2_U, eiVals, N)});
         }
 
-
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         ///// save /////
 
-        std::string filenameSusceptibility_X = "data_susceptibility_J_const.txt"; // spininversion_susceptibility_J_const.txt
+        std::string filenameSusceptibility_X = "spininversion_susceptibility_J_const.txt"; // spininversion_susceptibility_J_const.txt / data_susceptibility_J_const
         std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"

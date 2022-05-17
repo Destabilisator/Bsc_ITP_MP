@@ -1,6 +1,6 @@
 #include "main.h"
 
-//#define DEBUG
+#define DEBUG
 
 int main(int argc, char* argv[]) {
 
@@ -46,7 +46,6 @@ int main(int argc, char* argv[]) {
     magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
     spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
-
     // individual methods
 //    spinInversion::start(J1, J2, N, SIZE);
 //    parityStates::start(J1, J2, N, SIZE);
@@ -64,7 +63,7 @@ int main(int argc, char* argv[]) {
 //    }
 #endif
 
-    std::cout << "\n";
+    std::cout << std::endl;
 
     return 0;
 }

@@ -140,15 +140,11 @@ def plot_susceptibility_J_const(N):
         #print(x + " " + y + "\r")
         X += [float(x)]
         Y += [float(y)]
-    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = 'red', label = "SI")
+    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'red', label = "SI")
 
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
     plt.savefig("results/" + N + "_susceptibility_J_const.png")
-
-
-
-
 
 def plot_k_dispersion_J_const(N):
     print("plotting energy dispersion (constant J1/J2) ...")
@@ -178,12 +174,12 @@ if __name__ == "__main__":
 
     N = sys.argv[1]
     
-    plot_delta_E(N)
-    plot_specific_heat_T_const(N)
-    plot_specific_heat_J_const(N)
-    plot_susceptibility_T_const(N)
+    # plot_delta_E(N)
+    # plot_specific_heat_T_const(N)
+    # plot_specific_heat_J_const(N)
+    # plot_susceptibility_T_const(N)
     plot_susceptibility_J_const(N)
-    plot_k_dispersion_J_const(N)
+    # plot_k_dispersion_J_const(N)
 
     end_time = time.time()
 
