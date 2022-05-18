@@ -1,6 +1,6 @@
 #include "main.h"
 
-#define DEBUG
+//#define DEBUG
 
 int main(int argc, char* argv[]) {
 
@@ -19,11 +19,10 @@ int main(int argc, char* argv[]) {
     // excitation energy \Delta E(J) and specific ehat C(J), T = const
     multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cpu_cnt, cores, T, N, SIZE);
     // susceptibility \Chi(J), T = const
-    //multi::start_XT_const(J_COUNT, J_START, J_END, cpu_cnt, cores, T, N, SIZE);
+    multi::start_XT_const(J_COUNT, J_START, J_END, cpu_cnt, cores, T, N, SIZE);
 
     // specific heat C(T), J = const
     if (N % 4 == 0) {
-        //momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
         spinInversion::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
     } else {
         momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
@@ -39,7 +38,7 @@ int main(int argc, char* argv[]) {
 
 
     // dispersion with fixed J
-//    momentumStates::startDispersionPlot(J1, J2, N, SIZE);
+    momentumStates::startDispersionPlot(J1, J2, N, SIZE);
 #endif
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
@@ -63,7 +62,7 @@ int main(int argc, char* argv[]) {
 //    }
 #endif
 
-    std::cout << std::endl;
+    std::cout << "\n" << std::endl;
 
     return 0;
 }

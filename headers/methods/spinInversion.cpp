@@ -605,8 +605,6 @@ namespace spinInversion {
 
         std::vector<double> eiVals;
         std::vector<Eigen::MatrixXd> matrixBlocks;
-//        auto *eiVals = new std::vector<double>;
-//        auto *matrixBlocks = new std::vector<Eigen::MatrixXd>;
 
         getEiVals(J1, J2, &eiVals, &matrixBlocks, N, SIZE);
 
@@ -627,7 +625,7 @@ namespace spinInversion {
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
-        std::string filenameSpecificHeat_C = "data_specific_heat_J_const.txt"; // spininversion_specific_heat
+        std::string filenameSpecificHeat_C = "data_specific_heat_J_const.txt"; // spininversion_specific_heat / data_specific_heat_J_const
         std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
                                            + "T START: " + std::to_string(START) + "\n"
                                            + "T END: " + std::to_string(END) + "\n"

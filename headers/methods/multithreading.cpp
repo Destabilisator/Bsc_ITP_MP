@@ -60,9 +60,6 @@ namespace multi {
             } else {
                 J = START + (END - START) * pos / COUNT;
             }
-            // clean up
-//            eiVals.clear();
-//            matrixBlocks.clear();
 
         }
 
@@ -125,9 +122,6 @@ namespace multi {
             } else {
                 J = START + (END - START) * pos / COUNT;
             }
-            // clean up
-//            eiVals.clear();
-//            matrixBlocks.clear();
 
         }
 
@@ -190,9 +184,6 @@ namespace multi {
             } else {
                 J = START + (END - START) * pos / COUNT;
             }
-            // clean up
-//            eiVals.clear();
-//            matrixBlocks.clear();
 
         }
 
@@ -259,7 +250,7 @@ namespace multi {
         });
 
         std::string filenameDeltaE = "data_delta_E.txt";
-        std::string filenameSpecificHeat_C = "data_specific_heat.txt";
+        std::string filenameSpecificHeat_C = "data_specific_heat_T_const.txt";
         std::string header = "N: " + std::to_string(N) + "\n"
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
@@ -324,11 +315,6 @@ namespace multi {
             pos = CURRENT;
             CURRENT++;
             nextJMutex.unlock();
-
-            // clean up
-//            std::cout << eiVals.size() << " " << states.size() << std::endl;
-//            eiVals.clear();
-//            states.clear();
 
             if (pos > COUNT) {
                 break;
