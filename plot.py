@@ -45,7 +45,7 @@ def plot_specific_heat_T_const(N):
     subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 18)
     subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $T$ = ' + linesBeta + r", $k_B$ = 1", fontsize = 18)
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
-    subfig1.axhline(0, color = "grey")
+    #subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
     plt.savefig("results/" + N + "_specific_heat_T_const.png")
 
