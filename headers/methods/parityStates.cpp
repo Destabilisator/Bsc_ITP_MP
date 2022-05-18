@@ -174,8 +174,6 @@ namespace parityStates {
         matrixBlocks->push_back(hamiltonBlock);
     #endif
 
-        //Eigen::MatrixXd hamiltonBlockTransposed = hamiltonBlock.transpose();
-
         //std::cout << "calculating eigenvalues...\n";
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
         const Eigen::VectorXd &H1EiVal = solver.eigenvalues();
@@ -203,7 +201,6 @@ namespace parityStates {
         for (int mag = 0; mag <= N; mag++) {
             for (int k = 0; k <= k_upper; k++) {
                 for (int p : {-1, 1}) {
-                    //if (k != 0 && k != k_upper && p == -1) {continue;}
                     for (int s : states_m.at(mag)) {
                         for (int sigma : {-1, 1}) {
                             int R, m;

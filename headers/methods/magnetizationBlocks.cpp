@@ -192,10 +192,6 @@ namespace magnetizationBlocks {
         Eigen::MatrixXcd matrixBlockU;
         magnetizationBlocks::getEiValsZeroBlock(J1, J2, eiVals, matrixBlockU, *states, N);
 
-//        for (std::complex<double> ev : *eiVals) {
-//            std::cout << ev << "\n";
-//        }
-
         ///// susceptibility /////
 
         auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;

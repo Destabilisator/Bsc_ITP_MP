@@ -291,11 +291,7 @@ void saveHamilton(double** hamilton, const std::string &filename, const std::str
         file << header << "\n\n";
         for (int i = 0; i <= size -1; i++) {
             for (int j = 0; j <= size-1; j++) {
-                //if (hamilton[i][j] < 0.001 && hamilton[i][j] > -0.001) {
-                //    file << " \t";
-                //} else {
-                    file << hamilton[i][j] << "\t" ;
-                //}
+                file << hamilton[i][j] << "\t" ;
             }
             file << "\n";
         }

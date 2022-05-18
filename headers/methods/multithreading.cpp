@@ -209,7 +209,7 @@ namespace multi {
         CURRENT = 1 + cores;
 
         if (N%4 == 0) {
-            if (N >= 16) {
+            if (N >= 12) {
                 std::cout << ", spin inversion\n";
                 for (int i = 0; i < cores; i++) {
                     Threads[i] = std::thread(get_DeltaE_CT_const_SI, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,

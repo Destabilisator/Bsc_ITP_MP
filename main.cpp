@@ -42,8 +42,8 @@ int main(int argc, char* argv[]) {
 #endif
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
-    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-    spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
     // individual methods
 //    spinInversion::start(J1, J2, N, SIZE);
@@ -53,13 +53,13 @@ int main(int argc, char* argv[]) {
 
 
     // speed test
-//    for (int n = 8; n <= 16; n += 4) {
-//        int size = (int) std::pow(2, n);
-//        std::cout << "N: " << n << ", size: " << size << "\n";
-//        spinInversion::start(J1, J2, n, size);
-//        parityStates::start(J1, J2, n, size);
-//        std::cout << "\n";
-//    }
+    for (int n = 0; n <= 16; n += 1) {
+        int size = (int) std::pow(2, 12);
+        std::cout << "N: " << n << ", size: " << size << "\n";
+        spinInversion::start(J1, J2, 12, size);
+        parityStates::start(J1, J2, 12, size);
+        std::cout << "\n";
+    }
 #endif
 
     std::cout << "\n" << std::endl;

@@ -19,8 +19,6 @@ namespace spinInversion {
         else if (mp == -1 && mz != -1 && mpz == -1) {m = mz; n = -1; return 3;}
         else if (mp == -1 && mz == -1 && mpz != -1) {m = mpz; n = -1; return 4;}
         else {m = mp; n = mz; return 5;}
-        //else if (mp != -1 && mz != -1 && mpz == mp + mz) {m = mp; n = mz; return 5;}
-        //else {m = -1; n = -1; return -1;}
 
     }
 
@@ -50,8 +48,6 @@ namespace spinInversion {
                 break;
         }
 
-        //std::cout << Na << "\n";
-
         return Na;
 
     }
@@ -66,7 +62,6 @@ namespace spinInversion {
         int c_a = c_vals.at(a);
         unsigned int R_a = std::abs(R_vals.at(a));
         double Na = getNa(m_a, n_a, R_a, sigma_a, p, z, k, c_a, N);
-        //std::cout << "sigma_a: " << sigma_a << ", m_a: " << m_a << ", n_a: " << n_a << ", c_a: " << c_a << ", R_a: " << R_a << ", Na: " << Na << "\n";
         // state b
         int sigma_b = R_vals.at(b) / abs(R_vals.at(b));
         int m_b = m_vals.at(b);
@@ -74,12 +69,9 @@ namespace spinInversion {
         int c_b = c_vals.at(b);
         unsigned int R_b = std::abs(R_vals.at(b));
         double Nb = getNa(m_b, n_b, R_b, sigma_b, p, z, k, c_b, N);
-        //std::cout << "sigma_b: " << sigma_b << ", m_b: " << m_b << ", n_b: " << n_b << ", c_b: " << c_b << ", R_b: " << R_b << ", Nb: " << Nb << "\n";
 
         double k_moment = 4.0 * PI * (double) k / (double) N;
         double val = 0.5 * (double) pow(sigma_a * p, q) * (double) std::pow(z, g) * sqrt(Nb / Na);
-        //std::cout << "Na: " << Na << ", Nb: " << Na << ", val: " << val << "\n";
-        //std::cout << "val: " << val << "\n";
 
         if (sigma_a == sigma_b) {
             switch (c_b) {
@@ -121,8 +113,6 @@ namespace spinInversion {
         if (std::abs(val) < epsilon) {
             val = 0.0;
         }
-
-        //std::cout << "helement returned: " << val << "\n\n";
 
         return val;
 
@@ -245,13 +235,6 @@ namespace spinInversion {
         matrixBlocks->push_back(hamiltonBlock);
     #endif
 
-        Eigen::MatrixXd hamiltonBlockTransposed = hamiltonBlock.transpose();
-        if (!hamiltonBlock.isApprox(hamiltonBlockTransposed)) {
-            std::cout << "\nALARM: k: " << k << ", p: " << p << ", z: " << z << "\n";
-        } else {
-            //std::cout << "all good\n";
-        }
-
         //std::cout << "calculating eigenvalues...\n";
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
         const Eigen::VectorXd &H1EiVal = solver.eigenvalues();
@@ -279,20 +262,16 @@ namespace spinInversion {
         const int k_upper = N/4;
 
         for (int mag = 0; mag <= N; mag++) {
-            //std::cout << "mag: " << mag << "\n";
             for (int k = 0; k <= k_upper; k++) {
 
                 if (mag == N/2) {
                     for (int z : {-1, 1}) {
                         for (int p: {-1, 1}) {
-                            //if (k != 0 && k != k_upper && p == -1) {continue;}
                             for (int s: states_m.at(mag)) {
                                 for (int sigma: {-1, 1}) {
                                     int R, n, m, mp, mz, mpz;
                                     checkStateSI(s, R, mp, mz, mpz, k, N);
                                     int c = getClass_set_m_n(m, n, mp, mz, mpz);
-                                    //std::cout << "case: " << c << "\n";
-                                    //std::cout << c;
                                     if ((k == 0 || k == k_upper) && sigma == -1) {continue;}
                                     if (c == 2 || c == 4 || c == 5) {
                                         double Na = getNa(m, n, R, sigma, p, z, k, c, N);
@@ -304,7 +283,6 @@ namespace spinInversion {
                                         if (std::abs(val) < epsilon) {R = -1;}
                                     }
                                     if (R > 0) {
-                                        //std::cout << getNa(m, n, R, sigma, p, z, k, c, N) << "\n";
                                         states.push_back(s);
                                         R_vals.push_back(sigma * R);
                                         m_vals.push_back(m);
@@ -327,7 +305,6 @@ namespace spinInversion {
                 }
                 else {
                     for (int p : {-1, 1}) {
-                        //if (k != 0 && k != k_upper && p == -1) {continue;}
                         for (int s : states_m.at(mag)) {
                             for (int sigma : {-1, 1}) {
                                 int R, m;
@@ -357,7 +334,7 @@ namespace spinInversion {
 
 
             }
-            //std::cout << "\n";
+
         }
 
         //std::cout << "number of states: " << numberOfStates << "\n";
@@ -420,7 +397,6 @@ namespace spinInversion {
 
         const int statesCount = (int) states.size();
         Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
-//        std::cout << "filling hamilton\n";
         fillHamiltonSIBlock(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, hamiltonBlock, N);
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
@@ -431,7 +407,6 @@ namespace spinInversion {
 
         eiVals.shrink_to_fit();
 
-//        std::cout << "saving U Block\n";
         matrixBlocks.push_back(solver.eigenvectors());
 
 //        // sort eigenvalues
@@ -487,10 +462,8 @@ namespace spinInversion {
                         }
                     }
                     if (!states.empty()) {
-//                        std::cout << "solving block\n";
                         SIBlockSolver_withSave(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, UBlocks, N);
                     }
-//                    std::cout << "clearing vectors\n";
                     states.clear();
                     R_vals.clear();
                     m_vals.clear();

@@ -84,9 +84,7 @@ namespace naiv {
 #ifdef saveEigenvalues
         saveComplexEiVals("EigenvaluesNaiv.txt", "naiver Ansatz für N = " + std::to_string(N), *HEiValList, N);
 #endif
-//    for (int i = 0; i < SIZE; i++) {
-//        delete hamilton1[i];
-//    } delete[] hamilton1;
+
     }
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,

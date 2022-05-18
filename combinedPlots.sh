@@ -1,14 +1,17 @@
 #!/bin/bash
 
+start=0
+end=2.5
+
 start_time=$SECONDS
 
 if [[ "$OSTYPE" == "msys" ]]; then
-    ./cmake-build-release/Bsc_ITP_MX.exe 6 0 2 5000 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX.exe 8 0 2 5000 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX.exe 10 0 2 500 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX.exe 12 0 2 50 -1 silent
-    # ./cmake-build-release/Bsc_ITP_MX.exe 14 0 2 50 -1 silent
-    # ./cmake-build-release/Bsc_ITP_MX.exe 16 0 2 16 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX.exe 6 $start $end 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX.exe 8 $start $end 5000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX.exe 10 $start $end 500 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX.exe 12 $start $end 50 -1 silent
+    # ./cmake-build-release/Bsc_ITP_MX.exe 14 $start $end50 -1 silent
+    # ./cmake-build-release/Bsc_ITP_MX.exe 16 $start $end 16 -1 silent
 
     start_time_plots=$SECONDS
     python plotDeltaE.py
@@ -19,12 +22,12 @@ if [[ "$OSTYPE" == "msys" ]]; then
     python plotDispersion.py
 
 else
-    ./cmake-build-release/Bsc_ITP_MX 6 0 2 1000 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 8 0 2 1000 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 10 0 2 500 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 12 0 2 50 -1 silent
-    # ./cmake-build-release/Bsc_ITP_MX 14 0 2 100 8 silent
-    # ./cmake-build-release/Bsc_ITP_MX 16 0 2 25 2 silent
+    ./cmake-build-release/Bsc_ITP_MX 6 $start $end 1000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 8 $start $end 1000 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 10 $start $end 500 -1 silent
+    ./cmake-build-release/Bsc_ITP_MX 12 $start $end 100 -1 silent
+    # ./cmake-build-release/Bsc_ITP_MX 14 $start $end 100 8 silent
+    # ./cmake-build-release/Bsc_ITP_MX 16 $start $end 25 2 silent
 
     start_time_plots=$SECONDS
     python3 plotDeltaE.py
