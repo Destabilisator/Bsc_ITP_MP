@@ -40,7 +40,7 @@ if [[ "$OSTYPE" == "msys" ]]; then
 else
     ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES $SILENT
     echo "plotting..."
-    python3 plot.py $N $show
+    python3 ./plotting/plot.py $N $show
 fi
 
 elapsed=$(( SECONDS - start_time ))

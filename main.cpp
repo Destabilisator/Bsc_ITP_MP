@@ -8,13 +8,12 @@ int main(int argc, char* argv[]) {
     bool plotsIn3D = false;
     int cores = (int) cpu_cnt;
 
-    validateInput(argc, argv, cpu_cnt, N, SIZE, J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, silent, cores, plotsIn3D, false, J1, J2);
+    validateInput(argc, argv, cpu_cnt, N, SIZE, J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, silent, cores, plotsIn3D, true, J1, J2);
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 #ifndef DEBUG
 
     if(plotsIn3D) {
-        std::cout << "reeeeeeeeeee\n";
         // 3D Plots of specific heat dependent on T and J
         plot3D::start_C(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
         // 3D Plots of susceptibility dependent on T and J
@@ -47,8 +46,10 @@ int main(int argc, char* argv[]) {
 #endif
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
-//    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-//    spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    N = 8; SIZE = 256; T_START = 0; T_END = 2; T_COUNT = 50;
+    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    //momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
     // individual methods
 //    spinInversion::start(J1, J2, N, SIZE);

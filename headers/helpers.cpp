@@ -527,9 +527,11 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M,
     return 1.0 / temp * expectation_mz_2 / N;
 }
 
-double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<double>& eiVals, const int &N) {
+double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<std::vector<double>>& eiVal_list, const int &N) {
     double Z_sum = 0.0, expectation_mz_2 = 0.0;
-    for (const Eigen::MatrixXd &M : M_list) {
+    for (int cur = 0; cur < M_list.size(); cur ++) {
+        const Eigen::MatrixXd &M = M_list.at(cur);
+        std::vector<double> eiVals = eiVal_list.at(cur);
         for (int i = 0; i < eiVals.size(); i++) {
             double ev_real = eiVals.at(i);
             double S_elem = M(i, i);
@@ -552,7 +554,6 @@ void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N,
 
     if (argc >= 2) {
         std::string DDD = "3D";
-        std::cout << argv[1] << "\n";
         if (argv[1] != DDD) {
             goto no3D;
         }
@@ -563,6 +564,7 @@ void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N,
             std::cout << "invalid chain size, must be even and at least 6, defaulting to " << N << "\n";
         }
         SIZE = (int) pow(2, N);
+        std::cout << "N: " << N << "; size: " << SIZE << std::endl;
         if (std::stod(argv[3]) > std::stod(argv[4]) || std::stoi(argv[5]) < 1) {
             std::cout << "range invalid, defaulting...\n";
         } else {

@@ -14,12 +14,12 @@ if [[ "$OSTYPE" == "msys" ]]; then
     # ./cmake-build-release/Bsc_ITP_MX.exe 16 $start $end 5 -1 silent
 
     start_time_plots=$SECONDS
-    python plotDeltaE.py
-    python plotSpecificHeatJConst.py
-    python plotSpecificHeatTConst.py
-    python plotSusceptibilityJConst.py
-    python plotSusceptibilityTConst.py
-    python plotDispersion.py
+    python ./plotting/plotDeltaE.py
+    python ./plotting/plotSpecificHeatJConst.py
+    python ./plotting/plotSpecificHeatTConst.py
+    python ./plotting/plotSusceptibilityJConst.py
+    python ./plotting/plotSusceptibilityTConst.py
+    python ./plotting/plotDispersion.py
 
 else
     ./cmake-build-release/Bsc_ITP_MX 6 $start $end 1000 -1 silent
@@ -30,12 +30,12 @@ else
     # ./cmake-build-release/Bsc_ITP_MX 16 $start $end 50 2 silent
 
     start_time_plots=$SECONDS
-    python3 plotDeltaE.py
-    python3 plotSpecificHeatTConst.py
-    python3 plotSpecificHeatJConst.py
-    python3 plotSusceptibilityTConst.py
-    python3 plotSusceptibilityJConst.py
-    python3 plotDispersion.py
+    python3 ./plotting/plotDeltaE.py
+    python3 ./plotting/plotSpecificHeatTConst.py
+    python3 ./plotting/plotSpecificHeatJConst.py
+    python3 ./plotting/plotSusceptibilityTConst.py
+    python3 ./plotting/plotSusceptibilityJConst.py
+    python3 ./plotting/plotDispersion.py
 fi
 
 elapsed=$(( SECONDS - start_time ))

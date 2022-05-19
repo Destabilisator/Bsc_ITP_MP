@@ -33,9 +33,9 @@ namespace momentumStates {
     void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                            const double &END, const int &COUNT);
 
+    void startDispersionPlot(const double &J1, const double &J2, const int &N, const int &SIZE);
+
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                              const double &END, const int &COUNT);
-
-    void startDispersionPlot(const double &J1, const double &J2, const int &N, const int &SIZE);
 
 }

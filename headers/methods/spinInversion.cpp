@@ -391,33 +391,38 @@ namespace spinInversion {
 
     }
 
-    Eigen::MatrixXd spinMatrixSI(const int &N, int p, int z, const std::vector<int> &states,
+    Eigen::MatrixXd spinMatrixSI(const int &N, int k, int p, int z, const std::vector<int> &states,
                                  const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
                                  const std::vector<int> &c_vals) {
 
         int size = (int) states.size();
+//        std::cout << "size: " << size << "\n";
         Eigen::MatrixXd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(size, size);
-        for (int k = 0; k < size; k++) {
+        for (int a = 0; a < size; a++) {
             for (int j = 0; j < N; j++) {
-                int s = states.at(k);
+                int s = states.at(a);
                 int state_n = 1;
-                if (k > 0 && states.at(k - 1) == states.at(k)) {
+                if (a > 0 && states.at(a - 1) == states.at(a)) {
                     continue;
-                } else if (k < states.size() - 1 && states.at(k) == states.at(k + 1)) {
+                } else if (a < states.size() - 1 && states.at(a) == states.at(a + 1)) {
                     state_n = 2;
                 }
                 for (int i = 0; i < j; i++) {
                     if (((s >> i) & 1) == ((s >> j) & 1)) {
-                        for (int _ = k; _ < k + state_n; _++) {
-                            S2(k, k) += 0.5;
+                        for (int _ = a; _ < a + state_n; _++) {
+//                            std::cout << "writing to " << a << " " << a << std::endl;
+                            S2(a, a) += 0.5;
                         }
                     } else {
-                        S2(k, k) -= 0.5;
+                        for (int _ = a; _ < a + state_n; _++) {
+//                            std::cout << "writing to " << a << " " << a << std::endl;
+                            S2(a, a) -= 0.5;
+                        }
                         int d = s ^ (1 << i) ^ (1 << j);
                         int r = 0, l = 0, q = 0, g = 0;
                         representative(d, r, l, q, g, N);
                         int b = findState(states, r);
-                        if (b > 0) {
+                        if (b >= 0) {
 //                        S2(k, b) = 1.0;
                             int m = 1;
                             if (b > 0 && states.at(b) == states.at(b - 1)) {
@@ -425,9 +430,10 @@ namespace spinInversion {
                             } else if (b < states.size() - 1 && states.at(b) == states.at(b + 1)) {
                                 m = 2;
                             }
-                            for (int j1 = b; j1 < b + m; j1++) {
-                                for (int i1 = k; i1 < k + state_n; i1++) {
-                                    S2(i1, j1) += 2.0 * helement(i, j, l, q, g, k, p, z, R_vals, m_vals, n_vals, c_vals, N);;
+                            for (int jj = b; jj < b + m; jj++) {
+                                for (int ii = a; ii < a + state_n; ii++) {
+//                                    std::cout << "writing to " << ii << " " << jj << std::endl;
+                                    S2(ii, jj) += 2.0 * helement(ii, jj, l, q, g, k, p, z, R_vals, m_vals, n_vals, c_vals, N);;
                                 }
                             }
                         }
@@ -440,7 +446,7 @@ namespace spinInversion {
 
     void SIBlockSolver_withMatrix(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
                                   const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
-                                  const std::vector<int> &c_vals, std::vector<double> &eiVals, std::vector<Eigen::MatrixXd> &matrixUBlocks,
+                                  const std::vector<int> &c_vals, std::vector<std::vector<double>> &eiVals, std::vector<Eigen::MatrixXd> &matrixUBlocks,
                                   std::vector<Eigen::MatrixXd> &matrixS2Blocks, const int &N) {
 
         const int statesCount = (int) states.size();
@@ -449,23 +455,27 @@ namespace spinInversion {
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
         const Eigen::VectorXd &H1EiVal = solver.eigenvalues();
-        std::cout << "egenvalues: \n";
+//        std::cout << "egenvalues: \n";
+        std::vector<double> eV;
         for (double ev: H1EiVal) {
-            eiVals.push_back(ev);
-            std::cout << ev << "\n";
+            eV.push_back(ev);
+//            std::cout << ev << "\n";
         }
-
-        std::cout << "S2:\n";
-
+        eV.shrink_to_fit();
+        eiVals.push_back(eV);
         eiVals.shrink_to_fit();
 
         matrixUBlocks.push_back(solver.eigenvectors());
 
+//        std::cout << "defining S2" << std::endl;
         Eigen::MatrixXd S2 = Eigen::MatrixXd::Zero(statesCount, statesCount);
-        S2 = spinMatrixSI(N, p, z, states, R_vals, m_vals, n_vals, c_vals);
+//        std::cout << "filling S2" << std::endl;
+        S2 = spinMatrixSI(N, k, p, z, states, R_vals, m_vals, n_vals, c_vals);
+//        std::cout << "saving S2" << std::endl;
         matrixS2Blocks.push_back(S2);
 
-        std::cout << S2 << std::endl;
+//        std::cout << "S2:" << std::endl;
+//        std::cout << S2 << std::endl;
 
 //        // sort eigenvalues
 //        std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
@@ -474,8 +484,8 @@ namespace spinInversion {
 
     }
 
-    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<double> & eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
-                            std::vector<Eigen::MatrixXd> &S2Blocks, std::vector<int> &allStates, const int &N, const int &SIZE) {
+    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<std::vector<double>> & eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
+                            std::vector<Eigen::MatrixXd> &S2Blocks, const int &N, const int &SIZE) {
 
         std::vector<int> states_m;
         fillStates(&states_m, N/2, N, SIZE);
@@ -509,7 +519,6 @@ namespace spinInversion {
                                 if (std::abs(val) < epsilon) { R = -1; }
                             }
                             if (R > 0) {
-                                allStates.push_back(s);
                                 states.push_back(s);
                                 R_vals.push_back(sigma * R);
                                 m_vals.push_back(m);
@@ -520,7 +529,7 @@ namespace spinInversion {
                         }
                     }
                     if (!states.empty()) {
-                        std::cout << "block\n";
+//                        std::cout << "block\n";
                         SIBlockSolver_withMatrix(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals,
                                                  UBlocks, S2Blocks, N);
                     }
@@ -533,7 +542,7 @@ namespace spinInversion {
             }
         }
 
-        std::cout << "number of states: " << numberOfStates << "\n";
+        //std::cout << "number of states: " << numberOfStates << "\n";
 
     }
 
@@ -545,16 +554,13 @@ namespace spinInversion {
 
         std::cout << "\n" << "susceptibility (spin inversion): calculating..." << std::endl;
 
-        std::vector<int> states;
-        //fillStates(&states, N/2, N, SIZE);
-
-        std::vector<double> eiVals;
+        std::vector<std::vector<double>> eiVals;
 
         std::vector<Eigen::MatrixXd> UBlocks;
         std::vector<Eigen::MatrixXd> S2Blocks;
 
         std::cout << "getting eiVals\n";
-        getEiValsZeroBlock(J1, J2, eiVals, UBlocks, S2Blocks, states, N, SIZE);
+        getEiValsZeroBlock(J1, J2, eiVals, UBlocks, S2Blocks, N, SIZE);
 
 //        for (double ev : eiVals) {
 //            std::cout << ev << "\n";
@@ -570,10 +576,6 @@ namespace spinInversion {
 
         ///// susceptibility /////
 
-        const int statesCount = (int) states.size();
-
-        std::cout << "statesCount: " << statesCount << "\n";
-
         //auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;
         std::vector<std::tuple<double, double>> susceptibility_magnetization;
 
@@ -585,6 +587,7 @@ namespace spinInversion {
             Eigen::MatrixXd M = Eigen::MatrixXd::Zero(sz, sz);
             M = UBlocks.at(i).transpose() * S2Blocks.at(i) * UBlocks.at(i);
             U_inv_S2_U.push_back(M);
+            //std::cout << M << std::endl;
         }
 
         for (int i = 0; i <= COUNT; i++) {

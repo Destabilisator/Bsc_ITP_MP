@@ -120,7 +120,7 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXcd &M
 
 double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M, const std::vector<double>& eiVals, const int &N);
 
-double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<double>& eiVals, const int &N);
+double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<std::vector<double>>& eiVal_list, const int &N);
 
 /////////////////////////////// others ///////////////////////////////
 

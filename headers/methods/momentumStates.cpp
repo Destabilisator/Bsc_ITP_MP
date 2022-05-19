@@ -293,5 +293,51 @@ namespace momentumStates {
         delete matrixMomentBlocks;
 
     }
+/*
+    void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+                             const double &END, const int &COUNT) {
 
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "susceptibility (momentum states): calculating..." << std::endl;
+
+        std::vector<std::complex<double>> eiVals;
+        std::vector<Eigen::MatrixXcd> matrixBlockU;
+        getEiValsZeroBlock(J1, J2, eiVals, matrixBlockU, states, N);
+
+        ///// susceptibility /////
+
+        auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;
+
+        Eigen::MatrixXd S2 = spinMatrix(N, states);
+        Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(statesCount, statesCount);
+        Matrix_U_inv_S2_U = matrixBlockU.adjoint() * S2 * matrixBlockU;
+
+        for (int i = 0; i <= COUNT; i++) {
+            double current = START + (END - START) * i / COUNT;
+            //current_beta = 1 / current_beta;
+            susceptibility_magnetization->push_back({current, getSusceptibilityDegeneracy(current, Matrix_U_inv_S2_U, *eiVals, N)});
+        }
+
+
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end-start;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+        ///// save /////
+
+        std::string filenameSusceptibility_X = "data_susceptibility_J_const.txt"; // magnetization_susceptibility_J_const.txt / data_susceptibility_J_const
+        std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
+                                             + "T START: " + std::to_string(START) + "\n"
+                                             + "T END: " + std::to_string(END) + "\n"
+                                             + "data-points: " + std::to_string(COUNT) + "\n"
+                                             + "calculation time: " + formatTime(elapsed_seconds);
+
+        std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
+        saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_magnetization, N);
+
+        std::cout << "\n";
+
+    }
+*/
 }

@@ -28,10 +28,10 @@ def plot_specific_heat(N):
         Z = []
         for line in lines:
             x, z = line.split("\t")
+            if math.isnan(float(z)):
+                continue
             X += [float(x)]
             Y += [J]
-            if math.isnan(float(z)):
-                z = 0.0
             Z += [float(z)]
         ax.plot(X, Y, Z, lw = 1, ls = "solid", color = "blue", alpha = 1.0)
 
@@ -39,7 +39,7 @@ def plot_specific_heat(N):
     ax.set_xlabel(r'$T$ in $J_2$/$k_B$', fontsize = 18)
     ax.set_ylabel(r'$J_1$ / $J_2$', fontsize = 18)
     ax.set_zlabel(r'$C/N$ in $J_2$', fontsize = 18)
-    ax.legend(loc = 'best' ,frameon = False, fontsize = 14)
+    #ax.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
     plt.savefig("results/3DData/" + N + "_specific_heat.png")
 
@@ -61,10 +61,10 @@ def plot_susceptibility(N):
         Z = []
         for line in lines:
             x, z = line.split("\t")
+            if math.isnan(float(z)):
+                continue
             X += [float(x)]
             Y += [J]
-            if math.isnan(float(z)):
-                z = 0.0
             Z += [float(z)]
         ax.plot(X, Y, Z, lw = 1, ls = "solid", color = "blue", alpha = 1.0)
 
@@ -72,9 +72,9 @@ def plot_susceptibility(N):
     ax.set_xlabel(r'$T$ in $J_2$/$k_B$', fontsize = 18)
     ax.set_ylabel(r'$J_1$ / $J_2$', fontsize = 18)
     ax.set_zlabel('$\\chi/N$ in $J_2$', fontsize = 18)
-    ax.legend(loc = 'best' ,frameon = False, fontsize = 14)
+    #ax.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
-    plt.savefig("results/3DData/" + N + "_specific_heat.png")
+    plt.savefig("results/3DData/" + N + "_susceptibility.png")
 
 
 if __name__ == "__main__":

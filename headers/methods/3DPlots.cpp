@@ -197,8 +197,6 @@ namespace plot3D {
 
         auto start = std::chrono::steady_clock::now();
 
-        std::cout << JCOUNT << " " << JSTART << " " << JEND << " " << TCOUNT << " " << TSTART << " "  << TEND << "\n";
-
         std::cout << "\n" << "specific heat (3D): calculating:...";
 
         if (JCOUNT < cores) {
