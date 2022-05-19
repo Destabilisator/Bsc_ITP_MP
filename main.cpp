@@ -10,30 +10,15 @@ int main(int argc, char* argv[]) {
 
     validateInput(argc, argv, cpu_cnt, N, SIZE, J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, silent, cores, plotsIn3D, false, J1, J2);
 
-    std::cout << "N: " << N << "\n";
-    std::cout << "SIZE: " << SIZE << "\n";
-    std::cout << "J_START: " << J_START << "\n";
-    std::cout << "J_END: " << J_END << "\n";
-    std::cout << "J_COUNT: " << J_COUNT << "\n";
-    std::cout << "T_START: " << T_START << "\n";
-    std::cout << "T_END: " << T_END << "\n";
-    std::cout << "T_COUNT: " << T_COUNT << "\n";
-    std::cout << "cores: " << cores << "\n";
-    std::cout << "silent: " << silent << "\n";
-    std::cout << "plotsIn3D: " << plotsIn3D << "\n";
-
-    return 1;
-
 /////////////////////////////// calculate quantities ///////////////////////////////
 #ifndef DEBUG
 
     if(plotsIn3D) {
         std::cout << "reeeeeeeeeee\n";
         // 3D Plots of specific heat dependent on T and J
-        plot3D::start_C(50, 0, 2, 50, 0, 2, cores, N, SIZE);
-        //plot3D::start_C(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
+        plot3D::start_C(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
         // 3D Plots of susceptibility dependent on T and J
-        //plot3D::start_X(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
+        plot3D::start_X(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
     } else {
         // excitation energy \Delta E(J) and specific ehat C(J), T = const
         multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);

@@ -322,7 +322,7 @@ namespace plot3D {
 
         std::thread Threads[cores];
 
-        CURRENT3D = 1 + cores;
+        CURRENT3D = 0 + cores;
 
         std::cout << ", magnetization blocks\n";
         for (int i = 0; i < cores; i++) {

@@ -13,7 +13,7 @@ Hamilton*.txt
 EV*.txt
 benchmarkResults.txt
 results/*
-!results/3DData/
+results/3DData/*
 !results/3DData/8/C/dummyFile.txt
 !results/3DData/8/X/dummyFile.txt
 !results/3DData/10/C/dummyFile.txt

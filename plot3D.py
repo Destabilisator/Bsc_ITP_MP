@@ -69,10 +69,10 @@ def plot_susceptibility(N):
             Z += [float(z)]
         ax.plot(X, Y, Z, lw = 1, ls = "solid", color = "blue", alpha = 1.0)
 
-    ax.set_title(r'suszepibilität $\\chi/N$ für $N$ = ' + N, fontsize = 18)
+    ax.set_title('suszepibilität $\\chi/N$ für $N$ = ' + N, fontsize = 18)
     ax.set_xlabel(r'$T$ in $J_2$/$k_B$', fontsize = 18)
     ax.set_ylabel(r'$J_1$ / $J_2$', fontsize = 18)
-    ax.set_zlabel(r'$\\chi/N$ in $J_2$', fontsize = 18)
+    ax.set_zlabel('$\\chi/N$ in $J_2$', fontsize = 18)
     ax.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
     plt.savefig("results/3DData/" + N + "_specific_heat.png")
@@ -87,7 +87,7 @@ if __name__ == "__main__":
     print("N = " + str(N))
     
     plot_specific_heat(N)
-    #plot_susceptibility(N)
+    plot_susceptibility(N)
 
     end_time = time.time()
 
