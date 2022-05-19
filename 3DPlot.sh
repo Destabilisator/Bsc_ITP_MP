@@ -31,10 +31,12 @@ fi
 
 
 if [[ "$OSTYPE" == "msys" ]]; then
+    python cleanData.py $N
     ./cmake-build-release/Bsc_ITP_MX.exe 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $SILENT
     echo "plotting..."
     python plot3D.py $N $show
 else
+    python3 cleanData.py $N
     ./cmake-build-release/Bsc_ITP_MX 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $SILENT
     echo "plotting..."
     python3 plot3D.py $N $show

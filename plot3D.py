@@ -10,7 +10,6 @@ import time
 import scipy.interpolate as interp
 import math
 
-
 def plot_specific_heat(N):
     print("plotting specific heat (3D) ...")
 
@@ -85,7 +84,7 @@ if __name__ == "__main__":
     N = sys.argv[1]
 
     print("N = " + str(N))
-    
+  
     plot_specific_heat(N)
     plot_susceptibility(N)
 
