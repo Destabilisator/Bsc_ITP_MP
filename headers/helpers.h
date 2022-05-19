@@ -122,6 +122,8 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M,
 
 double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<std::vector<double>>& eiVal_list, const int &N);
 
+double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXcd> &M_list, const std::vector<std::vector<std::complex<double>>> &eiVal_list, const int &N);
+
 /////////////////////////////// others ///////////////////////////////
 
 // check validity of user input

@@ -527,7 +527,7 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M,
     return 1.0 / temp * expectation_mz_2 / N;
 }
 
-double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<std::vector<double>>& eiVal_list, const int &N) {
+double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<std::vector<double>> &eiVal_list, const int &N) {
     double Z_sum = 0.0, expectation_mz_2 = 0.0;
     for (int cur = 0; cur < M_list.size(); cur ++) {
         const Eigen::MatrixXd &M = M_list.at(cur);
@@ -535,6 +535,24 @@ double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::
         for (int i = 0; i < eiVals.size(); i++) {
             double ev_real = eiVals.at(i);
             double S_elem = M(i, i);
+            double S = - 0.5 + std::sqrt(0.25 + S_elem);
+            Z_sum += std::exp(-1.0 / temp * ev_real) * (2.0 * S + 1);
+            expectation_mz_2 += std::exp(-1.0 / temp * ev_real) * S_elem * (2.0 * S + 1);
+        }
+    }
+    expectation_mz_2 /= Z_sum;
+    expectation_mz_2 /= 3.0;
+    return 1.0 / temp * expectation_mz_2 / N;
+}
+
+double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXcd> &M_list, const std::vector<std::vector<std::complex<double>>> &eiVal_list, const int &N) {
+    double Z_sum = 0.0, expectation_mz_2 = 0.0;
+    for (int cur = 0; cur < M_list.size(); cur ++) {
+        const Eigen::MatrixXcd &M = M_list.at(cur);
+        std::vector<std::complex<double>> eiVals = eiVal_list.at(cur);
+        for (int i = 0; i < eiVals.size(); i++) {
+            double ev_real = std::real(eiVals.at(i));
+            double S_elem = std::real(M(i, i));
             double S = - 0.5 + std::sqrt(0.25 + S_elem);
             Z_sum += std::exp(-1.0 / temp * ev_real) * (2.0 * S + 1);
             expectation_mz_2 += std::exp(-1.0 / temp * ev_real) * S_elem * (2.0 * S + 1);

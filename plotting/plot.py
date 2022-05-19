@@ -109,7 +109,7 @@ def plot_susceptibility_J_const(N):
     subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$ für ' + r"$J_1$ / $J_2$ = " + linesJ + r", $k_B$ = 1", fontsize = 18)
     
 
-    # file = open("results/" + N + "_spininversion_susceptibility_J_const.txt", 'r')
+    # file = open("results/" + N + "_magnetization_susceptibility_J_const.txt", 'r')
     # lines = file.readlines()
     # linesJ = lines[0][len("J1/J2 = "):-1]
     # lbl = "N = " + N
@@ -119,7 +119,7 @@ def plot_susceptibility_J_const(N):
     #     x, y = lines[i].split("\t")
     #     X += [float(x)]
     #     Y += [float(y)]
-    # subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'red', label = "SI")
+    # subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'red', label = "MS")
 
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
@@ -156,12 +156,12 @@ if __name__ == "__main__":
 
     print("N = " + str(N))
     
-    plot_delta_E(N)
-    plot_specific_heat_T_const(N)
-    plot_specific_heat_J_const(N)
-    plot_susceptibility_T_const(N)
+    # plot_delta_E(N)
+    # plot_specific_heat_T_const(N)
+    # plot_specific_heat_J_const(N)
+    # plot_susceptibility_T_const(N)
     plot_susceptibility_J_const(N)
-    plot_k_dispersion_J_const(N)
+    # plot_k_dispersion_J_const(N)
 
     end_time = time.time()
 

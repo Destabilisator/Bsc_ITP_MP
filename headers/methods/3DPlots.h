@@ -41,6 +41,10 @@ namespace plot3D {
                const int &TCOUNT, const double &TSTART, const double &TEND,
                const int &N, const int &SIZE);
 
+    void get_X_momentum(double J, int pos, const int &JCOUNT, const double &JSTART, const double &JEND,
+               const int &TCOUNT, const double &TSTART, const double &TEND,
+               const int &N, const int &SIZE);
+
     void start_X(const int &JCOUNT, const double &JSTART, const double &JEND,
                  const int &TCOUNT, const double &TSTART, const double &TEND,
                  int &cores, const int &N, const int &SIZE);

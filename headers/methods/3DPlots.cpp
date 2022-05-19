@@ -22,13 +22,7 @@ namespace plot3D {
             std::vector<std::complex<double>> eiVals;
             std::vector<Eigen::MatrixXcd> matrixBlocks;
 
-            momentumStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
-
-            // sort eigenvalues
-//            eiVals.shrink_to_fit();
-//            std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
-//                return std::real(c1) < std::real(c2);
-//            });
+            momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
 
             std::vector<std::tuple<double, double>> C_func_T;
 
@@ -88,13 +82,6 @@ namespace plot3D {
 
             parityStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
 
-
-//             //sort eigenvalues
-//            eiVals.shrink_to_fit();
-//            std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
-//                return std::real(c1) < std::real(c2);
-//            });
-
             std::vector<std::tuple<double, double>> C_func_T;
 
             for (int i = 0; i <= TCOUNT; i++) {
@@ -149,12 +136,6 @@ namespace plot3D {
             std::vector<Eigen::MatrixXd> matrixBlocks;
 
             spinInversion::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
-
-//            // sort eigenvalues
-//            eiVals.shrink_to_fit();
-//            std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
-//                return std::real(c1) < std::real(c2);
-//            });
 
             std::vector<std::tuple<double, double>> C_func_T;
 
@@ -223,7 +204,6 @@ namespace plot3D {
                                              JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
                 }
             }
-
         } else {
             std::cout << ", momentum states\n";
             for (int i = 0; i < cores; i++) {
@@ -306,6 +286,68 @@ namespace plot3D {
 
     }
 
+    void get_X_momentum(double J, int pos, const int &JCOUNT, const double &JSTART, const double &JEND,
+               const int &TCOUNT, const double &TSTART, const double &TEND,
+               const int &N, const int &SIZE) {
+
+        // progressbar init
+        nextJMutex3D.lock();
+        std::cout << "\r[";
+        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS3D; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << JSTART << " (" << 0 << "/" << JCOUNT << ")     ";
+        std::cout.flush();
+        nextJMutex3D.unlock();
+
+        while (true) {
+
+            std::vector<std::vector<std::complex<double>>> eiVals;
+            std::vector<Eigen::MatrixXcd> matrixBlockU;
+            std::vector<Eigen::MatrixXcd> matrixBlockS2;
+            momentumStates::getEiValsZeroBlock(J, 1.0, eiVals, matrixBlockU, matrixBlockS2, N, SIZE);
+
+            std::vector<std::tuple<double, double>> X_func_T;
+
+            std::vector<Eigen::MatrixXcd> Blocks_U_inv_S2_U;
+            for(int i = 0; i < matrixBlockU.size(); i++) {
+                Eigen::MatrixXcd M = matrixBlockU.at(i).adjoint() * matrixBlockS2.at(i) * matrixBlockU.at(i);
+                Blocks_U_inv_S2_U.push_back(M);
+            }
+
+            for (int i = 0; i <= TCOUNT; i++) {
+                double current = TSTART + (TEND - TSTART) * i / TCOUNT;
+                //current_beta = 1 / current_beta;
+                X_func_T.emplace_back(current, getSusceptibilityDegeneracy(current, Blocks_U_inv_S2_U, eiVals, N));
+            }
+
+            save3DPlotDataX(J, N, X_func_T);
+
+            // progressbar
+            nextJMutex3D.lock();
+            int prg = std::min({CURRENT3D, JCOUNT});
+            int p = (int) ( (float) prg / (float) JCOUNT * (float) PROGRESSBAR_SEGMENTS3D);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS3D; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) prg / (float) JCOUNT * 100.0 ) << "% J1/J2 = "
+                        << JSTART + (JEND - JSTART) * prg / JCOUNT << " (" << prg << "/" << JCOUNT << ")     ";
+            std::cout.flush();
+            pos = CURRENT3D;
+            CURRENT3D++;
+            nextJMutex3D.unlock();
+
+            if (pos > JCOUNT) {
+                break;
+            } else {
+                J = JSTART + (JEND - JSTART) * pos / JCOUNT;
+            }
+
+        }
+
+    }
+
     void start_X(const int &JCOUNT, const double &JSTART, const double &JEND,
                  const int &TCOUNT, const double &TSTART, const double &TEND,
                  int &cores, const int &N, const int &SIZE) {
@@ -322,11 +364,21 @@ namespace plot3D {
 
         CURRENT3D = 0 + cores;
 
-        std::cout << ", magnetization blocks\n";
-        for (int i = 0; i < cores; i++) {
-            Threads[i] = std::thread(get_X, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,
-                                     JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
+
+        if (N >= 14) {
+            std::cout << ", momentum states\n";
+            for (int i = 0; i < cores; i++) {
+                Threads[i] = std::thread(get_X_momentum, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,
+                                         JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
+            }
+        } else {
+            std::cout << ", magnetization blocks\n";
+            for (int i = 0; i < cores; i++) {
+                Threads[i] = std::thread(get_X, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,
+                                         JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
+            }
         }
+
 
         for (int i = 0; i < cores; i++) {
             Threads[i].join();

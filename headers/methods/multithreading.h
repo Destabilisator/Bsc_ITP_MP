@@ -38,6 +38,9 @@ namespace multi {
     void get_XT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
                       const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T);
 
+    void get_XT_const_momentum(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
+                               const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T);
+
     void start_XT_const(const int &COUNT, const double &START, const double &END,
                         int &cores, const double &T, const int &N, const int &SIZE);
 

@@ -22,7 +22,7 @@ namespace multi {
             std::vector<std::complex<double>> eiVals;
             std::vector<Eigen::MatrixXcd> matrixBlocks;
 
-            momentumStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
+            momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
 
             // sort eigenvalues
             eiVals.shrink_to_fit();
@@ -329,6 +329,62 @@ namespace multi {
 
     }
 
+    void get_XT_const_momentum(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
+                      const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T) {
+
+        // progressbar init
+        nextJMutex.lock();
+        std::cout << "\r[";
+        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << START << " (" << 0 << "/" << COUNT << ")     ";
+        std::cout.flush();
+        nextJMutex.unlock();
+
+        while (true) {
+
+            std::vector<std::vector<std::complex<double>>> eiVals;
+            std::vector<Eigen::MatrixXcd> matrixBlockU;
+            std::vector<Eigen::MatrixXcd> matrixBlockS2;
+            momentumStates::getEiValsZeroBlock(J, 1.0, eiVals, matrixBlockU, matrixBlockS2, N, SIZE);
+
+            std::vector<Eigen::MatrixXcd> Blocks_U_inv_S2_U;
+            for(int i = 0; i < matrixBlockU.size(); i++) {
+                Eigen::MatrixXcd M = matrixBlockU.at(i).adjoint() * matrixBlockS2.at(i) * matrixBlockU.at(i);
+                Blocks_U_inv_S2_U.push_back(M);
+            }
+
+            double susceptibility = getSusceptibilityDegeneracy(T, Blocks_U_inv_S2_U, eiVals, N);
+            // progressbar
+            nextJMutex.lock();
+            int prg = std::min({CURRENT, COUNT});
+            int p = (int) ( (float) prg / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
+            //coutMutex.lock();
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% J1/J2 = "
+                        << START + (END - START) * prg / COUNT << " (" << prg << "/" << COUNT << ")     ";
+            std::cout.flush();
+            //coutMutex.unlock();
+
+            // write data
+            outDataMagneticSusceptibility_X->push_back({J, susceptibility});
+            pos = CURRENT;
+            CURRENT++;
+            nextJMutex.unlock();
+
+            if (pos > COUNT) {
+                break;
+            } else {
+                J = (double) START + (double) (END - START) * (double) pos / (double) COUNT;
+            }
+        }
+
+    }
+
     void start_XT_const(const int &COUNT, const double &START, const double &END,
                         int &cores, const double &T, const int &N, const int &SIZE) {
 
@@ -348,8 +404,14 @@ namespace multi {
         CURRENT = 0 + cores;
 
         std::cout << ", magnetization blocks\n";
-        for (int i = 0; i < cores; i++) {
-            Threads[i] = std::thread(get_XT_const, START + (END - START) * i / COUNT, i + 1, &outDataMagneticSusceptibility_X, COUNT, START, END, N, SIZE, T);
+        if (N >= 14) {
+            for (int i = 0; i < cores; i++) {
+                Threads[i] = std::thread(get_XT_const_momentum, START + (END - START) * i / COUNT, i + 1, &outDataMagneticSusceptibility_X, COUNT, START, END, N, SIZE, T);
+            }
+        } else {
+            for (int i = 0; i < cores; i++) {
+                Threads[i] = std::thread(get_XT_const, START + (END - START) * i / COUNT, i + 1, &outDataMagneticSusceptibility_X, COUNT, START, END, N, SIZE, T);
+            }
         }
 
         for (int i = 0; i < cores; i++) {
