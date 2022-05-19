@@ -95,6 +95,11 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                  const std::string &y_label, const std::vector<std::tuple<int, double>> &outData, const int &N);
 
+// saves a vector of tuples (double, double) to be processed into a 3D-plot by python
+void save3DPlotDataC(const double &J, const int &N, const std::vector<std::tuple<double, double>>& C_func_T);
+
+void save3DPlotDataX(const double &J, const int &N, const std::vector<std::tuple<double, double>>& X_func_T);
+
 /////////////////////////////// calculate quantities ///////////////////////////////
 
 // returns the Matrix S^2 for a system of a given size
@@ -115,12 +120,15 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXcd &M
 
 double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M, const std::vector<double>& eiVals, const int &N);
 
+double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<double>& eiVals, const int &N);
+
 /////////////////////////////// others ///////////////////////////////
 
 // check validity of user input
 // [executable] N J_START J_END J_COUNT CORES SILENT
-void validateInput(int &argc, char* argv[], int &N, int &SIZE, double &J_START, double &J_END, int &J_COUNT,
-                   const unsigned int &cpu_cnt, bool &silent, int &cores, const double &J1, const double &J2, bool skipSilent);
+void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N, int &SIZE, double &J_START, double &J_END,
+                   int &J_COUNT, double &T_START, double &T_END, int &T_COUNT, bool &silent, int &cores, bool &plotsIn3D,
+                   bool skipSilent, const double &J1, const double &J2);
 
 // converts time in s in hh:mm:ss
 std::string formatTime(std::chrono::duration<double> elapsed_seconds);

@@ -10,8 +10,8 @@ if [[ "$OSTYPE" == "msys" ]]; then
     ./cmake-build-release/Bsc_ITP_MX.exe 8 $start $end 5000 -1 silent
     ./cmake-build-release/Bsc_ITP_MX.exe 10 $start $end 500 -1 silent
     ./cmake-build-release/Bsc_ITP_MX.exe 12 $start $end 50 -1 silent
-    # ./cmake-build-release/Bsc_ITP_MX.exe 14 $start $end50 -1 silent
-    # ./cmake-build-release/Bsc_ITP_MX.exe 16 $start $end 16 -1 silent
+    # ./cmake-build-release/Bsc_ITP_MX.exe 14 $start $end 10 -1 silent
+    # ./cmake-build-release/Bsc_ITP_MX.exe 16 $start $end 5 -1 silent
 
     start_time_plots=$SECONDS
     python plotDeltaE.py
@@ -25,9 +25,9 @@ else
     ./cmake-build-release/Bsc_ITP_MX 6 $start $end 1000 -1 silent
     ./cmake-build-release/Bsc_ITP_MX 8 $start $end 1000 -1 silent
     ./cmake-build-release/Bsc_ITP_MX 10 $start $end 500 -1 silent
-    ./cmake-build-release/Bsc_ITP_MX 12 $start $end 100 -1 silent
-    # ./cmake-build-release/Bsc_ITP_MX 14 $start $end 100 8 silent
-    # ./cmake-build-release/Bsc_ITP_MX 16 $start $end 25 2 silent
+    ./cmake-build-release/Bsc_ITP_MX 12 $start $end 50 -1 silent
+    # ./cmake-build-release/Bsc_ITP_MX 14 $start $end 500 8 silent
+    # ./cmake-build-release/Bsc_ITP_MX 16 $start $end 50 2 silent
 
     start_time_plots=$SECONDS
     python3 plotDeltaE.py

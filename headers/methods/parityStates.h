@@ -16,6 +16,7 @@
 /////////////////////////////// parity states ///////////////////////////////
 
 namespace parityStates {
+
     double get_gk(int k, int N);
 
     double getNa(int sigma, int m, int Ra, int k, int p, int N);
@@ -34,4 +35,5 @@ namespace parityStates {
                    std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N, const int &SIZE);
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE);
+
 }

@@ -3,6 +3,7 @@
 /////////////////////////////// multi-threading ///////////////////////////////
 
 namespace multi {
+
     void get_DeltaE_CT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
@@ -32,6 +33,7 @@ namespace multi {
             // Delta E
             double E0 = std::real(eiVals.at(0));
             double E1 = std::real(eiVals.at(1));
+            double specificHeat = getSpecificHeat(T, eiVals, N);
 
             // progressbar
             nextJMutex.lock();
@@ -50,7 +52,7 @@ namespace multi {
 
             // write data
             outDataDeltaE->push_back({J, E1 - E0});
-            outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, eiVals, N)});
+            outDataSpecificHeat_C->push_back({J, specificHeat});
             pos = CURRENT;
             CURRENT++;
             nextJMutex.unlock();
@@ -94,6 +96,7 @@ namespace multi {
             // Delta E
             double E0 = std::real(eiVals.at(0));
             double E1 = std::real(eiVals.at(1));
+            double specificHeat = getSpecificHeat(T, eiVals, N);
 
             // progressbar
             nextJMutex.lock();
@@ -112,7 +115,7 @@ namespace multi {
 
             // write data
             outDataDeltaE->push_back({J, E1 - E0});
-            outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, eiVals, N)});
+            outDataSpecificHeat_C->push_back({J, specificHeat});
             pos = CURRENT;
             CURRENT++;
             nextJMutex.unlock();
@@ -156,6 +159,7 @@ namespace multi {
             // Delta E
             double E0 = std::real(eiVals.at(0));
             double E1 = std::real(eiVals.at(1));
+            double specificHeat = getSpecificHeat(T, eiVals, N);
 
             // progressbar
             nextJMutex.lock();
@@ -174,7 +178,7 @@ namespace multi {
 
             // write data
             outDataDeltaE->push_back({J, E1 - E0});
-            outDataSpecificHeat_C->push_back({J, getSpecificHeat(T, eiVals, N)});
+            outDataSpecificHeat_C->push_back({J, specificHeat});
             pos = CURRENT;
             CURRENT++;
             nextJMutex.unlock();
@@ -189,7 +193,7 @@ namespace multi {
 
     }
 
-    void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const unsigned int &cpu_cnt,
+    void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END,
                                int &cores, const double &T, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
@@ -206,7 +210,7 @@ namespace multi {
 
         std::thread Threads[cores];
 
-        CURRENT = 1 + cores;
+        CURRENT = 0 + cores;
 
         if (N%4 == 0) {
             if (N >= 12) {
@@ -325,7 +329,7 @@ namespace multi {
 
     }
 
-    void start_XT_const(const int &COUNT, const double &START, const double &END, const unsigned int &cpu_cnt,
+    void start_XT_const(const int &COUNT, const double &START, const double &END,
                         int &cores, const double &T, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
@@ -341,7 +345,7 @@ namespace multi {
 
         std::thread Threads[cores];
 
-        CURRENT = 1 + cores;
+        CURRENT = 0 + cores;
 
         std::cout << ", magnetization blocks\n";
         for (int i = 0; i < cores; i++) {

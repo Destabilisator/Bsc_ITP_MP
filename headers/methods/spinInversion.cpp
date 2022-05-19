@@ -391,9 +391,57 @@ namespace spinInversion {
 
     }
 
-    void SIBlockSolver_withSave(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
-                                const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
-                                const std::vector<int> &c_vals, std::vector<double> &eiVals, std::vector<Eigen::MatrixXd> &matrixBlocks, const int &N) {
+    Eigen::MatrixXd spinMatrixSI(const int &N, int p, int z, const std::vector<int> &states,
+                                 const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
+                                 const std::vector<int> &c_vals) {
+
+        int size = (int) states.size();
+        Eigen::MatrixXd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(size, size);
+        for (int k = 0; k < size; k++) {
+            for (int j = 0; j < N; j++) {
+                int s = states.at(k);
+                int state_n = 1;
+                if (k > 0 && states.at(k - 1) == states.at(k)) {
+                    continue;
+                } else if (k < states.size() - 1 && states.at(k) == states.at(k + 1)) {
+                    state_n = 2;
+                }
+                for (int i = 0; i < j; i++) {
+                    if (((s >> i) & 1) == ((s >> j) & 1)) {
+                        for (int _ = k; _ < k + state_n; _++) {
+                            S2(k, k) += 0.5;
+                        }
+                    } else {
+                        S2(k, k) -= 0.5;
+                        int d = s ^ (1 << i) ^ (1 << j);
+                        int r = 0, l = 0, q = 0, g = 0;
+                        representative(d, r, l, q, g, N);
+                        int b = findState(states, r);
+                        if (b > 0) {
+//                        S2(k, b) = 1.0;
+                            int m = 1;
+                            if (b > 0 && states.at(b) == states.at(b - 1)) {
+                                m = 2, b -= 1;
+                            } else if (b < states.size() - 1 && states.at(b) == states.at(b + 1)) {
+                                m = 2;
+                            }
+                            for (int j1 = b; j1 < b + m; j1++) {
+                                for (int i1 = k; i1 < k + state_n; i1++) {
+                                    S2(i1, j1) += 2.0 * helement(i, j, l, q, g, k, p, z, R_vals, m_vals, n_vals, c_vals, N);;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return S2;
+    }
+
+    void SIBlockSolver_withMatrix(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
+                                  const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
+                                  const std::vector<int> &c_vals, std::vector<double> &eiVals, std::vector<Eigen::MatrixXd> &matrixUBlocks,
+                                  std::vector<Eigen::MatrixXd> &matrixS2Blocks, const int &N) {
 
         const int statesCount = (int) states.size();
         Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
@@ -401,13 +449,23 @@ namespace spinInversion {
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
         const Eigen::VectorXd &H1EiVal = solver.eigenvalues();
+        std::cout << "egenvalues: \n";
         for (double ev: H1EiVal) {
             eiVals.push_back(ev);
+            std::cout << ev << "\n";
         }
+
+        std::cout << "S2:\n";
 
         eiVals.shrink_to_fit();
 
-        matrixBlocks.push_back(solver.eigenvectors());
+        matrixUBlocks.push_back(solver.eigenvectors());
+
+        Eigen::MatrixXd S2 = Eigen::MatrixXd::Zero(statesCount, statesCount);
+        S2 = spinMatrixSI(N, p, z, states, R_vals, m_vals, n_vals, c_vals);
+        matrixS2Blocks.push_back(S2);
+
+        std::cout << S2 << std::endl;
 
 //        // sort eigenvalues
 //        std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
@@ -417,7 +475,7 @@ namespace spinInversion {
     }
 
     void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<double> & eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
-                            std::vector<int> &allStates, const int &N, const int &SIZE) {
+                            std::vector<Eigen::MatrixXd> &S2Blocks, std::vector<int> &allStates, const int &N, const int &SIZE) {
 
         std::vector<int> states_m;
         fillStates(&states_m, N/2, N, SIZE);
@@ -462,7 +520,9 @@ namespace spinInversion {
                         }
                     }
                     if (!states.empty()) {
-                        SIBlockSolver_withSave(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, UBlocks, N);
+                        std::cout << "block\n";
+                        SIBlockSolver_withMatrix(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals,
+                                                 UBlocks, S2Blocks, N);
                     }
                     states.clear();
                     R_vals.clear();
@@ -491,9 +551,10 @@ namespace spinInversion {
         std::vector<double> eiVals;
 
         std::vector<Eigen::MatrixXd> UBlocks;
+        std::vector<Eigen::MatrixXd> S2Blocks;
 
-//        std::cout << "getting eiVals\n";
-        getEiValsZeroBlock(J1, J2, eiVals, UBlocks, states, N, SIZE);
+        std::cout << "getting eiVals\n";
+        getEiValsZeroBlock(J1, J2, eiVals, UBlocks, S2Blocks, states, N, SIZE);
 
 //        for (double ev : eiVals) {
 //            std::cout << ev << "\n";
@@ -511,47 +572,34 @@ namespace spinInversion {
 
         const int statesCount = (int) states.size();
 
-//        std::cout << "statesCount: " << statesCount << "\n";
+        std::cout << "statesCount: " << statesCount << "\n";
 
-        auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;
+        //auto *susceptibility_magnetization = new std::vector<std::tuple<double, double>>;
+        std::vector<std::tuple<double, double>> susceptibility_magnetization;
 
-//        std::cout << "getting S2\n";
-        Eigen::MatrixXd S2 = spinMatrix(N, states);
+        std::vector<Eigen::MatrixXd> U_inv_S2_U;
 
-//        std::cout << S2 << std::endl;
-
-//        std::cout << "defining U\n";
-        Eigen::MatrixXd U = Eigen::MatrixXd::Zero(statesCount, statesCount);
-
-//        std::cout << U << std::endl;
-//
-//        std::cout << "getting U\n";
-
-        int offset_blocks = 0;
-        for (const Eigen::MatrixXd& M : UBlocks) {
-            U.block(offset_blocks, offset_blocks, M.rows(), M.cols()) = M;
-            offset_blocks += (int) M.rows();
+        int matrixCount = (int) UBlocks.size();
+        for (int i = 0; i < matrixCount; i++) {
+            int sz = (int) UBlocks.at(i).rows();
+            Eigen::MatrixXd M = Eigen::MatrixXd::Zero(sz, sz);
+            M = UBlocks.at(i).transpose() * S2Blocks.at(i) * UBlocks.at(i);
+            U_inv_S2_U.push_back(M);
         }
-
-//        std::cout << U << std::endl;
-
-//        std::cout << "getting U_inv_S2_U\n";
-        Eigen::MatrixXd U_inv_S2_U = Eigen::MatrixXd::Zero(statesCount, statesCount);
-        U_inv_S2_U = U.adjoint() * S2 * U;
-
-//        std::cout << U_inv_S2_U << std::endl;
-
-//        std::cout << "getting susceptibility" << std::endl;
 
         for (int i = 0; i <= COUNT; i++) {
             double current = START + (END - START) * i / COUNT;
             //current_beta = 1 / current_beta;
-            susceptibility_magnetization->push_back({current, getSusceptibilityDegeneracy(current, U_inv_S2_U, eiVals, N)});
+            susceptibility_magnetization.emplace_back(current, getSusceptibilityDegeneracy(current, U_inv_S2_U, eiVals, N));
         }
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+        for (std::tuple<double, double> t : susceptibility_magnetization) {
+            std::cout << std::get<0>(t) << " " << std::get<1>(t) << "\n";
+        }
 
         ///// save /////
 
@@ -563,7 +611,7 @@ namespace spinInversion {
                                              + "calculation time: " + formatTime(elapsed_seconds);
 
         std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
-        saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_magnetization, N);
+        saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", susceptibility_magnetization, N);
 
         std::cout << "\n";
 

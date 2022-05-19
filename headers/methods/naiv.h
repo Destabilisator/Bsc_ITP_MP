@@ -13,6 +13,7 @@
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 namespace naiv {
+
     void fillHamilton(double **hamilton, const double &J1,const double &J2, const int &N, const int &SIZE);
 
     void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> *HEiValList,
@@ -20,4 +21,5 @@ namespace naiv {
 
     void start(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                const double &END, const int &COUNT, const int &cores);
+
 }

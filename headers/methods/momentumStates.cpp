@@ -3,6 +3,7 @@
 /////////////////////////////// momentum states ///////////////////////////////
 
 namespace momentumStates {
+
     void fillHamiltonBlock(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
                            const std::vector<int> &R_vals, std::complex<double> **hamiltonBlock, const int &N,
                            const int &SIZE) {
@@ -292,4 +293,5 @@ namespace momentumStates {
         delete matrixMomentBlocks;
 
     }
+
 }

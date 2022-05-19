@@ -3,6 +3,7 @@
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
 namespace naiv {
+
     void fillHamilton(double **hamilton, const double &J1,const double &J2, const int &N, const int &SIZE) {
 
         for (int s = 0; s <= SIZE - 1; s++) {

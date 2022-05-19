@@ -8,8 +8,25 @@
 *.exe
 *.elf
 
-# results
+# calcutaed data and plots
 Hamilton*.txt
 EV*.txt
 benchmarkResults.txt
 results/*
+!results/3DData/
+!results/3DData/8/C/dummyFile.txt
+!results/3DData/8/X/dummyFile.txt
+!results/3DData/10/C/dummyFile.txt
+!results/3DData/10/X/dummyFile.txt
+!results/3DData/12/C/dummyFile.txt
+!results/3DData/12/X/dummyFile.txt
+!results/3DData/14/C/dummyFile.txt
+!results/3DData/14/X/dummyFile.txt
+!results/3DData/16/C/dummyFile.txt
+!results/3DData/16/X/dummyFile.txt
+!results/3DData/18/C/dummyFile.txt
+!results/3DData/18/X/dummyFile.txt
+!results/3DData/20/C/dummyFile.txt
+!results/3DData/20/X/dummyFile.txt
+!results/data_placeholder.txt
+

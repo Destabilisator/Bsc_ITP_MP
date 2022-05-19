@@ -393,6 +393,34 @@ void saveOutData(const std::string &filename, const std::string &header, const s
     file.close();
 }
 
+void save3DPlotDataC(const double &J, const int &N, const std::vector<std::tuple<double, double>>& C_func_T) {
+    std::ofstream file;
+    try {
+        file.open("./results/3DData/" + std::to_string(N) + "/C/" + std::to_string(J) + ".txt");
+        for (std::tuple<double, double> data : C_func_T) {
+            file << std::get<0>(data) << "\t" << std::get<1>(data) << "\n";
+        }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
+void save3DPlotDataX(const double &J, const int &N, const std::vector<std::tuple<double, double>>& X_func_T) {
+    std::ofstream file;
+    try {
+        file.open("./results/3DData/" + std::to_string(N) + "/X/" + std::to_string(J) + ".txt");
+        for (std::tuple<double, double> data : X_func_T) {
+            file << std::get<0>(data) << "\t" << std::get<1>(data) << "\n";
+        }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
 /////////////////////////////// calculate quantities ///////////////////////////////
 
 Eigen::MatrixXd spinMatrix(const int &N, const  int &SIZE) {
@@ -499,11 +527,83 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M,
     return 1.0 / temp * expectation_mz_2 / N;
 }
 
+double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<double>& eiVals, const int &N) {
+    double Z_sum = 0.0, expectation_mz_2 = 0.0;
+    for (const Eigen::MatrixXd &M : M_list) {
+        for (int i = 0; i < eiVals.size(); i++) {
+            double ev_real = eiVals.at(i);
+            double S_elem = M(i, i);
+            double S = - 0.5 + std::sqrt(0.25 + S_elem);
+            Z_sum += std::exp(-1.0 / temp * ev_real) * (2.0 * S + 1);
+            expectation_mz_2 += std::exp(-1.0 / temp * ev_real) * S_elem * (2.0 * S + 1);
+        }
+    }
+    expectation_mz_2 /= Z_sum;
+    expectation_mz_2 /= 3.0;
+    return 1.0 / temp * expectation_mz_2 / N;
+}
+
 /////////////////////////////// others ///////////////////////////////
 
 // [executable] N J_START J_END J_COUNT CORES SILENT
-void validateInput(int &argc, char* argv[], int &N, int &SIZE, double &J_START, double &J_END, int &J_COUNT,
-                   const unsigned int &cpu_cnt, bool &silent, int &cores, const double &J1, const double &J2, bool skipSilent) {
+void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N, int &SIZE, double &J_START, double &J_END,
+                   int &J_COUNT, double &T_START, double &T_END, int &T_COUNT, bool &silent, int &cores, bool &plotsIn3D,
+                   bool skipSilent, const double &J1, const double &J2) {
+
+    if (argc >= 2) {
+        std::string DDD = "3D";
+        std::cout << argv[1] << "\n";
+        if (argv[1] != DDD) {
+            goto no3D;
+        }
+        plotsIn3D = true;
+        if ( (std::stoi(argv[2]) % 2 == 0) && (std::stoi(argv[2]) >= 6) && (std::stoi(argv[2]) <= 32) ) {
+            N = std::stoi(argv[2]);
+        } else {
+            std::cout << "invalid chain size, must be even and at least 6, defaulting to " << N << "\n";
+        }
+        SIZE = (int) pow(2, N);
+        if (std::stod(argv[3]) > std::stod(argv[4]) || std::stoi(argv[5]) < 1) {
+            std::cout << "range invalid, defaulting...\n";
+        } else {
+            J_START = std::stod(argv[3]); J_END = std::stod(argv[4]); J_COUNT = std::stoi(argv[5]);
+        }
+        std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << " from args\n";
+
+        if (std::stod(argv[6]) > std::stod(argv[7]) || std::stoi(argv[8]) < 1) {
+            std::cout << "range invalid, defaulting...\n";
+        } else {
+            T_START = std::stod(argv[6]); T_END = std::stod(argv[7]); T_COUNT = std::stoi(argv[8]);
+        }
+        std::cout << "T_START = " << T_START << ", T_END = " << T_END << " and T_COUNT = " << T_COUNT << " from args\n";
+
+        if (argc >= 9) {
+            int crs = std::stoi(argv[9]);
+            if (crs > 0 && crs <= cpu_cnt) {
+                cores = crs;
+                std::cout << "using " << cores << " cores\n";
+            } else {
+                std::cout << "defaulting to using all (" << cores << ") cores\n";
+            }
+        }
+
+        if (skipSilent) {
+            return;
+        }
+
+        if (argc >= 10) {
+            std::string s1 = "silent";
+            std::string s2 = argv[10];
+            std::cout << s2 << "\n";
+            if (s1 == s2) {
+                silent = true;
+            }
+        }
+
+        goto silentEntry;
+    }
+
+    no3D:
 
     if (argc >= 2) {
         if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) && (std::stoi(argv[1]) <= 32) ) {
@@ -539,6 +639,10 @@ void validateInput(int &argc, char* argv[], int &N, int &SIZE, double &J_START, 
         }
     }
 
+    T_START = J_START;
+    T_END = J_END;
+    T_COUNT = J_COUNT;
+
     if (skipSilent) {
         return;
     }
@@ -551,37 +655,40 @@ void validateInput(int &argc, char* argv[], int &N, int &SIZE, double &J_START, 
         }
     }
 
+    silentEntry:
+
     if (!silent) {
         std::cout << "continue? (y/n):";
         char c;
         std::cin >> c;
         if (c != 'y') {
-            wrong_N:
-            std::cout << "Enter new N (must be even ans >= 6):";
-            int N_usr;
-            std::cin >> N_usr;
-            if (N_usr >= 6 && N_usr % 2 == 0) {
-                N = N_usr;
-            } else {
-                goto wrong_N;
-            }
-            wrong_JRANGE:
-            std::cout << "Enter new J_START (J1/J2):";
-            double J_START_usr;
-            std::cin >> J_START_usr;
-            std::cout << "Enter new J_END (J1/J2):";
-            double J_END_usr;
-            std::cin >> J_END_usr;
-            std::cout << "Enter new J_COUNT (number of data-points):";
-            int J_COUNT_usr;
-            std::cin >> J_COUNT_usr;
-            if (J_START_usr <= J_END_usr && J_COUNT_usr >= 1) {
-                J_START = J_START_usr;
-                J_END = J_END_usr;
-                J_COUNT = J_COUNT_usr;
-            } else {
-                goto wrong_JRANGE;
-            }
+            exit(1);
+//            wrong_N:
+//            std::cout << "Enter new N (must be even ans >= 6):";
+//            int N_usr;
+//            std::cin >> N_usr;
+//            if (N_usr >= 6 && N_usr % 2 == 0) {
+//                N = N_usr;
+//            } else {
+//                goto wrong_N;
+//            }
+//            wrong_JRANGE:
+//            std::cout << "Enter new J_START (J1/J2):";
+//            double J_START_usr;
+//            std::cin >> J_START_usr;
+//            std::cout << "Enter new J_END (J1/J2):";
+//            double J_END_usr;
+//            std::cin >> J_END_usr;
+//            std::cout << "Enter new J_COUNT (number of data-points):";
+//            int J_COUNT_usr;
+//            std::cin >> J_COUNT_usr;
+//            if (J_START_usr <= J_END_usr && J_COUNT_usr >= 1) {
+//                J_START = J_START_usr;
+//                J_END = J_END_usr;
+//                J_COUNT = J_COUNT_usr;
+//            } else {
+//                goto wrong_JRANGE;
+//            }
         }
     }
 }

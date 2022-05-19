@@ -13,6 +13,7 @@
 #include "headers/helpers.h"
 #include "headers/methods.h"
 #include "headers/methods/multithreading.h"
+#include "headers/methods/3DPlots.h"
 
 //// methods ////
 #define multiCalc
