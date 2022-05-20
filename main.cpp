@@ -73,7 +73,7 @@ int main(int argc, char* argv[]) {
     }
 #endif
 
-    std::cout << "\n" << std::endl;
+    std::cout << std::endl;
 
     return 0;
 }

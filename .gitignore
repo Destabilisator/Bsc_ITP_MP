@@ -9,42 +9,19 @@
 *.elf
 
 # calcutaed data and plots
+
 Hamilton*.txt
 EV*.txt
 benchmarkResults.txt
+
 #results/*.txt
 #results/*.png
 results/*
 !results/3DData/
 results/3DData/*.png
-results/3DData/*.txt
+results/3DData/*/*/*.txt
+!results/3DData/*/*/dummyFile.txt
 
-!results/3DData/6/C/dummyFile.txt
-!results/3DData/6/X/dummyFile.txt
-!results/3DData/8/C/dummyFile.txt
-!results/3DData/8/X/dummyFile.txt
-!results/3DData/10/C/dummyFile.txt
-!results/3DData/10/X/dummyFile.txt
-!results/3DData/12/C/dummyFile.txt
-!results/3DData/12/X/dummyFile.txt
-!results/3DData/14/C/dummyFile.txt
-!results/3DData/14/X/dummyFile.txt
-!results/3DData/16/C/dummyFile.txt
-!results/3DData/16/X/dummyFile.txt
-!results/3DData/18/C/dummyFile.txt
-!results/3DData/18/X/dummyFile.txt
-!results/3DData/20/C/dummyFile.txt
-!results/3DData/20/X/dummyFile.txt
-!results/3DData/22/C/dummyFile.txt
-!results/3DData/22/X/dummyFile.txt
-!results/3DData/24/C/dummyFile.txt
-!results/3DData/24/X/dummyFile.txt
-!results/3DData/26/C/dummyFile.txt
-!results/3DData/26/X/dummyFile.txt
-!results/3DData/28/C/dummyFile.txt
-!results/3DData/28/X/dummyFile.txt
-!results/3DData/30/C/dummyFile.txt
-!results/3DData/30/X/dummyFile.txt
 
 !results/data_placeholder.txt
 
