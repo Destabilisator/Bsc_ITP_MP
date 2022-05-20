@@ -20,7 +20,7 @@ for N, c in N_color:
         Y += [float(y)]
     subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = c, label = lbl)
 
-subfig1.set_xlabel(r'$T$ in $J_2$/$k_B$', fontsize = 18)
+subfig1.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 18)
 subfig1.set_ylabel('Suszeptibilität pro Spin $\\chi/N$ in $J_2$', fontsize = 18)
 subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$ für ' + r"$J_1$ / $J_2$ = " + linesJ + r", $k_B$ = 1", fontsize = 18)
 

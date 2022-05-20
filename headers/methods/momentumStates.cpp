@@ -385,7 +385,7 @@ namespace momentumStates {
 
         ///// save /////
 
-        std::string filenameSusceptibility_X = "magnetization_susceptibility_J_const.txt"; // magnetization_susceptibility_J_const.txt / data_susceptibility_J_const
+        std::string filenameSusceptibility_X = "momentum_susceptibility_J_const.txt"; // momentum_susceptibility_J_const.txt / data_susceptibility_J_const
         std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"

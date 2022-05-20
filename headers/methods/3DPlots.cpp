@@ -365,7 +365,7 @@ namespace plot3D {
         CURRENT3D = 0 + cores;
 
 
-        if (N >= 14) {
+        if (N >= 10) {
             std::cout << ", momentum states\n";
             for (int i = 0; i < cores; i++) {
                 Threads[i] = std::thread(get_X_momentum, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,

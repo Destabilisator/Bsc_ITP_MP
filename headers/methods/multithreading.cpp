@@ -403,12 +403,14 @@ namespace multi {
 
         CURRENT = 0 + cores;
 
-        std::cout << ", magnetization blocks\n";
-        if (N >= 14) {
+
+        if (N >= 10) {
+            std::cout << ", momentum states\n";
             for (int i = 0; i < cores; i++) {
                 Threads[i] = std::thread(get_XT_const_momentum, START + (END - START) * i / COUNT, i + 1, &outDataMagneticSusceptibility_X, COUNT, START, END, N, SIZE, T);
             }
         } else {
+            std::cout << ", magnetization blocks\n";
             for (int i = 0; i < cores; i++) {
                 Threads[i] = std::thread(get_XT_const, START + (END - START) * i / COUNT, i + 1, &outDataMagneticSusceptibility_X, COUNT, START, END, N, SIZE, T);
             }

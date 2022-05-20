@@ -1,6 +1,6 @@
 #include "main.h"
 
-//#define DEBUG
+#define DEBUG
 
 int main(int argc, char* argv[]) {
 
@@ -46,11 +46,13 @@ int main(int argc, char* argv[]) {
 #endif
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
-    //N = 8; SIZE = 256; T_START = 0; T_END = 2; T_COUNT = 50; J_START = 0; J_END = 2; J_COUNT = 50;
+    //N = 8; SIZE = (int) std::pow(2,N); T_START = 0; T_END = 20; T_COUNT = 50; J_START = 0; J_END = 2; J_COUNT = 50;
     //multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
-    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-    momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-    //spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+
+    // susceptibilities
+//    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
     // individual methods
 //    spinInversion::start(J1, J2, N, SIZE);
@@ -60,13 +62,15 @@ int main(int argc, char* argv[]) {
 
 
     // speed test
-//    for (int n = 0; n <= 16; n += 1) {
-//        int size = (int) std::pow(2, 12);
-//        std::cout << "N: " << n << ", size: " << size << "\n";
+    for (int n = 0; n <= 16; n += 1) {
+        int size = (int) std::pow(2, 12);
+        std::cout << "N: " << n << ", size: " << size << "\n";
+        magnetizationBlocks::startSusceptibility(1.0, 1.0, n, size, 0, 5, 50000);
+        momentumStates::startSusceptibility(1.0, 1.0, n, size, 0, 5, 50000);
 //        spinInversion::start(J1, J2, 12, size);
 //        parityStates::start(J1, J2, 12, size);
-//        std::cout << "\n";
-//    }
+        std::cout << "\n";
+    }
 #endif
 
     std::cout << "\n" << std::endl;

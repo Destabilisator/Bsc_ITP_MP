@@ -28,7 +28,7 @@ def plot_specific_heat(N):
         Z = []
         for line in lines:
             x, z = line.split("\t")
-            if math.isnan(float(z)):
+            if "nan" in z or "inf" in z:#math.isnan(float(z)):
                 continue
             X += [float(x)]
             Y += [J]
@@ -36,7 +36,7 @@ def plot_specific_heat(N):
         ax.plot(X, Y, Z, lw = 1, ls = "solid", color = "blue", alpha = 1.0)
 
     ax.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ für $N$ = ' + N, fontsize = 18)
-    ax.set_xlabel(r'$T$ in $J_2$/$k_B$', fontsize = 18)
+    ax.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 18)
     ax.set_ylabel(r'$J_1$ / $J_2$', fontsize = 18)
     ax.set_zlabel(r'$C/N$ in $J_2$', fontsize = 18)
     #ax.legend(loc = 'best' ,frameon = False, fontsize = 14)
@@ -61,15 +61,15 @@ def plot_susceptibility(N):
         Z = []
         for line in lines:
             x, z = line.split("\t")
-            if math.isnan(float(z)):
+            if "nan" in z or "inf" in z:#math.isnan(float(z)):
                 continue
             X += [float(x)]
             Y += [J]
             Z += [float(z)]
         ax.plot(X, Y, Z, lw = 1, ls = "solid", color = "blue", alpha = 1.0)
 
-    ax.set_title('suszepibilität $\\chi/N$ für $N$ = ' + N, fontsize = 18)
-    ax.set_xlabel(r'$T$ in $J_2$/$k_B$', fontsize = 18)
+    ax.set_title('Suszeptibilität $\\chi/N$ für $N$ = ' + N, fontsize = 18)
+    ax.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 18)
     ax.set_ylabel(r'$J_1$ / $J_2$', fontsize = 18)
     ax.set_zlabel('$\\chi/N$ in $J_2$', fontsize = 18)
     #ax.legend(loc = 'best' ,frameon = False, fontsize = 14)

@@ -399,14 +399,17 @@ namespace spinInversion {
 //        std::cout << "size: " << size << "\n";
         Eigen::MatrixXd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(size, size);
         for (int a = 0; a < size; a++) {
+
+            int state_n = 1;
+            if (a > 0 && states.at(a - 1) == states.at(a)) {
+                continue;
+            } else if (a < states.size() - 1 && states.at(a) == states.at(a + 1)) {
+                state_n = 2;
+            }
+
+            int s = states.at(a);
+
             for (int j = 0; j < N; j++) {
-                int s = states.at(a);
-                int state_n = 1;
-                if (a > 0 && states.at(a - 1) == states.at(a)) {
-                    continue;
-                } else if (a < states.size() - 1 && states.at(a) == states.at(a + 1)) {
-                    state_n = 2;
-                }
                 for (int i = 0; i < j; i++) {
                     if (((s >> i) & 1) == ((s >> j) & 1)) {
                         for (int _ = a; _ < a + state_n; _++) {
@@ -441,6 +444,7 @@ namespace spinInversion {
                 }
             }
         }
+        std::cout << S2 << std::endl;
         return S2;
     }
 
@@ -581,18 +585,29 @@ namespace spinInversion {
 
         std::vector<Eigen::MatrixXd> U_inv_S2_U;
 
+//        std::cout << std::endl << std::endl;
+
         int matrixCount = (int) UBlocks.size();
         for (int i = 0; i < matrixCount; i++) {
             int sz = (int) UBlocks.at(i).rows();
             Eigen::MatrixXd M = Eigen::MatrixXd::Zero(sz, sz);
             M = UBlocks.at(i).transpose() * S2Blocks.at(i) * UBlocks.at(i);
             U_inv_S2_U.push_back(M);
-            //std::cout << M << std::endl;
+//            std::cout << M.rows() << std::endl;
         }
+
+//        std::cout << std::endl << std::endl;
+//        for (std::vector<double> eV : eiVals) {
+//            std::cout << eV.size() << "\n";
+//            std::cout << "new ev block\n";
+//            for (double ev : eV) {
+//                std::cout << ev << "\n";
+//            }
+//        }
 
         for (int i = 0; i <= COUNT; i++) {
             double current = START + (END - START) * i / COUNT;
-            //current_beta = 1 / current_beta;
+            //current_beta = 1 / current;
             susceptibility_magnetization.emplace_back(current, getSusceptibilityDegeneracy(current, U_inv_S2_U, eiVals, N));
         }
 
@@ -600,9 +615,9 @@ namespace spinInversion {
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
-        for (std::tuple<double, double> t : susceptibility_magnetization) {
-            std::cout << std::get<0>(t) << " " << std::get<1>(t) << "\n";
-        }
+//        for (std::tuple<double, double> t : susceptibility_magnetization) {
+//            std::cout << std::get<0>(t) << " " << std::get<1>(t) << "\n";
+//        }
 
         ///// save /////
 
