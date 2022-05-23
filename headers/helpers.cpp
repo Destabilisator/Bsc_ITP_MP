@@ -530,20 +530,23 @@ double getSusceptibilityDegeneracy(const double &temp, const Eigen::MatrixXd &M,
 double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::MatrixXd> &M_list, const std::vector<std::vector<double>> &eiVal_list, const int &N) {
     double Z_sum = 0.0, expectation_mz_2 = 0.0;
     for (int cur = 0; cur < M_list.size(); cur ++) {
+//        std::cout << "new block:\n";
         const Eigen::MatrixXd &M = M_list.at(cur);
         std::vector<double> eiVals = eiVal_list.at(cur);
         for (int i = 0; i < eiVals.size(); i++) {
             double ev_real = eiVals.at(i);
-            double S_elem = std::max(-0.25, M(i, i));
+            double S_elem = M(i, i);//std::max(-0.25, M(i, i));
             double S = - 0.5 + std::sqrt(0.25 + S_elem);
+//            std::cout << "S_elem: " << S_elem;
+//            std::cout << ", S: " << S << std::endl;
             Z_sum += std::exp(-1.0 / temp * ev_real) * (2.0 * S + 1);
             expectation_mz_2 += std::exp(-1.0 / temp * ev_real) * S_elem * (2.0 * S + 1);
-            std::cout << ev_real << " " << S_elem << " " << S << ": " << Z_sum << " " << expectation_mz_2 << "\n";
+            //std::cout << ev_real << " " << S_elem << " " << S << ": " << Z_sum << " " << expectation_mz_2 << "\n";
         }
     }
     expectation_mz_2 /= Z_sum;
     expectation_mz_2 /= 3.0;
-    std::cout << 1.0 / temp * expectation_mz_2 / N << "\n\n\n";
+    //std::cout << 1.0 / temp * expectation_mz_2 / N << "\n\n\n";
     return 1.0 / temp * expectation_mz_2 / N;
 }
 
@@ -556,6 +559,8 @@ double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::
             double ev_real = std::real(eiVals.at(i));
             double S_elem = std::real(M(i, i));
             double S = - 0.5 + std::sqrt(0.25 + S_elem);
+//            std::cout << "S_elem: " << S_elem;
+//            std::cout << ", S: " << S << std::endl;
             Z_sum += std::exp(-1.0 / temp * ev_real) * (2.0 * S + 1);
             expectation_mz_2 += std::exp(-1.0 / temp * ev_real) * S_elem * (2.0 * S + 1);
         }

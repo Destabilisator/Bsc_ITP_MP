@@ -289,6 +289,7 @@ namespace momentumStates {
                 }
             }
         }
+        //std::cout << S2 << std::endl;
         return S2;
     }
 
@@ -368,9 +369,11 @@ namespace momentumStates {
         std::vector<std::tuple<double, double>> susceptibility_magnetization;
 
         std::vector<Eigen::MatrixXcd> Blocks_U_inv_S2_U;
+        //std::cout << "M:\n";
         for(int i = 0; i < matrixBlockU.size(); i++) {
             Eigen::MatrixXcd M = matrixBlockU.at(i).adjoint() * matrixBlockS2.at(i) * matrixBlockU.at(i);
             Blocks_U_inv_S2_U.push_back(M);
+            //std::cout << M << std::endl;
         }
 
         for (int i = 0; i <= COUNT; i++) {
@@ -378,6 +381,10 @@ namespace momentumStates {
             //current_beta = 1 / current_beta;
             susceptibility_magnetization.emplace_back(current, getSusceptibilityDegeneracy(current, Blocks_U_inv_S2_U, eiVals, N));
         }
+
+//        for (std::tuple<double, double> t : susceptibility_magnetization) {
+//            std::cout << std::get<1>(t) << "\n";
+//        }
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;

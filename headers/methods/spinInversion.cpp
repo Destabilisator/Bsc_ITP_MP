@@ -436,7 +436,7 @@ namespace spinInversion {
                             for (int jj = b; jj < b + m; jj++) {
                                 for (int ii = a; ii < a + state_n; ii++) {
 //                                    std::cout << "writing to " << ii << " " << jj << std::endl;
-                                    S2(ii, jj) += 2.0 * helement(ii, jj, l, q, g, k, p, z, R_vals, m_vals, n_vals, c_vals, N);;
+                                    S2(ii, jj) += 2.0 * helement(ii, jj, l, q, g, k, p, z, R_vals, m_vals, n_vals, c_vals, N);
                                 }
                             }
                         }
@@ -444,7 +444,10 @@ namespace spinInversion {
                 }
             }
         }
-        std::cout << S2 << std::endl;
+//        for (int i = 0; i < size; i++) {
+//            std::cout << S2(i,i) << std::endl;
+//        }
+        //std::cout << S2 << std::endl;
         return S2;
     }
 
@@ -456,6 +459,9 @@ namespace spinInversion {
         const int statesCount = (int) states.size();
         Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
         fillHamiltonSIBlock(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, hamiltonBlock, N);
+
+//        std::cout << "hamiltonblock\n";
+//        std::cout << hamiltonBlock << std::endl;
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXd> solver(hamiltonBlock);
         const Eigen::VectorXd &H1EiVal = solver.eigenvalues();
@@ -488,7 +494,7 @@ namespace spinInversion {
 
     }
 
-    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<std::vector<double>> & eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
+    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<std::vector<double>> &eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
                             std::vector<Eigen::MatrixXd> &S2Blocks, const int &N, const int &SIZE) {
 
         std::vector<int> states_m;
@@ -593,6 +599,7 @@ namespace spinInversion {
             Eigen::MatrixXd M = Eigen::MatrixXd::Zero(sz, sz);
             M = UBlocks.at(i).transpose() * S2Blocks.at(i) * UBlocks.at(i);
             U_inv_S2_U.push_back(M);
+//            std::cout << M << std::endl;
 //            std::cout << M.rows() << std::endl;
         }
 
@@ -605,7 +612,7 @@ namespace spinInversion {
 //            }
 //        }
 
-        for (int i = 0; i <= COUNT; i++) {
+        for (int i = 0; i <= 0; i++) { // for (int i = 0; i <= COUNT; i++) {
             double current = START + (END - START) * i / COUNT;
             //current_beta = 1 / current;
             susceptibility_magnetization.emplace_back(current, getSusceptibilityDegeneracy(current, U_inv_S2_U, eiVals, N));

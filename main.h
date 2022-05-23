@@ -32,7 +32,7 @@ int SIZE;
 double J1 = 1.0, J2 = 1.0;
 double J_START = 0.0;
 double J_END = 2.0;
-int J_COUNT = 50;
+int J_COUNT = 0;
 
 const double T = 1.0;
 double T_START = J_START;
