@@ -21,26 +21,32 @@ else
 fi
 
 if [[ "$#" -ge 6 ]]; then
-	show=$6
+	noX=$6
+else
+	noX=-X
+fi
+
+if [[ "$#" -ge 7 ]]; then
+	show=$7
 else
 	show=-
 fi
 
-if [[ "$#" -ge 7 ]]; then
-	SILENT=$7
+if [[ "$#" -ge 8 ]]; then
+	SILENT=$8
 else
 	SILENT=-
 fi
 
 
 if [[ "$OSTYPE" == "msys" ]]; then
-    ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES $SILENT
+    ./cmake-build-release/Bsc_ITP_MX.exe $N $J_START $J_END $J_COUNT $CORES $noX $SILENT
     echo "plotting..."
     python ./plotting/plot.py $N $show
 else
-    ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES $SILENT
+    ./cmake-build-release/Bsc_ITP_MX $N $J_START $J_END $J_COUNT $CORES $noX $SILENT
     echo "plotting..."
-    python3 ./plotting/plot.py $N $show
+    python3 ./plotting/plot.py $N $show $noX
 fi
 
 elapsed=$(( SECONDS - start_time ))

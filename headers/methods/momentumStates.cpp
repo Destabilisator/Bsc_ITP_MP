@@ -352,6 +352,74 @@ namespace momentumStates {
 
     }
 
+    void getEiValsMagBlock_with_k(const double &J1, const double &J2, std::vector<std::tuple<std::complex<double>, int>> &data,
+                            const int &N, const int &SIZE, const int &mag) {
+
+        std::vector<Eigen::MatrixXcd> matrixBlockU;
+
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
+
+        std::vector<int> states_m;
+        std::vector<std::vector<int>> states(N/2);
+        std::vector<std::vector<int>> R_vals(N/2);
+        fillStates(&states_m, mag, N, SIZE);
+
+        for (int s : states_m) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = checkState(s, k, N);
+                if (R >= 0) {
+                    states.at(k - k_lower).push_back(s);
+                    R_vals.at(k - k_lower).push_back(R);
+                }
+            }
+        }
+
+        for (int m = 0; m <= N; m++) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                std::vector<std::complex<double>> eiVals;
+                momentumBlockSolver(J1, J2, k, states.at(k - k_lower), R_vals.at(k - k_lower), eiVals,
+                                               matrixBlockU, N, SIZE);
+                for (std::complex<double> ev : eiVals) {
+                    data.emplace_back(ev, k);
+                }
+            }
+        }
+
+    }
+
+    void getEiValsMagBlock(const double &J1, const double &J2, std::vector<std::complex<double>> &eiVals,
+                                  const int &N, const int &SIZE, const int &mag) {
+
+        std::vector<Eigen::MatrixXcd> matrixBlockU;
+
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
+
+        std::vector<int> states_m;
+        std::vector<std::vector<int>> states(N/2);
+        std::vector<std::vector<int>> R_vals(N/2);
+        fillStates(&states_m, mag, N, SIZE);
+
+        for (int s : states_m) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = checkState(s, k, N);
+                if (R >= 0) {
+                    states.at(k - k_lower).push_back(s);
+                    R_vals.at(k - k_lower).push_back(R);
+                }
+            }
+        }
+
+        for (int m = 0; m <= N; m++) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                momentumBlockSolver(J1, J2, k, states.at(k - k_lower), R_vals.at(k - k_lower), eiVals,
+                                    matrixBlockU, N, SIZE);
+            }
+        }
+
+    }
+
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                              const double &END, const int &COUNT) {
 

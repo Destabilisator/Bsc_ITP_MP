@@ -44,4 +44,19 @@ namespace multi {
     void start_XT_const(const int &COUNT, const double &START, const double &END,
                         int &cores, const double &T, const int &N, const int &SIZE);
 
+    void get_SpinGap_momentum(double J, int pos, std::vector<std::tuple<double, double>> *outDataSpinGap,
+                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
+
+    void get_SpinGap_momentum_with_k(double J, int pos, std::vector<std::tuple<double, double, int, int>> *outDataSpinGap,
+                                     const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
+
+    void get_SpinGap_SI(double J, int pos, std::vector<std::tuple<double, double>> *outDataSpinGap,
+                        const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
+
+    void start_SpinGap(const int &COUNT, const double &START, const double &END,
+                       int &cores, const int &N, const int &SIZE);
+
+    void start_SpinGap_with_k(const int &COUNT, const double &START, const double &END,
+                              int &cores, const int &N, const int &SIZE);
+
 }

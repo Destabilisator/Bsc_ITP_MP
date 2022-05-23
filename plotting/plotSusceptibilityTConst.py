@@ -7,7 +7,7 @@ print("plotting suszeptibility (constant T, funtion of J1/J2) ...")
 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
 
 for N, c in N_color:
-    file = open("results/" + N + "_data_magnetic_susceptibility_T_const.txt", 'r')
+    file = open("results/" + N + "_data_susceptibility_T_const.txt", 'r')
     lines = file.readlines()
     linesBeta = lines[0][len("T = "):-1]
     lbl = "N = " + N

@@ -18,13 +18,19 @@ else
 fi
 
 if [[ "$#" -ge 9 ]]; then
-	show=$9
+	noX=${9}
+else
+	noX=-
+fi
+
+if [[ "$#" -ge 10 ]]; then
+	show=${10}
 else
 	show=-
 fi
 
 if [[ "$#" -ge 10 ]]; then
-	SILENT=${10}
+	SILENT=${11}
 else
 	SILENT=-
 fi
@@ -32,12 +38,12 @@ fi
 
 if [[ "$OSTYPE" == "msys" ]]; then
     python ./plotting/deleteData.py $N
-    ./cmake-build-release/Bsc_ITP_MX.exe 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $SILENT
+    ./cmake-build-release/Bsc_ITP_MX.exe 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $noX $SILENT
     echo "plotting..."
     python ./plotting/plot3D.py $N $show
 else
     python3 ./plotting/deleteData.py $N
-    ./cmake-build-release/Bsc_ITP_MX 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $SILENT
+    ./cmake-build-release/Bsc_ITP_MX 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $noX $SILENT
     echo "plotting..."
     python3 ./plotting/plot3D.py $N $show
 fi

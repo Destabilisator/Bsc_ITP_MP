@@ -556,6 +556,97 @@ namespace spinInversion {
 
     }
 
+    void getEiValsMagBlock(const double &J1, const double &J2, std::vector<double> *eiVals, const int &N, const int &SIZE, const int &mag) {
+
+        std::vector<Eigen::MatrixXd> matrixBlocks;
+
+        std::vector<int> states_m;
+        fillStates(&states_m, mag, N, SIZE);
+
+        std::vector<int> states;
+        std::vector<int> R_vals;
+        std::vector<int> m_vals;
+        std::vector<int> n_vals;
+        std::vector<int> c_vals;
+
+        int numberOfStates = 0;
+        const int k_upper = N/4;
+
+        for (int k = 0; k <= k_upper; k++) {
+
+            if (mag == N/2) {
+                for (int z : {-1, 1}) {
+                    for (int p: {-1, 1}) {
+                        for (int s: states_m) {
+                            for (int sigma: {-1, 1}) {
+                                int R, n, m, mp, mz, mpz;
+                                checkStateSI(s, R, mp, mz, mpz, k, N);
+                                int c = getClass_set_m_n(m, n, mp, mz, mpz);
+                                if ((k == 0 || k == k_upper) && sigma == -1) {continue;}
+                                if (c == 2 || c == 4 || c == 5) {
+                                    double Na = getNa(m, n, R, sigma, p, z, k, c, N);
+                                    double Na_inv = getNa(m, n, R, -sigma, p, z, k, c, N);
+                                    if (std::abs(Na) < epsilon) {R = -1;}
+                                    if (sigma == -1 && std::abs(Na_inv) > epsilon) {R = -1;}
+                                } else if (c == 3) {
+                                    double val = 1.0 + (double) z * std::cos(4 * PI * (double) k * (double) m / (double) N);
+                                    if (std::abs(val) < epsilon) {R = -1;}
+                                }
+                                if (R > 0) {
+                                    states.push_back(s);
+                                    R_vals.push_back(sigma * R);
+                                    m_vals.push_back(m);
+                                    n_vals.push_back(n);
+                                    c_vals.push_back(c);
+                                    numberOfStates++;
+                                }
+                            }
+                        }
+                        if (!states.empty()) {
+                            SIBlockSolver(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, &matrixBlocks, N);
+                        }
+                        states.clear();
+                        R_vals.clear();
+                        m_vals.clear();
+                        n_vals.clear();
+                        c_vals.clear();
+                    }
+                }
+            }
+            else {
+                for (int p : {-1, 1}) {
+                    for (int s : states_m) {
+                        for (int sigma : {-1, 1}) {
+                            int R, m;
+                            checkState(s, &R, &m, k, N);
+                            if ((k == 0 || k == k_upper) && sigma == -1) {continue;}
+                            if (m != -1) {
+                                double val = (double) sigma * (double) p * std::cos(4 * PI * (double) k * (double) m / (double) N);
+                                if (std::abs(1.0 + val) < 1e-10) {R = -1;}
+                                if (sigma == -1 && abs(1.0 - val) > 1e-10) {R = -1;}
+                            }
+                            if (R > 0) {
+                                states.push_back(s);
+                                R_vals.push_back(sigma * R);
+                                m_vals.push_back(m);
+                                numberOfStates++;
+                            }
+                        }
+                    }
+                    if (!states.empty()) {
+                        parityStates::parityBlockSolver(J1, J2, k, p, states, R_vals, m_vals, eiVals, &matrixBlocks, N);
+                    }
+                    states.clear();
+                    R_vals.clear();
+                    m_vals.clear();
+                }
+            }
+
+
+        }
+
+    }
+
     //////////////////////// help ////////////////////////
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                              const double &END, const int &COUNT) {

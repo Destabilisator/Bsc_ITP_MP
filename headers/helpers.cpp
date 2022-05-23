@@ -393,6 +393,26 @@ void saveOutData(const std::string &filename, const std::string &header, const s
     file.close();
 }
 
+void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
+                 const std::string &y_label, const std::vector<std::tuple<double, double, int, int>> &outData, const int &N) {
+
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+    std::ofstream file;
+    try {
+        file.open("./results/" + std::to_string(N) + "_" + filename);
+        file << header << "\n\n";
+        file << x_label << "\t" << y_label << "\n";
+        for (std::tuple<double, double, int, int> data : outData) {
+            file << std::get<0>(data) << "\t" << std::get<1>(data)
+                    << "\t" << std::get<2>(data)  << "\t" << std::get<3>(data)<< "\n";
+        }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
 void save3DPlotDataC(const double &J, const int &N, const std::vector<std::tuple<double, double>>& C_func_T) {
     std::ofstream file;
     try {
@@ -575,7 +595,7 @@ double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::
 // [executable] N J_START J_END J_COUNT CORES SILENT
 void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N, int &SIZE, double &J_START, double &J_END,
                    int &J_COUNT, double &T_START, double &T_END, int &T_COUNT, bool &silent, int &cores, bool &plotsIn3D,
-                   bool skipSilent, const double &J1, const double &J2) {
+                   bool skipSilent, const double &J1, const double &J2, bool &noX) {
 
     if (argc >= 2) {
         std::string DDD = "3D";
@@ -614,13 +634,22 @@ void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N,
             }
         }
 
+        if (argc >= 10) {
+            std::string s1 = "noX";
+            std::string s2 = argv[10];
+            std::cout << s2 << "\n";
+            if (s1 == s2) {
+                noX = true;
+            }
+        }
+
         if (skipSilent) {
             return;
         }
 
-        if (argc >= 10) {
+        if (argc >= 11) {
             std::string s1 = "silent";
-            std::string s2 = argv[10];
+            std::string s2 = argv[11];
             std::cout << s2 << "\n";
             if (s1 == s2) {
                 silent = true;
@@ -670,13 +699,21 @@ void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N,
     T_END = J_END;
     T_COUNT = J_COUNT;
 
+    if (argc >= 7) {
+        std::string s1 = "noX";
+        std::string s2 = argv[6];
+        if (s1 == s2) {
+            noX = true;
+        }
+    }
+
     if (skipSilent) {
         return;
     }
 
-    if (argc >= 7) {
+    if (argc >= 8) {
         std::string s1 = "silent";
-        std::string s2 = argv[6];
+        std::string s2 = argv[7];
         if (s1 == s2) {
             silent = true;
         }

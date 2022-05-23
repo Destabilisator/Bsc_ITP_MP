@@ -1,14 +1,15 @@
 #include "main.h"
 
-//#define DEBUG
+#define DEBUG
 
 int main(int argc, char* argv[]) {
 
     bool silent = false;
     bool plotsIn3D = false;
     int cores = (int) cpu_cnt;
+    bool noX = false;
 
-    validateInput(argc, argv, cpu_cnt, N, SIZE, J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, silent, cores, plotsIn3D, true, J1, J2);
+    validateInput(argc, argv, cpu_cnt, N, SIZE, J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, silent, cores, plotsIn3D, true, J1, J2, noX);
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 #ifndef DEBUG
@@ -17,12 +18,19 @@ int main(int argc, char* argv[]) {
         // 3D Plots of specific heat dependent on T and J
         plot3D::start_C(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
         // 3D Plots of susceptibility dependent on T and J
-        plot3D::start_X(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
+        if (!noX) {
+            plot3D::start_X(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
+        }
     } else {
-        // excitation energy \Delta E(J) and specific ehat C(J), T = const
+        // excitation energy \Delta E(J) and specific heat C(J), T = const
         multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
         // susceptibility \Chi(J), T = const
-        multi::start_XT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
+        if (!noX) {
+            multi::start_XT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
+        }
+
+        // spin gap E_{gap} (J)
+        multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
         // specific heat C(T), J = const
         if (N % 4 == 0) {
@@ -32,7 +40,9 @@ int main(int argc, char* argv[]) {
         }
 
         // susceptibility \Chi(T), J = const
-        magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+        if (!noX) {
+            magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+        }
 //    if (N % 4 == 0) {
 //        spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 //    } else {
@@ -46,13 +56,17 @@ int main(int argc, char* argv[]) {
 #endif
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
+
+    //multi::start_SpinGap_with_k(J_COUNT, J_START, J_END, cores, N, SIZE);
+    multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+
     //N = 8; SIZE = (int) std::pow(2,N); T_START = 0; T_END = 20; T_COUNT = 50; J_START = 0; J_END = 2; J_COUNT = 50;
     //multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
 
     // susceptibilities
-    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-    momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-    spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
     // individual methods
 //    spinInversion::start(J1, J2, N, SIZE);

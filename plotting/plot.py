@@ -71,7 +71,7 @@ def plot_specific_heat_J_const(N):
 
 def plot_susceptibility_T_const(N):
     print("plotting suszeptibility (constant T, funtion of J1/J2) ...")
-    file = open("results/" + N + "_data_magnetic_susceptibility_T_const.txt", 'r')
+    file = open("results/" + N + "_data_susceptibility_T_const.txt", 'r')
     lines = file.readlines()
     linesBeta = lines[0][len("T = "):-1]
     lbl = "N = " + N
@@ -160,6 +160,26 @@ def plot_k_dispersion_J_const(N):
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
     plt.savefig("results/" + N + "_energy_dispersion_J_const.png")
 
+def plot_spin_gap(N):
+    print("plotting spin gap ...")
+    file = open("results/" + N + "_data_spin_gap.txt", 'r')
+    lines = file.readlines()
+    lbl = "N = " + N + "\n" +"\\# Datenpunkte: " + lines[3][len("datapoints: "):-1]
+    X = []
+    Y = []
+    for i in range(7,len(lines)):
+        x, y = lines[i].split("\t")
+        X += [float(x)]
+        Y += [float(y)]
+    fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'blue', label = lbl)
+    subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 18)
+    subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 18)
+    subfig1.set_title(r'Spingap Energies $\Delta E_{gap}$ für $\Delta = 1$', fontsize = 18)
+    subfig1.axhline(0, color = "grey")
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
+    plt.savefig("results/" + N + "_spin_gap.png")
+
 if __name__ == "__main__":
 
     start_time = time.time()
@@ -171,9 +191,11 @@ if __name__ == "__main__":
     plot_delta_E(N)
     plot_specific_heat_T_const(N)
     plot_specific_heat_J_const(N)
-    plot_susceptibility_T_const(N)
-    plot_susceptibility_J_const(N)
+    if sys.argv[3] != "noX":
+        plot_susceptibility_T_const(N)
+        plot_susceptibility_J_const(N)
     plot_k_dispersion_J_const(N)
+    plot_spin_gap(N)
 
     end_time = time.time()
 

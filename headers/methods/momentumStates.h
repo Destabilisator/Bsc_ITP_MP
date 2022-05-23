@@ -47,6 +47,12 @@ namespace momentumStates {
                             std::vector<Eigen::MatrixXcd> &matrixBlockU, std::vector<Eigen::MatrixXcd> &matrixBlockS2,
                             const int &N, const int &SIZE);
 
+    void getEiValsMagBlock_with_k(const double &J1, const double &J2, std::vector<std::tuple<std::complex<double>, int>> &data,
+                                  const int &N, const int &SIZE, const int &mag);
+
+    void getEiValsMagBlock(const double &J1, const double &J2, std::vector<std::complex<double>> &eiVals,
+                           const int &N, const int &SIZE, const int &mag);
+
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                              const double &END, const int &COUNT);
 
