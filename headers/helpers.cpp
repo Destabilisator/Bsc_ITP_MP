@@ -404,7 +404,28 @@ void saveOutData(const std::string &filename, const std::string &header, const s
         file << x_label << "\t" << y_label << "\n";
         for (std::tuple<double, double, int, int> data : outData) {
             file << std::get<0>(data) << "\t" << std::get<1>(data)
-                    << "\t" << std::get<2>(data)  << "\t" << std::get<3>(data)<< "\n";
+                    << "\t" << std::get<2>(data)  << "\t" << std::get<3>(data) << "\n";
+        }
+    } catch (...) {
+        file.close();
+        std::cout << "failed to save to file\n";
+    }
+    file.close();
+}
+
+void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
+                 const std::string &y_label, const std::vector<std::tuple<double, double, int, int, int, int>> &outData, const int &N) {
+
+    std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+    std::ofstream file;
+    try {
+        file.open("./results/" + std::to_string(N) + "_" + filename);
+        file << header << "\n\n";
+        file << x_label << "\t" << y_label << "\n";
+        for (std::tuple<double, double, int, int, int, int> data : outData) {
+            file << std::get<0>(data) << "\t" << std::get<1>(data)
+                 << "\t" << std::get<2>(data)  << "\t" << std::get<3>(data)
+                 << "\t" << std::get<4>(data)  << "\t" << std::get<5>(data)<< "\n";
         }
     } catch (...) {
         file.close();

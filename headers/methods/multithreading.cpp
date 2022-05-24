@@ -509,7 +509,7 @@ namespace multi {
 
     }
 
-    void get_SpinGap_momentum_with_k(double J, int pos, std::vector<std::tuple<double, double, int, int>> *outDataSpinGap,
+    void get_SpinGap_momentum_with_index(double J, int pos, std::vector<std::tuple<double, double, int, int, int, int>> *outDataSpinGap,
                               const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
 
         // progressbar init
@@ -523,25 +523,58 @@ namespace multi {
 
         while (true) {
 
-            std::vector<std::tuple<std::complex<double>, int>> data0;
-            std::vector<std::tuple<std::complex<double>, int>> data1;
-            momentumStates::getEiValsMagBlock_with_k(J, 1.0, data0, N, SIZE, N/2);
-            momentumStates::getEiValsMagBlock_with_k(J, 1.0, data1, N, SIZE, N/2 + 1);
+//            std::vector<std::tuple<std::complex<double>, int, int>> data0;
+//            std::vector<std::tuple<std::complex<double>, int, int>> data1;
+//            momentumStates::getEiValsMagBlock_with_index(J, 1.0, data0, N, SIZE, N/2);
+//            momentumStates::getEiValsMagBlock_with_index(J, 1.0, data1, N, SIZE, N/2 + 1);
+//
+//            // sort eigenvalues
+//            data0.shrink_to_fit();
+//            std::sort(data0.begin(), data0.end(), [](const std::tuple<std::complex<double>, int, int> &t1, const std::tuple<std::complex<double>, int, int> &t2) {
+//                return std::real(std::get<0>(t1)) < std::real(std::get<0>(t2));
+//            });
+//
+//            data1.shrink_to_fit();
+//            std::sort(data1.begin(), data1.end(), [](const std::tuple<std::complex<double>, int, int> &t1, const std::tuple<std::complex<double>, int, int> &t2) {
+//                return std::real(std::get<0>(t1)) < std::real(std::get<0>(t2));
+//            });
 
-            // sort eigenvalues
-            data0.shrink_to_fit();
-            std::sort(data0.begin(), data0.end(), [](const std::tuple<std::complex<double>, int> &t1, const std::tuple<std::complex<double>, int> &t2) {
-                return std::real(std::get<0>(t1)) < std::real(std::get<0>(t2));
-            });
+            std::vector<std::vector<std::tuple<std::complex<double>, int, int>>> data(N+1);
+            for (int m = 0; m <= N; m++) {
+                std::vector<std::tuple<std::complex<double>, int, int>> d;
+                momentumStates::getEiValsMagBlock_with_index(J, 1.0, d, N, SIZE, m);
+                d.shrink_to_fit();
+                std::sort(d.begin(), d.end(), [](const std::tuple<std::complex<double>, int, int> &t1, const std::tuple<std::complex<double>, int, int> &t2) {
+                    return std::real(std::get<0>(t1)) < std::real(std::get<0>(t2));
+                });
+                data.push_back(d);
+            }
 
-            data1.shrink_to_fit();
-            std::sort(data1.begin(), data1.end(), [](const std::tuple<std::complex<double>, int> &t1, const std::tuple<std::complex<double>, int> &t2) {
-                return std::real(std::get<0>(t1)) < std::real(std::get<0>(t2));
-            });
-
-            // Delta E
-            double E0 = std::real(std::get<0>(data0.at(0)));
-            double E1 = std::real(std::get<0>(data1.at(0)));
+            double E0 = NAN;
+            double E1 = NAN;// = std::real(std::get<0>(data.at(0).at(0)));
+            //double E1;
+            int k0, k1, S0, S1;
+            for (const std::vector<std::tuple<std::complex<double>, int, int>>& dat : data) {
+                for (std::tuple<std::complex<double>, int, int> d : dat) {
+                    double E = std::real(std::get<0>(d));
+                    int k = std::get<1>(d);
+                    int S = std::get<2>(d);
+                    // if nan, set it to first val
+                    if (S == 0 && std::isnan(E0)) {E0 = E; k0 = k, S0 = S;}
+                    else if ((S == 1 || S == -1) && std::isnan(E1)) {E1 = E; k1 = k, S1 = S;}
+                    // if not nan check if E is lower
+                    if (S == 0 && E < E0) {E0 = E; k0 = k, S0 = S;}
+                    else if ((S == 1 || S == -1) && E < E1) {E1 = E; k1 = k, S1 = S;}
+                    else {continue;}
+                }
+            }
+//
+//            double E0 = std::real(std::get<0>(data0.at(0)));
+//            double E1 = std::real(std::get<0>(data1.at(0)));
+//            int k0;
+//            int k1;
+//            int S0;
+//            int S1;
 
             // progressbar
             nextJMutex.lock();
@@ -559,7 +592,7 @@ namespace multi {
             //coutMutex.unlock();
 
             // write data
-            outDataSpinGap->push_back({J, E1-E0, std::get<1>(data0.at(0)), std::get<1>(data1.at(0))});
+            outDataSpinGap->push_back({J, E1-E0, k0, k1, S0, S1});
             pos = CURRENT;
             CURRENT++;
             nextJMutex.unlock();
@@ -696,14 +729,14 @@ namespace multi {
 
     }
 
-    void start_SpinGap_with_k(const int &COUNT, const double &START, const double &END,
+    void start_SpinGap_with_index(const int &COUNT, const double &START, const double &END,
                        int &cores, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "spin gap: calculating:...";
 
-        std::vector<std::tuple<double, double, int, int>> outDataSpinGap;
+        std::vector<std::tuple<double, double, int, int, int, int>> outDataSpinGap;
 
         if (COUNT < cores) {
             cores = COUNT;
@@ -716,7 +749,7 @@ namespace multi {
 
         std::cout << ", momentum states\n";
         for (int i = 0; i < cores; i++) {
-            Threads[i] = std::thread(get_SpinGap_momentum_with_k, START + (END - START) * i / COUNT, i + 1, &outDataSpinGap, COUNT, START, END, N, SIZE);
+            Threads[i] = std::thread(get_SpinGap_momentum_with_index, START + (END - START) * i / COUNT, i + 1, &outDataSpinGap, COUNT, START, END, N, SIZE);
         }
 
 
@@ -729,11 +762,13 @@ namespace multi {
         std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
 
         // sort data-points
-        std::sort(outDataSpinGap.begin(), outDataSpinGap.end(), [](const std::tuple<double, double, int, int> &a, const std::tuple<double, double, int, int> &b) {
+        std::cout << "sorting final data" << std::endl;
+        std::sort(outDataSpinGap.begin(), outDataSpinGap.end(), [](const std::tuple<double, double, int, int, int, int> &a, const std::tuple<double, double, int, int, int, int> &b) {
             return std::get<0>(a) < std::get<0>(b);
         });
+        std::cout << "sorted final data" << std::endl;
 
-        std::string filenameMagneticSusceptibility_X = "data_spin_gap_with_k.txt";
+        std::string filenameMagneticSusceptibility_X = "data_spin_gap_with_index.txt";
         std::string header = "N: " + std::to_string(N) + "\n"
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
@@ -741,7 +776,7 @@ namespace multi {
                              + "calculation time with " + std::to_string(cores) + " threads: "
                              + std::to_string(elapsed_seconds.count()) + " seconds";
 
-        saveOutData(filenameMagneticSusceptibility_X, header, "J1/J2", "spin gap in J2\tk0\tk1", outDataSpinGap, N);
+        saveOutData(filenameMagneticSusceptibility_X, header, "J1/J2", "spin gap in J2\tk0\tk1\tS0\tS1", outDataSpinGap, N);
 
         std::cout << "\n";
 

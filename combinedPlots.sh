@@ -25,14 +25,14 @@ if [[ "$OSTYPE" == "msys" ]]; then
     python ./plotting/plotSpinGap.py
 
 else
-    ./cmake-build-release/Bsc_ITP_MP 6 $start $end 10000 -1 $noX silent
-    ./cmake-build-release/Bsc_ITP_MP 8 $start $end 10000 -1 $noX silent
-    ./cmake-build-release/Bsc_ITP_MP 10 $start $end 5000 -1 $noX silent
-    ./cmake-build-release/Bsc_ITP_MP 12 $start $end 1000 -1 $noX silent
-    ./cmake-build-release/Bsc_ITP_MP 14 $start $end 50 -1 $noX silent
-    ./cmake-build-release/Bsc_ITP_MP 16 $start $end 50 -1 $noX silent
+    ./cmake-build-release/Bsc_ITP_MP 6 $start $end 50 -1 $noX silent # 10000
+    ./cmake-build-release/Bsc_ITP_MP 8 $start $end 50 -1 $noX silent # 10000
+    ./cmake-build-release/Bsc_ITP_MP 10 $start $end 50 -1 $noX silent # 5000
+    ./cmake-build-release/Bsc_ITP_MP 12 $start $end 50 -1 $noX silent # 1000
+    # ./cmake-build-release/Bsc_ITP_MP 14 $start $end 50 -1 $noX silent # 50
+    # ./cmake-build-release/Bsc_ITP_MP 16 $start $end 50 -1 $noX silent #
     # ./cmake-build-release/Bsc_ITP_MP 18 $start $end 20 -1 $noX silent
-    ./cmake-build-release/Bsc_ITP_MP 20 $start $end 20 -1 $noX silent
+    # ./cmake-build-release/Bsc_ITP_MP 20 $start $end 20 -1 $noX silent
 
     start_time_plots=$SECONDS
     # python3 ./plotting/plotDeltaE.py

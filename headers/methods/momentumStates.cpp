@@ -293,9 +293,8 @@ namespace momentumStates {
         return S2;
     }
 
-    void momentumBlockSolver_withMatrix(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
-                                        const std::vector<int> &R_vals, std::vector<std::vector<std::complex<double>>> &eiVals,
-                                        std::vector<Eigen::MatrixXcd> &matrixBlockU, std::vector<Eigen::MatrixXcd> &matrixBlockS2,
+    void momentumBlockSolver_with_S(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+                                        const std::vector<int> &R_vals, std::vector<std::tuple<std::complex<double>, int>> &data,
                                         const int &N, const int &SIZE) {
 
         const int statesCount = (int) states.size();
@@ -307,17 +306,26 @@ namespace momentumStates {
         fillHamiltonBlock(J1, J2, k, states, R_vals, hamiltonBlock, N, SIZE);
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> solver(hamiltonBlock);
-        matrixBlockU.push_back(solver.eigenvectors());
         const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
         std::vector<std::complex<double>> HEiValList;
         for (std::complex<double> ev: H1EiVal) {
             HEiValList.push_back(ev);
         }
-        HEiValList.shrink_to_fit();
-        eiVals.push_back(HEiValList);
 
+//        std::cout << "getting S2\n";
         Eigen::MatrixXcd S2 = spinMatrix(N, k, states, R_vals);
-        matrixBlockS2.push_back(S2);
+//        std::cout << "getting U\n";
+        const Eigen::MatrixXcd& U = solver.eigenvectors();
+//        std::cout << "getting U_inv_S2_U\n";
+        Eigen::MatrixXcd U_inv_S2_U = U.adjoint() * S2 * U;
+
+//        std::cout << "filling data in momentumBlockSolver_with_S\n";
+//        std::cout << "HEiValList size: " << HEiValList.size();
+        for (int i = 0; i < HEiValList.size(); i++) {
+            data.emplace_back(HEiValList.at(i), std::real(U_inv_S2_U(i,i)));
+        }
+//        std::cout << ", data size: " << data.size() << std::endl;
+
 
     }
 
@@ -352,12 +360,40 @@ namespace momentumStates {
 
     }
 
-    void getEiValsMagBlock_with_k(const double &J1, const double &J2, std::vector<std::tuple<std::complex<double>, int>> &data,
+    void momentumBlockSolver_withMatrix(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+                                        const std::vector<int> &R_vals, std::vector<std::vector<std::complex<double>>> &eiVals,
+                                        std::vector<Eigen::MatrixXcd> &matrixBlockU, std::vector<Eigen::MatrixXcd> &matrixBlockS2,
+                                        const int &N, const int &SIZE) {
+
+        const int statesCount = (int) states.size();
+        if (statesCount == 0) {
+            return;
+        }
+        Eigen::MatrixXcd hamiltonBlock = Eigen::MatrixXcd::Zero(statesCount,statesCount);
+
+        fillHamiltonBlock(J1, J2, k, states, R_vals, hamiltonBlock, N, SIZE);
+
+        Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> solver(hamiltonBlock);
+        matrixBlockU.push_back(solver.eigenvectors());
+        const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
+        std::vector<std::complex<double>> HEiValList;
+        for (std::complex<double> ev: H1EiVal) {
+            HEiValList.push_back(ev);
+        }
+        HEiValList.shrink_to_fit();
+        eiVals.push_back(HEiValList);
+
+        Eigen::MatrixXcd S2 = spinMatrix(N, k, states, R_vals);
+        matrixBlockS2.push_back(S2);
+
+    }
+
+    void getEiValsMagBlock_with_index(const double &J1, const double &J2, std::vector<std::tuple<std::complex<double>, int, int>> &data,
                             const int &N, const int &SIZE, const int &mag) {
 
         std::vector<Eigen::MatrixXcd> matrixBlockU;
 
-        int k_lower = -(N + 2) / 4 + 1;
+        int k_lower = 0;//-(N + 2) / 4 + 1;
         int k_upper = N / 4;
 
         std::vector<int> states_m;
@@ -377,12 +413,16 @@ namespace momentumStates {
 
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
-                std::vector<std::complex<double>> eiVals;
-                momentumBlockSolver(J1, J2, k, states.at(k - k_lower), R_vals.at(k - k_lower), eiVals,
-                                               matrixBlockU, N, SIZE);
-                for (std::complex<double> ev : eiVals) {
-                    data.emplace_back(ev, k);
+                std::vector<std::tuple<std::complex<double>, int>> eiVals;
+//                std::cout << "calling momentumBlockSolver_with_S\n";
+                momentumBlockSolver_with_S(J1, J2, k, states.at(k - k_lower), R_vals.at(k - k_lower), eiVals, N, SIZE);
+//                std::cout << "eivals size: " << eiVals.size();
+//                std::cout << "filling data in getEiValsMagBlock_with_index\n";
+                for (auto & eiVal : eiVals) {
+                    data.emplace_back(std::get<0>(eiVal), k, std::get<1>(eiVal));
                 }
+//                std::cout << ", data size: " << data.size() << std::endl;
+//                std::cout << "filled data in getEiValsMagBlock_with_index\n";
             }
         }
 

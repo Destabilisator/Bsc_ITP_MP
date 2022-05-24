@@ -99,6 +99,10 @@ void saveOutData(const std::string &filename, const std::string &header, const s
 void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                 const std::string &y_label, const std::vector<std::tuple<double, double, int, int>> &outData, const int &N);
 
+// also saves the S values of the gap energies
+void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
+                 const std::string &y_label, const std::vector<std::tuple<double, double, int, int, int, int>> &outData, const int &N);
+
 // saves a vector of tuples (double, double) to be processed into a 3D-plot by python
 void save3DPlotDataC(const double &J, const int &N, const std::vector<std::tuple<double, double>>& C_func_T);
 

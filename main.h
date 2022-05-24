@@ -40,4 +40,4 @@ double T_END = J_END;
 int T_COUNT = J_COUNT;
 
 ///// multi threading stuff /////
-const unsigned int cpu_cnt = (unsigned int) std::thread::hardware_concurrency();
+const unsigned int cpu_cnt = 1;//(unsigned int) std::thread::hardware_concurrency();

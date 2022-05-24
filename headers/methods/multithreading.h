@@ -47,7 +47,7 @@ namespace multi {
     void get_SpinGap_momentum(double J, int pos, std::vector<std::tuple<double, double>> *outDataSpinGap,
                               const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
 
-    void get_SpinGap_momentum_with_k(double J, int pos, std::vector<std::tuple<double, double, int, int>> *outDataSpinGap,
+    void get_SpinGap_momentum_with_index(double J, int pos, std::vector<std::tuple<double, double, int, int, int, int>> *outDataSpinGap,
                                      const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
 
     void get_SpinGap_SI(double J, int pos, std::vector<std::tuple<double, double>> *outDataSpinGap,
@@ -56,7 +56,7 @@ namespace multi {
     void start_SpinGap(const int &COUNT, const double &START, const double &END,
                        int &cores, const int &N, const int &SIZE);
 
-    void start_SpinGap_with_k(const int &COUNT, const double &START, const double &END,
+    void start_SpinGap_with_index(const int &COUNT, const double &START, const double &END,
                               int &cores, const int &N, const int &SIZE);
 
 }
