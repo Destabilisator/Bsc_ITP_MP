@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.21)
-project(Bsc_ITP_MX)
+project(Bsc_ITP_MP)
 
 set(CMAKE_CXX_STANDARD 20)
 
@@ -34,7 +34,7 @@ include_directories(${MAIN_DIR})
 
 include_directories("./src")
 
-add_executable(Bsc_ITP_MX main.h main.cpp
+add_executable(Bsc_ITP_MP main.h main.cpp
         headers/helpers.h
         headers/helpers.cpp
         headers/methods.h
@@ -54,10 +54,10 @@ add_executable(Bsc_ITP_MX main.h main.cpp
         headers/methods/3DPlots.cpp)
 
 if (WIN32)
-    target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(Bsc_ITP_MP ${CMAKE_THREAD_LIBS_INIT})
 elseif (DIST STREQUAL "Ubuntu")
-    target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT})
+    target_link_libraries(Bsc_ITP_MP ${CMAKE_THREAD_LIBS_INIT})
 else()
-    target_link_libraries(Bsc_ITP_MX ${CMAKE_THREAD_LIBS_INIT} -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a
+    target_link_libraries(Bsc_ITP_MP ${CMAKE_THREAD_LIBS_INIT} -Wl,--start-group ${MKLROOT}/lib/intel64/libmkl_intel_lp64.a
             ${MKLROOT}/lib/intel64/libmkl_gnu_thread.a ${MKLROOT}/lib/intel64/libmkl_core.a -Wl,--end-group -lgomp -lpthread -lm -ldl)
 endif()

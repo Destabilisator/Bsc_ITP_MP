@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 plt.rcParams['text.usetex'] = True
 
-N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "orange"), ("14", "brown"), ("16", "purple"), ("18", "black"), ("20", "cyan")]
+N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "orange"), ("14", "brown"), ("16", "purple"), ("20", "cyan")] #, ("18", "black")
 
 print("plotting spin gap ...")
 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))

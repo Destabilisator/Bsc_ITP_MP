@@ -16,7 +16,7 @@ if [[ "$OSTYPE" == "msys" ]]; then
     for i in 6 8 10 12
     do
         python ./plotting/deleteData.py $i
-        ./cmake-build-release/Bsc_ITP_MX.exe 3D $i $Jstart $Jend $Jcount $Tstart $Tend $Tcount -1 $noX silent
+        ./cmake-build-release/Bsc_ITP_MP.exe 3D $i $Jstart $Jend $Jcount $Tstart $Tend $Tcount -1 $noX silent
         echo "plotting..."
         python ./plotting/plot3D.py $i no-show
     done
@@ -24,7 +24,7 @@ else
     for i in 6 8 10 12 14 16
     do
         python3 ./plotting/deleteData.py $i
-        ./cmake-build-release/Bsc_ITP_MX 3D $i $Jstart $Jend $Jcount $Tstart $Tend $Tcount 1 $noX silent
+        ./cmake-build-release/Bsc_ITP_MP 3D $i $Jstart $Jend $Jcount $Tstart $Tend $Tcount 1 $noX silent
         echo "plotting..."
         python3 ./plotting/plot3D.py $i no-show
         echo ""

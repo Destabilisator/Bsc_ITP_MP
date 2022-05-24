@@ -733,7 +733,7 @@ namespace multi {
             return std::get<0>(a) < std::get<0>(b);
         });
 
-        std::string filenameMagneticSusceptibility_X = "data_spin_gap.txt";
+        std::string filenameMagneticSusceptibility_X = "data_spin_gap_with_k.txt";
         std::string header = "N: " + std::to_string(N) + "\n"
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
@@ -741,7 +741,7 @@ namespace multi {
                              + "calculation time with " + std::to_string(cores) + " threads: "
                              + std::to_string(elapsed_seconds.count()) + " seconds";
 
-        saveOutData(filenameMagneticSusceptibility_X, header, "J1/J2", "spin gap in J2\tk1\tk2", outDataSpinGap, N);
+        saveOutData(filenameMagneticSusceptibility_X, header, "J1/J2", "spin gap in J2\tk0\tk1", outDataSpinGap, N);
 
         std::cout << "\n";
 

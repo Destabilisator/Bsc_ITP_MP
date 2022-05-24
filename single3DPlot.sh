@@ -38,12 +38,12 @@ fi
 
 if [[ "$OSTYPE" == "msys" ]]; then
     python ./plotting/deleteData.py $N
-    ./cmake-build-release/Bsc_ITP_MX.exe 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $noX $SILENT
+    ./cmake-build-release/Bsc_ITP_MP.exe 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $noX $SILENT
     echo "plotting..."
     python ./plotting/plot3D.py $N $show
 else
     python3 ./plotting/deleteData.py $N
-    ./cmake-build-release/Bsc_ITP_MX 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $noX $SILENT
+    ./cmake-build-release/Bsc_ITP_MP 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $noX $SILENT
     echo "plotting..."
     python3 ./plotting/plot3D.py $N $show
 fi
