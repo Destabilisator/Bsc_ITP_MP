@@ -22,6 +22,8 @@ results/3DData/*.png
 results/3DData/*/*/*.txt
 !results/3DData/*/*/dummyFile.txt
 
+results/3DData/knowngood/
+
 
 !results/data_placeholder.txt
 

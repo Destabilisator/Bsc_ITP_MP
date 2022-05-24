@@ -264,35 +264,6 @@ namespace momentumStates {
 
     }
 
-    Eigen::MatrixXcd spinMatrix(const int &N, const int &k, const std::vector<int> &states,
-                               const std::vector<int> &R_vals) {
-
-        const int size = (int) states.size();
-        Eigen::MatrixXcd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(size, size);
-        for (int a = 0; a < size; a++) {
-            int s = states.at(a);
-            for (int j = 0; j < N; j++) {
-                for (int i = 0; i < j; i++) {
-                    if (((s >> i) & 1) == ((s >> j) & 1)) {
-                        S2(a, a) += 0.5;
-                    } else {
-                        S2(a, a) -= 0.5;
-                        int d = s ^ (1 << i) ^ (1 << j);
-                        int r = 0, l = 0;
-                        representative(d, &r, &l, N);
-                        int b = findState(states, r);
-                        if (b >= 0) {
-                            std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
-                            S2(a,b) += (std::complex<double>) 1.0 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
-                        }
-                    }
-                }
-            }
-        }
-        //std::cout << S2 << std::endl;
-        return S2;
-    }
-
     void momentumBlockSolver_with_S(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
                                         const std::vector<int> &R_vals, std::vector<std::tuple<std::complex<double>, int>> &data,
                                         const int &N, const int &SIZE) {
@@ -313,7 +284,7 @@ namespace momentumStates {
         }
 
 //        std::cout << "getting S2\n";
-        Eigen::MatrixXcd S2 = spinMatrix(N, k, states, R_vals);
+        Eigen::MatrixXcd S2 = spinMatrixMomentum(N, k, states, R_vals);
 //        std::cout << "getting U\n";
         const Eigen::MatrixXcd& U = solver.eigenvectors();
 //        std::cout << "getting U_inv_S2_U\n";
@@ -323,6 +294,7 @@ namespace momentumStates {
 //        std::cout << "HEiValList size: " << HEiValList.size();
         for (int i = 0; i < HEiValList.size(); i++) {
             data.emplace_back(HEiValList.at(i), std::real(U_inv_S2_U(i,i)));
+            std::cout << std::real(U_inv_S2_U(i,i)) << std::endl;
         }
 //        std::cout << ", data size: " << data.size() << std::endl;
 
@@ -383,7 +355,7 @@ namespace momentumStates {
         HEiValList.shrink_to_fit();
         eiVals.push_back(HEiValList);
 
-        Eigen::MatrixXcd S2 = spinMatrix(N, k, states, R_vals);
+        Eigen::MatrixXcd S2 = spinMatrixMomentum(N, k, states, R_vals);
         matrixBlockS2.push_back(S2);
 
     }
@@ -481,6 +453,9 @@ namespace momentumStates {
         for(int i = 0; i < matrixBlockU.size(); i++) {
             Eigen::MatrixXcd M = matrixBlockU.at(i).adjoint() * matrixBlockS2.at(i) * matrixBlockU.at(i);
             Blocks_U_inv_S2_U.push_back(M);
+//            for (int j = 0; j < M.rows(); j++) {
+//                std::cout << M(j,j) << std::endl;
+//            }
             //std::cout << M << std::endl;
         }
 

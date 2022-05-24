@@ -423,8 +423,12 @@ void saveOutData(const std::string &filename, const std::string &header, const s
         file << header << "\n\n";
         file << x_label << "\t" << y_label << "\n";
         for (std::tuple<double, double, int, int, int, int> data : outData) {
-            file << std::get<0>(data) << "\t" << std::get<1>(data)
-                 << "\t" << std::get<2>(data)  << "\t" << std::get<3>(data)
+            #ifdef fixedPrecision
+                file << std::fixed << std::setprecision(5) << std::get<0>(data) << "\t" << std::get<1>(data);
+            #else
+                file << std::get<0>(data) << "\t" << std::get<1>(data);
+            #endif
+            file << "\t" << std::get<2>(data)  << "\t" << std::get<3>(data)
                  << "\t" << std::get<4>(data)  << "\t" << std::get<5>(data)<< "\n";
         }
     } catch (...) {
@@ -500,6 +504,34 @@ Eigen::MatrixXd spinMatrix(const int &N, const std::vector<int> &states) {
             }
         }
     }
+    return S2;
+}
+
+Eigen::MatrixXcd spinMatrixMomentum(const int &N, const int &k, const std::vector<int> &states, const std::vector<int> &R_vals) {
+
+    const int size = (int) states.size();
+    Eigen::MatrixXcd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(size, size);
+    for (int a = 0; a < size; a++) {
+        int s = states.at(a);
+        for (int j = 0; j < N; j++) {
+            for (int i = 0; i < j; i++) {
+                if (((s >> i) & 1) == ((s >> j) & 1)) {
+                    S2(a, a) += 0.5;
+                } else {
+                    S2(a, a) -= 0.5;
+                    int d = s ^ (1 << i) ^ (1 << j);
+                    int r = 0, l = 0;
+                    representative(d, &r, &l, N);
+                    int b = findState(states, r);
+                    if (b >= 0) {
+                        std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
+                        S2(a,b) += (std::complex<double>) 1.0 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
+                    }
+                }
+            }
+        }
+    }
+    //std::cout << S2 << std::endl;
     return S2;
 }
 

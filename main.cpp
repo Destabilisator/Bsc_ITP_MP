@@ -56,16 +56,15 @@ int main(int argc, char* argv[]) {
 #endif
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
-
-    multi::start_SpinGap_with_index(J_COUNT, J_START, J_END, cores, N, SIZE);
-    //multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+//    multi::start_SpinGap_with_index(J_COUNT, J_START, J_END, cores, N, SIZE);
+//    multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
     //N = 8; SIZE = (int) std::pow(2,N); T_START = 0; T_END = 20; T_COUNT = 50; J_START = 0; J_END = 2; J_COUNT = 50;
     //multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
 
     // susceptibilities
-//    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-//    momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 //    spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
     // individual methods

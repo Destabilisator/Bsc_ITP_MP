@@ -6,7 +6,12 @@
 #include <list>
 #include <complex>
 #include <chrono>
+#include <iomanip>
 #include <Eigen/Eigenvalues>
+
+#define fixedPrecision
+
+#define PI  3.14159265358979323846
 
 /////////////////////////////// bits ///////////////////////////////
 
@@ -115,6 +120,9 @@ Eigen::MatrixXd spinMatrix(const int &N, const  int &SIZE);
 
 // returns the Matrix S^2 for a given set of states
 Eigen::MatrixXd spinMatrix(const int &N, const std::vector<int> &states);
+
+// returns the Matrix S^2 for a given set of momentum states
+Eigen::MatrixXcd spinMatrixMomentum(const int &N, const int &k, const std::vector<int> &states, const std::vector<int> &R_vals);
 
 // calculates the specific heat of a system for a set og eigenvalues and a beta
 double getSpecificHeat(const double &beta, const std::vector<std::complex<double>>& eiVals, const int &N);

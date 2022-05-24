@@ -8,20 +8,20 @@ noX=-X
 start_time=$SECONDS
 
 if [[ "$OSTYPE" == "msys" ]]; then
-    ./cmake-build-release/Bsc_ITP_MP.exe 6 $start $end 5000 -1 $noX silent
-    ./cmake-build-release/Bsc_ITP_MP.exe 8 $start $end 5000 -1 $noX silent
-    ./cmake-build-release/Bsc_ITP_MP.exe 10 $start $end 500 -1 $noX silent
+    ./cmake-build-release/Bsc_ITP_MP.exe 6 $start $end 50 -1 $noX silent
+    ./cmake-build-release/Bsc_ITP_MP.exe 8 $start $end 50 -1 $noX silent
+    ./cmake-build-release/Bsc_ITP_MP.exe 10 $start $end 50 -1 $noX silent
     ./cmake-build-release/Bsc_ITP_MP.exe 12 $start $end 50 -1 $noX silent
     # ./cmake-build-release/Bsc_ITP_MP.exe 14 $start $end 10 -1 $noX silent
     # ./cmake-build-release/Bsc_ITP_MP.exe 16 $start $end 5 -1 $noX silent
 
     start_time_plots=$SECONDS
-    python ./plotting/plotDeltaE.py
-    python ./plotting/plotSpecificHeatJConst.py
-    python ./plotting/plotSpecificHeatTConst.py
-    python ./plotting/plotSusceptibilityJConst.py
-    python ./plotting/plotSusceptibilityTConst.py
-    python ./plotting/plotDispersion.py
+    # python ./plotting/plotDeltaE.py
+    # python ./plotting/plotSpecificHeatJConst.py
+    # python ./plotting/plotSpecificHeatTConst.py
+    # python ./plotting/plotSusceptibilityJConst.py
+    # python ./plotting/plotSusceptibilityTConst.py
+    # python ./plotting/plotDispersion.py
     python ./plotting/plotSpinGap.py
 
 else
