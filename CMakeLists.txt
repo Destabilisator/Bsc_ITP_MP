@@ -37,21 +37,21 @@ include_directories("./src")
 add_executable(Bsc_ITP_MP main.h main.cpp
         headers/helpers.h
         headers/helpers.cpp
-        headers/methods.h
-        headers/methods/multithreading.h
-        headers/methods/multithreading.cpp
-        headers/methods/naiv.h
-        headers/methods/naiv.cpp
-        headers/methods/magnetizationBlocks.h
-        headers/methods/magnetizationBlocks.cpp
-        headers/methods/momentumStates.h
-        headers/methods/momentumStates.cpp
-        headers/methods/parityStates.h
-        headers/methods/parityStates.cpp
-        headers/methods/spinInversion.h
-        headers/methods/spinInversion.cpp
-        headers/methods/3DPlots.h
-        headers/methods/3DPlots.cpp headers/defines.h)
+        headers/methods/ED/methods.h
+        headers/methods/ED/multithreading.h
+        headers/methods/ED/multithreading.cpp
+        headers/methods/ED/naiv.h
+        headers/methods/ED/naiv.cpp
+        headers/methods/ED/magnetizationBlocks.h
+        headers/methods/ED/magnetizationBlocks.cpp
+        headers/methods/ED/momentumStates.h
+        headers/methods/ED/momentumStates.cpp
+        headers/methods/ED/parityStates.h
+        headers/methods/ED/parityStates.cpp
+        headers/methods/ED/spinInversion.h
+        headers/methods/ED/spinInversion.cpp
+        headers/methods/ED/3DPlots.h
+        headers/methods/ED/3DPlots.cpp headers/defines.h)
 
 if (WIN32)
     target_link_libraries(Bsc_ITP_MP ${CMAKE_THREAD_LIBS_INIT})

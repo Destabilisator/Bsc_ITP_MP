@@ -2,7 +2,7 @@
 
 /////////////////////////////// parity states ///////////////////////////////
 
-namespace parityStates {
+namespace ED::parityStates {
 
     double get_gk(int k, int N) {
         if (k == 0 || k == N/4) {

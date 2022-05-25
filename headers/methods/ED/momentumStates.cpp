@@ -2,7 +2,7 @@
 
 /////////////////////////////// momentum states ///////////////////////////////
 
-namespace momentumStates {
+namespace ED::momentumStates {
 
     void fillHamiltonBlock(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
                            const std::vector<int> &R_vals, Eigen::MatrixXcd &hamiltonBlock, const int &N,

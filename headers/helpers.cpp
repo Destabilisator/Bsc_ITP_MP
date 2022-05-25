@@ -691,7 +691,7 @@ void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N,
         if (argc >= 10) {
             std::string s1 = "noX";
             std::string s2 = argv[10];
-            std::cout << s2 << "\n";
+//            std::cout << s2 << "\n";
             if (s1 == s2) {
                 noX = true;
             }

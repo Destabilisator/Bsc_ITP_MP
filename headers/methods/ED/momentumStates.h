@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include <Eigen/Eigenvalues>
+#include "Eigen/Eigenvalues"
 
 #include "helpers.h"
 #include "defines.h"
@@ -14,7 +14,7 @@
 
 /////////////////////////////// momentum states ///////////////////////////////
 
-namespace momentumStates {
+namespace ED::momentumStates {
 
     void fillHamiltonBlock(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
                            const std::vector<int> &R_vals, Eigen::MatrixXcd &hamiltonBlock, const int &N,

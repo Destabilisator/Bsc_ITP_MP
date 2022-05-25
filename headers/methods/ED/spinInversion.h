@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include <Eigen/Eigenvalues>
+#include "Eigen/Eigenvalues"
 
 #include "helpers.h"
 #include "parityStates.h"
@@ -15,7 +15,7 @@
 
 /////////////////////////////// spin inversion ///////////////////////////////
 
-namespace spinInversion {
+namespace ED::spinInversion {
 
     void fillHamiltonSIBlock(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
                              const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,

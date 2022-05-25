@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include <Eigen/Eigenvalues>
+#include "Eigen/Eigenvalues"
 
 #include "helpers.h"
 #include "defines.h"
@@ -14,7 +14,7 @@
 
 /////////////////////////////// parity states ///////////////////////////////
 
-namespace parityStates {
+namespace ED::parityStates {
 
     double get_gk(int k, int N);
 

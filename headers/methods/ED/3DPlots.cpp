@@ -2,7 +2,7 @@
 
 /////////////////////////////// 3D Plots ///////////////////////////////
 
-namespace plot3D {
+namespace ED::plot3D {
 
     void get_C(double J, int pos, const int &JCOUNT, const double &JSTART, const double &JEND,
                       const int &TCOUNT, const double &TSTART, const double &TEND,

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include <Eigen/Eigenvalues>
+#include "Eigen/Eigenvalues"
 
 #include "helpers.h"
 
@@ -12,7 +12,7 @@
 //#define saveEigenvalues
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
-namespace naiv {
+namespace ED::naiv {
 
     void fillHamilton(double **hamilton, const double &J1,const double &J2, const int &N, const int &SIZE);
 

@@ -2,7 +2,7 @@
 
 /////////////////////////////// multi-threading ///////////////////////////////
 
-namespace multi {
+namespace ED::multi {
 
     void get_DeltaE_CT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,

@@ -10,12 +10,12 @@
 #include <complex>
 #include <Eigen/Eigenvalues>
 
+//// ED /////
 #include "headers/helpers.h"
-#include "headers/methods.h"
-#include "headers/methods/multithreading.h"
-#include "headers/methods/3DPlots.h"
+#include "methods/ED/methods.h"
+#include "methods/ED/multithreading.h"
+#include "methods/ED/3DPlots.h"
 
-//// methods ////
 #define multiCalc
 
 #ifndef multiCalc

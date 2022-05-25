@@ -188,13 +188,13 @@ if __name__ == "__main__":
 
     print("N = " + str(N))
     
-    # plot_delta_E(N)
-    # plot_specific_heat_T_const(N)
-    # plot_specific_heat_J_const(N)
-    # if sys.argv[3] != "noX":
-    #     plot_susceptibility_T_const(N)
+    plot_delta_E(N)
+    plot_specific_heat_T_const(N)
+    plot_specific_heat_J_const(N)
+    if sys.argv[3] != "noX":
+        plot_susceptibility_T_const(N)
     plot_susceptibility_J_const(N)
-    # plot_k_dispersion_J_const(N)
+    plot_k_dispersion_J_const(N)
     # plot_spin_gap(N)
 
     end_time = time.time()

@@ -2,7 +2,7 @@
 
 /////////////////////////////// naiver Ansatz ///////////////////////////////
 
-namespace naiv {
+namespace ED::naiv {
 
     void fillHamilton(double **hamilton, const double &J1,const double &J2, const int &N, const int &SIZE) {
 

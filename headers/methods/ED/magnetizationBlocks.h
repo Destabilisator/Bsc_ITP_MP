@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include <Eigen/Eigenvalues>
+#include "Eigen/Eigenvalues"
 
 #include "helpers.h"
 
@@ -13,7 +13,7 @@
 
 /////////////////////////////// fixed magnetization blocks ///////////////////////////////
 
-namespace magnetizationBlocks {
+namespace ED::magnetizationBlocks {
     
     void fillHamiltonBlock(const double &J1, const double &J2, const std::vector<int> &states, double **hamiltonBlock,
                            const int &N);
