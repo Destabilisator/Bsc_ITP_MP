@@ -1,6 +1,6 @@
 #!/bin/bash
 
-start=0
+start=0.01
 end=2.5
 
 noX=-X

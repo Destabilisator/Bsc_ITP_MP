@@ -293,8 +293,11 @@ namespace momentumStates {
 //        std::cout << "filling data in momentumBlockSolver_with_S\n";
 //        std::cout << "HEiValList size: " << HEiValList.size();
         for (int i = 0; i < HEiValList.size(); i++) {
-            data.emplace_back(HEiValList.at(i), std::real(U_inv_S2_U(i,i)));
-            std::cout << std::real(U_inv_S2_U(i,i)) << std::endl;
+            double S_elem = std::real(U_inv_S2_U(i, i));
+            double S = - 0.5 + std::sqrt(0.25 + S_elem);
+            if (S < epsilon) {S = 0.0;}
+            data.emplace_back(HEiValList.at(i), S);
+//            std::cout << S << std::endl;
         }
 //        std::cout << ", data size: " << data.size() << std::endl;
 

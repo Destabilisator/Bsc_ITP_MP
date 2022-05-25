@@ -551,23 +551,28 @@ namespace multi {
             }
 
             double E0 = NAN;
-            double E1 = NAN;// = std::real(std::get<0>(data.at(0).at(0)));
-            //double E1;
+            double E1 = NAN;
             int k0, k1, S0, S1;
             for (const std::vector<std::tuple<std::complex<double>, int, int>>& dat : data) {
                 for (std::tuple<std::complex<double>, int, int> d : dat) {
                     double E = std::real(std::get<0>(d));
                     int k = std::get<1>(d);
                     int S = std::get<2>(d);
+//                    std::cout << E << " " << k << " " << S << std::endl;
                     // if nan, set it to first val
                     if (S == 0 && std::isnan(E0)) {E0 = E; k0 = k, S0 = S;}
                     else if ((S == 1 || S == -1) && std::isnan(E1)) {E1 = E; k1 = k, S1 = S;}
                     // if not nan check if E is lower
                     if (S == 0 && E < E0) {E0 = E; k0 = k, S0 = S;}
                     else if ((S == 1 || S == -1) && E < E1) {E1 = E; k1 = k, S1 = S;}
-                    else {continue;}
+//                    else {continue;}
+//                    std::cout << E0 << " " << k0 << " " << S0 << std::endl;
+//                    std::cout << E1 << " " << k1 << " " << S1 << std::endl << std::endl;
                 }
             }
+//            std::cout << std::endl;
+//            std::cout << E0 << " " << k0 << " " << S0 << std::endl;
+//            std::cout << E1 << " " << k1 << " " << S1 << std::endl << std::endl;
 //
 //            double E0 = std::real(std::get<0>(data0.at(0)));
 //            double E1 = std::real(std::get<0>(data1.at(0)));
@@ -762,11 +767,11 @@ namespace multi {
         std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
 
         // sort data-points
-        std::cout << "sorting final data" << std::endl;
+//        std::cout << "sorting final data" << std::endl;
         std::sort(outDataSpinGap.begin(), outDataSpinGap.end(), [](const std::tuple<double, double, int, int, int, int> &a, const std::tuple<double, double, int, int, int, int> &b) {
             return std::get<0>(a) < std::get<0>(b);
         });
-        std::cout << "sorted final data" << std::endl;
+//        std::cout << "sorted final data" << std::endl;
 
         std::string filenameMagneticSusceptibility_X = "data_spin_gap_with_index.txt";
         std::string header = "N: " + std::to_string(N) + "\n"

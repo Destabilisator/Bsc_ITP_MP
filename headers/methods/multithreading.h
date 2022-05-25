@@ -8,14 +8,13 @@
 
 #include "methods.h"
 #include "helpers.h"
+#include "defines.h"
 
 static int CURRENT = 1;
 static const int PROGRESSBAR_SEGMENTS = 50;
 
 //static std::mutex coutMutex;
 static std::mutex nextJMutex;
-
-#define PI  3.14159265358979323846
 
 /////////////////////////////// multi-threading ///////////////////////////////
 

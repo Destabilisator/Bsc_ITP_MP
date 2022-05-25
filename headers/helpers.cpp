@@ -632,6 +632,7 @@ double getSusceptibilityDegeneracy(const double &temp, const std::vector<Eigen::
             double ev_real = std::real(eiVals.at(i));
             double S_elem = std::real(M(i, i));
             double S = - 0.5 + std::sqrt(0.25 + S_elem);
+            if (S < epsilon) {S = 0.0;}
 //            std::cout << "S_elem: " << S_elem;
 //            std::cout << ", S: " << S << std::endl;
             Z_sum += std::exp(-1.0 / temp * ev_real) * (2.0 * S + 1);

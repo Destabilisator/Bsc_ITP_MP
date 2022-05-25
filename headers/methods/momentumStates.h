@@ -4,8 +4,7 @@
 #include <Eigen/Eigenvalues>
 
 #include "helpers.h"
-
-#define PI  3.14159265358979323846
+#include "defines.h"
 
 ///// output, turn off during multithreading /////
 //#define showMatrix

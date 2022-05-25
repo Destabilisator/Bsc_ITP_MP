@@ -51,7 +51,7 @@ add_executable(Bsc_ITP_MP main.h main.cpp
         headers/methods/spinInversion.h
         headers/methods/spinInversion.cpp
         headers/methods/3DPlots.h
-        headers/methods/3DPlots.cpp)
+        headers/methods/3DPlots.cpp headers/defines.h)
 
 if (WIN32)
     target_link_libraries(Bsc_ITP_MP ${CMAKE_THREAD_LIBS_INIT})

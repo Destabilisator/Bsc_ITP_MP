@@ -5,9 +5,7 @@
 
 #include "helpers.h"
 #include "parityStates.h"
-
-#define PI  3.14159265358979323846
-#define epsilon 1e-10
+#include "defines.h"
 
 ///// output, turn off during multithreading /////
 //#define showMatrix

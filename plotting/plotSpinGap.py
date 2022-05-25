@@ -7,7 +7,7 @@ print("plotting spin gap ...")
 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
 
 for N, c in N_color:
-    file = open("results/" + N + "_data_spin_gap_with_index.txt", 'r')
+    file = open("results/" + N + "_data_spin_gap_with_index.txt", 'r') # _data_spin_gap / _data_spin_gap_with_index
     lines = file.readlines()
     lbl = "N = " + N
     X = []

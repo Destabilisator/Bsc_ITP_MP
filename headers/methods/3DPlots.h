@@ -8,14 +8,13 @@
 
 #include "methods.h"
 #include "helpers.h"
+#include "defines.h"
 
 static int CURRENT3D = 1;
 static const int PROGRESSBAR_SEGMENTS3D = 50;
 
 //static std::mutex coutMutex;
 static std::mutex nextJMutex3D;
-
-#define PI  3.14159265358979323846
 
 /////////////////////////////// 3D Plots ///////////////////////////////
 
