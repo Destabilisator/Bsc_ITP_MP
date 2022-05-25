@@ -463,6 +463,7 @@ namespace ED::multi {
             std::vector<std::complex<double>> data1;
             momentumStates::getEiValsMagBlock(J, 1.0, data0, N, SIZE, N/2);
             momentumStates::getEiValsMagBlock(J, 1.0, data1, N, SIZE, N/2 + 1);
+            momentumStates::getEiValsMagBlock(J, 1.0, data1, N, SIZE, N/2 - 1);
 
             // sort eigenvalues
             data0.shrink_to_fit();
@@ -629,6 +630,7 @@ namespace ED::multi {
             std::vector<double> eiVals1;
             spinInversion::getEiValsMagBlock(J, 1.0, &eiVals0, N, SIZE, N/2);
             spinInversion::getEiValsMagBlock(J, 1.0, &eiVals1, N, SIZE, N/2 + 1);
+            spinInversion::getEiValsMagBlock(J, 1.0, &eiVals1, N, SIZE, N/2 - 1);
 
             // sort eigenvalues
             eiVals0.shrink_to_fit();
