@@ -3,6 +3,7 @@
 #include <complex>
 #include "Eigen/Eigenvalues"
 
+#include "EDHelpers.h"
 #include "helpers.h"
 #include "parityStates.h"
 #include "defines.h"

@@ -8,4 +8,8 @@ for filename in os.listdir("results/3DData/" + N + "/C/"):
     if filename == "dummyFile.txt":
         continue
     os.remove("results/3DData/" + N + "/C/" + filename)
+
+for filename in os.listdir("results/3DData/" + N + "/X/"):
+    if filename == "dummyFile.txt":
+        continue
     os.remove("results/3DData/" + N + "/X/" + filename)

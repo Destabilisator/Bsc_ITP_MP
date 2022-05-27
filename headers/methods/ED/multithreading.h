@@ -6,7 +6,8 @@
 #include <thread>
 #include <chrono>
 
-#include "methods.h"
+#include "methods/EDMethods.h"
+#include "EDHelpers.h"
 #include "helpers.h"
 #include "defines.h"
 

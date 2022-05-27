@@ -384,7 +384,7 @@ namespace ED::spinInversion {
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         delete SIEiVals;
         delete matrixSIBlocks;
@@ -728,8 +728,7 @@ namespace ED::spinInversion {
 
         std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
         saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", susceptibility_magnetization, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 
@@ -771,8 +770,7 @@ namespace ED::spinInversion {
 
         std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
         saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", specificHeat_momentum, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 

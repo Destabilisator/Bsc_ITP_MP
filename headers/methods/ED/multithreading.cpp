@@ -266,8 +266,7 @@ namespace ED::multi {
 
         saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", outDataDeltaE, N);
         saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", outDataSpecificHeat_C, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 
@@ -440,8 +439,7 @@ namespace ED::multi {
         std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
 
         saveOutData(filenameMagneticSusceptibility_X, headerWithBeta, "J1/J2", "magnetic susceptibility in J2", outDataMagneticSusceptibility_X, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 
@@ -577,10 +575,10 @@ namespace ED::multi {
 //
 //            double E0 = std::real(std::get<0>(data0.at(0)));
 //            double E1 = std::real(std::get<0>(data1.at(0)));
-//            int k0;
-//            int k1;
-//            int S0;
-//            int S1;
+//            int k0 = std::get<1>(data0.at(0));
+//            int k1 = std::get<1>(data1.at(0));
+//            int S0 = std::get<2>(data0.at(0));
+//            int S1 = std::get<2>(data1.at(0));
 
             // progressbar
             nextJMutex.lock();
@@ -722,7 +720,7 @@ namespace ED::multi {
             return std::get<0>(a) < std::get<0>(b);
         });
 
-        std::string filenameMagneticSusceptibility_X = "data_spin_gap.txt";
+        std::string filenameMagneticSusceptibility_X = "data_spin_gap.txt"; // data_spin_gap
         std::string header = "N: " + std::to_string(N) + "\n"
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
@@ -731,8 +729,7 @@ namespace ED::multi {
                              + std::to_string(elapsed_seconds.count()) + " seconds";
 
         saveOutData(filenameMagneticSusceptibility_X, header, "J1/J2", "spin gap in J2", outDataSpinGap, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 
@@ -775,7 +772,7 @@ namespace ED::multi {
         });
 //        std::cout << "sorted final data" << std::endl;
 
-        std::string filenameMagneticSusceptibility_X = "data_spin_gap_with_index.txt";
+        std::string filenameMagneticSusceptibility_X = "data_spin_gap_with_index_V2.txt";
         std::string header = "N: " + std::to_string(N) + "\n"
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
@@ -784,8 +781,7 @@ namespace ED::multi {
                              + std::to_string(elapsed_seconds.count()) + " seconds";
 
         saveOutData(filenameMagneticSusceptibility_X, header, "J1/J2", "spin gap in J2\tk0\tk1\tS0\tS1", outDataSpinGap, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 

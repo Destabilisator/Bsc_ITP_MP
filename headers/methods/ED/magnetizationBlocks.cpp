@@ -223,8 +223,7 @@ namespace ED::magnetizationBlocks {
 
         std::string headerWithJSusceptibility_X = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSusceptibility_X;
         saveOutData(filenameSusceptibility_X, headerWithJSusceptibility_X, "J1/J2", "specific heat in J2", *susceptibility_magnetization, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 

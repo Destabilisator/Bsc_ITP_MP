@@ -278,7 +278,7 @@ namespace ED::parityStates {
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         delete parityEiVals;
         delete matrixParityBlocks;

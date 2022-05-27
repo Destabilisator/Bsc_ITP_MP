@@ -40,14 +40,17 @@ fi
 
 
 if [[ "$OSTYPE" == "msys" ]]; then
-    ./cmake-build-release/Bsc_ITP_MP.exe $N $J_START $J_END $J_COUNT $CORES $noX $SILENT
-    echo "plotting..."
-    python ./plotting/plot.py $N $show $noX
+	prgm=Bsc_ITP_MP.exe
+	pth=python
 else
-    ./cmake-build-release/Bsc_ITP_MP $N $J_START $J_END $J_COUNT $CORES $noX $SILENT
-    echo "plotting..."
-    python3 ./plotting/plot.py $N $show $noX
+	prgm=Bsc_ITP_MP
+	pth=python3
 fi
+
+./cmake-build-release/$prgm $N $J_START $J_END $J_COUNT $CORES $noX $SILENT
+echo ""
+echo "plotting for N = $N:"
+$pth ./plotting/plot.py $N $show $noX
 
 elapsed=$(( SECONDS - start_time ))
 echo "all done, total elapsed time: $elapsed seconds"

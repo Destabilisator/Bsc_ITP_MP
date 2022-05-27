@@ -109,17 +109,17 @@ def plot_susceptibility_J_const(N):
     subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$ für ' + r"$J_1$ / $J_2$ = " + linesJ + r", $k_B$ = 1", fontsize = 18)
     
 
-    file = open("results/" + N + "_momentum_susceptibility_J_const.txt", 'r')
-    lines = file.readlines()
-    linesJ = lines[0][len("J1/J2 = "):-1]
-    lbl = "N = " + N
-    X = []
-    Y = []
-    for i in range(8,len(lines)):
-        x, y = lines[i].split("\t")
-        X += [float(x)]
-        Y += [float(y)]
-    subfig1.plot(X, Y, lw = 0.5, ls = "solid", markersize = 1, marker = "o", color = 'red', label = "MS")
+    # file = open("results/" + N + "_momentum_susceptibility_J_const.txt", 'r')
+    # lines = file.readlines()
+    # linesJ = lines[0][len("J1/J2 = "):-1]
+    # lbl = "N = " + N
+    # X = []
+    # Y = []
+    # for i in range(8,len(lines)):
+    #     x, y = lines[i].split("\t")
+    #     X += [float(x)]
+    #     Y += [float(y)]
+    # subfig1.plot(X, Y, lw = 0.5, ls = "solid", markersize = 1, marker = "o", color = 'red', label = "MS")
 
     # file = open("results/" + N + "_spininversion_susceptibility_J_const.txt", 'r')
     # lines = file.readlines()
@@ -185,8 +185,6 @@ if __name__ == "__main__":
     start_time = time.time()
 
     N = sys.argv[1]
-
-    print("N = " + str(N))
     
     plot_delta_E(N)
     plot_specific_heat_T_const(N)
@@ -195,7 +193,7 @@ if __name__ == "__main__":
         plot_susceptibility_T_const(N)
     plot_susceptibility_J_const(N)
     plot_k_dispersion_J_const(N)
-    # plot_spin_gap(N)
+    plot_spin_gap(N)
 
     end_time = time.time()
 

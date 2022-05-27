@@ -163,7 +163,7 @@ namespace ED::momentumStates {
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
-        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
     }
 
@@ -204,8 +204,7 @@ namespace ED::momentumStates {
 
         std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
         saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", specificHeat_momentum, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 
@@ -259,8 +258,7 @@ namespace ED::momentumStates {
         std::string header = "N: " + std::to_string(N);
         std::string headerWithJ = "J1/J2 = " + std::to_string(J1/J2) +"\n" + header;
         saveOutData(filename, headerWithJ, "k", "E in J2", momentData, N);
-
-        std::cout << "\n";
+//        std::cout << "\n";
 
     }
 

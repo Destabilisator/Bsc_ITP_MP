@@ -11,8 +11,8 @@
 #include <Eigen/Eigenvalues>
 
 //// ED /////
-#include "headers/helpers.h"
-#include "methods/ED/methods.h"
+#include "helpers.h"
+#include "methods/EDMethods.h"
 #include "methods/ED/multithreading.h"
 #include "methods/ED/3DPlots.h"
 

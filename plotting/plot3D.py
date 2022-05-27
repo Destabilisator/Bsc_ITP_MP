@@ -16,7 +16,6 @@ def plot_specific_heat(N):
     fig = plt.figure()
     ax = plt.axes(projection='3d')
 
-
     for filename in os.listdir("results/3DData/" + N + "/C/"):
         if filename == "dummyFile.txt":
             continue
@@ -48,7 +47,6 @@ def plot_susceptibility(N):
 
     fig = plt.figure()
     ax = plt.axes(projection='3d')
-
 
     for filename in os.listdir("results/3DData/" + N + "/X/"):
         if filename == "dummyFile.txt":
@@ -82,8 +80,6 @@ if __name__ == "__main__":
     start_time = time.time()
 
     N = sys.argv[1]
-
-    print("N = " + str(N))
   
     plot_specific_heat(N)
     plot_susceptibility(N)
