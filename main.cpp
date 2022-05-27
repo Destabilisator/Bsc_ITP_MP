@@ -1,7 +1,7 @@
 #include "main.h"
 
-//#define DEBUG
-#define ED_METHODS
+#define DEBUG
+//#define ED_METHODS
 
 int main(int argc, char* argv[]) {
 
@@ -57,36 +57,76 @@ int main(int argc, char* argv[]) {
 #endif
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
-//    cores = 1;
-//    ED::multi::start_SpinGap_with_index(50, 0.01, 2.5, cores, N, SIZE);
-    ED::multi::start_SpinGap_with_index(J_COUNT, J_START, J_END, cores, N, SIZE);
-//    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
-    //N = 8; SIZE = (int) std::pow(2,N); T_START = 0; T_END = 20; T_COUNT = 50; J_START = 0; J_END = 2; J_COUNT = 50;
-//    ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
+    for(int n = 6; n <= 32; n += 2) {
+        N = n;
+        SIZE = (int) std::pow(2, N);
+        std::cout << "N = " << N << ", SIZE = " << SIZE << std::endl;
 
-    // susceptibilities
-//    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-//    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-//    ED::spinInversion::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+        std::cout << "momentumStates" << std::endl;
 
-    // individual methods
-//    ED::spinInversion::start(J1, J2, N, SIZE);
-//    ED::parityStates::start(J1, J2, N, SIZE);
-//    ED::momentumStates::start(J1, J2, N, SIZE);
-//    ED::magnetizationBlocks::start(J1, J2, N, SIZE);
+        auto start1 = std::chrono::steady_clock::now();
+
+        // get full moment matrix
+        std::vector<std::complex<double>> HEiValList;
+        std::vector<Eigen::MatrixXcd> matrixBlocks;
+
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
+
+        std::vector<std::vector<std::vector<int>>> states(N + 1, std::vector<std::vector<int>>(N/2));
+        std::vector<std::vector<std::vector<int>>> R_vals(N + 1, std::vector<std::vector<int>>(N/2));
+
+        for (int s = 0; s < SIZE; s++) {
+            int m = ED::bitSum(s, N);
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = ED::checkState(s, k, N);
+                if (R >= 0) {
+                    states.at(m).at(k - k_lower).push_back(s);
+                    R_vals.at(m).at(k - k_lower).push_back(R);
+                }
+            }
+        }
+
+        for (int m = 0; m <= N; m++) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                ED::momentumStates::momentumBlockSolver(J1, J2, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower), HEiValList,
+                                                        matrixBlocks, N, SIZE);
+            }
+        }
+
+        int offset_blocks = 0;
+        Eigen::MatrixXcd H_moment_Block = Eigen::MatrixXcd::Zero(SIZE, SIZE);
+        for (const Eigen::MatrixXcd &M: matrixBlocks) {
+            H_moment_Block.block(offset_blocks, offset_blocks, M.rows(), M.cols()) = M;
+            offset_blocks += (int) M.rows();
+        }
+
+        auto end1 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds1 = end1-start1;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds1) << "\n";
 
 
-    // speed test
-//    for (int n = 0; n <= 16; n += 1) {
-//        int size = (int) std::pow(2, 12);
-//        std::cout << "N: " << n << ", size: " << size << "\n";
-//        ED::magnetizationBlocks::startSusceptibility(1.0, 1.0, n, size, 0, 5, 50000);
-//        ED::momentumStates::startSusceptibility(1.0, 1.0, n, size, 0, 5, 50000);
-////        ED::spinInversion::start(J1, J2, 12, size);
-////        ED::parityStates::start(J1, J2, 12, size);
-//        std::cout << "\n";
-//    }
+        std::cout << "getting full sparse matrix" << std::endl;
+        auto start2 = std::chrono::steady_clock::now();
+        Eigen::SparseMatrix<std::complex<double>> Matrix = QT::hamilton::getHamilton(J1, J2, N, SIZE);
+
+        if (Matrix.isApprox(H_moment_Block, EPSILON)) {
+            std::cout << "Oui\n";
+        } else {
+            std::cout << "no bueno\n";
+        }
+
+        auto end2 = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds2 = end2-start2;
+        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds2) << "\n";
+
+        std::cout << std::endl;
+
+    }
+
+
+
 #endif
 
     std::cout << std::endl;

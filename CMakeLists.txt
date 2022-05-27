@@ -35,9 +35,12 @@ include_directories(${MAIN_DIR})
 include_directories("./src")
 
 add_executable(Bsc_ITP_MP main.h main.cpp
+        headers/defines.h
+        headers/helpers.h
+        headers/helpers.cpp
+        headers/methods/EDMethods.h
         headers/methods/ED/EDHelpers.h
         headers/methods/ED/EDHelpers.cpp
-        headers/methods/EDMethods.h
         headers/methods/ED/multithreading.h
         headers/methods/ED/multithreading.cpp
         headers/methods/ED/naiv.h
@@ -51,7 +54,10 @@ add_executable(Bsc_ITP_MP main.h main.cpp
         headers/methods/ED/spinInversion.h
         headers/methods/ED/spinInversion.cpp
         headers/methods/ED/3DPlots.h
-        headers/methods/ED/3DPlots.cpp headers/defines.h headers/helpers.h headers/helpers.cpp)
+        headers/methods/ED/3DPlots.cpp
+        headers/methods/QTMethods.h
+        headers/methods/QT/hamilton.cpp
+        headers/methods/QT/hamilton.h)
 
 if (WIN32)
     target_link_libraries(Bsc_ITP_MP ${CMAKE_THREAD_LIBS_INIT})

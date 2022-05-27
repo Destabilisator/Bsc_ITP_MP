@@ -293,7 +293,7 @@ namespace ED::momentumStates {
         for (int i = 0; i < HEiValList.size(); i++) {
             double S_elem = std::real(U_inv_S2_U(i, i));
             double S = - 0.5 + std::sqrt(0.25 + S_elem);
-            if (S < epsilon) {S = 0.0;}
+            if (S < EPSILON) { S = 0.0;}
             data.emplace_back(HEiValList.at(i), S);
 //            std::cout << S << std::endl;
         }

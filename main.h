@@ -13,6 +13,7 @@
 //// ED /////
 #include "helpers.h"
 #include "methods/EDMethods.h"
+#include "methods/QTMethods.h"
 #include "methods/ED/multithreading.h"
 #include "methods/ED/3DPlots.h"
 
@@ -26,7 +27,7 @@
 #endif
 
 ///// global variables /////
-int N = 8;  // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
+int N = 6;  // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
             // has to be divisible by 4 to use parity and spin inversion
 int SIZE;
 double J1 = 1.0, J2 = 1.0;

@@ -110,7 +110,7 @@ namespace ED::spinInversion {
                     break;
             }
         }
-        if (std::abs(val) < epsilon) {
+        if (std::abs(val) < EPSILON) {
             val = 0.0;
         }
 
@@ -276,11 +276,11 @@ namespace ED::spinInversion {
                                     if (c == 2 || c == 4 || c == 5) {
                                         double Na = getNa(m, n, R, sigma, p, z, k, c, N);
                                         double Na_inv = getNa(m, n, R, -sigma, p, z, k, c, N);
-                                        if (std::abs(Na) < epsilon) {R = -1;}
-                                        if (sigma == -1 && std::abs(Na_inv) > epsilon) {R = -1;}
+                                        if (std::abs(Na) < EPSILON) { R = -1;}
+                                        if (sigma == -1 && std::abs(Na_inv) > EPSILON) { R = -1;}
                                     } else if (c == 3) {
                                         double val = 1.0 + (double) z * std::cos(4 * PI * (double) k * (double) m / (double) N);
-                                        if (std::abs(val) < epsilon) {R = -1;}
+                                        if (std::abs(val) < EPSILON) { R = -1;}
                                     }
                                     if (R > 0) {
                                         states.push_back(s);
@@ -522,11 +522,11 @@ namespace ED::spinInversion {
                             if (c == 2 || c == 4 || c == 5) {
                                 double Na = getNa(m, n, R, sigma, p, z, k, c, N);
                                 double Na_inv = getNa(m, n, R, -sigma, p, z, k, c, N);
-                                if (std::abs(Na) < epsilon) { R = -1; }
-                                if (sigma == -1 && std::abs(Na_inv) > epsilon) { R = -1; }
+                                if (std::abs(Na) < EPSILON) { R = -1; }
+                                if (sigma == -1 && std::abs(Na_inv) > EPSILON) { R = -1; }
                             } else if (c == 3) {
                                 double val = 1.0 + (double) z * std::cos(4 * PI * (double) k * (double) m / (double) N);
-                                if (std::abs(val) < epsilon) { R = -1; }
+                                if (std::abs(val) < EPSILON) { R = -1; }
                             }
                             if (R > 0) {
                                 states.push_back(s);
@@ -586,11 +586,11 @@ namespace ED::spinInversion {
                                 if (c == 2 || c == 4 || c == 5) {
                                     double Na = getNa(m, n, R, sigma, p, z, k, c, N);
                                     double Na_inv = getNa(m, n, R, -sigma, p, z, k, c, N);
-                                    if (std::abs(Na) < epsilon) {R = -1;}
-                                    if (sigma == -1 && std::abs(Na_inv) > epsilon) {R = -1;}
+                                    if (std::abs(Na) < EPSILON) { R = -1;}
+                                    if (sigma == -1 && std::abs(Na_inv) > EPSILON) { R = -1;}
                                 } else if (c == 3) {
                                     double val = 1.0 + (double) z * std::cos(4 * PI * (double) k * (double) m / (double) N);
-                                    if (std::abs(val) < epsilon) {R = -1;}
+                                    if (std::abs(val) < EPSILON) { R = -1;}
                                 }
                                 if (R > 0) {
                                     states.push_back(s);
