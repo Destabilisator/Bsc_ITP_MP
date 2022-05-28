@@ -72,6 +72,8 @@ namespace ED::momentumStates {
         }
         Eigen::MatrixXcd hamiltonBlock = Eigen::MatrixXcd::Zero(statesCount,statesCount);
 
+//        std::cout << "M = " << bitSum(states.at(0), N) << ", k = " << k << std::endl;
+
         fillHamiltonBlock(J1, J2, k, states, R_vals, hamiltonBlock, N, SIZE);
 
         #if defined(showMatrix) || defined(saveMatrix)

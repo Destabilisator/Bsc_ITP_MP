@@ -1,10 +1,10 @@
-#include "hamilton.h"
+#include "ms.h"
 
 /////////////////////////////// momentum states ///////////////////////////////
 
-namespace QT::hamilton {
+namespace QT::MS {
 
-    Eigen::SparseMatrix<std::complex<double>> getHamilton(const double &J1, const double &J2, const int &N, const int &SIZE) {
+    std::vector<matrixDataMomentumType> getHamilton(const double &J1, const double &J2, const int &N, const int &SIZE) {
 
         int k_lower = -(N + 2) / 4 + 1;
         int k_upper = N / 4;
@@ -28,37 +28,24 @@ namespace QT::hamilton {
         }
 
         std::vector<Eigen::MatrixXcd> matrixBlocks;
+        std::vector<matrixDataMomentumType> matList;
 
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
-                fillHamiltonBlockMomentum(J1, J2, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower),
-                                  matrixBlocks, N, SIZE);
+                if (states.at(m).at(k - k_lower).empty()) {continue;}
+                Eigen::MatrixXcd Mtrx = fillHamiltonBlock(J1, J2, k, states.at(m).at(k - k_lower),
+                                                          R_vals.at(m).at(k - k_lower), N, SIZE);
+                matList.emplace_back(m, k, Mtrx.sparseView());
             }
         }
 
-        int offset_blocks = 0;
-        // fill Triplets
-        typedef Eigen::Triplet<std::complex<double>> Trip;
-        std::vector<Trip> trp;
-        for (const Eigen::MatrixXcd &M: matrixBlocks) {
-            for (int i = 0; i < (int) M.rows(); i++) {
-                for (int j = 0; j < (int) M.rows(); j++) {
-                    trp.emplace_back(offset_blocks + i, offset_blocks + j, M(i,j));
-                }
-            }
-            offset_blocks += (int) M.rows();
-        }
+        matList.shrink_to_fit();
+        return matList;
 
-        // create SparseMatrix from Triplets
-        Eigen::SparseMatrix<std::complex<double>> H(SIZE, SIZE);
-        H.setFromTriplets(trp.begin(), trp.end());
-//        H.makeCompressed();
-        return H;
     }
 
-    void fillHamiltonBlockMomentum(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
-                           const std::vector<int> &R_vals, std::vector<Eigen::MatrixXcd> &hamiltonBlocks,
-                           const int &N, const int &SIZE) {
+    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+                                       const std::vector<int> &R_vals, const int &N, const int &SIZE) {
 
         const int statesCount = (int) states.size();
         Eigen::MatrixXcd hamiltonBlock = Eigen::MatrixXcd::Zero(statesCount,statesCount);
@@ -115,7 +102,30 @@ namespace QT::hamilton {
                 }
             }
         }
-        hamiltonBlocks.emplace_back(hamiltonBlock);
+        return hamiltonBlock;
+    }
+
+    std::vector<Eigen::VectorXcd> getVector(const int &N, const int &SIZE, const std::vector<matrixDataMomentumType> &matrixBlocks) {
+
+        std::random_device rd{};
+        std::mt19937 gen{rd()};
+        std::normal_distribution<> randNum{0,1};
+
+        std::vector<Eigen::VectorXcd> vectors;
+
+        for (const matrixDataMomentumType &data : matrixBlocks) {
+            int size = (int) std::get<2>(data).size();
+            Eigen::VectorXcd v = Eigen::VectorXcd::Zero(size);
+            for (int i = 0; i < size; i++) {
+                v(i) = std::complex<double>(randNum(gen), randNum(gen));
+            }
+            v.normalize();
+            vectors.push_back(v);
+            std::cout << v << std::endl;
+        }
+
+        return vectors;
+
     }
 
 }
