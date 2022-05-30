@@ -1,13 +1,14 @@
 #include "multi.h"
-/*
-/////////////////////////////// multi-threading ///////////////////////////////
 
+/////////////////////////////// multi-threading ///////////////////////////////
+/*
 namespace QT::multi {
 
     /////////////////////////////// C(T) ///////////////////////////////
 
-    void start_C_J_const(const double &START, const double &END, const double &STEP, int &cores,
-                         const double &J, const int &N, const int &SIZE) {
+    void start_C_3D(const double &J_START, const double &J_END, const int &J_COUNT,
+                    const double &T_START, const double &T_END, const double &T_STEP,
+                    int &cores, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -27,7 +28,8 @@ namespace QT::multi {
 
         std::cout << ", momentum states\n";
         for (int i = 0; i < cores; i++) {
-            Threads[i] = std::thread(get_C_J_const, J, i , &rawData, indexList, START, END, STEP, N, SIZE);
+            double J = (double) J_START + (double) (J_END - J_START) * (double) i / (double) J_COUNT;
+            Threads[i] = std::thread(get_C_J_const, J_START, J_END, J_COUNT, T_START, T_END, T_STEP, J, i, N, SIZE);
         }
 
         for (int i = 0; i < cores; i++) {
@@ -51,64 +53,47 @@ namespace QT::multi {
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n\n";
 
-        // sort data-points
-        std::sort(outData.begin(), outData.end(), [](
-                const std::tuple<double, double> &a, const std::tuple<double, double> &b) {
-            return std::get<0>(a) < std::get<0>(b);
-        });
-
-        std::string filename = "data_specific_heat_J_const_QT_multi.txt";
-        std::string header = "N: " + std::to_string(N) + "\n"
-                             + "T START: " + std::to_string(START) + "\n"
-                             + "T END: " + std::to_string(END) + "\n"
-                             + "step size: " + std::to_string(STEP) + "\n"
-                             + "calculation time with " + std::to_string(cores) + " threads: " +
-                             std::to_string(elapsed_seconds.count()) + " seconds";
-
-        std::string headerWithJ = "J = " + std::to_string(J) + "\n" + header;
-
-        hlp::saveOutData(filename, headerWithJ, "J1/J2", "specific heat in J2", outData, N);
-
     }
 
-    void get_C_J_const(double J, int pos, std::vector<std::vector<std::tuple<double, double>>> *outData,
-                       const std::vector<indexStateVectorType> &indexList, const double &START,
-                       const double &END, const double &STEP, const int &N, const int &SIZE) {
-
-        const int COUNT = (int) indexList.size() - 1;
+    void get_C_J_3D(const double &J_START, const double &J_END, const int &J_COUNT,
+                    const double &T_START, const double &T_END, const double &T_STEP,
+                    double J, int pos, const int &N, const int &SIZE) {
 
         // progressbar init
         nextQTMutex.lock();
         std::cout << "\r[";
         for (int _ = 0; _ < PROGRESSBAR_SEGMENTS; _++) {
             std::cout << ".";
-        } std::cout << "] " << 0 <<  "% block = " << 0 << "/" << COUNT << "     ";
+        } std::cout << "] " << int(0.0) << "% J1/J2 = " << J_START << " (" << 0 << "/" << J_COUNT << ")     ";
         std::cout.flush();
         nextQTMutex.unlock();
 
-        while (pos < (int) indexList.size()) {
+        while (pos < J_COUNT) {
 
-            std::vector<std::tuple<double, double>> dat = MS::rungeKutta4_C(START, END, STEP, J, 1.0, N, indexList.at(pos));
+            std::vector<matrixType> matrixList = QT::MS::getHamilton(J, 1.0, N, SIZE);
+
+            std::vector<std::tuple<double, double>> data = QT::MS::rungeKutta4_C(T_START, T_END, T_STEP, J, 1.0, N, SIZE, matrixList);
 
             // progressbar
             nextQTMutex.lock();
-            int prg = std::min({NEXT, COUNT});;
-            int p = (int) ( (float) prg / (float) COUNT * (float) PROGRESSBAR_SEGMENTS);
+            int prg = std::min({NEXT, J_COUNT});;
+            int p = (int) ( (float) prg / (float) J_COUNT * (float) PROGRESSBAR_SEGMENTS);
             //coutMutex.lock();
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
                 std::cout << "#";
             } for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) COUNT * 100.0 ) << "% block = " << prg << "/" << COUNT << "     ";
+            } std::cout << "] " << int( (float) prg / (float) J_COUNT * 100.0 ) << "% block = " << prg << "/" << J_COUNT << "     ";
             std::cout.flush();
             //coutMutex.unlock();
 
             // write data
-            outData->push_back(dat);
             pos = NEXT;
             NEXT++;
             nextQTMutex.unlock();
+
+            J = (double) J_START + (double) (J_END - J_START) * (double) pos / (double) J_COUNT;
 
         }
 

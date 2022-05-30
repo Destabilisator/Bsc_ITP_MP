@@ -12,6 +12,8 @@ int main(int argc, char* argv[]) {
 
     validateInput(argc, argv, cpu_cnt, N, SIZE, J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, silent, cores, plotsIn3D, true, J1, J2, noX);
 
+    omp_set_num_threads((int) cpu_cnt);
+
 /////////////////////////////// calculate quantities ///////////////////////////////
 #ifndef DEBUG
 #ifdef ED_METHODS
@@ -59,7 +61,7 @@ int main(int argc, char* argv[]) {
 #ifdef DEBUG
 
    double stepsize = (T_END - T_START) / (double) T_COUNT;
-    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE);
+    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 10);
     ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 //    QT::multi::start_C_J_const(T_START, T_END, stepsize, cores, J1 / J2, N, SIZE);
 

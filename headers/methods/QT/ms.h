@@ -3,6 +3,7 @@
 #include <complex>
 #include <random>
 #include "Eigen/SparseCore"
+#include <omp.h>
 
 #include "helpers.h"
 #include "methods/ED/EDHelpers.h"
@@ -37,19 +38,14 @@ namespace QT::MS {
     std::vector<Eigen::VectorXcd> getVector(const int &N, const int &SIZE, const std::vector<matrixDataMomentumType> &matrixBlocks);
 
     std::vector<Eigen::VectorXcd> getVector(const std::vector<matrixType> &matrixBlocks);
-/*
-    // fourth order Runge-Kutta to calculate beta dependency
-    std::vector<std::tuple<double, double>> rungeKutta4_C(const double &start, const double &end, const double &step,
-                                                          const double &J1, const double &J2, const int &N,
-                                                          const indexStateVectorType& matrixIndex);
-*/
+
     // fourth order Runge-Kutta to calculate beta dependency
     std::vector<std::tuple<double, double>> rungeKutta4_C(const double &start, const double &end, const double &step,
                                                           const double &J1, const double &J2, const int &N, const int &SIZE,
                                                           const std::vector<matrixType> &matrixList);
 
     // calculate and save specific heat as a function of temperature (beta)
-    void start_calculation_C_J_const(const double &start, const double &end, const double &step,
-                                     const double &J1, const double &J2, const int &N, const int &SIZE);
+    void start_calculation_C_J_const(const double &start, const double &end, const double &step, const double &J1,
+                                     const double &J2, const int &N, const int &SIZE, const int &SAMPLES);
 
 }

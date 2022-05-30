@@ -6,8 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 find_package(Threads)
 
 if (WIN32)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc -O3")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -static-libstdc++ -static-libgcc -O3 -fopenmp")
     set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
     set(CMAKE_EXE_LINKER_FLAGS -static)
 else()
@@ -15,12 +14,12 @@ else()
     string(REGEX MATCH "Debian|Ubuntu" DIST ${ETC_ISSUE})
 
     if(DIST STREQUAL "Ubuntu")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -fopenmp")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
     else()
         find_package(MKL REQUIRED)
         set(MKLROOT /opt/intel/oneapi/mkl/latest)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL") ##############
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL -fopenmp")
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL")
     endif()
 endif()
@@ -62,8 +61,6 @@ add_executable(Bsc_ITP_MP main.h main.cpp
         headers/methods/QT/ms.h
         headers/methods/QT/multi.h
         headers/methods/QT/multi.cpp
-#        headers/methods/QT/3D.h
-#        headers/methods/QT/3D.cpp
         )
 
 if (WIN32)

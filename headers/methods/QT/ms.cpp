@@ -250,99 +250,61 @@ namespace QT::MS {
     }
 
     std::vector<std::tuple<double, double>> rungeKutta4_C(const double &start, const double &end, const double &step,
-                                                          const double &J1, const double &J2, const int &N,
-                                                          const indexStateVectorType& matrixIndex) {
-
-        std::vector<std::tuple<double, double>> outData;
-
-        int m = std::get<0>(matrixIndex);
-        int k = std::get<1>(matrixIndex);
-        std::vector<int> states = std::get<2>(matrixIndex);
-        std::vector<int> R_vals = std::get<3>(matrixIndex);
-
-//        std::cout << "Runge-Kutta; m = " << m << ", k = " << k << ", statescount = " << states.size() << "\n";
-
-        Eigen::MatrixXcd H = fillHamiltonBlock(J1, J2, k, states, R_vals, N);
-
-        Eigen::VectorXcd vec = getVector((int) states.size());
-        double beta = start - step;
-
-        while (beta <= end) {
-
-            beta += step;
-
-            Eigen::VectorXcd k1 = - 0.5 * H * vec;
-            Eigen::VectorXcd k2 = - 0.5 * H * (vec + step * 0.5 * k1);
-            Eigen::VectorXcd k3 = - 0.5 * H * (vec + step * 0.5 * k2);
-            Eigen::VectorXcd k4 = - 0.5 * H * (vec + step * k3);
-
-            vec = vec + step / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
-            vec.normalize();
-
-            std::complex<double> vec_H_vec = vec.adjoint() * H * vec;
-            std::complex<double> vec_H2_vec = vec.adjoint() * H * H * vec;
-            double H_diff = std::real(vec_H2_vec - vec_H_vec * vec_H_vec);
-            double C = beta * beta * H_diff / (double) N;
-
-            outData.emplace_back(beta, C);
-
-        }
-
-        outData.shrink_to_fit();
-        return outData;
-
-    }
-
-    std::vector<std::tuple<double, double>> rungeKutta4_C(const double &start, const double &end, const double &step,
                                                           const double &J1, const double &J2, const int &N, const int &SIZE,
                                                           const std::vector<matrixType> &matrixList) {
 
         std::vector<std::tuple<double, double>> outData;
         std::vector<Eigen::VectorXcd> vec = getVector(matrixList);
-
         int blockCount = (int) matrixList.size();
+
+        double norm = 0.0;
+        for (int i = 0; i < blockCount; i++) {
+            norm += std::pow(vec.at(i).norm(), 2);
+        } norm = std::sqrt(norm);
+        for (int i = 0; i < blockCount; i++) {
+            vec.at(i) = vec.at(i) / norm;
+        }
+
         double beta = start - step;
         while (beta <= end) {
 
-            std::cout << "runge kutta, beta = " << beta << "\n";
-
             beta += step;
 
-            double norm = 0.0;
+            norm = 0.0;
+
+            #pragma omp parallel for default(none) shared(blockCount, vec, matrixList, step, norm)
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), matrixList.at(i), step);
+                #pragma omp critical
                 norm += std::pow(vec.at(i).norm(), 2);
             }
-
-//            std::cout << norm << "\t";
 
             norm = std::sqrt(norm);
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = vec.at(i) / norm;
             }
 
-//            Eigen::VectorXcd v = Eigen::VectorXcd::Zero(SIZE);
-//
-//            int pos = 0;
-//            for (const Eigen::VectorXcd &vector : vec) {
-//                for (int i = 0; i < vector.rows(); i++) {
-//                    v(pos) = vector(i);
-//                    pos++;
-//                }
-//            }
-//            std::cout << v.norm() << "\n";
-
-//            vec = hlp::normalizedVectorList(vec, SIZE);
+            std::vector<double> vec_H_vec_List;
+            std::vector<double> vec_H2_vec_List;
 
             double C = 0.0;
+            #pragma omp parallel for default(none) shared(blockCount, matrixList, vec, vec_H_vec_List, vec_H2_vec_List)
             for (int i = 0; i < blockCount; i++) {
                 const matrixType &H = matrixList.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
-                std::complex<double> vec_H_vec = v.adjoint() * H * v;
-                std::complex<double> vec_H2_vec = v.adjoint() * H * H * v;
-                double H_diff = std::real(vec_H2_vec - vec_H_vec * vec_H_vec);
-                C += beta * beta * H_diff / (double) N;
+                double vHv = std::real((v.adjoint() * H * v)(0,0));
+                double vH2v = std::real((v.adjoint() * H * H * v)(0,0));
+                #pragma omp critical
+                vec_H_vec_List.emplace_back(vHv);
+                #pragma omp critical
+                vec_H2_vec_List.emplace_back(vH2v);
             }
+
+            double vec_H_vec = std::accumulate(vec_H_vec_List.begin(), vec_H_vec_List.end(), 0.0);
+            double vec_H2_vec = std::accumulate(vec_H2_vec_List.begin(), vec_H2_vec_List.end(), 0.0);
+
+            double H_diff = std::real(vec_H2_vec - std::pow(vec_H_vec, 2));
+            C += beta * beta * H_diff / (double) N;
 
             outData.emplace_back(beta, C);
 
@@ -354,38 +316,36 @@ namespace QT::MS {
     }
 
     void start_calculation_C_J_const(const double &start, const double &end, const double &step,
-                            const double &J1, const double &J2, const int &N, const int &SIZE) {
+                            const double &J1, const double &J2, const int &N, const int &SIZE, const int &SAMPLES) {
 
         auto start_timer = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "C(T), J = const, QT, momentum states ..." << std::endl;
 
-        std::vector<indexStateVectorType> indexList = getIndexAndStates(N, SIZE);
         std::vector<matrixType> matrixList = getHamilton(J1, J2, N, SIZE);
 
-        std::vector<std::tuple<double, double>> data = rungeKutta4_C(start, end, step, J1, J2, N, SIZE, matrixList);
+        typedef std::vector<std::tuple<double, double>> dataVectorType;
+        std::vector<dataVectorType> dataToAvg;
+        for (int _ = 1; _ <= SAMPLES; _++) {
+            std::cout << _ << "/" << SAMPLES << "\n";
+            dataVectorType rawData = rungeKutta4_C(start, end, step, J1, J2, N, SIZE, matrixList);
+            dataToAvg.push_back(rawData);
+        }
 
-//        std::vector<std::vector<std::tuple<double, double>>> rawData;
-//        for (const indexStateVectorType& index : indexList) {
-//            std::vector<std::tuple<double, double>> d = rungeKutta4_C(start, end, step, J1, J2, N, index);
-//            rawData.push_back(d);
-//        } rawData.shrink_to_fit();
-//
-//        std::vector<std::tuple<double, double>> data;
-//
-//        for (int i = 0; i < rawData.at(0).size(); i++) {
-//            double temp = std::get<0>(rawData.at(0).at(i));
-//            double C = 0.0;
-//            for (const std::vector<std::tuple<double, double>> &dat : rawData) {
-//                C += std::get<1>(dat.at(i));
-//            }
-//            C = C / (double) N;
-////            std::cout << temp << " " << C << "\n";
-//            data.emplace_back(temp, C);
-//        }
+        std::vector<std::tuple<double, double>> outData;
 
-        hlp::saveOutData("data_specific_heat_J_const_QT.txt", "QT, MS für N = " + std::to_string(N),
-                         "T in J2 / kb", "C in J2", data, N);
+        for (int i = 0; i < dataToAvg.at(0).size(); i++) {
+            double C = 0.0;
+            double beta = std::get<0>(dataToAvg.at(0).at(i));
+            for (dataVectorType data : dataToAvg) {
+                C += std::get<1>(data.at(i));
+            }
+            outData.emplace_back(beta, C / (double) SAMPLES);
+        }
+
+        hlp::saveOutData("data_specific_heat_J_const_QT.txt", "QT, MS für N = " + std::to_string(N)
+                        + " mit " + std::to_string(SAMPLES) + " Samples",
+                        "T in J2 / kb", "C in J2", outData, N);
 
         auto end_timer = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;

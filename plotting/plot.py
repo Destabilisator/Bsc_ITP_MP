@@ -77,17 +77,17 @@ def plot_specific_heat_J_const(N):
         Y += [float(y)]
     subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'red', label = "QT")
 
-    file = open("results/" + N + "_data_specific_heat_J_const_QT_multi.txt", 'r')
-    lines = file.readlines()
-    linesJ = lines[0][len("J1/J2 = "):-1]
-    lbl = "N = " + N
-    X = []
-    Y = []
-    for i in range(8,len(lines)):
-        x, y = lines[i].split("\t")
-        X += [float(x)]
-        Y += [float(y)]
-    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'green', label = "QT")
+    # file = open("results/" + N + "_data_specific_heat_J_const_QT_multi.txt", 'r')
+    # lines = file.readlines()
+    # linesJ = lines[0][len("J1/J2 = "):-1]
+    # lbl = "N = " + N
+    # X = []
+    # Y = []
+    # for i in range(8,len(lines)):
+    #     x, y = lines[i].split("\t")
+    #     X += [float(x)]
+    #     Y += [float(y)]
+    # subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'green', label = "QT")
 
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
