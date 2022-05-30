@@ -11,15 +11,17 @@
 #include "helpers.h"
 #include "defines.h"
 
-static int CURRENT = 1;
-static const int PROGRESSBAR_SEGMENTS = 50;
-
-//static std::mutex coutMutex;
-static std::mutex nextJMutex;
-
 /////////////////////////////// multi-threading ///////////////////////////////
 
 namespace ED::multi {
+
+    static int CURRENT = 1;
+    const int PROGRESSBAR_SEGMENTS = 50;
+
+    //static std::mutex coutMutex;
+    static std::mutex nextJMutex;
+
+    /////////////////////////////// Delta E, C(J) ///////////////////////////////
 
     void get_DeltaE_CT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
@@ -35,6 +37,8 @@ namespace ED::multi {
     void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END,
                                int &cores, const double &T, const int &N, const int &SIZE);
 
+    /////////////////////////////// Chi(J) ///////////////////////////////
+
     void get_XT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
                       const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T);
 
@@ -43,6 +47,8 @@ namespace ED::multi {
 
     void start_XT_const(const int &COUNT, const double &START, const double &END,
                         int &cores, const double &T, const int &N, const int &SIZE);
+
+    /////////////////////////////// spin gap ///////////////////////////////
 
     void get_SpinGap_momentum(double J, int pos, std::vector<std::tuple<double, double>> *outDataSpinGap,
                               const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);

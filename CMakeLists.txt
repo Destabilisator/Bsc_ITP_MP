@@ -56,8 +56,15 @@ add_executable(Bsc_ITP_MP main.h main.cpp
         headers/methods/ED/3DPlots.h
         headers/methods/ED/3DPlots.cpp
         headers/methods/QTMethods.h
+        headers/methods/QT/QTHelpers.h
+        headers/methods/QT/QTHelpers.cpp
         headers/methods/QT/ms.cpp
-        headers/methods/QT/ms.h)
+        headers/methods/QT/ms.h
+        headers/methods/QT/multi.h
+        headers/methods/QT/multi.cpp
+#        headers/methods/QT/3D.h
+#        headers/methods/QT/3D.cpp
+        )
 
 if (WIN32)
     target_link_libraries(Bsc_ITP_MP ${CMAKE_THREAD_LIBS_INIT})

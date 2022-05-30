@@ -65,6 +65,30 @@ def plot_specific_heat_J_const(N):
     subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 18)
     subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", $k_B$ = 1", fontsize = 18)
 
+    file = open("results/" + N + "_data_specific_heat_J_const_QT.txt", 'r')
+    lines = file.readlines()
+    linesJ = lines[0][len("J1/J2 = "):-1]
+    lbl = "N = " + N
+    X = []
+    Y = []
+    for i in range(3,len(lines)):
+        x, y = lines[i].split("\t")
+        X += [float(x)]
+        Y += [float(y)]
+    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'red', label = "QT")
+
+    file = open("results/" + N + "_data_specific_heat_J_const_QT_multi.txt", 'r')
+    lines = file.readlines()
+    linesJ = lines[0][len("J1/J2 = "):-1]
+    lbl = "N = " + N
+    X = []
+    Y = []
+    for i in range(8,len(lines)):
+        x, y = lines[i].split("\t")
+        X += [float(x)]
+        Y += [float(y)]
+    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'green', label = "QT")
+
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
     plt.savefig("results/" + N + "_specific_heat_J_const.png")
@@ -186,14 +210,14 @@ if __name__ == "__main__":
 
     N = sys.argv[1]
     
-    plot_delta_E(N)
-    plot_specific_heat_T_const(N)
+    # plot_delta_E(N)
+    # plot_specific_heat_T_const(N)
     plot_specific_heat_J_const(N)
-    if sys.argv[3] != "noX":
-        plot_susceptibility_T_const(N)
-    plot_susceptibility_J_const(N)
-    plot_k_dispersion_J_const(N)
-    plot_spin_gap(N)
+    # if sys.argv[3] != "noX":
+    #     plot_susceptibility_T_const(N)
+    # plot_susceptibility_J_const(N)
+    # plot_k_dispersion_J_const(N)
+    # plot_spin_gap(N)
 
     end_time = time.time()
 

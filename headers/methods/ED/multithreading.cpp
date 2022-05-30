@@ -4,6 +4,8 @@
 
 namespace ED::multi {
 
+    /////////////////////////////// Delta E, C(J) ///////////////////////////////
+
     void get_DeltaE_CT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
@@ -270,6 +272,8 @@ namespace ED::multi {
 
     }
 
+    /////////////////////////////// Chi(J) ///////////////////////////////
+
     void get_XT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
                       const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T) {
 
@@ -442,6 +446,8 @@ namespace ED::multi {
 //        std::cout << "\n";
 
     }
+
+    /////////////////////////////// spin gap ///////////////////////////////
 
     void get_SpinGap_momentum(double J, int pos, std::vector<std::tuple<double, double>> *outDataSpinGap,
                               const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {

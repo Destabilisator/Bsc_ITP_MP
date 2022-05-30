@@ -4,14 +4,14 @@ start_time=$SECONDS
 
 if [[ "$#" -ge 4 ]]; then
 	N=$1
-	J_START=$2
-	J_END=$3
-	J_COUNT=$4
+	START=$2
+	END=$3
+	COUNT=$4
 else
 	N=4
-	J_START=1
-	J_END=2
-	J_COUNT=30
+	START=1
+	END=2
+	COUNT=30
 fi
 
 if [[ "$#" -ge 5 ]]; then
@@ -47,7 +47,7 @@ else
 	pth=python3
 fi
 
-./cmake-build-release/$prgm $N $J_START $J_END $J_COUNT $CORES $noX $SILENT
+./cmake-build-release/$prgm $N $START $END $COUNT $CORES $noX $SILENT
 echo ""
 echo "plotting for N = $N:"
 $pth ./plotting/plot.py $N $show $noX
