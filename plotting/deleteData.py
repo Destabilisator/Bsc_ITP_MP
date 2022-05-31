@@ -3,7 +3,7 @@ import sys
 
 N = sys.argv[1]
 
-print("removing old data ...")
+print("removing old data (" + N + ") ...")
 for filename in os.listdir("results/3DData/" + N + "/C/"):
     if filename == "dummyFile.txt":
         continue

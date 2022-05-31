@@ -16,9 +16,9 @@ namespace QT::multi {
 
     static int NEXT = 0;
     static const int PROGRESSBAR_SEGMENTS = 50;
-//    //static std::mutex coutMutex;
-
     static std::mutex nextQTMutex;
+
+    typedef std::tuple<int, int, std::vector<int>, std::vector<int>> indexStateVectorType;
 
     /////////////////////////////// C(T) ///////////////////////////////
 

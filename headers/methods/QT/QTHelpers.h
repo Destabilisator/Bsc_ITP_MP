@@ -24,4 +24,7 @@ namespace QT::hlp {
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
                      const std::vector<std::tuple<double, double>> &outData, const int &N);
 
+    void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
+                     const std::vector<double> &xData, const std::vector<double> &yData, const int &N);
+
 }

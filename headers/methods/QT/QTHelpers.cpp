@@ -47,6 +47,7 @@ namespace QT::hlp {
 
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
                      const std::vector<std::tuple<double, double>> &outData, const int &N) {
+
         std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
         std::ofstream file;
         try {
@@ -55,6 +56,26 @@ namespace QT::hlp {
             file << x_lbl << "\t" << y_lbl << "\n";
             for (std::tuple<double, double> data : outData) {
                 file << std::get<0>(data) << "\t" << std::get<1>(data) << "\n";
+            }
+        } catch (...) {
+            file.close();
+            std::cout << "failed to save to file\n";
+        }
+        std::cout << "done\n";
+        file.close();
+    }
+
+    void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
+                     const std::vector<double> &xData, const std::vector<double> &yData, const int &N) {
+
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
+        std::ofstream file;
+        try {
+            file.open("./results/" + std::to_string(N) + "_" + filename);
+            file << header <<"\n\n";
+            file << x_lbl << "\t" << y_lbl << "\n";
+            for (int i = 0; i < xData.size(); i++) {
+                file << xData.at(i) << "\t" << yData.at(i) << "\n";
             }
         } catch (...) {
             file.close();

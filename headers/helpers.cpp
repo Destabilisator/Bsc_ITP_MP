@@ -31,6 +31,7 @@ void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N,
         if (argv[1] != DDD) {
             goto no3D;
         }
+        std::cout << "3D plots:\n";
         plotsIn3D = true;
         if ( (std::stoi(argv[2]) % 2 == 0) && (std::stoi(argv[2]) >= 6) && (std::stoi(argv[2]) <= 32) ) {
             N = std::stoi(argv[2]);
@@ -90,6 +91,7 @@ void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N,
 
     no3D:
 
+    std::cout << "2D plots:\n";
     if (argc >= 2) {
         if ( (std::stoi(argv[1]) % 2 == 0) && (std::stoi(argv[1]) >= 6) && (std::stoi(argv[1]) <= 32) ) {
             N = std::stoi(argv[1]);
@@ -102,6 +104,7 @@ void validateInput(int &argc, char* argv[], const unsigned int &cpu_cnt, int &N,
     if (argc >= 5) {
         std::cout << "range given: ";
         if (std::stod(argv[2]) > std::stod(argv[3]) || std::stoi(argv[4]) < 1) {
+//            std::cout << argv[2] << "\t" << argv[3] << "\t" << argv[4] << "\n";
             std::cout << "range invalid, defaulting...\n";
         } else {
             J_START = std::stod(argv[2]); J_END = std::stod(argv[3]); J_COUNT = std::stoi(argv[4]);

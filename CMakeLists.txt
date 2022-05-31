@@ -61,7 +61,7 @@ add_executable(Bsc_ITP_MP main.h main.cpp
         headers/methods/QT/ms.h
         headers/methods/QT/multi.h
         headers/methods/QT/multi.cpp
-        )
+        headers/methods/QT/mb.h headers/methods/QT/mb.cpp)
 
 if (WIN32)
     target_link_libraries(Bsc_ITP_MP ${CMAKE_THREAD_LIBS_INIT})
