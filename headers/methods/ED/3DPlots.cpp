@@ -4,216 +4,158 @@
 
 namespace ED::plot3D {
 
-    void get_C(double J, int pos, const int &JCOUNT, const double &JSTART, const double &JEND,
-                      const int &TCOUNT, const double &TSTART, const double &TEND,
-                      const int &N, const int &SIZE) {
+    /////////////////////////////// C ///////////////////////////////
 
-        // progressbar init
-        nextJMutex3D.lock();
-        std::cout << "\r[";
-        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-            std::cout << ".";
-        } std::cout << "] " << int(0.0) << "% J1/J2 = " << JSTART << " (" << 0 << "/" << JCOUNT << ")     ";
-        std::cout.flush();
-        nextJMutex3D.unlock();
+    void get_C_momentum(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE) {
 
-        while (true) {
+        std::vector<std::complex<double>> eiVals;
+        std::vector<Eigen::MatrixXcd> matrixBlocks;
 
-            std::vector<std::complex<double>> eiVals;
-            std::vector<Eigen::MatrixXcd> matrixBlocks;
+        momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
 
-            momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
+        std::vector<std::tuple<double, double>> C_func_T;
 
-            std::vector<std::tuple<double, double>> C_func_T;
-
-            nextJMutex3D.lock();
-            for (int i = 0; i <= TCOUNT; i++) {
-                double T = TSTART + (TEND - TSTART) * i / TCOUNT;
-                C_func_T.emplace_back(T, getSpecificHeat(T, eiVals, N));
-            }
-
-            nextJMutex3D.unlock();
-
-            save3DPlotDataC(J, N, C_func_T);
-
-            // progressbar
-            nextJMutex3D.lock();
-            int prg = std::min({CURRENT3D, JCOUNT});
-            int p = (int) ( (float) prg / (float) JCOUNT * (float) PROGRESSBAR_SEGMENTS3D);
-            std::cout << "\r[";
-            for (int _ = 0; _ < p; _++) {
-                std::cout << "#";
-            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-                std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) JCOUNT * 100.0 ) << "% J1/J2 = "
-                        << JSTART + (JEND - JSTART) * prg / JCOUNT << " (" << prg << "/" << JCOUNT << ")     ";
-            std::cout.flush();
-            pos = CURRENT3D;
-            CURRENT3D++;
-            nextJMutex3D.unlock();
-
-            if (pos > JCOUNT) {
-                break;
-            } else {
-                J = JSTART + (JEND - JSTART) * pos / JCOUNT;
-            }
-
+        for (int i = 0; i <= TCOUNT; i++) {
+            double T = TSTART + (TEND - TSTART) * i / TCOUNT;
+            C_func_T.emplace_back(T, getSpecificHeat(1.0 / T, eiVals, N)); // beta = 1.0 / T => 1.0 / beta = T, undo T => beta conversion
         }
+
+        save3DPlotDataC(J, N, C_func_T);
+
+        // write data
+        nextJMutex3D.lock();
+//        CURRENT3D++;
+        nextJMutex3D.unlock();
 
     }
 
-    void get_C_parity(double J, int pos, const int &JCOUNT, const double &JSTART, const double &JEND,
-                             const int &TCOUNT, const double &TSTART, const double &TEND,
-                             const int &N, const int &SIZE) {
+    void get_C_parity(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE) {
 
-        // progressbar init
-        nextJMutex3D.lock();
-        std::cout << "\r[";
-        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-            std::cout << ".";
-        } std::cout << "] " << int(0.0) << "% J1/J2 = " << JSTART << " (" << 0 << "/" << JCOUNT << ")     ";
-        std::cout.flush();
-        nextJMutex3D.unlock();
+        std::vector<double> eiVals;
+        std::vector<Eigen::MatrixXd> matrixBlocks;
 
-        while (true) {
+        parityStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
 
-            std::vector<double> eiVals;
-            std::vector<Eigen::MatrixXd> matrixBlocks;
+        std::vector<std::tuple<double, double>> C_func_T;
 
-            parityStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
-
-            std::vector<std::tuple<double, double>> C_func_T;
-
-            for (int i = 0; i <= TCOUNT; i++) {
-                double T = TSTART + (TEND - TSTART) * i / TCOUNT;
-                C_func_T.emplace_back(T, getSpecificHeat(T, eiVals, N));
-            }
-
-            save3DPlotDataC(J, N, C_func_T);
-
-            // progressbar
-            nextJMutex3D.lock();
-            int prg = std::min({CURRENT3D, JCOUNT});
-            int p = (int) ( (float) prg / (float) JCOUNT * (float) PROGRESSBAR_SEGMENTS3D);
-            std::cout << "\r[";
-            for (int _ = 0; _ < p; _++) {
-                std::cout << "#";
-            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-                std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) JCOUNT * 100.0 ) << "% J1/J2 = "
-                        << JSTART + (JEND - JSTART) * prg / JCOUNT << " (" << prg << "/" << JCOUNT << ")     ";
-            std::cout.flush();
-            pos = CURRENT3D;
-            CURRENT3D++;
-            nextJMutex3D.unlock();
-
-            if (pos > JCOUNT) {
-                break;
-            } else {
-                J = JSTART + (JEND - JSTART) * pos / JCOUNT;
-            }
-
+        for (int i = 0; i <= TCOUNT; i++) {
+            double T = TSTART + (TEND - TSTART) * i / TCOUNT;
+            C_func_T.emplace_back(T, getSpecificHeat(1.0 / T, eiVals, N)); // beta = 1.0 / T => 1.0 / beta = T, undo T => beta conversion
         }
+
+        save3DPlotDataC(J, N, C_func_T);
+
+        // write data
+        nextJMutex3D.lock();
+//        CURRENT3D++;
+        nextJMutex3D.unlock();
 
     }
 
-    void get_C_SI(double J, int pos, const int &JCOUNT, const double &JSTART, const double &JEND,
-                         const int &TCOUNT, const double &TSTART, const double &TEND,
-                         const int &N, const int &SIZE) {
+    void get_C_SI(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE) {
 
-        // progressbar init
-        nextJMutex3D.lock();
-        std::cout << "\r[";
-        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-            std::cout << ".";
-        } std::cout << "] " << int(0.0) << "% J1/J2 = " << JSTART << " (" << 0 << "/" << JCOUNT << ")     ";
-        std::cout.flush();
-        nextJMutex3D.unlock();
+        std::vector<double> eiVals;
+        std::vector<Eigen::MatrixXd> matrixBlocks;
 
-        while (true) {
+        spinInversion::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
 
-            std::vector<double> eiVals;
-            std::vector<Eigen::MatrixXd> matrixBlocks;
+        std::vector<std::tuple<double, double>> C_func_T;
 
-            spinInversion::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
-
-            std::vector<std::tuple<double, double>> C_func_T;
-
-            for (int i = 0; i <= TCOUNT; i++) {
-                double T = TSTART + (TEND - TSTART) * i / TCOUNT;
-                C_func_T.emplace_back(T, getSpecificHeat(T, eiVals, N));
-            }
-
-            save3DPlotDataC(J, N, C_func_T);
-
-            // progressbar
-            nextJMutex3D.lock();
-            int prg = std::min({CURRENT3D, JCOUNT});
-            int p = (int) ( (float) prg / (float) JCOUNT * (float) PROGRESSBAR_SEGMENTS3D);
-            std::cout << "\r[";
-            for (int _ = 0; _ < p; _++) {
-                std::cout << "#";
-            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-                std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) JCOUNT * 100.0 ) << "% J1/J2 = "
-                        << JSTART + (JEND - JSTART) * prg / JCOUNT << " (" << prg << "/" << JCOUNT << ")     ";
-            std::cout.flush();
-            pos = CURRENT3D;
-            CURRENT3D++;
-            nextJMutex3D.unlock();
-
-            if (pos > JCOUNT) {
-                break;
-            } else {
-                J = JSTART + (JEND - JSTART) * pos / JCOUNT;
-            }
-
+        for (int i = 0; i <= TCOUNT; i++) {
+            double T = TSTART + (TEND - TSTART) * i / TCOUNT;
+            C_func_T.emplace_back(T, getSpecificHeat(1.0 / T, eiVals, N)); // beta = 1.0 / T => 1.0 / beta = T, undo T => beta conversion
         }
+
+        save3DPlotDataC(J, N, C_func_T);
+
+        // write data
+        nextJMutex3D.lock();
+//        CURRENT3D++;
+        nextJMutex3D.unlock();
 
     }
 
-    void start_C(const int &JCOUNT, const double &JSTART, const double &JEND,
-                               const int &TCOUNT, const double &TSTART, const double &TEND,
-                               int &cores, const int &N, const int &SIZE) {
+    void start_C(const double &JSTART, const double &JEND, const int &JCOUNT,
+                 const double &TSTART, const double &TEND, const int &TCOUNT,
+                 int &cores, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "specific heat (3D): calculating:...";
 
-        if (JCOUNT < cores) {
-            cores = JCOUNT;
-        }
-
         std::cout << " (" << cores << ") cores";
-
-        std::thread Threads[cores];
-
-        CURRENT3D = 0 + cores;
 
         if (N%4 == 0) {
             if (N >= 12) {
                 std::cout << ", spin inversion\n";
-                for (int i = 0; i < cores; i++) {
-                    Threads[i] = std::thread(get_C_SI, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,
-                                             JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
+                int curr = 0;
+#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
+                for (int i = 0; i <= JCOUNT; i++) {
+                    double J = JSTART + (JEND - JSTART) * i / JCOUNT;
+                    coutMutex.lock();
+                    int p = (int) ((float) curr / (float) (JCOUNT) * (float) PROGRESSBAR_SEGMENTS);
+                    std::cout << "\r[";
+                    for (int _ = 0; _ < p; _++) {
+                        std::cout << "#";
+                    }
+                    for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                        std::cout << ".";
+                    }
+                    std::cout << "] " << int((float) curr / (float) JCOUNT * 100) << "% J1/J2 = " << J << " (" << curr
+                              << "/" << JCOUNT << ")     ";
+                    std::cout.flush();
+                    curr++;
+                    coutMutex.unlock();
+
+                    get_C_SI(J, TCOUNT, TSTART, TEND, N, SIZE);
                 }
             } else {
                 std::cout << ", parity states\n";
-                for (int i = 0; i < cores; i++) {
-                    Threads[i] = std::thread(get_C_parity, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,
-                                             JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
+                int curr = 0;
+#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
+                for (int i = 0; i <= JCOUNT; i++) {
+                    double J = JSTART + (JEND - JSTART) * i / JCOUNT;
+                    coutMutex.lock();
+                    int p = (int) ((float) curr / (float) (JCOUNT) * (float) PROGRESSBAR_SEGMENTS);
+                    std::cout << "\r[";
+                    for (int _ = 0; _ < p; _++) {
+                        std::cout << "#";
+                    }
+                    for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                        std::cout << ".";
+                    }
+                    std::cout << "] " << int((float) curr / (float) JCOUNT * 100) << "% J1/J2 = " << J << " (" << curr
+                              << "/" << JCOUNT << ")     ";
+                    std::cout.flush();
+                    curr++;
+                    coutMutex.unlock();
+
+                    get_C_parity(J, TCOUNT, TSTART, TEND, N, SIZE);
                 }
             }
         } else {
             std::cout << ", momentum states\n";
-            for (int i = 0; i < cores; i++) {
-                Threads[i] = std::thread(get_C, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,
-                                         JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
-            }
-        }
+            int curr = 0;
+#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
+            for (int i = 0; i <= JCOUNT; i++) {
+                double J = JSTART + (JEND - JSTART) * i / JCOUNT;
+                coutMutex.lock();
+                int p = (int) ((float) curr / (float) (JCOUNT) * (float) PROGRESSBAR_SEGMENTS);
+                std::cout << "\r[";
+                for (int _ = 0; _ < p; _++) {
+                    std::cout << "#";
+                }
+                for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                    std::cout << ".";
+                }
+                std::cout << "] " << int((float) curr / (float) JCOUNT * 100) << "% J1/J2 = " << J << " (" << curr
+                          << "/" << JCOUNT << ")     ";
+                std::cout.flush();
+                curr++;
+                coutMutex.unlock();
 
-        for (int i = 0; i < cores; i++) {
-            Threads[i].join();
+                get_C_momentum(J, TCOUNT, TSTART, TEND, N, SIZE);
+            }
         }
 
         auto end = std::chrono::steady_clock::now();
@@ -223,165 +165,129 @@ namespace ED::plot3D {
 
     }
 
-    void get_X(double J, int pos, const int &JCOUNT, const double &JSTART, const double &JEND,
-               const int &TCOUNT, const double &TSTART, const double &TEND,
-               const int &N, const int &SIZE) {
+    /////////////////////////////// Chi ///////////////////////////////
 
-        // progressbar init
-        nextJMutex3D.lock();
-        std::cout << "\r[";
-        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-            std::cout << ".";
-        } std::cout << "] " << int(0.0) << "% J1/J2 = " << JSTART << " (" << 0 << "/" << JCOUNT << ")     ";
-        std::cout.flush();
-        nextJMutex3D.unlock();
+    void get_X_magnetization(double J, const int &N, const int &SIZE,
+               const double &JSTART, const double &JEND, const int &JCOUNT,
+               const double &TSTART, const double &TEND, const int &TCOUNT) {
 
-        while (true) {
+        std::vector<int> states;
+        std::vector<std::complex<double>> eiVals;
 
-            std::vector<int> states;
-            std::vector<std::complex<double>> eiVals;
+        fillStates(&states, N/2, N, SIZE);
+        const int statesCount = (int) states.size();
 
-            fillStates(&states, N/2, N, SIZE);
-            const int statesCount = (int) states.size();
+        Eigen::MatrixXcd matrixBlockU;
+        magnetizationBlocks::getEiValsZeroBlock(J, 1.0, &eiVals, matrixBlockU, states, N);
 
-            Eigen::MatrixXcd matrixBlockU;
-            magnetizationBlocks::getEiValsZeroBlock(J, 1.0, &eiVals, matrixBlockU, states, N);
+        Eigen::MatrixXd S2 = spinMatrix(N, states);
+        Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(statesCount, statesCount);
+        Matrix_U_inv_S2_U = matrixBlockU.adjoint() * S2 * matrixBlockU;
 
-            Eigen::MatrixXd S2 = spinMatrix(N, states);
-            Eigen::MatrixXcd Matrix_U_inv_S2_U = Eigen::MatrixXcd::Zero(statesCount, statesCount);
-            Matrix_U_inv_S2_U = matrixBlockU.adjoint() * S2 * matrixBlockU;
+        std::vector<std::tuple<double, double>> X_func_T;
 
-            std::vector<std::tuple<double, double>> X_func_T;
-
-            for (int i = 0; i <= TCOUNT; i++) {
-                double T = TSTART + (TEND - TSTART) * i / TCOUNT;
-                X_func_T.emplace_back(T, getSusceptibilityDegeneracy(T, Matrix_U_inv_S2_U, eiVals, N));
-            }
-
-            save3DPlotDataX(J, N, X_func_T);
-
-            // progressbar
-            nextJMutex3D.lock();
-            int prg = std::min({CURRENT3D, JCOUNT});
-            int p = (int) ( (float) prg / (float) JCOUNT * (float) PROGRESSBAR_SEGMENTS3D);
-            std::cout << "\r[";
-            for (int _ = 0; _ < p; _++) {
-                std::cout << "#";
-            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-                std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) JCOUNT * 100.0 ) << "% J1/J2 = "
-                        << JSTART + (JEND - JSTART) * prg / JCOUNT << " (" << prg << "/" << JCOUNT << ")     ";
-            std::cout.flush();
-            pos = CURRENT3D;
-            CURRENT3D++;
-            nextJMutex3D.unlock();
-
-            if (pos > JCOUNT) {
-                break;
-            } else {
-                J = JSTART + (JEND - JSTART) * pos / JCOUNT;
-            }
-
+        for (int i = 0; i <= TCOUNT; i++) {
+            double T = TSTART + (TEND - TSTART) * i / TCOUNT;
+            X_func_T.emplace_back(T, getSusceptibilityDegeneracy(T, Matrix_U_inv_S2_U, eiVals, N));
         }
+
+        save3DPlotDataX(J, N, X_func_T);
+
+        // write data
+        nextJMutex3D.lock();
+//        CURRENT3D++;
+        nextJMutex3D.unlock();
 
     }
 
-    void get_X_momentum(double J, int pos, const int &JCOUNT, const double &JSTART, const double &JEND,
-               const int &TCOUNT, const double &TSTART, const double &TEND,
-               const int &N, const int &SIZE) {
+    void get_X_momentum(double J, const int &N, const int &SIZE,
+                        const double &JSTART, const double &JEND, const int &JCOUNT,
+                        const double &TSTART, const double &TEND, const int &TCOUNT) {
 
-        // progressbar init
-        nextJMutex3D.lock();
-        std::cout << "\r[";
-        for (int _ = 0; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-            std::cout << ".";
-        } std::cout << "] " << int(0.0) << "% J1/J2 = " << JSTART << " (" << 0 << "/" << JCOUNT << ")     ";
-        std::cout.flush();
-        nextJMutex3D.unlock();
+        std::vector<std::vector<std::complex<double>>> eiVals;
+        std::vector<Eigen::MatrixXcd> matrixBlockU;
+        std::vector<Eigen::MatrixXcd> matrixBlockS2;
+        momentumStates::getEiValsZeroBlock(J, 1.0, eiVals, matrixBlockU, matrixBlockS2, N, SIZE);
 
-        while (true) {
+        std::vector<std::tuple<double, double>> X_func_T;
 
-            std::vector<std::vector<std::complex<double>>> eiVals;
-            std::vector<Eigen::MatrixXcd> matrixBlockU;
-            std::vector<Eigen::MatrixXcd> matrixBlockS2;
-            momentumStates::getEiValsZeroBlock(J, 1.0, eiVals, matrixBlockU, matrixBlockS2, N, SIZE);
-
-            std::vector<std::tuple<double, double>> X_func_T;
-
-            std::vector<Eigen::MatrixXcd> Blocks_U_inv_S2_U;
-            for(int i = 0; i < matrixBlockU.size(); i++) {
-                Eigen::MatrixXcd M = matrixBlockU.at(i).adjoint() * matrixBlockS2.at(i) * matrixBlockU.at(i);
-                Blocks_U_inv_S2_U.push_back(M);
-            }
-
-            for (int i = 0; i <= TCOUNT; i++) {
-                double current = TSTART + (TEND - TSTART) * i / TCOUNT;
-                //current_beta = 1 / current_beta;
-                X_func_T.emplace_back(current, getSusceptibilityDegeneracy(current, Blocks_U_inv_S2_U, eiVals, N));
-            }
-
-            save3DPlotDataX(J, N, X_func_T);
-
-            // progressbar
-            nextJMutex3D.lock();
-            int prg = std::min({CURRENT3D, JCOUNT});
-            int p = (int) ( (float) prg / (float) JCOUNT * (float) PROGRESSBAR_SEGMENTS3D);
-            std::cout << "\r[";
-            for (int _ = 0; _ < p; _++) {
-                std::cout << "#";
-            } for (int _ = p; _ < PROGRESSBAR_SEGMENTS3D; _++) {
-                std::cout << ".";
-            } std::cout << "] " << int( (float) prg / (float) JCOUNT * 100.0 ) << "% J1/J2 = "
-                        << JSTART + (JEND - JSTART) * prg / JCOUNT << " (" << prg << "/" << JCOUNT << ")     ";
-            std::cout.flush();
-            pos = CURRENT3D;
-            CURRENT3D++;
-            nextJMutex3D.unlock();
-
-            if (pos > JCOUNT) {
-                break;
-            } else {
-                J = JSTART + (JEND - JSTART) * pos / JCOUNT;
-            }
-
+        std::vector<Eigen::MatrixXcd> Blocks_U_inv_S2_U;
+        for(int i = 0; i < matrixBlockU.size(); i++) {
+            Eigen::MatrixXcd M = matrixBlockU.at(i).adjoint() * matrixBlockS2.at(i) * matrixBlockU.at(i);
+            Blocks_U_inv_S2_U.push_back(M);
         }
+
+        for (int i = 0; i <= TCOUNT; i++) {
+            double current = TSTART + (TEND - TSTART) * i / TCOUNT;
+            //current_beta = 1 / current_beta;
+            X_func_T.emplace_back(current, getSusceptibilityDegeneracy(current, Blocks_U_inv_S2_U, eiVals, N));
+        }
+
+        save3DPlotDataX(J, N, X_func_T);
+
+        // write data
+        nextJMutex3D.lock();
+//        CURRENT3D++;
+        nextJMutex3D.unlock();
 
     }
 
-    void start_X(const int &JCOUNT, const double &JSTART, const double &JEND,
-                 const int &TCOUNT, const double &TSTART, const double &TEND,
+    void start_X(const double &JSTART, const double &JEND, const int &JCOUNT,
+                 const double &TSTART, const double &TEND, const int &TCOUNT,
                  int &cores, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "susceptibility (3D): calculating:...";
-        if (JCOUNT < cores) {
-            cores = JCOUNT;
-        }
+
         std::cout << " (" << cores << ") cores";
-
-        std::thread Threads[cores];
-
-        CURRENT3D = 0 + cores;
-
 
         if (N >= 10) {
             std::cout << ", momentum states\n";
-            for (int i = 0; i < cores; i++) {
-                Threads[i] = std::thread(get_X_momentum, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,
-                                         JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
+            int curr = 0;
+#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
+            for (int i = 0; i <= JCOUNT; i++) {
+                double J = JSTART + (JEND - JSTART) * i / JCOUNT;
+                coutMutex.lock();
+                int p = (int) ((float) curr / (float) (JCOUNT) * (float) PROGRESSBAR_SEGMENTS);
+                std::cout << "\r[";
+                for (int _ = 0; _ < p; _++) {
+                    std::cout << "#";
+                }
+                for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                    std::cout << ".";
+                }
+                std::cout << "] " << int((float) curr / (float) JCOUNT * 100) << "% J1/J2 = " << J << " (" << curr
+                          << "/" << JCOUNT << ")     ";
+                std::cout.flush();
+                curr++;
+                coutMutex.unlock();
+
+                get_X_momentum(J, N, SIZE, JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT);
             }
         } else {
             std::cout << ", magnetization blocks\n";
-            for (int i = 0; i < cores; i++) {
-                Threads[i] = std::thread(get_X, JSTART + (JEND - JSTART) * i / JCOUNT, i + 1,
-                                         JCOUNT, JSTART, JEND, TCOUNT, TSTART, TEND, N, SIZE);
+            int curr = 0;
+#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
+            for (int i = 0; i <= JCOUNT; i++) {
+                double J = JSTART + (JEND - JSTART) * i / JCOUNT;
+                coutMutex.lock();
+                int p = (int) ((float) curr / (float) (JCOUNT) * (float) PROGRESSBAR_SEGMENTS);
+                std::cout << "\r[";
+                for (int _ = 0; _ < p; _++) {
+                    std::cout << "#";
+                }
+                for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                    std::cout << ".";
+                }
+                std::cout << "] " << int((float) curr / (float) JCOUNT * 100) << "% J1/J2 = " << J << " (" << curr
+                          << "/" << JCOUNT << ")     ";
+                std::cout.flush();
+                curr++;
+                coutMutex.unlock();
+
+                get_X_magnetization(J, N, SIZE, JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT);
             }
-        }
-
-
-        for (int i = 0; i < cores; i++) {
-            Threads[i].join();
         }
 
         auto end = std::chrono::steady_clock::now();

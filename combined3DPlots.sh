@@ -1,9 +1,9 @@
 #!/bin/bash
 
-Jstart=0
+Jstart=0.01
 Jend=5
 Jcount=20
-Tstart=0
+Tstart=0.01
 Tend=5
 Tcount=50000
 

@@ -1,6 +1,6 @@
 #include "main.h"
 
-#define DEBUG
+//#define DEBUG
 #define ED_METHODS
 
 int main(int argc, char* argv[]) {
@@ -16,16 +16,18 @@ int main(int argc, char* argv[]) {
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 #ifndef DEBUG
-    QT::MS::start_calculation_C_J_const(T_START, T_END * T_END, 0.01, J1, J2, N, SIZE, 1000); ////////////////////////////
+
 #ifdef ED_METHODS
     if(plotsIn3D) {
         // 3D Plots of specific heat dependent on T and J
-        ED::plot3D::start_C(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
+        ED::plot3D::start_C(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
         // 3D Plots of susceptibility dependent on T and J
         if (!noX) {
-            ED::plot3D::start_X(J_COUNT, J_START, J_END, T_COUNT, T_START, T_END, cores, N, SIZE);
+            ED::plot3D::start_X(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
         }
     } else {
+        QT::MS::start_calculation_C_J_const(T_START, T_END * T_END, 0.01, J1, J2, N, SIZE, 10); ////////////////////////////
+
         // excitation energy \Delta E(J) and specific heat C(J), T = const
         ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
 
@@ -36,8 +38,8 @@ int main(int argc, char* argv[]) {
             ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END * T_END, T_COUNT); ////////////////////////////
         }
 
-        // spin gap E_{gap} (J)
-        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+        // spin gap E_gap (J)
+        ED::multi::start_SpinGap(J_COUNT, J_START, J_END/2.0, cores, N, SIZE);
 
         // susceptibility \Chi(J), T = const
         if (!noX) {
@@ -58,7 +60,10 @@ int main(int argc, char* argv[]) {
 #ifdef DEBUG
 
     ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
-//    ED::multi::start_XT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
+    ED::multi::start_XT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
+    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+    ED::plot3D::start_C(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
+    ED::plot3D::start_X(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
 
 //    double stepsize = (T_END - T_START) / (double) T_COUNT; // 0.01
 //    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);

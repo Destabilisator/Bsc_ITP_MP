@@ -22,18 +22,6 @@ namespace ED::multi {
     static std::mutex nextJMutex;
 
     /////////////////////////////// Delta E, C(J) ///////////////////////////////
-/*
-    void get_DeltaE_CT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
-                             double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
-                             const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
-
-    void get_DeltaE_CT_const_parity(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
-                                    double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
-                                    const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
-    void get_DeltaE_CT_const_SI(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
-                                double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
-                                const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
-*/
 
     void get_DeltaE_CT_const(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
@@ -52,30 +40,30 @@ namespace ED::multi {
 
     /////////////////////////////// Chi(J) ///////////////////////////////
 
-    void get_XT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
-                      const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T);
+    void get_XT_const(double J, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
+                      const int &N, const int &SIZE, const double &T);
 
-    void get_XT_const_momentum(double J, int pos, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
-                               const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T);
+    void get_XT_const_momentum(double J, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
+                               const int &N, const int &SIZE, const double &T);
 
     void start_XT_const(const int &COUNT, const double &START, const double &END,
-                        int cores, const double &T, const int &N, const int &SIZE);
+                        int &cores, const double &T, const int &N, const int &SIZE);
 
     /////////////////////////////// spin gap ///////////////////////////////
 
-    void get_SpinGap_momentum(double J, int pos, std::vector<std::tuple<double, double>> *outDataSpinGap,
-                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
+    void get_SpinGap_momentum(std::vector<std::tuple<double, double>> *outDataSpinGap,
+                              const double &J, const int &N, const int &SIZE);
 
-    void get_SpinGap_momentum_with_index(double J, int pos, std::vector<std::tuple<double, double, int, int, int, int>> *outDataSpinGap,
-                                     const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
+    void get_SpinGap_momentum_with_index(std::vector<std::tuple<double, double, int, int, int, int>> *outDataSpinGap,
+                                         const double &J, const int &N, const int &SIZE);
 
-    void get_SpinGap_SI(double J, int pos, std::vector<std::tuple<double, double>> *outDataSpinGap,
-                        const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
+    void get_SpinGap_SI(std::vector<std::tuple<double, double>> *outDataSpinGap,
+                        const double &J, const int &N, const int &SIZE);
 
     void start_SpinGap(const int &COUNT, const double &START, const double &END,
                        int &cores, const int &N, const int &SIZE);
 
     void start_SpinGap_with_index(const int &COUNT, const double &START, const double &END,
-                              int &cores, const int &N, const int &SIZE);
+                                  int &cores, const int &N, const int &SIZE);
 
 }
