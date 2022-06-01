@@ -40,48 +40,56 @@ echo ""
 # setting the pc on fire
 ./$build/$prgm 6 $START $END 50000 -1 -X silent && echo ""
 ./$build/$prgm 3D 6 $J_START $J_END 50 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 8 $START $END 50000 -1 -X silent && echo ""
 ./$build/$prgm 3D 8 $J_START $J_END 50 $T_START 5$T_END $T_COUNT -1 -X silent && echo ""
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
-exit
-
 ./$build/$prgm 10 $START $END 50000 -1 -X silent && echo ""
 ./$build/$prgm 3D 10 $J_START $J_END 50 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 12 $START $END 5000 -1 -X silent && echo ""
 ./$build/$prgm 3D 12 $J_START $J_END 50 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 14 $START $END 500 -1 -X silent && echo ""
 ./$build/$prgm 3D 14 $J_START $J_END 50 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 16 $START $END 500 -1 -X silent && echo ""
 ./$build/$prgm 3D 16 $J_START $J_END 50 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 18 $START $END 50 -1 -X silent && echo ""
 ./$build/$prgm 3D 18 $J_START $J_END 50 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 20 $START $END 30 -1 -X silent && echo ""
 ./$build/$prgm 3D 20 $J_START $J_END 30 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 24 $START $END 20 -1 -X silent && echo ""
 ./$build/$prgm 3D 24 $J_START $J_END 20 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 28 $START $END 20 -1 -X silent && echo ""
 ./$build/$prgm 3D 28 $J_START $J_END 20 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 ./$build/$prgm 32 $START $END 20 -1 -X silent && echo ""
 ./$build/$prgm 3D 32 $J_START $J_END 20 $T_START $T_END $T_COUNT -1 -X silent && echo ""
+elapsed=$(( SECONDS - start_time ))
 echo "elapsed time until now: $elapsed seconds" && echo ""
 
 # pc has been set on fire
