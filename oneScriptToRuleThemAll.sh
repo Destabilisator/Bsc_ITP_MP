@@ -15,7 +15,7 @@ T_END=5
 T_COUNT=50000
 
 # general
-$build=build
+build=build
 #build=cmake-build-release
 CORES=-1
 noX=-X

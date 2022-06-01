@@ -49,8 +49,8 @@ int main(int argc, char* argv[]) {
             ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
         }
 
-        // dispersion with fixed J
-        ED::momentumStates::startDispersionPlot(J1, J2, N, SIZE);
+//        // dispersion with fixed J
+//        ED::momentumStates::startDispersionPlot(J1, J2, N, SIZE);
     }
 #endif
 #endif

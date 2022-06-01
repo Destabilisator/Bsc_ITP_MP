@@ -33,7 +33,7 @@ $pth ./plotting/plotSpecificHeatTConst.py
 $pth ./plotting/plotSpecificHeatJConst.py
 $pth ./plotting/plotSusceptibilityTConst.py
 $pth ./plotting/plotSusceptibilityJConst.py
-$pth ./plotting/plotDispersion.py
+# $pth ./plotting/plotDispersion.py
 $pth ./plotting/plotSpinGap.py
 
 elapsed=$(( SECONDS - start_time ))

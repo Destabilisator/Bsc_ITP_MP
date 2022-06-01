@@ -365,7 +365,7 @@ namespace QT::MS {
 
         auto end_timer = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
-        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         hlp::saveOutData("data_specific_heat_J_const_QT.txt",
                          "QT, MS\nfür N = " + std::to_string(N) + "\nmit " + std::to_string(SAMPLES) + " Samples\n"

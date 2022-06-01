@@ -47,7 +47,10 @@ else
 	pth=python3
 fi
 
-./cmake-build-release/$prgm $N $START $END $COUNT $CORES $noX $SILENT
+build=build
+#build=cmake-build-release
+
+./$build/$prgm $N $START $END $COUNT $CORES $noX $SILENT
 echo ""
 echo "plotting for N = $N:"
 $pth ./plotting/plot.py $N $show $noX
