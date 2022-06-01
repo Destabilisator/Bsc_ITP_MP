@@ -1,7 +1,7 @@
 #!/bin/bash
 
 start=0.01
-end=25
+end=5
 
 noX=-X
 #noX=noX
