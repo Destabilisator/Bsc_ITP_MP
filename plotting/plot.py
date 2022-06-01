@@ -239,7 +239,7 @@ if __name__ == "__main__":
     plot_specific_heat_J_const(N)
     if sys.argv[3] != "noX":
         plot_susceptibility_T_const(N)
-    plot_susceptibility_J_const(N)
+        plot_susceptibility_J_const(N)
     plot_k_dispersion_J_const(N)
     plot_spin_gap(N)
 
