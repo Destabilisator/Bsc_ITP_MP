@@ -172,8 +172,7 @@ namespace QT::MS {
                 }
             }
         }
-//
-//        std::vector<Eigen::MatrixXcd> matrixBlocks;
+
         std::vector<matrixType> matList;
 
         for (int m = 0; m <= N; m++) {
@@ -253,7 +252,6 @@ namespace QT::MS {
 
     std::vector<double> rungeKutta4_C(const double &start, const double &end, const double &step, const int &N, const std::vector<matrixType> &matrixList) {
 
-//        std::vector<std::tuple<double, double>> outData;
         std::vector<double> outData;
         std::vector<Eigen::VectorXcd> vec = getVector(matrixList);
         int blockCount = (int) matrixList.size();
@@ -265,11 +263,6 @@ namespace QT::MS {
         for (int i = 0; i < blockCount; i++) {
             vec.at(i) = vec.at(i) / norm;
         }
-
-//        double nrm = 0.0;
-//        for (int i = 0; i < blockCount; i++) {
-//            nrm += std::pow(vec.at(i).norm(), 2);
-//        } std::cout << nrm << "\n";
 
         double beta = start - step;
         while (beta <= end) {
@@ -290,12 +283,6 @@ namespace QT::MS {
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = vec.at(i) / norm;
             }
-
-//            nrm = 0.0;
-//            for (int i = 0; i < blockCount; i++) {
-//                nrm += std::pow(vec.at(i).norm(), 2);
-//            } std::cout << nrm << "\n";
-
 
             std::vector<double> vec_H_vec_List;
             std::vector<double> vec_H2_vec_List;
@@ -319,7 +306,6 @@ namespace QT::MS {
             double H_diff = std::real(vec_H2_vec - std::pow(vec_H_vec, 2));
             C += beta * beta * H_diff / (double) N;
 
-//            outData.emplace_back(beta, C);
             outData.emplace_back(C);
 
         }
@@ -339,44 +325,52 @@ namespace QT::MS {
         std::vector<matrixType> matrixList = getHamilton(J1, J2, N, SIZE);
 
         typedef std::vector<std::tuple<double, double>> dataVectorType;
-        std::cout << 1 << "/" << SAMPLES << "\n";
-        std::vector<double> outData = rungeKutta4_C(start, end, step, N, matrixList);
+        std::vector<std::vector<double>> outData;
 
-        int cnt = 1;
-        for (int s = 2; s <= SAMPLES; s++) {
-            std::cout << s << "/" << SAMPLES << "\n";
-            //std::cout << "\r" << s << "/" << SAMPLES;
+        int prgbar_segm = 50;
+        for (int s = 1; s <= SAMPLES; s++) {
+            int p = (int) ( (float) s / (float) SAMPLES * (float) prgbar_segm);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < prgbar_segm; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) s / (float) SAMPLES * 100.0 ) << " (" << s << "/" << SAMPLES << ")     ";
+            std::cout.flush();
             std::vector<double> rawData = rungeKutta4_C(start, end, step, N, matrixList);
-//            std::cout << rawData.size() << "\t" << outData.size() << "\n";
-//            cnt ++;
-            for (int i = 0; i < rawData.size(); i++) {
-                outData.at(i) += rawData.at(i);
-            }
+            outData.emplace_back(rawData);
         }
-//        std::cout << cnt << "\n";
 
         outData.shrink_to_fit();
 
-        for (double &dataPoint : outData) {
-            dataPoint = dataPoint / (double) SAMPLES;
+        std::vector<double> C_Data;
+        std::vector<double> CErr_Data;
+
+        for(int i = 0; i < outData.at(0).size(); i++) {
+            std::vector<double> C_data;
+            for (std::vector<double> C_data_raw : outData) {
+                C_data.emplace_back(C_data_raw.at(i));
+            }
+            std::tuple<double, double> mean_se = get_mean_and_se(C_data);
+            C_Data.emplace_back(std::get<0>(mean_se));
+            CErr_Data.emplace_back(std::get<1>(mean_se));
         }
 
-        std::vector<double> betaData;
+        std::vector<double> beta_Data;
         double beta = start - step;
         while (beta <= end) {
             beta += step;
-            betaData.emplace_back(beta);
-        } betaData.shrink_to_fit();
-
-//        std::cout << "sizes: " << betaData.size() << "\t" << outData.size() << "\n";
-
-        hlp::saveOutData("data_specific_heat_J_const_QT.txt", "QT, MS für N = " + std::to_string(N)
-                        + " mit " + std::to_string(SAMPLES) + " Samples",
-                        "T in J2 / kb", "C in J2", betaData, outData, N);
+            beta_Data.emplace_back(beta);
+        } beta_Data.shrink_to_fit();
 
         auto end_timer = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+        hlp::saveOutData("data_specific_heat_J_const_QT.txt",
+                         "QT, MS\nfür N = " + std::to_string(N) + "\nmit " + std::to_string(SAMPLES) + " Samples\n"
+                          + "this took: " + formatTime(elapsed_seconds),
+                         "beta in kb / J2", "C in J2", beta_Data, C_Data, CErr_Data, N);
 
     }
 

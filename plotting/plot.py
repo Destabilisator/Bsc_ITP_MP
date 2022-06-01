@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
+import numpy as np
 plt.rcParams['text.usetex'] = True
 import sys
 import time
@@ -62,7 +63,8 @@ def plot_specific_heat_J_const(N):
         Y += [float(y)]
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'blue', label = lbl)
-    subfig1.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 18)
+    subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 18)
+    # subfig1.set_xlabel(r'$T$ in $k_B$ / $J_2$', fontsize = 18)
     subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 18)
     subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", $k_B$ = 1", fontsize = 18)
 
@@ -72,12 +74,18 @@ def plot_specific_heat_J_const(N):
     lbl = "N = " + N
     X = []
     Y = []
-    for i in range(3,len(lines)):
-        x, y = lines[i].split("\t")
+    YErr = []
+    for i in range(6,len(lines)):
+        x, y, yErr = lines[i].split("\t")
         # if float(x) > 0:
         X += [float(x)]
         Y += [float(y)]
+        YErr += [float(yErr)]
     subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'red', label = "QT")
+    X = np.asarray(X)
+    Y = np.asarray(Y)
+    YErr = np.asarray(YErr)
+    subfig1.fill_between(X, Y - YErr, Y + YErr, color = 'red', alpha = 0.4)
 
     # file = open("results/" + N + "_data_specific_heat_J_const_QT_multi.txt", 'r')
     # lines = file.readlines()
@@ -226,14 +234,14 @@ if __name__ == "__main__":
 
     N = sys.argv[1]
     
-    # plot_delta_E(N)
-    # plot_specific_heat_T_const(N)
+    plot_delta_E(N)
+    plot_specific_heat_T_const(N)
     plot_specific_heat_J_const(N)
-    # if sys.argv[3] != "noX":
-        # plot_susceptibility_T_const(N)
-    # plot_susceptibility_J_const(N)
-    # plot_k_dispersion_J_const(N)
-    # plot_spin_gap(N)
+    if sys.argv[3] != "noX":
+        plot_susceptibility_T_const(N)
+    plot_susceptibility_J_const(N)
+    plot_k_dispersion_J_const(N)
+    plot_spin_gap(N)
 
     end_time = time.time()
 

@@ -11,6 +11,8 @@
 
 #include "defines.h"
 
+#define plotOverBeta
+
 namespace ED {
     /////////////////////////////// bits ///////////////////////////////
 

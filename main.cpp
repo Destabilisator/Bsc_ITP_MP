@@ -12,10 +12,11 @@ int main(int argc, char* argv[]) {
 
     validateInput(argc, argv, cpu_cnt, N, SIZE, J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, silent, cores, plotsIn3D, true, J1, J2, noX);
 
-    omp_set_num_threads((int) cpu_cnt);
+    omp_set_num_threads(cpu_cnt);
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 #ifndef DEBUG
+    QT::MS::start_calculation_C_J_const(T_START, T_END * T_END, 0.01, J1, J2, N, SIZE, 10); ////////////////////////////
 #ifdef ED_METHODS
     if(plotsIn3D) {
         // 3D Plots of specific heat dependent on T and J
@@ -30,9 +31,9 @@ int main(int argc, char* argv[]) {
 
         // specific heat C(T), J = const
         if (N % 4 == 0) {
-            ED::spinInversion::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+            ED::spinInversion::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END * T_END, T_COUNT); ////////////////////////////
         } else {
-            ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+            ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END * T_END, T_COUNT); ////////////////////////////
         }
 
         // spin gap E_{gap} (J)
@@ -56,12 +57,12 @@ int main(int argc, char* argv[]) {
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
 
-    double stepsize = (T_END - T_START) / (double) T_COUNT;
-//    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
-//    ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    double stepsize = (T_END - T_START) / (double) T_COUNT; // 0.01
+    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
+    ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
-    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 10);
-    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 10);
+//    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
 #endif
 

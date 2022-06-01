@@ -85,4 +85,24 @@ namespace QT::hlp {
         file.close();
     }
 
+    void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
+                     const std::vector<double> &xData, const std::vector<double> &yData, const std::vector<double> &yErrData, const int &N) {
+
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
+        std::ofstream file;
+        try {
+            file.open("./results/" + std::to_string(N) + "_" + filename);
+            file << header <<"\n\n";
+            file << x_lbl << "\t" << y_lbl << "\t" << "yErr" << "\n";
+            for (int i = 0; i < xData.size(); i++) {
+                file << xData.at(i) << "\t" << yData.at(i) << "\t" << yErrData.at(i) << "\n";
+            }
+        } catch (...) {
+            file.close();
+            std::cout << "failed to save to file\n";
+        }
+        std::cout << "done\n";
+        file.close();
+    }
+
 }

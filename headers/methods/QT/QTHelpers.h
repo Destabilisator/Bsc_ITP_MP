@@ -15,6 +15,7 @@ namespace QT::hlp {
 
     /////////////////////////////// Runge-Kutta 4 ///////////////////////////////
 
+    // does one step of the RunkeKutt-Iteration on a given matrix block with a given vector
     Eigen::VectorXcd rungeKutta4Block(const Eigen::VectorXcd &vec, const Eigen::MatrixXcd &H, const double &step);
 
     std::vector<Eigen::VectorXcd> normalizedVectorList(const std::vector<Eigen::VectorXcd> &vectors, const int &SIZE);
@@ -26,5 +27,8 @@ namespace QT::hlp {
 
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
                      const std::vector<double> &xData, const std::vector<double> &yData, const int &N);
+
+    void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
+                     const std::vector<double> &xData, const std::vector<double> &yData, const std::vector<double> &yErrData, const int &N);
 
 }

@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+import numpy as np
 plt.rcParams['text.usetex'] = True
 
 N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "orange")]#, ("14", "brown"), ("16", "purple")]
@@ -19,9 +20,29 @@ for N, c in N_color:
         #print(x + " " + y + "\r")
         X += [float(x)]
         Y += [float(y)]
-    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = c, label = lbl)
+    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)
 
-subfig1.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 18)
+    file = open("results/" + N + "_data_specific_heat_J_const_QT.txt", 'r')
+    lines = file.readlines()
+    linesJ = lines[0][len("J1/J2 = "):-1]
+    lbl = "N = " + N
+    X = []
+    Y = []
+    YErr = []
+    for i in range(6,len(lines)):
+        x, y, yErr = lines[i].split("\t")
+        # if float(x) > 0:
+        X += [float(x)]
+        Y += [float(y)]
+        YErr += [float(yErr)]
+    subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = ".", color = c, label = "QT", alpha = 0.2)
+    X = np.asarray(X)
+    Y = np.asarray(Y)
+    YErr = np.asarray(YErr)
+    subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.05)
+
+subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 18)
+# subfig1.set_xlabel(r'$T$ in $k_B$ / $J_2$', fontsize = 18)
 subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 18)
 subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", $k_B$ = 1", fontsize = 18)
 
@@ -29,4 +50,4 @@ subfig1.axhline(0, color = "grey")
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
 plt.savefig("results/" + "specific_heat_J_const.png")
-#plt.show
+# plt.show

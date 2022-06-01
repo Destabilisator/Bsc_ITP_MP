@@ -1,9 +1,10 @@
 #!/bin/bash
 
 start=0.01
-end=2.5
+end=25
 
 noX=-X
+#noX=noX
 
 start_time=$SECONDS
 

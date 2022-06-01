@@ -1,15 +1,4 @@
-#include <iostream>
-#include <fstream>
-#include <cmath>
-#include <string>
-#include <vector>
-#include <list>
-#include <complex>
-#include <chrono>
-#include <iomanip>
-#include "Eigen/Eigenvalues"
-
-#include "defines.h"
+#include "helpers.h"
 
 /////////////////////////////// bits ///////////////////////////////
 
@@ -17,6 +6,19 @@ void printBits(int s, int N) {
     for (int n = N-1; n >= 0; n--) {
         std::cout << ( (s >> n) & 1 );
     } std::cout << "\n";
+}
+
+/////////////////////////////// statistics ///////////////////////////////
+
+std::tuple<double, double> get_mean_and_se(const std::vector<double> &data) {
+    double mean = std::accumulate(data.begin(), data.end(), 0.0) / (double) data.size();
+    double se = 0.0;
+    for (double d : data) {
+        se += std::pow(d - mean, 2);
+    }
+    se /= (double) data.size();
+    se = std::sqrt(se);
+    return {mean, se};
 }
 
 /////////////////////////////// others ///////////////////////////////
