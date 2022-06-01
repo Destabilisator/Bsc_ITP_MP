@@ -18,11 +18,11 @@ namespace ED::multi {
     static int CURRENT = 1;
     const int PROGRESSBAR_SEGMENTS = 50;
 
-    //static std::mutex coutMutex;
+    static std::mutex coutMutex;
     static std::mutex nextJMutex;
 
     /////////////////////////////// Delta E, C(J) ///////////////////////////////
-
+/*
     void get_DeltaE_CT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
@@ -33,9 +33,22 @@ namespace ED::multi {
     void get_DeltaE_CT_const_SI(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
                                 double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                                 const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE);
+*/
+
+    void get_DeltaE_CT_const(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                             double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                             const int &N, const int &SIZE);
+
+    void get_DeltaE_CT_const_parity(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                                    double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                    const int &N, const int &SIZE);
+
+    void get_DeltaE_CT_const_SI(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                                double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                const int &N, const int &SIZE);
 
     void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END,
-                               int &cores, const double &T, const int &N, const int &SIZE);
+                               int cores, const double &T, const int &N, const int &SIZE);
 
     /////////////////////////////// Chi(J) ///////////////////////////////
 
@@ -46,7 +59,7 @@ namespace ED::multi {
                                const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE, const double &T);
 
     void start_XT_const(const int &COUNT, const double &START, const double &END,
-                        int &cores, const double &T, const int &N, const int &SIZE);
+                        int cores, const double &T, const int &N, const int &SIZE);
 
     /////////////////////////////// spin gap ///////////////////////////////
 

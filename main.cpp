@@ -1,6 +1,6 @@
 #include "main.h"
 
-//#define DEBUG
+#define DEBUG
 #define ED_METHODS
 
 int main(int argc, char* argv[]) {
@@ -12,11 +12,11 @@ int main(int argc, char* argv[]) {
 
     validateInput(argc, argv, cpu_cnt, N, SIZE, J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, silent, cores, plotsIn3D, true, J1, J2, noX);
 
-    omp_set_num_threads(cpu_cnt);
+    omp_set_num_threads(cores);
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 #ifndef DEBUG
-    QT::MS::start_calculation_C_J_const(T_START, T_END * T_END, 0.01, J1, J2, N, SIZE, 10); ////////////////////////////
+    QT::MS::start_calculation_C_J_const(T_START, T_END * T_END, 0.01, J1, J2, N, SIZE, 1000); ////////////////////////////
 #ifdef ED_METHODS
     if(plotsIn3D) {
         // 3D Plots of specific heat dependent on T and J
@@ -57,9 +57,12 @@ int main(int argc, char* argv[]) {
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
 
-    double stepsize = (T_END - T_START) / (double) T_COUNT; // 0.01
-    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
-    ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
+//    ED::multi::start_XT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
+
+//    double stepsize = (T_END - T_START) / (double) T_COUNT; // 0.01
+//    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
+//    ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
 //    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 10);
 //    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);

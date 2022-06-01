@@ -5,7 +5,7 @@
 namespace ED::multi {
 
     /////////////////////////////// Delta E, C(J) ///////////////////////////////
-
+/*
     void get_DeltaE_CT_const(double J, int pos, std::vector<std::tuple<double, double>> *outDataDeltaE,
                              double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                              const int &COUNT, const double &START, const double &END, const int &N, const int &SIZE) {
@@ -19,7 +19,7 @@ namespace ED::multi {
         std::cout.flush();
         nextJMutex.unlock();
 
-        while (true) {
+        while (pos <= COUNT) {
 
             std::vector<std::complex<double>> eiVals;
             std::vector<Eigen::MatrixXcd> matrixBlocks;
@@ -59,11 +59,13 @@ namespace ED::multi {
             CURRENT++;
             nextJMutex.unlock();
 
-            if (pos > COUNT) {
-                break;
-            } else {
-                J = START + (END - START) * pos / COUNT;
-            }
+//            if (pos > COUNT) {
+//                break;
+//            } else {
+//                J = START + (END - START) * pos / COUNT;
+//            }
+
+            J = START + (END - START) * pos / COUNT;
 
         }
 
@@ -82,7 +84,7 @@ namespace ED::multi {
         std::cout.flush();
         nextJMutex.unlock();
 
-        while (true) {
+        while (pos <= COUNT) {
 
             std::vector<double> eiVals;
             std::vector<Eigen::MatrixXd> matrixBlocks;
@@ -122,11 +124,13 @@ namespace ED::multi {
             CURRENT++;
             nextJMutex.unlock();
 
-            if (pos > COUNT) {
-                break;
-            } else {
-                J = START + (END - START) * pos / COUNT;
-            }
+//            if (pos > COUNT) {
+//                break;
+//            } else {
+//                J = START + (END - START) * pos / COUNT;
+//            }
+
+            J = START + (END - START) * pos / COUNT;
 
         }
 
@@ -145,7 +149,7 @@ namespace ED::multi {
         std::cout.flush();
         nextJMutex.unlock();
 
-        while (true) {
+        while (pos <= COUNT) {
 
             std::vector<double> eiVals;
             std::vector<Eigen::MatrixXd> matrixBlocks;
@@ -185,18 +189,111 @@ namespace ED::multi {
             CURRENT++;
             nextJMutex.unlock();
 
-            if (pos > COUNT) {
-                break;
-            } else {
-                J = START + (END - START) * pos / COUNT;
-            }
+//            if (pos > COUNT) {
+//                break;
+//            } else {
+//                J = START + (END - START) * pos / COUNT;
+//            }
+
+            J = START + (END - START) * pos / COUNT;
 
         }
 
     }
+*/
+
+    void get_DeltaE_CT_const(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                             double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                             const int &N, const int &SIZE) {
+
+        std::vector<std::complex<double>> eiVals;
+        std::vector<Eigen::MatrixXcd> matrixBlocks;
+
+        momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
+
+        // sort eigenvalues
+        eiVals.shrink_to_fit();
+        std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+            return std::real(c1) < std::real(c2);
+        });
+
+        // Delta E
+        double E0 = std::real(eiVals.at(0));
+        double E1 = std::real(eiVals.at(1));
+        double specificHeat = getSpecificHeat(T, eiVals, N);
+
+
+        // write data
+        nextJMutex.lock();
+        outDataDeltaE->push_back({J, E1 - E0});
+        outDataSpecificHeat_C->push_back({J, specificHeat});
+//        CURRENT++;
+        nextJMutex.unlock();
+
+    }
+
+    void get_DeltaE_CT_const_parity(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                                    double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                    const int &N, const int &SIZE) {
+
+        std::vector<double> eiVals;
+        std::vector<Eigen::MatrixXd> matrixBlocks;
+
+        parityStates::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
+
+        // sort eigenvalues
+        eiVals.shrink_to_fit();
+        std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+            return std::real(c1) < std::real(c2);
+        });
+
+        // Delta E
+        double E0 = std::real(eiVals.at(0));
+        double E1 = std::real(eiVals.at(1));
+        double specificHeat = getSpecificHeat(T, eiVals, N);
+
+        // write data
+        nextJMutex.lock();
+        outDataDeltaE->push_back({J, E1 - E0});
+        outDataSpecificHeat_C->push_back({J, specificHeat});
+//        CURRENT++;
+        nextJMutex.unlock();
+
+    }
+
+    void get_DeltaE_CT_const_SI(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                                double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                const int &N, const int &SIZE) {
+
+        std::vector<double> eiVals;
+        std::vector<Eigen::MatrixXd> matrixBlocks;
+
+        spinInversion::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
+
+        // sort eigenvalues
+        eiVals.shrink_to_fit();
+        std::sort(eiVals.begin(), eiVals.end(), [](const std::complex<double> &c1, const std::complex<double> &c2) {
+            return std::real(c1) < std::real(c2);
+        });
+
+        // Delta E
+        double E0 = std::real(eiVals.at(0));
+        double E1 = std::real(eiVals.at(1));
+        double specificHeat = getSpecificHeat(T, eiVals, N);
+
+        // write data
+        nextJMutex.lock();
+        outDataDeltaE->push_back({J, E1 - E0});
+        outDataSpecificHeat_C->push_back({J, specificHeat});
+//        CURRENT++;
+        nextJMutex.unlock();
+
+    }
+
+
 
     void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END,
-                               int &cores, const double &T, const int &N, const int &SIZE) {
+                               int cores, const double &T, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -205,41 +302,122 @@ namespace ED::multi {
         std::vector<std::tuple<double, double>> outDataDeltaE;
         std::vector<std::tuple<double, double>> outDataSpecificHeat_C;
 
-        if (COUNT < cores) {
-            cores = COUNT;
-        }
         std::cout << " (" << cores << ") cores";
-
-        std::thread Threads[cores];
-
-        CURRENT = 0 + cores;
 
         if (N%4 == 0) {
             if (N >= 12) {
                 std::cout << ", spin inversion\n";
-                for (int i = 0; i < cores; i++) {
-                    Threads[i] = std::thread(get_DeltaE_CT_const_SI, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
-                                             &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+                int curr = 0;
+#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr)
+                for (int i = 0; i <= COUNT; i++) {
+                    double J = START + (END - START) * i / COUNT;
+                    coutMutex.lock();
+                    int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
+                    std::cout << "\r[";
+                    for (int _ = 0; _ < p; _++) {
+                        std::cout << "#";
+                    }
+                    for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                        std::cout << ".";
+                    }
+                    std::cout << "] " << int((float) curr / (float) COUNT * 100) << "% J1/J2 = " << J << " (" << curr
+                              << "/" << COUNT << ")     ";
+                    std::cout.flush();
+                    curr++;
+                    coutMutex.unlock();
+
+                    get_DeltaE_CT_const(J, &outDataDeltaE, T, &outDataSpecificHeat_C, N, SIZE);
                 }
             } else {
                 std::cout << ", parity states\n";
-                for (int i = 0; i < cores; i++) {
-                    Threads[i] = std::thread(get_DeltaE_CT_const_parity, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
-                                             &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+                int curr = 0;
+#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr)
+                for (int i = 0; i <= COUNT; i++) {
+                    double J = START + (END - START) * i / COUNT;
+                    coutMutex.lock();
+                    int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
+                    std::cout << "\r[";
+                    for (int _ = 0; _ < p; _++) {
+                        std::cout << "#";
+                    }
+                    for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                        std::cout << ".";
+                    }
+                    std::cout << "] " << int((float) curr / (float) COUNT * 100) << "% J1/J2 = " << J << " (" << curr
+                              << "/" << COUNT << ")     ";
+                    std::cout.flush();
+                    curr++;
+                    coutMutex.unlock();
+
+                    get_DeltaE_CT_const_parity(J, &outDataDeltaE, T, &outDataSpecificHeat_C, N, SIZE);
                 }
             }
 
         } else {
             std::cout << ", momentum states\n";
-            for (int i = 0; i < cores; i++) {
-                Threads[i] = std::thread(get_DeltaE_CT_const, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
-                                         &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+            int curr = 0;
+#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr)
+            for (int i = 0; i <= COUNT; i++) {
+                double J = START + (END - START) * i / COUNT;
+                coutMutex.lock();
+                int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
+                std::cout << "\r[";
+                for (int _ = 0; _ < p; _++) {
+                    std::cout << "#";
+                }
+                for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+                    std::cout << ".";
+                }
+                std::cout << "] " << int((float) curr / (float) COUNT * 100) << "% J1/J2 = " << J << " (" << curr
+                          << "/" << COUNT << ")     ";
+                std::cout.flush();
+                curr++;
+                coutMutex.unlock();
+
+                get_DeltaE_CT_const_SI(J, &outDataDeltaE, T, &outDataSpecificHeat_C, N, SIZE);
             }
         }
 
-        for (int i = 0; i < cores; i++) {
-            Threads[i].join();
-        }
+
+
+//        if (COUNT < cores) {
+//            cores = COUNT;
+//        }
+//
+//        cores = 1;
+//
+//        std::cout << " (" << cores << ") cores";
+//
+//        std::thread Threads[cores];
+//
+//        CURRENT = 0 + cores;
+//
+//        if (N%4 == 0) {
+//            if (N >= 12) {
+//                std::cout << ", spin inversion\n";
+//                for (int i = 0; i < cores; i++) {
+//                    Threads[i] = std::thread(get_DeltaE_CT_const_SI, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+//                                             &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+//                }
+//            } else {
+//                std::cout << ", parity states\n";
+//                for (int i = 0; i < cores; i++) {
+//                    Threads[i] = std::thread(get_DeltaE_CT_const_parity, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+//                                             &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+//                }
+//            }
+//
+//        } else {
+//            std::cout << ", momentum states\n";
+//            for (int i = 0; i < cores; i++) {
+//                Threads[i] = std::thread(get_DeltaE_CT_const, START + (END - START) * i / COUNT, i + 1, &outDataDeltaE, T,
+//                                         &outDataSpecificHeat_C, COUNT, START, END, N, SIZE);
+//            }
+//        }
+//
+//        for (int i = 0; i < cores; i++) {
+//            Threads[i].join();
+//        }
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
