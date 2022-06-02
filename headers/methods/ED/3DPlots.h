@@ -23,15 +23,15 @@ namespace ED::plot3D {
 
     /////////////////////////////// C ///////////////////////////////
 
-    void get_C_momentum(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE);
-
+    void get_C_momentum(double &J, const double &h, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE);
+/*
     void get_C_parity(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE);
-
-    void get_C_SI(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE);
+*/
+    void get_C_SI(double J, const double &h, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE);
 
     void start_C(const double &JSTART, const double &JEND, const int &JCOUNT,
                  const double &TSTART, const double &TEND, const int &TCOUNT,
-                 int &cores, const int &N, const int &SIZE);
+                 const double &h, int &cores, const int &N, const int &SIZE);
 
     /////////////////////////////// Chi ///////////////////////////////
 

@@ -29,24 +29,24 @@ namespace QT::MS {
     ///// C /////
 
     // returns the MS as a complex SparseMatrix with indices (m, k, H_block)
-    std::vector<matrixDataMomentumType> getIndexAndHamilton(const double &J1, const double &J2, const int &N, const int &SIZE);
+    std::vector<matrixDataMomentumType> getIndexAndHamilton(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE);
 
     // returns the MS as a complex SparseMatrix
-    std::vector<Eigen::SparseMatrix<std::complex<double>>> getHamilton(const double &J1, const double &J2, const int &N, const int &SIZE);
+    std::vector<Eigen::SparseMatrix<std::complex<double>>> getHamilton(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE);
 
     // returns a vector with (m, k, states, R_vals)
     std::vector<indexStateVectorType> getIndexAndStates(const int &N, const int &SIZE);
 
     // fills the M,k blocks of the MS
-    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                                        const std::vector<int> &R_vals, const int &N);
 
     // fourth order Runge-Kutta to calculate beta dependency of the specific heat
     std::vector<double> rungeKutta4_C(const double &start, const double &end, const double &step, const int &N, const std::vector<matrixType> &matrixList);
 
     // calculate and save the specific heat as a function of temperature (beta)
-    void start_calculation_C_J_const(const double &start, const double &end, const double &step,
-                                     const double &J1, const double &J2, const int &N, const int &SIZE, const int &SAMPLES);
+    void start_calculation_C_J_const(const double &start, const double &end, const double &step, const double &J1,
+                                     const double &J2, const double &h, const int &N, const int &SIZE, const int &SAMPLES);
 
     ///// X /////
 

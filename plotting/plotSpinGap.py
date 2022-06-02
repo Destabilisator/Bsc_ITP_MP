@@ -36,7 +36,8 @@ for N, c in N_color:
 
 subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 18)
 subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 18)
-subfig1.set_title(r'Spingap Energies $\Delta E_{gap}$ für $\Delta = 1$', fontsize = 18)
+subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$', fontsize = 18)
+# subfig1.set_title(r'Spingap Energies $\Delta E_{gap}$ für $\Delta = 1$', fontsize = 18)
 
 subfig1.axhline(0, color = "grey")
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)

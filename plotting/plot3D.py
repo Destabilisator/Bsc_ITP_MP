@@ -19,7 +19,9 @@ def plot_specific_heat(N):
     for filename in os.listdir("results/3DData/" + N + "/C/"):
         if filename == "dummyFile.txt":
             continue
-        J = float(os.path.splitext(filename)[0])
+        h, J = filename.split("_")
+        h = float(h)
+        J = float(J.rstrip(".txt"))
         file = open("results/3DData/" + N + "/C/" + filename, 'r')
         lines = file.readlines()
         X = []
@@ -34,13 +36,14 @@ def plot_specific_heat(N):
             Z += [float(z)]
         ax.plot(X, Y, Z, lw = 1, ls = "solid", color = "blue", alpha = 1.0)
 
-    ax.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ für $N$ = ' + N, fontsize = 18)
+    ax.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "\n" + r"für $N$ = " + N + " mit h = " + str(h), fontsize = 18)
     ax.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 18)
     ax.set_ylabel(r'$J_1$ / $J_2$', fontsize = 18)
     ax.set_zlabel(r'$C/N$ in $J_2$', fontsize = 18)
     #ax.legend(loc = 'best' ,frameon = False, fontsize = 14)
+    print(h)
 
-    plt.savefig("results/3DData/" + N + "_specific_heat.png")
+    plt.savefig("results/3DData/" + N + "_specific_heat_" + str(h) + ".png")
 
 def plot_susceptibility(N):
     print("plotting suszeptibility (3D) ...")
@@ -81,8 +84,10 @@ if __name__ == "__main__":
 
     N = sys.argv[1]
   
-    plot_specific_heat(N)
-    plot_susceptibility(N)
+    if (sys.argv[3] == "C"):
+        plot_specific_heat(N)
+    if (sys.argv[4] != "noX"):
+        plot_susceptibility(N)
 
     end_time = time.time()
 

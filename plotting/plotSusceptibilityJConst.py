@@ -3,13 +3,13 @@ plt.rcParams['text.usetex'] = True
 
 N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "orange")]#, ("14", "brown"), ("16", "purple")]
 
-print("plotting suszeptibility (constant J1/J2, funtion of T) ...")
+print("plotting susceptibility (constant J1/J2, funtion of T) ...")
 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
 
 for N, c in N_color:
     file = open("results/" + N + "_data_susceptibility_J_const.txt", 'r')
     lines = file.readlines()
-    linesJ = lines[0][len("J1/J2 = "):-1]
+    linesJ = lines[0][len("J1/J2: "):-1]
     lbl = "N = " + N
     X = []
     Y = []

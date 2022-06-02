@@ -20,6 +20,7 @@ benchmarkResults.txt
 results/*
 !results/3DData/
 results/3DData/*.png
+results/3DData/*.gif
 results/3DData/*/*/*.txt
 !results/3DData/*/*/dummyFile.txt
 

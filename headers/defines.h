@@ -3,4 +3,4 @@
 //#define fixedPrecision // remove if not debug
 
 // prevent multithreading in Eigen
-#define EIGEN_DONT_PARALLELIZE
+//#define EIGEN_DONT_PARALLELIZE

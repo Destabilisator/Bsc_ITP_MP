@@ -118,21 +118,28 @@ namespace ED::spinInversion {
 
     }
 
-    void fillHamiltonSIBlock(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
+    void fillHamiltonSIBlock(const double &J1, const double &J2, const double &h, int k, int p, int z, const std::vector<int> &states,
                                  const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
                                  const std::vector<int> &c_vals, Eigen::MatrixXd &hamiltonBlock, const int &N) {
 
         int statesCount = (int) states.size();
 
         for (int a; a < statesCount; a++) {
+
+            int s = states.at(a);
+
+            // external magnetic field
+//            std::cout << hamiltonBlock(a,a) << std::endl;
+//            int mag = bitSum(s, N) - N/2;
+//            hamiltonBlock(a,a) += (double) mag * h;
+//            std::cout << hamiltonBlock(a,a) << std::endl << std::endl;
+
             int state_n = 1;
             if (a > 0 && states.at(a - 1) == states.at(a)) {
                 continue;
             } else if (a < states.size() - 1 && states.at(a) == states.at(a + 1)) {
                 state_n = 2;
             }
-
-            int s = states.at(a);
 
             for (int n = 0; n < N/2; n++) {
                 // declaring indices
@@ -223,13 +230,13 @@ namespace ED::spinInversion {
 
     }
 
-    void SIBlockSolver(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
+    void SIBlockSolver(const double &J1, const double &J2, const double &h, int k, int p, int z, const std::vector<int> &states,
                            const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
                            const std::vector<int> &c_vals, std::vector<double> *eiVals, std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N) {
 
         const int statesCount = (int) states.size();
         Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
-        fillHamiltonSIBlock(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, hamiltonBlock, N);
+        fillHamiltonSIBlock(J1, J2, h, k, p, z, states, R_vals, m_vals, n_vals, c_vals, hamiltonBlock, N);
 
     #if defined(showMatrix) || defined(saveMatrix)
         matrixBlocks->push_back(hamiltonBlock);
@@ -244,7 +251,7 @@ namespace ED::spinInversion {
 
     }
 
-    void getEiVals(const double &J1, const double &J2, std::vector<double> *eiVals,
+    void getEiVals(const double &J1, const double &J2, const double &h, std::vector<double> *eiVals,
                    std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N, const int &SIZE) {
 
         std::vector<std::vector<int>> states_m(N+1);
@@ -293,7 +300,7 @@ namespace ED::spinInversion {
                                 }
                             }
                             if (!states.empty()) {
-                                SIBlockSolver(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, matrixBlocks, N);
+                                SIBlockSolver(J1, J2, h, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, matrixBlocks, N);
                             }
                             states.clear();
                             R_vals.clear();
@@ -371,7 +378,7 @@ namespace ED::spinInversion {
     #endif
     }
 
-    void start(const double &J1, const double &J2, const int &N, const int &SIZE) {
+    void start(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -380,7 +387,7 @@ namespace ED::spinInversion {
         auto *SIEiVals = new std::vector<double>;
         auto *matrixSIBlocks = new std::vector<Eigen::MatrixXd>;
 
-        getEiVals(J1, J2, SIEiVals, matrixSIBlocks, N, SIZE);
+        getEiVals(J1, J2, h, SIEiVals, matrixSIBlocks, N, SIZE);
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
@@ -390,6 +397,8 @@ namespace ED::spinInversion {
         delete matrixSIBlocks;
 
     }
+
+    //////////////////////// susceptibility ////////////////////////
 
     Eigen::MatrixXd spinMatrixSI(const int &N, int k, int p, int z, const std::vector<int> &states,
                                  const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
@@ -451,14 +460,14 @@ namespace ED::spinInversion {
         return S2;
     }
 
-    void SIBlockSolver_withMatrix(const double &J1, const double &J2, int k, int p, int z, const std::vector<int> &states,
+    void SIBlockSolver_withMatrix(const double &J1, const double &J2, const double &h, int k, int p, int z, const std::vector<int> &states,
                                   const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
                                   const std::vector<int> &c_vals, std::vector<std::vector<double>> &eiVals, std::vector<Eigen::MatrixXd> &matrixUBlocks,
                                   std::vector<Eigen::MatrixXd> &matrixS2Blocks, const int &N) {
 
         const int statesCount = (int) states.size();
         Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
-        fillHamiltonSIBlock(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, hamiltonBlock, N);
+        fillHamiltonSIBlock(J1, J2, h, k, p, z, states, R_vals, m_vals, n_vals, c_vals, hamiltonBlock, N);
 
 //        std::cout << "hamiltonblock\n";
 //        std::cout << hamiltonBlock << std::endl;
@@ -494,7 +503,7 @@ namespace ED::spinInversion {
 
     }
 
-    void getEiValsZeroBlock(const double &J1, const double &J2, std::vector<std::vector<double>> &eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
+    void getEiValsZeroBlock(const double &J1, const double &J2, const double &h, std::vector<std::vector<double>> &eiVals, std::vector<Eigen::MatrixXd> &UBlocks,
                             std::vector<Eigen::MatrixXd> &S2Blocks, const int &N, const int &SIZE) {
 
         std::vector<int> states_m;
@@ -540,7 +549,7 @@ namespace ED::spinInversion {
                     }
                     if (!states.empty()) {
 //                        std::cout << "block\n";
-                        SIBlockSolver_withMatrix(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals,
+                        SIBlockSolver_withMatrix(J1, J2, h, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals,
                                                  UBlocks, S2Blocks, N);
                     }
                     states.clear();
@@ -556,7 +565,7 @@ namespace ED::spinInversion {
 
     }
 
-    void getEiValsMagBlock(const double &J1, const double &J2, std::vector<double> *eiVals, const int &N, const int &SIZE, const int &mag) {
+    void getEiValsMagBlock(const double &J1, const double &J2, const double &h, std::vector<double> *eiVals, const int &N, const int &SIZE, const int &mag) {
 
         std::vector<Eigen::MatrixXd> matrixBlocks;
 
@@ -603,7 +612,7 @@ namespace ED::spinInversion {
                             }
                         }
                         if (!states.empty()) {
-                            SIBlockSolver(J1, J2, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, &matrixBlocks, N);
+                            SIBlockSolver(J1, J2, h, k, p, z, states, R_vals, m_vals, n_vals, c_vals, eiVals, &matrixBlocks, N);
                         }
                         states.clear();
                         R_vals.clear();
@@ -647,7 +656,7 @@ namespace ED::spinInversion {
 
     }
 
-    //////////////////////// help ////////////////////////
+    ///// help /////
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                              const double &END, const int &COUNT) {
 
@@ -661,7 +670,7 @@ namespace ED::spinInversion {
         std::vector<Eigen::MatrixXd> S2Blocks;
 
         std::cout << "getting eiVals\n";
-        getEiValsZeroBlock(J1, J2, eiVals, UBlocks, S2Blocks, N, SIZE);
+        getEiValsZeroBlock(J1, J2, 0.0, eiVals, UBlocks, S2Blocks, N, SIZE);
 
 //        for (double ev : eiVals) {
 //            std::cout << ev << "\n";
@@ -732,7 +741,8 @@ namespace ED::spinInversion {
 
     }
 
-    void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+    //////////////////////// specific heat ////////////////////////
+    void startSpecificHeat(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE, const double &START,
                            const double &END, const int &COUNT) {
 
         auto start = std::chrono::steady_clock::now();
@@ -742,7 +752,7 @@ namespace ED::spinInversion {
         std::vector<double> eiVals;
         std::vector<Eigen::MatrixXd> matrixBlocks;
 
-        getEiVals(J1, J2, &eiVals, &matrixBlocks, N, SIZE);
+        getEiVals(J1, J2, h, &eiVals, &matrixBlocks, N, SIZE);
 
 
         ///// specific /////
@@ -763,12 +773,13 @@ namespace ED::spinInversion {
 
         std::string filenameSpecificHeat_C = "data_specific_heat_J_const.txt"; // spininversion_specific_heat / data_specific_heat_J_const
         std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
+                                           + "h: " + std::to_string(h) + "\n"
                                            + "T START: " + std::to_string(START) + "\n"
                                            + "T END: " + std::to_string(END) + "\n"
                                            + "data-points: " + std::to_string(COUNT) + "\n"
                                            + "calculation time: " + formatTime(elapsed_seconds);
 
-        std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
+        std::string headerWithJSpecificHeat_C = "J1/J2: " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
         saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", specificHeat_momentum, N);
 //        std::cout << "\n";
 

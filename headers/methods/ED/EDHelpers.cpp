@@ -433,10 +433,10 @@ namespace ED {
         file.close();
     }
 
-    void save3DPlotDataC(const double &J, const int &N, const std::vector<std::tuple<double, double>>& C_func_T) {
+    void save3DPlotDataC(const double &J, const double &h, const int &N, const std::vector<std::tuple<double, double>>& C_func_T) {
         std::ofstream file;
         try {
-            file.open("./results/3DData/" + std::to_string(N) + "/C/" + std::to_string(J) + ".txt");
+            file.open("./results/3DData/" + std::to_string(N) + "/C/" + std::to_string(h) + "_" + std::to_string(J) + ".txt");
             for (std::tuple<double, double> data : C_func_T) {
                 file << std::get<0>(data) << "\t" << std::get<1>(data) << "\n";
             }

@@ -6,14 +6,14 @@ namespace ED::multi {
 
     /////////////////////////////// Delta E, C(J) ///////////////////////////////
 
-    void get_DeltaE_CT_const(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
-                             double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
-                             const int &N, const int &SIZE) {
+    void get_DeltaE_CT_const_momentum(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                                      double temp, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                      const double &h, const int &N, const int &SIZE) {
 
         std::vector<std::complex<double>> eiVals;
         std::vector<Eigen::MatrixXcd> matrixBlocks;
 
-        momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
+        momentumStates::getEiVals(J, 1.0, h, eiVals, matrixBlocks, N, SIZE);
 
         // sort eigenvalues
         eiVals.shrink_to_fit();
@@ -24,7 +24,7 @@ namespace ED::multi {
         // Delta E
         double E0 = std::real(eiVals.at(0));
         double E1 = std::real(eiVals.at(1));
-        double specificHeat = getSpecificHeat(T, eiVals, N);
+        double specificHeat = getSpecificHeat(temp, eiVals, N);
 
 
         // write data
@@ -35,7 +35,7 @@ namespace ED::multi {
         nextJMutex.unlock();
 
     }
-
+/*
     void get_DeltaE_CT_const_parity(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
                                     double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                                     const int &N, const int &SIZE) {
@@ -64,15 +64,15 @@ namespace ED::multi {
         nextJMutex.unlock();
 
     }
-
+*/
     void get_DeltaE_CT_const_SI(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
-                                double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
-                                const int &N, const int &SIZE) {
+                                double temp, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                const double &h, const int &N, const int &SIZE) {
 
         std::vector<double> eiVals;
         std::vector<Eigen::MatrixXd> matrixBlocks;
 
-        spinInversion::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
+        spinInversion::getEiVals(J, 1.0, h, &eiVals, &matrixBlocks, N, SIZE);
 
         // sort eigenvalues
         eiVals.shrink_to_fit();
@@ -83,7 +83,7 @@ namespace ED::multi {
         // Delta E
         double E0 = std::real(eiVals.at(0));
         double E1 = std::real(eiVals.at(1));
-        double specificHeat = getSpecificHeat(T, eiVals, N);
+        double specificHeat = getSpecificHeat(temp, eiVals, N);
 
         // write data
         nextJMutex.lock();
@@ -96,8 +96,8 @@ namespace ED::multi {
 
 
 
-    void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END,
-                               int cores, const double &T, const int &N, const int &SIZE) {
+    void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const double &h,
+                               int cores, const double &temp, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -108,11 +108,11 @@ namespace ED::multi {
 
         std::cout << " (" << cores << ") cores";
 
-        if (N%4 == 0) {
-            if (N >= 12) {
+        if (N%4 == 0 && std::abs(h) < EPSILON) { // h with SI not yet working
+//            if (N >= 12) {
                 std::cout << ", spin inversion\n";
                 int curr = 0;
-#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr)
+#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, temp, N, SIZE, coutMutex, std::cout, curr, h)
                 for (int i = 0; i <= COUNT; i++) {
                     double J = START + (END - START) * i / COUNT;
                     coutMutex.lock();
@@ -130,37 +130,36 @@ namespace ED::multi {
                     curr++;
                     coutMutex.unlock();
 
-                    get_DeltaE_CT_const(J, &outDataDeltaE, T, &outDataSpecificHeat_C, N, SIZE);
+                    get_DeltaE_CT_const_SI(J, &outDataDeltaE, temp, &outDataSpecificHeat_C, h, N, SIZE);
                 }
-            } else {
-                std::cout << ", parity states\n";
-                int curr = 0;
-#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr)
-                for (int i = 0; i <= COUNT; i++) {
-                    double J = START + (END - START) * i / COUNT;
-                    coutMutex.lock();
-                    int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
-                    std::cout << "\r[";
-                    for (int _ = 0; _ < p; _++) {
-                        std::cout << "#";
-                    }
-                    for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
-                        std::cout << ".";
-                    }
-                    std::cout << "] " << int((float) curr / (float) COUNT * 100) << "% J1/J2 = " << START + (END - START) * curr / COUNT << " (" << curr
-                              << "/" << COUNT << ")     ";
-                    std::cout.flush();
-                    curr++;
-                    coutMutex.unlock();
-
-                    get_DeltaE_CT_const_parity(J, &outDataDeltaE, T, &outDataSpecificHeat_C, N, SIZE);
-                }
-            }
-
+//            } else {
+//                std::cout << ", parity states\n";
+//                int curr = 0;
+//#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr)
+//                for (int i = 0; i <= COUNT; i++) {
+//                    double J = START + (END - START) * i / COUNT;
+//                    coutMutex.lock();
+//                    int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
+//                    std::cout << "\r[";
+//                    for (int _ = 0; _ < p; _++) {
+//                        std::cout << "#";
+//                    }
+//                    for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+//                        std::cout << ".";
+//                    }
+//                    std::cout << "] " << int((float) curr / (float) COUNT * 100) << "% J1/J2 = " << START + (END - START) * curr / COUNT << " (" << curr
+//                              << "/" << COUNT << ")     ";
+//                    std::cout.flush();
+//                    curr++;
+//                    coutMutex.unlock();
+//
+//                    get_DeltaE_CT_const_parity(J, &outDataDeltaE, T, &outDataSpecificHeat_C, N, SIZE);
+//                }
+//            }
         } else {
             std::cout << ", momentum states\n";
             int curr = 0;
-#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr)
+#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, temp, N, SIZE, coutMutex, std::cout, curr, h)
             for (int i = 0; i <= COUNT; i++) {
                 double J = START + (END - START) * i / COUNT;
                 coutMutex.lock();
@@ -178,7 +177,7 @@ namespace ED::multi {
                 curr++;
                 coutMutex.unlock();
 
-                get_DeltaE_CT_const_SI(J, &outDataDeltaE, T, &outDataSpecificHeat_C, N, SIZE);
+                get_DeltaE_CT_const_momentum(J, &outDataDeltaE, temp, &outDataSpecificHeat_C, h, N, SIZE);
             }
         }
 
@@ -199,13 +198,15 @@ namespace ED::multi {
         std::string filenameDeltaE = "data_delta_E.txt";
         std::string filenameSpecificHeat_C = "data_specific_heat_T_const.txt";
         std::string header = "N: " + std::to_string(N) + "\n"
+                             + "h: " + std::to_string(h) + "\n"
                              + "J1/J2 START: " + std::to_string(START) + "\n"
                              + "J1/J2 END: " + std::to_string(END) + "\n"
                              + "data-points: " + std::to_string(COUNT) + "\n"
                              + "calculation time with " + std::to_string(cores) + " threads: " +
                              std::to_string(elapsed_seconds.count()) + " seconds";
 
-        std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
+
+        std::string headerWithBeta = "beta: " + std::to_string(temp) + "\n" + header;
 
         saveOutData(filenameDeltaE, header, "J1/J2", "Delta E in J2", outDataDeltaE, N);
         saveOutData(filenameSpecificHeat_C, headerWithBeta, "J1/J2", "specific heat in J2", outDataSpecificHeat_C, N);
@@ -215,8 +216,8 @@ namespace ED::multi {
 
     /////////////////////////////// Chi(J) ///////////////////////////////
 
-    void get_XT_const(double J, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
-                      const int &N, const int &SIZE, const double &T) {
+    void get_XT_const_magnetization(double J, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
+                                    const int &N, const int &SIZE, const double &T) {
 
         std::vector<int> states;
         std::vector<std::complex<double>> eiVals;
@@ -322,7 +323,7 @@ namespace ED::multi {
                 curr++;
                 coutMutex.unlock();
 
-                get_XT_const(J, &outDataMagneticSusceptibility_X, N, SIZE, T);
+                get_XT_const_magnetization(J, &outDataMagneticSusceptibility_X, N, SIZE, T);
             }
         }
 
@@ -344,7 +345,7 @@ namespace ED::multi {
                              + "calculation time with " + std::to_string(cores) + " threads: "
                              + std::to_string(elapsed_seconds.count()) + " seconds";
 
-        std::string headerWithBeta = "T = " + std::to_string(T) + "\n" + header;
+        std::string headerWithBeta = "T: " + std::to_string(T) + "\n" + header;
 
         saveOutData(filenameMagneticSusceptibility_X, headerWithBeta, "J1/J2", "magnetic susceptibility in J2", outDataMagneticSusceptibility_X, N);
 //        std::cout << "\n";
@@ -428,9 +429,9 @@ namespace ED::multi {
 
         std::vector<double> eiVals0;
         std::vector<double> eiVals1;
-        spinInversion::getEiValsMagBlock(J, 1.0, &eiVals0, N, SIZE, N/2);
-        spinInversion::getEiValsMagBlock(J, 1.0, &eiVals1, N, SIZE, N/2 + 1);
-        spinInversion::getEiValsMagBlock(J, 1.0, &eiVals1, N, SIZE, N/2 - 1);
+        spinInversion::getEiValsMagBlock(J, 1.0, 0.0, &eiVals0, N, SIZE, N/2);
+        spinInversion::getEiValsMagBlock(J, 1.0, 0.0, &eiVals1, N, SIZE, N/2 + 1);
+        spinInversion::getEiValsMagBlock(J, 1.0, 0.0, &eiVals1, N, SIZE, N/2 - 1);
 
         // sort eigenvalues
         eiVals0.shrink_to_fit();

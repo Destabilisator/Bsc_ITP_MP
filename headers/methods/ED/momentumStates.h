@@ -17,26 +17,31 @@
 
 namespace ED::momentumStates {
 
-    void fillHamiltonBlock(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+    /////////////////////////////// eigenvalues ///////////////////////////////
+
+    void fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                            const std::vector<int> &R_vals, Eigen::MatrixXcd &hamiltonBlock, const int &N,
                            const int &SIZE);
 
-    void momentumBlockSolver(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+    void momentumBlockSolver(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                              const std::vector<int> &R_vals, std::vector<std::complex<double>> &HEiValList,
                              std::vector<Eigen::MatrixXcd> &matrixBlocks, const int &N, const int &SIZE);
 
-    void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> &HEiValList,
+    void getEiVals(const double &J1, const double &J2, const double &h, std::vector<std::complex<double>> &HEiValList,
                    std::vector<Eigen::MatrixXcd> &matrixBlocks, const int &N, const int &SIZE);
 
-    void start(const double &J1, const double &J2, const int &N, const int &SIZE);
+    void start(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE);
 
-    void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+    /////////////////////////////// specific heat ///////////////////////////////
+
+    void startSpecificHeat(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE, const double &START,
                            const double &END, const int &COUNT);
 
-    void startDispersionPlot(const double &J1, const double &J2, const int &N, const int &SIZE);
+    /////////////////////////////// dispersion ///////////////////////////////
 
-    Eigen::MatrixXcd spinMatrix(const int &N, const int &k, const std::vector<int> &states,
-                                const std::vector<int> &R_vals);
+    void startDispersionPlot(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE);
+
+    /////////////////////////////// susceptibility ///////////////////////////////
 
     void momentumBlockSolver_with_S(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
                                     const std::vector<int> &R_vals, std::vector<std::tuple<std::complex<double>, int>> &data,

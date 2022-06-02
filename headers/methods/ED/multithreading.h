@@ -23,25 +23,27 @@ namespace ED::multi {
 
     /////////////////////////////// Delta E, C(J) ///////////////////////////////
 
-    void get_DeltaE_CT_const(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
-                             double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
-                             const int &N, const int &SIZE);
-
+    void get_DeltaE_CT_const_momentum(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
+                                      double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
+                                      const double &h, const int &N, const int &SIZE);
+/*
     void get_DeltaE_CT_const_parity(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
                                     double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
                                     const int &N, const int &SIZE);
-
+*/
     void get_DeltaE_CT_const_SI(double J, std::vector<std::tuple<double, double>> *outDataDeltaE,
                                 double T, std::vector<std::tuple<double, double>> *outDataSpecificHeat_C,
-                                const int &N, const int &SIZE);
+                                const double &h, const int &N, const int &SIZE);
 
-    void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END,
+
+
+    void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const double &h,
                                int cores, const double &T, const int &N, const int &SIZE);
 
     /////////////////////////////// Chi(J) ///////////////////////////////
 
-    void get_XT_const(double J, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
-                      const int &N, const int &SIZE, const double &T);
+    void get_XT_const_magnetization(double J, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
+                                    const int &N, const int &SIZE, const double &T);
 
     void get_XT_const_momentum(double J, std::vector<std::tuple<double, double>> *outDataMagneticSusceptibility_X,
                                const int &N, const int &SIZE, const double &T);

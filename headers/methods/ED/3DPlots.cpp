@@ -6,12 +6,12 @@ namespace ED::plot3D {
 
     /////////////////////////////// C ///////////////////////////////
 
-    void get_C_momentum(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE) {
+    void get_C_momentum(double &J, const double &h, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE) {
 
         std::vector<std::complex<double>> eiVals;
         std::vector<Eigen::MatrixXcd> matrixBlocks;
 
-        momentumStates::getEiVals(J, 1.0, eiVals, matrixBlocks, N, SIZE);
+        momentumStates::getEiVals(J, 1.0, h, eiVals, matrixBlocks, N, SIZE);
 
         std::vector<std::tuple<double, double>> C_func_T;
 
@@ -20,7 +20,7 @@ namespace ED::plot3D {
             C_func_T.emplace_back(T, getSpecificHeat(1.0 / T, eiVals, N)); // beta = 1.0 / T => 1.0 / beta = T, undo T => beta conversion
         }
 
-        save3DPlotDataC(J, N, C_func_T);
+        save3DPlotDataC(J, h, N, C_func_T);
 
         // write data
         nextJMutex3D.lock();
@@ -28,7 +28,7 @@ namespace ED::plot3D {
         nextJMutex3D.unlock();
 
     }
-
+/*
     void get_C_parity(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE) {
 
         std::vector<double> eiVals;
@@ -51,13 +51,13 @@ namespace ED::plot3D {
         nextJMutex3D.unlock();
 
     }
-
-    void get_C_SI(double J, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE) {
+*/
+    void get_C_SI(double J, const double &h, const int &TCOUNT, const double &TSTART, const double &TEND, const int &N, const int &SIZE) {
 
         std::vector<double> eiVals;
         std::vector<Eigen::MatrixXd> matrixBlocks;
 
-        spinInversion::getEiVals(J, 1.0, &eiVals, &matrixBlocks, N, SIZE);
+        spinInversion::getEiVals(J, 1.0, h, &eiVals, &matrixBlocks, N, SIZE);
 
         std::vector<std::tuple<double, double>> C_func_T;
 
@@ -66,7 +66,7 @@ namespace ED::plot3D {
             C_func_T.emplace_back(T, getSpecificHeat(1.0 / T, eiVals, N)); // beta = 1.0 / T => 1.0 / beta = T, undo T => beta conversion
         }
 
-        save3DPlotDataC(J, N, C_func_T);
+        save3DPlotDataC(J, h, N, C_func_T);
 
         // write data
         nextJMutex3D.lock();
@@ -77,7 +77,7 @@ namespace ED::plot3D {
 
     void start_C(const double &JSTART, const double &JEND, const int &JCOUNT,
                  const double &TSTART, const double &TEND, const int &TCOUNT,
-                 int &cores, const int &N, const int &SIZE) {
+                 const double &h, int &cores, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -85,11 +85,11 @@ namespace ED::plot3D {
 
         std::cout << " (" << cores << ") cores";
 
-        if (N%4 == 0) {
-            if (N >= 12) {
+        if (N%4 == 0 && std::abs(h) < EPSILON) { // h with SI not yet working
+//            if (N >= 12) {
                 std::cout << ", spin inversion\n";
                 int curr = 0;
-#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
+#pragma omp parallel for default(none) shared(h, JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
                 for (int i = 0; i <= JCOUNT; i++) {
                     double J = JSTART + (JEND - JSTART) * i / JCOUNT;
                     coutMutex.lock();
@@ -107,36 +107,36 @@ namespace ED::plot3D {
                     curr++;
                     coutMutex.unlock();
 
-                    get_C_SI(J, TCOUNT, TSTART, TEND, N, SIZE);
+                    get_C_SI(J, h, TCOUNT, TSTART, TEND, N, SIZE);
                 }
-            } else {
-                std::cout << ", parity states\n";
-                int curr = 0;
-#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
-                for (int i = 0; i <= JCOUNT; i++) {
-                    double J = JSTART + (JEND - JSTART) * i / JCOUNT;
-                    coutMutex.lock();
-                    int p = (int) ((float) curr / (float) (JCOUNT) * (float) PROGRESSBAR_SEGMENTS);
-                    std::cout << "\r[";
-                    for (int _ = 0; _ < p; _++) {
-                        std::cout << "#";
-                    }
-                    for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
-                        std::cout << ".";
-                    }
-                    std::cout << "] " << int((float) curr / (float) JCOUNT * 100) << "% J1/J2 = " << J << " (" << curr
-                              << "/" << JCOUNT << ")     ";
-                    std::cout.flush();
-                    curr++;
-                    coutMutex.unlock();
-
-                    get_C_parity(J, TCOUNT, TSTART, TEND, N, SIZE);
-                }
-            }
+//            } else {
+//                std::cout << ", parity states\n";
+//                int curr = 0;
+//#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
+//                for (int i = 0; i <= JCOUNT; i++) {
+//                    double J = JSTART + (JEND - JSTART) * i / JCOUNT;
+//                    coutMutex.lock();
+//                    int p = (int) ((float) curr / (float) (JCOUNT) * (float) PROGRESSBAR_SEGMENTS);
+//                    std::cout << "\r[";
+//                    for (int _ = 0; _ < p; _++) {
+//                        std::cout << "#";
+//                    }
+//                    for (int _ = p; _ < PROGRESSBAR_SEGMENTS; _++) {
+//                        std::cout << ".";
+//                    }
+//                    std::cout << "] " << int((float) curr / (float) JCOUNT * 100) << "% J1/J2 = " << J << " (" << curr
+//                              << "/" << JCOUNT << ")     ";
+//                    std::cout.flush();
+//                    curr++;
+//                    coutMutex.unlock();
+//
+//                    get_C_parity(J, TCOUNT, TSTART, TEND, N, SIZE);
+//                }
+//            }
         } else {
             std::cout << ", momentum states\n";
             int curr = 0;
-#pragma omp parallel for default(none) shared(JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
+#pragma omp parallel for default(none) shared(h, JSTART, JEND, JCOUNT, TSTART, TEND, TCOUNT, N, SIZE, coutMutex, std::cout, curr)
             for (int i = 0; i <= JCOUNT; i++) {
                 double J = JSTART + (JEND - JSTART) * i / JCOUNT;
                 coutMutex.lock();
@@ -154,7 +154,7 @@ namespace ED::plot3D {
                 curr++;
                 coutMutex.unlock();
 
-                get_C_momentum(J, TCOUNT, TSTART, TEND, N, SIZE);
+                get_C_momentum(J, h, TCOUNT, TSTART, TEND, N, SIZE);
             }
         }
 

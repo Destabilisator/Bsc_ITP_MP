@@ -4,12 +4,20 @@
 
 namespace ED::momentumStates {
 
-    void fillHamiltonBlock(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+    /////////////////////////////// eigenvalues ///////////////////////////////
+
+    void fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                            const std::vector<int> &R_vals, Eigen::MatrixXcd &hamiltonBlock, const int &N,
                            const int &SIZE) {
 
         for (int a = 0; a < states.size(); a++) {
+
             int s = states.at(a);
+
+            // external magnetic field
+            int mag = bitSum(s, N) - N/2;
+            hamiltonBlock(a,a) += (double) mag * h;
+
             for (int n = 0; n < N / 2; n++) {
                 // declaring indices
                 int j_0 = 2 * n;
@@ -62,7 +70,7 @@ namespace ED::momentumStates {
         }
     }
 
-    void momentumBlockSolver(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+    void momentumBlockSolver(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                              const std::vector<int> &R_vals, std::vector<std::complex<double>> &HEiValList,
                              std::vector<Eigen::MatrixXcd> &matrixBlocks, const int &N, const int &SIZE) {
 
@@ -74,7 +82,7 @@ namespace ED::momentumStates {
 
 //        std::cout << "M = " << bitSum(states.at(0), N) << ", k = " << k << std::endl;
 
-        fillHamiltonBlock(J1, J2, k, states, R_vals, hamiltonBlock, N, SIZE);
+        fillHamiltonBlock(J1, J2, h, k, states, R_vals, hamiltonBlock, N, SIZE);
 
         #if defined(showMatrix) || defined(saveMatrix)
             matrixBlocks.push_back(hamiltonBlock);
@@ -88,7 +96,7 @@ namespace ED::momentumStates {
 
     }
 
-    void getEiVals(const double &J1, const double &J2, std::vector<std::complex<double>> &HEiValList,
+    void getEiVals(const double &J1, const double &J2, const double &h, std::vector<std::complex<double>> &HEiValList,
                    std::vector<Eigen::MatrixXcd> &matrixBlocks, const int &N, const int &SIZE) {
 
         int k_lower = -(N + 2) / 4 + 1;
@@ -110,7 +118,7 @@ namespace ED::momentumStates {
 
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
-                momentumBlockSolver(J1, J2, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower), HEiValList,
+                momentumBlockSolver(J1, J2, h, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower), HEiValList,
                                     matrixBlocks, N, SIZE);
             }
         }
@@ -152,7 +160,7 @@ namespace ED::momentumStates {
         #endif
     }
 
-    void start(const double &J1, const double &J2, const int &N, const int &SIZE) {
+    void start(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -161,7 +169,7 @@ namespace ED::momentumStates {
         std::vector<std::complex<double>> momentEiVals;
         std::vector<Eigen::MatrixXcd> matrixMomentBlocks;
 
-        getEiVals(J1, J2, momentEiVals, matrixMomentBlocks, N, SIZE);
+        getEiVals(J1, J2, h, momentEiVals, matrixMomentBlocks, N, SIZE);
 
         auto end = std::chrono::steady_clock::now();
         std::chrono::duration<double> elapsed_seconds = end-start;
@@ -169,7 +177,9 @@ namespace ED::momentumStates {
 
     }
 
-    void startSpecificHeat(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
+    /////////////////////////////// specific heat ///////////////////////////////
+
+    void startSpecificHeat(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE, const double &START,
                            const double &END, const int &COUNT) {
 
         auto start = std::chrono::steady_clock::now();
@@ -179,7 +189,7 @@ namespace ED::momentumStates {
         std::vector<std::complex<double>> momentEiVals;
         std::vector<Eigen::MatrixXcd> matrixMomentBlocks;
 
-        getEiVals(J1, J2, momentEiVals, matrixMomentBlocks, N, SIZE);
+        getEiVals(J1, J2, h, momentEiVals, matrixMomentBlocks, N, SIZE);
 
 
         ///// specific /////
@@ -199,18 +209,21 @@ namespace ED::momentumStates {
 
         std::string filenameSpecificHeat_C = "data_specific_heat_J_const.txt"; // momentum_specific_heat / data_specific_heat_J_const
         std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
+                                           + "h: " + std::to_string(h) + "\n"
                                            + "T START: " + std::to_string(START) + "\n"
                                            + "T END: " + std::to_string(END) + "\n"
                                            + "data-points: " + std::to_string(COUNT) + "\n"
                                            + "calculation time: " + formatTime(elapsed_seconds);
 
-        std::string headerWithJSpecificHeat_C = "J1/J2 = " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
-        saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "J1/J2", "specific heat in J2", specificHeat_momentum, N);
+        std::string headerWithJSpecificHeat_C = "J1/J2: " + std::to_string(J1/J2) +"\n" + headerSpecificHeat_C;
+        saveOutData(filenameSpecificHeat_C, headerWithJSpecificHeat_C, "beta", "specific heat in J2", specificHeat_momentum, N);
 //        std::cout << "\n";
 
     }
 
-    void startDispersionPlot(const double &J1, const double &J2, const int &N, const int &SIZE) {
+    /////////////////////////////// dispersion ///////////////////////////////
+
+    void startDispersionPlot(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -239,7 +252,7 @@ namespace ED::momentumStates {
 
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
-                momentumBlockSolver(J1, J2, k, states.at(m).at(k-k_lower), R_vals.at(m).at(k-k_lower), momentEiVals.at(k-k_lower),
+                momentumBlockSolver(J1, J2, h, k, states.at(m).at(k-k_lower), R_vals.at(m).at(k-k_lower), momentEiVals.at(k-k_lower),
                                     matrixMomentBlocks, N, SIZE);
             }
         }
@@ -257,16 +270,20 @@ namespace ED::momentumStates {
         ///// save /////
 
         std::string filename = "momentum_energy_dispersion_J_const.txt";
-        std::string header = "N: " + std::to_string(N);
-        std::string headerWithJ = "J1/J2 = " + std::to_string(J1/J2) +"\n" + header;
+        std::string header = "N: " + std::to_string(N) + "\n" + "h: " + std::to_string(h);
+        std::string headerWithJ = "J1/J2: " + std::to_string(J1/J2) +"\n" + header;
         saveOutData(filename, headerWithJ, "k", "E in J2", momentData, N);
 //        std::cout << "\n";
 
     }
 
+    /////////////////////////////// susceptibility ///////////////////////////////
+
     void momentumBlockSolver_with_S(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
                                         const std::vector<int> &R_vals, std::vector<std::tuple<std::complex<double>, int>> &data,
                                         const int &N, const int &SIZE) {
+
+        double h = 0.0;
 
         const int statesCount = (int) states.size();
         if (statesCount == 0) {
@@ -274,7 +291,7 @@ namespace ED::momentumStates {
         }
         Eigen::MatrixXcd hamiltonBlock = Eigen::MatrixXcd::Zero(statesCount,statesCount);
 
-        fillHamiltonBlock(J1, J2, k, states, R_vals, hamiltonBlock, N, SIZE);
+        fillHamiltonBlock(J1, J2, h, k, states, R_vals, hamiltonBlock, N, SIZE);
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> solver(hamiltonBlock);
         const Eigen::VectorXcd &H1EiVal = solver.eigenvalues();
@@ -340,13 +357,15 @@ namespace ED::momentumStates {
                                         std::vector<Eigen::MatrixXcd> &matrixBlockU, std::vector<Eigen::MatrixXcd> &matrixBlockS2,
                                         const int &N, const int &SIZE) {
 
+        double h = 0.0;
+
         const int statesCount = (int) states.size();
         if (statesCount == 0) {
             return;
         }
         Eigen::MatrixXcd hamiltonBlock = Eigen::MatrixXcd::Zero(statesCount,statesCount);
 
-        fillHamiltonBlock(J1, J2, k, states, R_vals, hamiltonBlock, N, SIZE);
+        fillHamiltonBlock(J1, J2, h, k, states, R_vals, hamiltonBlock, N, SIZE);
 
         Eigen::SelfAdjointEigenSolver<Eigen::MatrixXcd> solver(hamiltonBlock);
         matrixBlockU.push_back(solver.eigenvectors());
@@ -406,6 +425,8 @@ namespace ED::momentumStates {
     void getEiValsMagBlock(const double &J1, const double &J2, std::vector<std::complex<double>> &eiVals,
                                   const int &N, const int &SIZE, const int &mag) {
 
+        double h = 0.0;
+
         std::vector<Eigen::MatrixXcd> matrixBlockU;
 
         int k_lower = -(N + 2) / 4 + 1;
@@ -428,7 +449,7 @@ namespace ED::momentumStates {
 
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
-                momentumBlockSolver(J1, J2, k, states.at(k - k_lower), R_vals.at(k - k_lower), eiVals,
+                momentumBlockSolver(J1, J2, h, k, states.at(k - k_lower), R_vals.at(k - k_lower), eiVals,
                                     matrixBlockU, N, SIZE);
             }
         }
@@ -437,6 +458,8 @@ namespace ED::momentumStates {
 
     void startSusceptibility(const double &J1, const double &J2, const int &N, const int &SIZE, const double &START,
                              const double &END, const int &COUNT) {
+
+        double h = 0.0;
 
         auto start = std::chrono::steady_clock::now();
 
@@ -480,6 +503,7 @@ namespace ED::momentumStates {
 
         std::string filenameSusceptibility_X = "momentum_susceptibility_J_const.txt"; // momentum_susceptibility_J_const.txt / data_susceptibility_J_const
         std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
+                                             + "h = " + std::to_string(h) + "\n"
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"
                                              + "data-points: " + std::to_string(COUNT) + "\n"

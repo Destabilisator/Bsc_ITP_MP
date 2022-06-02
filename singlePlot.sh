@@ -15,25 +15,31 @@ else
 fi
 
 if [[ "$#" -ge 5 ]]; then
-	CORES=$5
+	h=$5
+else
+	h=0.0
+fi
+
+if [[ "$#" -ge 6 ]]; then
+	CORES=$6
 else
 	CORES=-1
 fi
 
-if [[ "$#" -ge 6 ]]; then
-	noX=$6
+if [[ "$#" -ge 7 ]]; then
+	noX=$7
 else
 	noX=-X
 fi
 
-if [[ "$#" -ge 7 ]]; then
-	show=$7
+if [[ "$#" -ge 8 ]]; then
+	show=$8
 else
 	show=-
 fi
 
-if [[ "$#" -ge 8 ]]; then
-	SILENT=$8
+if [[ "$#" -ge 9 ]]; then
+	SILENT=$9
 else
 	SILENT=-
 fi
@@ -47,10 +53,10 @@ else
 	pth=python3
 fi
 
-build=build
-#build=cmake-build-release
+#build=build
+build=cmake-build-release
 
-./$build/$prgm $N $START $END $COUNT $CORES $noX $SILENT
+./$build/$prgm $N $START $END $h $COUNT $CORES $noX $SILENT
 echo ""
 echo "plotting for N = $N:"
 $pth ./plotting/plot.py $N $show $noX

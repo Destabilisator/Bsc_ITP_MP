@@ -11,31 +11,33 @@ fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
 for N, c in N_color:
     file = open("results/" + N + "_data_specific_heat_J_const.txt", 'r')
     lines = file.readlines()
-    linesJ = lines[0][len("J1/J2 = "):-1]
+    linesJ = lines[0][len("J1/J2: "):-1]
+    linesh = lines[2][len("h: "):-1]
     lbl = "N = " + N
     X = []
     Y = []
-    for i in range(8,len(lines)):
+    for i in range(9,len(lines)):
         x, y = lines[i].split("\t")
         #print(x + " " + y + "\r")
         X += [float(x)]
         Y += [float(y)]
-    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)
+    subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = c, label = lbl)
 
     file = open("results/" + N + "_data_specific_heat_J_const_QT.txt", 'r')
     lines = file.readlines()
-    linesJ = lines[0][len("J1/J2 = "):-1]
+    linesJ = lines[1][len("J1/J2: "):-1]
+    linesh = lines[2][len("h: "):-1]
     lbl = "N = " + N
     X = []
     Y = []
     YErr = []
-    for i in range(6,len(lines)):
+    for i in range(7,len(lines)):
         x, y, yErr = lines[i].split("\t")
         # if float(x) > 0:
         X += [float(x)]
         Y += [float(y)]
         YErr += [float(yErr)]
-    subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = ".", color = c, label = "QT", alpha = 0.2)
+    subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 1, marker = "o", color = c, label = "QT", alpha = 0.2)
     X = np.asarray(X)
     Y = np.asarray(Y)
     YErr = np.asarray(YErr)
@@ -44,7 +46,7 @@ for N, c in N_color:
 subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 18)
 # subfig1.set_xlabel(r'$T$ in $k_B$ / $J_2$', fontsize = 18)
 subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 18)
-subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", $k_B$ = 1", fontsize = 18)
+subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
 
 subfig1.axhline(0, color = "grey")
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)

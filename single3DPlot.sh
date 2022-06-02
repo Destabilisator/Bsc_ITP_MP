@@ -12,25 +12,31 @@ T_END=$6
 T_COUNT=$7
 
 if [[ "$#" -ge 8 ]]; then
-	CORES=$8
+	h=$8
+else
+	h=0.0
+fi
+
+if [[ "$#" -ge 9 ]]; then
+	CORES=$9
 else
 	CORES=-1
 fi
 
-if [[ "$#" -ge 9 ]]; then
-	noX=${9}
+if [[ "$#" -ge 10 ]]; then
+	noX=${10}
 else
 	noX=-
 fi
 
-if [[ "$#" -ge 10 ]]; then
-	show=${10}
+if [[ "$#" -ge 11 ]]; then
+	show=${11}
 else
 	show=-
 fi
 
-if [[ "$#" -ge 10 ]]; then
-	SILENT=${11}
+if [[ "$#" -ge 12 ]]; then
+	SILENT=${12}
 else
 	SILENT=-
 fi
@@ -44,11 +50,14 @@ else
 	pth=python3
 fi
 
+#build=build
+build=cmake-build-release
+
 $pth ./plotting/deleteData.py $N
-./cmake-build-release/$prgm 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $CORES $noX $SILENT
+./$build/$prgm 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $h $CORES $noX $SILENT
 echo ""
 echo "plotting for N = $N:"
-$pth ./plotting/plot3D.py $N $show
+$pth ./plotting/plot3D.py $N $show C $noX
 
 elapsed=$(( SECONDS - start_time ))
 echo "all done, total elapsed time: $elapsed seconds"

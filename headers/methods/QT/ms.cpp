@@ -110,7 +110,7 @@ namespace QT::MS {
 
     }
 
-    std::vector<matrixDataMomentumType> getIndexAndHamilton(const double &J1, const double &J2, const int &N, const int &SIZE) {
+    std::vector<matrixDataMomentumType> getIndexAndHamilton(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE) {
 
         int k_lower = -(N + 2) / 4 + 1;
         int k_upper = N / 4;
@@ -139,7 +139,7 @@ namespace QT::MS {
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
                 if (states.at(m).at(k - k_lower).empty()) {continue;}
-                Eigen::MatrixXcd Mtrx = fillHamiltonBlock(J1, J2, k, states.at(m).at(k - k_lower),
+                Eigen::MatrixXcd Mtrx = fillHamiltonBlock(J1, J2, h, k, states.at(m).at(k - k_lower),
                                                           R_vals.at(m).at(k - k_lower), N);
                 matList.emplace_back(m, k, Mtrx.sparseView());
             }
@@ -150,7 +150,7 @@ namespace QT::MS {
 
     }
 
-    std::vector<matrixType> getHamilton(const double &J1, const double &J2, const int &N, const int &SIZE) {
+    std::vector<matrixType> getHamilton(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE) {
 
         int k_lower = -(N + 2) / 4 + 1;
         int k_upper = N / 4;
@@ -178,7 +178,7 @@ namespace QT::MS {
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
                 if (states.at(m).at(k - k_lower).empty()) {continue;}
-                Eigen::MatrixXcd Mtrx = fillHamiltonBlock(J1, J2, k, states.at(m).at(k - k_lower),
+                Eigen::MatrixXcd Mtrx = fillHamiltonBlock(J1, J2, h, k, states.at(m).at(k - k_lower),
                                                           R_vals.at(m).at(k - k_lower), N);
                 matList.emplace_back(Mtrx.sparseView());
             }
@@ -189,7 +189,7 @@ namespace QT::MS {
 
     }
 
-    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const int &k, const std::vector<int> &states,
+    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                                        const std::vector<int> &R_vals, const int &N) {
 
         const int statesCount = (int) states.size();
@@ -197,6 +197,8 @@ namespace QT::MS {
 
         for (int a = 0; a < statesCount; a++) {
             int s = states.at(a);
+            int mag = ED::bitSum(s, N) - N/2;
+            hamiltonBlock(a,a) += (double) mag * h;
             for (int n = 0; n < N / 2; n++) {
                 // declaring indices
                 int j_0 = 2 * n;
@@ -315,14 +317,14 @@ namespace QT::MS {
 
     }
 
-    void start_calculation_C_J_const(const double &start, const double &end, const double &step,
-                            const double &J1, const double &J2, const int &N, const int &SIZE, const int &SAMPLES) {
+    void start_calculation_C_J_const(const double &start, const double &end, const double &step, const double &J1,
+                                     const double &J2, const double &h, const int &N, const int &SIZE, const int &SAMPLES) {
 
         auto start_timer = std::chrono::steady_clock::now();
 
         std::cout << "\n" << "C(T), J = const, QT, momentum states ..." << std::endl;
 
-        std::vector<matrixType> matrixList = getHamilton(J1, J2, N, SIZE);
+        std::vector<matrixType> matrixList = getHamilton(J1, J2, h, N, SIZE);
 
         typedef std::vector<std::tuple<double, double>> dataVectorType;
         std::vector<std::vector<double>> outData;
@@ -368,8 +370,11 @@ namespace QT::MS {
         std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         hlp::saveOutData("data_specific_heat_J_const_QT.txt",
-                         "QT, MS\nfür N = " + std::to_string(N) + "\nmit " + std::to_string(SAMPLES) + " Samples\n"
-                          + "this took: " + formatTime(elapsed_seconds),
+                         "N: " + std::to_string(N) + "\n"
+                         + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                         + "h: " + std::to_string(h)+ "\n"
+                         + "samples: " + std::to_string(SAMPLES) + "\n"
+                         + "this took: " + formatTime(elapsed_seconds),
                          "beta in kb / J2", "C in J2", beta_Data, C_Data, CErr_Data, N);
 
     }
@@ -512,7 +517,7 @@ namespace QT::MS {
         std::cout << "\n" << "X(T), J = const, QT, momentum states ..." << std::endl;
 
 
-        std::vector<matrixType> H_List = getHamilton(J1, J2, N, SIZE);
+        std::vector<matrixType> H_List = getHamilton(J1, J2, 0.0, N, SIZE);
         std::vector<matrixType> S2_List = getS2(J1, J2, N, SIZE);
 
         typedef std::vector<std::tuple<double, double>> dataVectorType;
