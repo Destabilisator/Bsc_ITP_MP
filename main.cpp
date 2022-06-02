@@ -42,20 +42,20 @@ int main(int argc, char* argv[]) {
             ED::plot3D::start_X(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
         }
     } else {
-        QT::MS::start_calculation_C_J_const(T_START, T_END, step_size, J1, J2, h, N, SIZE, 5);
+        QT::MS::start_calculation_C_J_const(T_START, T_END * T_END, step_size, J1, J2, h, N, SIZE, 5); ///////////////////////
 
         // excitation energy \Delta E(J) and specific heat C(J), T = const
-        ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
+        ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END * J_END, h, cores, T, N, SIZE); ///////////////////////
 
         // specific heat C(T), J = const
         if (N%4 == 0 && std::abs(h) < EPSILON) { // h with SI not yet working
-            ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
+            ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END * T_END, T_COUNT); ///////////////////////
         } else {
-            ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
+            ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END * T_END, T_COUNT); ///////////////////////
         }
 
         // spin gap E_gap (J)
-        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+        ED::multi::start_SpinGap(J_COUNT, J_START, J_END / 2.0, cores, N, SIZE); ///////////////////////
 
         // susceptibility \Chi(J), T = const
         if (!noX) {

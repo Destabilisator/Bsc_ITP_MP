@@ -41,7 +41,6 @@ def plot_specific_heat(N):
     ax.set_ylabel(r'$J_1$ / $J_2$', fontsize = 18)
     ax.set_zlabel(r'$C/N$ in $J_2$', fontsize = 18)
     #ax.legend(loc = 'best' ,frameon = False, fontsize = 14)
-    print(h)
 
     plt.savefig("results/3DData/" + N + "_specific_heat_" + str(h) + ".png")
 
