@@ -108,7 +108,7 @@ namespace ED::multi {
 
         std::cout << " (" << cores << ") cores";
 
-        if (N%4 == 0 && std::abs(h) < EPSILON) { // h with SI not yet working
+        if (N%4 == 0) {
 //            if (N >= 12) {
                 std::cout << ", spin inversion\n";
                 int curr = 0;

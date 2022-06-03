@@ -56,7 +56,7 @@ fi
 #build=build
 build=cmake-build-release
 
-./$build/$prgm $N $START $END $h $COUNT $CORES $noX $SILENT
+./$build/$prgm $N $START $END $COUNT $h $CORES $noX $SILENT
 echo ""
 echo "plotting for N = $N:"
 $pth ./plotting/plot.py $N $show $noX

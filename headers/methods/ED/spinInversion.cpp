@@ -331,7 +331,7 @@ namespace ED::spinInversion {
                             }
                         }
                         if (!states.empty()) {
-                            parityStates::parityBlockSolver(J1, J2, k, p, states, R_vals, m_vals, eiVals, matrixBlocks, N);
+                            parityStates::parityBlockSolver(J1, J2, h, k, p, states, R_vals, m_vals, eiVals, matrixBlocks, N);
                         }
                         states.clear();
                         R_vals.clear();
@@ -771,7 +771,7 @@ namespace ED::spinInversion {
         std::chrono::duration<double> elapsed_seconds = end-start;
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
-        std::string filenameSpecificHeat_C = "data_specific_heat_J_const.txt"; // spininversion_specific_heat / data_specific_heat_J_const
+        std::string filenameSpecificHeat_C = "data_specific_heat_J_const_SI.txt"; // spininversion_specific_heat / data_specific_heat_J_const
         std::string headerSpecificHeat_C = "N: " + std::to_string(N) + "\n"
                                            + "h: " + std::to_string(h) + "\n"
                                            + "T START: " + std::to_string(START) + "\n"

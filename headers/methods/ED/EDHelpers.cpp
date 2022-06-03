@@ -520,7 +520,8 @@ namespace ED {
                         int b = findState(states, r);
                         if (b >= 0) {
                             std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
-                            S2(a,b) += (std::complex<double>) 1.0 * sqrt((double) R_vals.at(a) / (double) R_vals.at(b)) * std::exp(numC);
+                            S2(a,b) += (std::complex<double>) 1.0 * sqrt((double) R_vals.at(a)
+                                    / (double) R_vals.at(b)) * std::exp(numC);
                         }
                     }
                 }

@@ -158,8 +158,6 @@ namespace QT::MS {
         std::vector<std::vector<std::vector<int>>> states(N + 1, std::vector<std::vector<int>>(N/2));
         std::vector<std::vector<std::vector<int>>> R_vals(N + 1, std::vector<std::vector<int>>(N/2));
 
-        int numberOfStates = 0;
-
         // get states
         for (int s = 0; s < SIZE; s++) {
             int m = ED::bitSum(s, N);
@@ -168,7 +166,6 @@ namespace QT::MS {
                 if (R >= 0) {
                     states.at(m).at(k - k_lower).push_back(s);
                     R_vals.at(m).at(k - k_lower).push_back(R);
-                    numberOfStates++;
                 }
             }
         }
@@ -252,7 +249,8 @@ namespace QT::MS {
         return hamiltonBlock;
     }
 
-    std::vector<double> rungeKutta4_C(const double &start, const double &end, const double &step, const int &N, const std::vector<matrixType> &matrixList) {
+    std::vector<double> rungeKutta4_C(const double &start, const double &end, const double &step, const int &N,
+                                      const std::vector<matrixType> &matrixList) {
 
         std::vector<double> outData;
         std::vector<Eigen::VectorXcd> vec = getVector(matrixList);
@@ -270,7 +268,6 @@ namespace QT::MS {
         while (beta <= end) {
 
             beta += step;
-
             norm = 0.0;
 
             #pragma omp parallel for default(none) shared(blockCount, vec, matrixList, step, norm)
@@ -289,7 +286,7 @@ namespace QT::MS {
             std::vector<double> vec_H_vec_List;
             std::vector<double> vec_H2_vec_List;
 
-            double C = 0.0;
+            //double C = 0.0;
             #pragma omp parallel for default(none) shared(blockCount, matrixList, vec, vec_H_vec_List, vec_H2_vec_List)
             for (int i = 0; i < blockCount; i++) {
                 const matrixType &H = matrixList.at(i);
@@ -306,7 +303,7 @@ namespace QT::MS {
             double vec_H2_vec = std::accumulate(vec_H2_vec_List.begin(), vec_H2_vec_List.end(), 0.0);
 
             double H_diff = std::real(vec_H2_vec - std::pow(vec_H_vec, 2));
-            C += beta * beta * H_diff / (double) N;
+            double C = beta * beta * H_diff / (double) N;
 
             outData.emplace_back(C);
 
@@ -421,8 +418,8 @@ namespace QT::MS {
 
         const int blockSize = (int) states.size();
         Eigen::MatrixXcd S2 = 0.75 * (double) N * Eigen::MatrixXd::Identity(blockSize, blockSize);
-        for (int s : states) {
-            int a = ED::findState(states, s);
+        for (int a = 0; a < blockSize; a++) {
+            int s = states.at(a);
             for (int i = 0; i < N; i++) {
                 for (int j = 0; j < i; j++) {
                     if (((s >> i) & 1) == ((s >> j) & 1)) {
@@ -435,7 +432,7 @@ namespace QT::MS {
                         int b = ED::findState(states, r);
                         if (b >= 0) {
                             std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
-                            S2(a,b) += (std::complex<double>) 0.5 * sqrt((double) R_vals.at(a)
+                            S2(a,b) += (std::complex<double>) 1.0 * sqrt((double) R_vals.at(a)
                                     / (double) R_vals.at(b)) * std::exp(numC);
                         }
                     }
@@ -446,7 +443,8 @@ namespace QT::MS {
         return S2;
     }
 
-    std::vector<double> rungeKutta4_X(const double &start, const double &end, const double &step, const int &N, const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List) {
+    std::vector<double> rungeKutta4_X(const double &start, const double &end, const double &step, const int &N,
+                                      const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List) {
 
         std::vector<double> outData;
         std::vector<Eigen::VectorXcd> vec = getVector(H_List);
@@ -460,47 +458,53 @@ namespace QT::MS {
             vec.at(i) = vec.at(i) / norm;
         }
 
+        norm = 0.0;
+        for (int i = 0; i < blockCount; i++) {
+            norm += std::pow(vec.at(i).norm(), 2);
+        }
+        norm = std::sqrt(norm);
+
         double beta = start - step;
         while (beta <= end) {
 
             beta += step;
-
             norm = 0.0;
 
-#pragma omp parallel for default(none) shared(blockCount, vec, H_List, step, norm)
+//#pragma omp parallel for default(none) shared(blockCount, vec, H_List, step, norm)
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
-                double normnt = std::pow(vec.at(i).norm(), 2);
-#pragma omp critical
-                norm += normnt;
+                double vec_norm = std::pow(vec.at(i).norm(), 2);
+//#pragma omp critical
+                norm += vec_norm;
             }
 
             norm = std::sqrt(norm);
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = vec.at(i) / norm;
             }
+            double notNorm = std::sqrt(norm);
 
-//            norm = 0.0;
-//            for (int i = 0; i < blockCount; i++) {
-//                norm += std::pow(vec.at(i).norm(), 2);
-//            }
+            norm = 0.0;
+            for (int i = 0; i < blockCount; i++) {
+                norm += std::pow(vec.at(i).norm(), 2);
+            }
+            norm = std::sqrt(norm);
 
             std::vector<double> vec_S2_vec_List;
 
-            double C = 0.0;
-#pragma omp parallel for default(none) shared(blockCount, H_List, S2_List, vec, vec_S2_vec_List)
+//#pragma omp parallel for default(none) shared(blockCount, H_List, S2_List, vec, vec_S2_vec_List)
             for (int i = 0; i < blockCount; i++) {
                 const matrixType &S2 = S2_List.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
                 double v_S2_v = std::real((v.adjoint() * S2 * v)(0,0));
-#pragma omp critical
+//#pragma omp critical
                 vec_S2_vec_List.emplace_back(v_S2_v);
             }
 
             double vec_S2_vec = std::accumulate(vec_S2_vec_List.begin(), vec_S2_vec_List.end(), 0.0);
 
-            C += beta * vec_S2_vec / 3.0 / (double) N;
-            outData.emplace_back(C);
+            double X = beta * vec_S2_vec / 3.0 / (double) N;
+            outData.emplace_back(X);
 
         }
 
@@ -516,9 +520,41 @@ namespace QT::MS {
 
         std::cout << "\n" << "X(T), J = const, QT, momentum states ..." << std::endl;
 
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
 
-        std::vector<matrixType> H_List = getHamilton(J1, J2, 0.0, N, SIZE);
-        std::vector<matrixType> S2_List = getS2(J1, J2, N, SIZE);
+        std::vector<std::vector<std::vector<int>>> states(N + 1, std::vector<std::vector<int>>(N/2));
+        std::vector<std::vector<std::vector<int>>> R_vals(N + 1, std::vector<std::vector<int>>(N/2));
+
+        // get states
+        for (int s = 0; s < SIZE; s++) {
+            int m = ED::bitSum(s, N);
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = ED::checkState(s, k, N);
+                if (R >= 0) {
+                    states.at(m).at(k - k_lower).push_back(s);
+                    R_vals.at(m).at(k - k_lower).push_back(R);
+                }
+            }
+        }
+
+        std::vector<matrixType> H_List;
+        std::vector<matrixType> S2_List;
+
+        for (int m = 0; m <= N; m++) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                if (states.at(m).at(k - k_lower).empty()) {continue;}
+                Eigen::MatrixXcd MtrxH = fillHamiltonBlock(J1, J2, 0.0, k, states.at(m).at(k - k_lower),
+                                                          R_vals.at(m).at(k - k_lower), N);
+                Eigen::MatrixXcd MtrxS2 = fillS2Block(k, states.at(m).at(k - k_lower),
+                                                    R_vals.at(m).at(k - k_lower), N);
+                H_List.emplace_back(MtrxH.sparseView());
+                S2_List.emplace_back(MtrxS2.sparseView());
+            }
+        }
+
+//        std::vector<matrixType> H_List = getHamilton(J1, J2, 0.0, N, SIZE);
+//        std::vector<matrixType> S2_List = getS2(J1, J2, N, SIZE);
 
         typedef std::vector<std::tuple<double, double>> dataVectorType;
         std::cout << 1 << "/" << SAMPLES << "\n";
@@ -547,7 +583,7 @@ namespace QT::MS {
 
 //        std::cout << "sizes: " << betaData.size() << "\t" << outData.size() << "\n";
 
-        hlp::saveOutData("data_susceptibility_J_const_QT.txt", "QT, MS für N = " + std::to_string(N)
+        hlp::saveOutData("data_susceptibility_J_const_QT_MS.txt", "QT, MS für N = " + std::to_string(N)
                         + " mit " + std::to_string(SAMPLES) + " Samples",
                         "T in J2 / kb", "C in J2", betaData, outData, N);
 

@@ -44,6 +44,7 @@ namespace QT::MB {
         std::vector<matrixType> matList;
 
         for (int m = 0; m <= N; m++) {
+//            if (m != N/2) { continue;}
             if (states.at(m).empty()) {continue;}
             Eigen::MatrixXd Mtrx = fillHamiltonBlock(J1, J2, states.at(m), N);
             matList.emplace_back(Mtrx.sparseView());
@@ -111,6 +112,7 @@ namespace QT::MB {
         std::vector<matrixType> matList;
 
         for (int m = 0; m <= N; m++) {
+//            if (m != N/2) { continue;}
             if (states.at(m).empty()) {continue;}
             Eigen::MatrixXd Mtrx = fillS2Block(N, states.at(m));
             matList.emplace_back(Mtrx.sparseView());
@@ -213,7 +215,6 @@ namespace QT::MB {
 
         std::cout << "\n" << "X(T), J = const, QT, magnetization blocks ..." << std::endl;
 
-
         std::vector<matrixType> H_List = getHamilton(J1, J2, N, SIZE);
         std::vector<matrixType> S2_List = getS2(J1, J2, N, SIZE);
 
@@ -244,7 +245,7 @@ namespace QT::MB {
 
 //        std::cout << "sizes: " << betaData.size() << "\t" << outData.size() << "\n";
 
-        hlp::saveOutData("data_susceptibility_J_const_QT.txt", "QT, MS für N = " + std::to_string(N)
+        hlp::saveOutData("data_susceptibility_J_const_QT_MB.txt", "QT, MS für N = " + std::to_string(N)
                                                                + " mit " + std::to_string(SAMPLES) + " Samples",
                          "T in J2 / kb", "C in J2", betaData, outData, N);
 

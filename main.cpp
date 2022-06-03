@@ -1,6 +1,6 @@
 #include "main.h"
 
-//#define DEBUG
+#define DEBUG
 #define ED_METHODS
 
 int main(int argc, char* argv[]) {
@@ -48,7 +48,7 @@ int main(int argc, char* argv[]) {
         ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END * J_END, h, cores, T, N, SIZE); ///////////////////////
 
         // specific heat C(T), J = const
-        if (N%4 == 0 && std::abs(h) < EPSILON) { // h with SI not yet working
+        if (N%4 == 0) {
             ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END * T_END, T_COUNT); ///////////////////////
         } else {
             ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END * T_END, T_COUNT); ///////////////////////
@@ -75,8 +75,7 @@ int main(int argc, char* argv[]) {
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
 
-    ED::momentumStates::start(J1, J2, h, N, SIZE);
-
+//    ED::momentumStates::start(J1, J2, h, N, SIZE);
 
 //    ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
 //    ED::multi::start_XT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
@@ -84,12 +83,14 @@ int main(int argc, char* argv[]) {
 //    ED::plot3D::start_C(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
 //    ED::plot3D::start_X(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
 
-//    double stepsize = (T_END - T_START) / (double) T_COUNT; // 0.01
-//    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
-//    ED::momentumStates::startSpecificHeat(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
+    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, 0.0, N, SIZE, 10);
+    ED::momentumStates::startSpecificHeat(J1, J2, 0.0, N, SIZE, T_START, T_END, T_COUNT);
 
-//    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 10);
-//    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
+    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
+    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
 #endif
 

@@ -61,17 +61,31 @@ namespace ED::parityStates {
                                  const std::vector<int> &R_vals, const std::vector<int> &m_vals,
                                  Eigen::MatrixXd &hamiltonBlock, const int &N) {
 
+        fillHamiltonParityBlock(J1, J2, 0.0, k, p, states, R_vals, m_vals, hamiltonBlock, N);
+
+    }
+
+    void fillHamiltonParityBlock(const double &J1, const double &J2, const double &h, const int &k, const int &p, const std::vector<int> &states,
+                                 const std::vector<int> &R_vals, const std::vector<int> &m_vals,
+                                 Eigen::MatrixXd &hamiltonBlock, const int &N) {
+
         int statesCount = (int) states.size();
 
         for (int a; a < statesCount; a++) {
+
+            int s = states.at(a);
+
+//            std::cout << hamiltonBlock(a,a) << std::endl;
+            int mag = bitSum(s, N) - N/2;
+            hamiltonBlock(a,a) += (double) mag * h;
+//            std::cout << hamiltonBlock(a,a) << std::endl << std::endl;
+
             int state_n = 1;
             if (a > 0 && states.at(a - 1) == states.at(a)) {
                 continue;
             } else if (a < states.size() - 1 && states.at(a) == states.at(a + 1)) {
                 state_n = 2;
             }
-
-            int s = states.at(a);
 
             for (int n = 0; n < N/2; n++) {
                 // declaring indices
@@ -166,9 +180,17 @@ namespace ED::parityStates {
                            const std::vector<int> &R_vals, const std::vector<int> &m_vals, std::vector<double> *eiVals,
                            std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N) {
 
+        parityBlockSolver(J1, J2, 0.0, k, p, states, R_vals, m_vals, eiVals, matrixBlocks, N);
+
+    }
+
+    void parityBlockSolver(const double &J1, const double &J2, const double &h, const int &k, const int &p, const std::vector<int> &states,
+                           const std::vector<int> &R_vals, const std::vector<int> &m_vals, std::vector<double> *eiVals,
+                           std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N) {
+
         const int statesCount = (int) states.size();
         Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount, statesCount);
-        fillHamiltonParityBlock(J1, J2, k, p, states, R_vals, m_vals, hamiltonBlock, N);
+        fillHamiltonParityBlock(J1, J2, h, k, p, states, R_vals, m_vals, hamiltonBlock, N);
 
     #if defined(showMatrix) || defined(saveMatrix)
         matrixBlocks->push_back(hamiltonBlock);

@@ -2,7 +2,7 @@
 
 start=0.01
 end=5
-h=1.0
+h=0.0
 
 noX=-X
 #noX=noX

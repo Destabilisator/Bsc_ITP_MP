@@ -27,7 +27,15 @@ namespace ED::parityStates {
                                  const std::vector<int> &R_vals, const std::vector<int> &m_vals,
                                  Eigen::MatrixXd &hamiltonBlock, const int &N);
 
+    void fillHamiltonParityBlock(const double &J1, const double &J2, const double &h, const int &k, const int &p, const std::vector<int> &states,
+                                 const std::vector<int> &R_vals, const std::vector<int> &m_vals,
+                                 Eigen::MatrixXd &hamiltonBlock, const int &N);
+
     void parityBlockSolver(const double &J1, const double &J2, const int &k, const int &p, const std::vector<int> &states,
+                           const std::vector<int> &R_vals, const std::vector<int> &m_vals, std::vector<double> *eiVals,
+                           std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N);
+
+    void parityBlockSolver(const double &J1, const double &J2, const double &h, const int &k, const int &p, const std::vector<int> &states,
                            const std::vector<int> &R_vals, const std::vector<int> &m_vals, std::vector<double> *eiVals,
                            std::vector<Eigen::MatrixXd> *matrixBlocks, const int &N);
 
