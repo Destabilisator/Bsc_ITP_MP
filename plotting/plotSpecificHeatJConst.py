@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 plt.rcParams['text.usetex'] = True
 
-N_color = [("12", "blue"), ("16", "red"), ("20", "green"), ("24", "orange")] #[("6", "red"), ("8", "blue"), ("10", "green"), ("12", "orange")]#, ("14", "brown"), ("16", "purple")]
+N_color = [("12", "blue")]#, ("16", "red"), ("20", "green"), ("24", "orange")] #[("6", "red"), ("8", "blue"), ("10", "green"), ("12", "orange")]#, ("14", "brown"), ("16", "purple")]
 
 print("plotting specific heat (constant J1/J2, funtion of T) ...")
 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
@@ -53,4 +53,4 @@ subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
 plt.savefig("results/" + "specific_heat_J_const_" + linesh + ".png")
 #plt.savefig("results/" + "specific_heat_J_const.png")
-# plt.show
+#plt.show

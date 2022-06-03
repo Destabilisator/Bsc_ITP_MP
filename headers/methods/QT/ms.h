@@ -4,6 +4,7 @@
 #include <random>
 #include "Eigen/SparseCore"
 #include <omp.h>
+#include <mutex>
 
 #include "helpers.h"
 #include "methods/ED/EDHelpers.h"
@@ -13,6 +14,8 @@
 /////////////////////////////// momentum states ///////////////////////////////
 
 namespace QT::MS {
+
+    static std::mutex coutMutex;
 
     typedef std::tuple<int, int, Eigen::SparseMatrix<std::complex<double>>> matrixDataMomentumType; // m, k, matrix
     typedef std::tuple<int, int, std::vector<int>, std::vector<int>> indexStateVectorType; // m, k, states, R_vals

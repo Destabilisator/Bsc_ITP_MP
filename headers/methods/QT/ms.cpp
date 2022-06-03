@@ -327,17 +327,37 @@ namespace QT::MS {
         std::vector<std::vector<double>> outData;
 
         int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) SAMPLES * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) SAMPLES * 100.0 ) << "% (" << curr << "/" << SAMPLES << ")     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
+
+//        #pragma omp parallel for default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, matrixList, outData)
         for (int s = 1; s <= SAMPLES; s++) {
-            int p = (int) ( (float) s / (float) SAMPLES * (float) prgbar_segm);
+//            int p = (int) ( (float) s / (float) SAMPLES * (float) prgbar_segm);
+            std::vector<double> rawData = rungeKutta4_C(start, end, step, N, matrixList);
+//            #pragma omp critical
+
+            coutMutex.lock();
+            outData.emplace_back(rawData);
+            int p = (int) ( (float) curr / (float) SAMPLES * (float) prgbar_segm);
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
                 std::cout << "#";
             } for (int _ = p; _ < prgbar_segm; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) s / (float) SAMPLES * 100.0 ) << " (" << s << "/" << SAMPLES << ")     ";
+            } std::cout << "] " << int( (float) curr / (float) SAMPLES * 100.0 ) << "% (" << curr << "/" << SAMPLES << ")     ";
             std::cout.flush();
-            std::vector<double> rawData = rungeKutta4_C(start, end, step, N, matrixList);
-            outData.emplace_back(rawData);
+            curr++;
+            coutMutex.unlock();
         }
 
         outData.shrink_to_fit();
@@ -345,6 +365,7 @@ namespace QT::MS {
         std::vector<double> C_Data;
         std::vector<double> CErr_Data;
 
+        // avg and stdv
         for(int i = 0; i < outData.at(0).size(); i++) {
             std::vector<double> C_data;
             for (std::vector<double> C_data_raw : outData) {
