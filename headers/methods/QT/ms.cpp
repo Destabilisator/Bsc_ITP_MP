@@ -270,7 +270,7 @@ namespace QT::MS {
             beta += step;
             norm = 0.0;
 
-            #pragma omp parallel for default(none) shared(blockCount, vec, matrixList, step, norm)
+            #pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, matrixList, step, norm)
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), matrixList.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
@@ -287,7 +287,7 @@ namespace QT::MS {
             std::vector<double> vec_H2_vec_List;
 
             //double C = 0.0;
-            #pragma omp parallel for default(none) shared(blockCount, matrixList, vec, vec_H_vec_List, vec_H2_vec_List)
+            #pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, matrixList, vec, vec_H_vec_List, vec_H2_vec_List)
             for (int i = 0; i < blockCount; i++) {
                 const matrixType &H = matrixList.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
@@ -340,7 +340,7 @@ namespace QT::MS {
         curr++;
         coutMutex.unlock();
 
-//        #pragma omp parallel for default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, matrixList, outData)
+        #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, matrixList, outData)
         for (int s = 1; s <= SAMPLES; s++) {
 //            int p = (int) ( (float) s / (float) SAMPLES * (float) prgbar_segm);
             std::vector<double> rawData = rungeKutta4_C(start, end, step, N, matrixList);

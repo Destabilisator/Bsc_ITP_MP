@@ -17,8 +17,8 @@ int main(int argc, char* argv[]) {
                   h, h_START, h_END, h_COUNT,
                   silent, cores, plotsIn3D, true, J1, J2, noX);
 
-    omp_set_num_threads(cores);
-//    omp_set_nested(1);
+    omp_set_num_threads(OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
+    omp_set_nested(1);
 
     std::cout << "N: " << N << "; size: " << SIZE << "\n";
     std::cout << "default J1 and J2 for plots with J = const: J1 = " << J1 << " and J2 = " << J2 << " (currently unchangeable)\n";
@@ -86,7 +86,7 @@ int main(int argc, char* argv[]) {
 //    ED::plot3D::start_X(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
 
     double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
-    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, 5);
+    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
     ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
 
 

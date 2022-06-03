@@ -2,5 +2,9 @@
 #define EPSILON 1e-10
 //#define fixedPrecision // remove if not debug
 
+// nested multithreaded loops
+#define OUTER_NESTED_THREADS 4
+#define INNER_NESTED_THREADS 1
+
 // prevent multithreading in Eigen
 //#define EIGEN_DONT_PARALLELIZE
