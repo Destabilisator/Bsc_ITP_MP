@@ -31,10 +31,10 @@ fi
 #     echo ""
 # done
 
-#./$build/$prgm 6 $start $end 10000 $h -1 $noX silent && echo "" # 10000
-#./$build/$prgm 8 $start $end 5000 $h -1 $noX silent && echo "" # 10000
-#./$build/$prgm 10 $start $end 500 $h -1 $noX silent && echo "" # 5000
-#./$build/$prgm 12 $start $end 500 $h -1 $noX silent && echo "" # 1000
+./$build/$prgm 6 $start $end 10000 $h -1 $noX silent && echo "" # 10000
+./$build/$prgm 8 $start $end 5000 $h -1 $noX silent && echo "" # 10000
+./$build/$prgm 10 $start $end 500 $h -1 $noX silent && echo "" # 5000
+./$build/$prgm 12 $start $end 500 $h -1 $noX silent && echo "" # 1000
 ./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo "" # 50
 #./$build/$prgm 16 $start $end 50 $h -1 $noX silent && echo ""
 #./$build/$prgm 18 $start $end 20 $h -1 $noX silent && echo ""
@@ -44,7 +44,7 @@ fi
 start_time_plots=$SECONDS
 # $pth ./plotting/plotDeltaE.py
 # $pth ./plotting/plotSpecificHeatTConst.py
-$pth ./plotting/plotSpecificHeatJConst.py
+# $pth ./plotting/plotSpecificHeatJConst.py
 # $pth ./plotting/plotSusceptibilityTConst.py
 # $pth ./plotting/plotSusceptibilityJConst.py
 # $pth ./plotting/plotDispersion.py
