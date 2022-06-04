@@ -362,6 +362,66 @@ namespace QT::MS {
 
         outData.shrink_to_fit();
 
+        auto end_timer = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+        std::cout << "preparing and saving data\n";
+
+        ///// avg and saving results (for different sample sizes n) /////
+
+        // gather x-data
+        std::vector<double> beta_Data;
+        double beta = start - step;
+        while (beta <= end) {
+            beta += step;
+            beta_Data.emplace_back(beta);
+        } beta_Data.shrink_to_fit();
+
+#ifdef SAVE_WITH_SETS_OF_n_SAMPLES
+        // save for different amounts n of random states
+        for (int n : {1, 2, 3, 4}) {
+            std::vector<std::vector<double>> C_Data_to_avg;
+            // combine data for every i to i+n samples into one avg
+            for (int i = 0; i < SAMPLES; i += n) {
+                std::vector<std::vector<double>> C_Data_raw;
+                // get data to avg
+                for (int j = i; j < i + n; j++) {
+                    C_Data_raw.emplace_back(outData.at(j));
+                }
+                std::vector<double> C_vector;
+                // avg
+                for(int k = 0; k < C_Data_raw.at(0).size(); k++) {
+                    std::vector<double> C_vector_raw;
+                    for (std::vector<double> Cd : C_Data_raw) {
+                        C_vector_raw.emplace_back(Cd.at(k));
+                    }
+                    std::tuple<double, double> mean_se = get_mean_and_se(C_vector_raw);
+                    C_vector.emplace_back(std::get<0>(mean_se));
+                }
+                C_Data_to_avg.emplace_back(C_vector);
+            }
+            std::vector<double> C_Data_save;
+            std::vector<double> CErr_Data_save;
+            // avg and stdv of avg C with n samples each
+            for(int k = 0; k < C_Data_to_avg.at(0).size(); k++) {
+                std::vector<double> C_vector_raw;
+                for (std::vector<double> Cd : C_Data_to_avg) {
+                    C_vector_raw.emplace_back(Cd.at(k));
+                } std::tuple<double, double> mean_se_C = get_mean_and_se(C_vector_raw);
+                C_Data_save.emplace_back(std::get<0>(mean_se_C));
+                CErr_Data_save.emplace_back(std::get<1>(mean_se_C));
+            }
+            // save data N_n_data_specific_heat_J_const_QT_txt
+            hlp::saveOutData(std::to_string(n) + "_data_specific_heat_J_const_QT.txt",
+                             "N: " + std::to_string(N) + "\n"
+                             + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                             + "h: " + std::to_string(h)+ "\n"
+                             + "samples: " + std::to_string(SAMPLES) + "\n"
+                             + "this took: " + formatTime(elapsed_seconds),
+                             "beta in kb / J2", "C in J2", beta_Data, C_Data_save, CErr_Data_save, N);
+        }
+
+#else
         std::vector<double> C_Data;
         std::vector<double> CErr_Data;
 
@@ -394,6 +454,7 @@ namespace QT::MS {
                          + "samples: " + std::to_string(SAMPLES) + "\n"
                          + "this took: " + formatTime(elapsed_seconds),
                          "beta in kb / J2", "C in J2", beta_Data, C_Data, CErr_Data, N);
+#endif
 
     }
 
