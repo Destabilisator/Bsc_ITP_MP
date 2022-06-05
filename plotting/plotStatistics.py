@@ -84,7 +84,7 @@ def plot_n_for_each_N_sigma(start: float, end: float):
         subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 18)
         subfig1.set_ylabel(r'Standardabweichung in $J_2$', fontsize = 18)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
-        subfig1.set_title(r"Standardabweichung der spezifische Wärmekapazität pro Spin $C/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = 18)
+        subfig1.set_title(r"Standardabweichung der spezifischen Wärmekapazität pro Spin $C/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = 18)
         subfig1.axhline(0, color = "grey")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
         filename = "N_" + N + "_n"
@@ -171,7 +171,7 @@ def plot_N_for_each_n_sigma(start: float, end: float):
         subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 18)
         subfig1.set_ylabel(r'Standardabweichung in $J_2$', fontsize = 18)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
-        subfig1.set_title(r"Standardabweichung der spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = " + linesJ + " nach " + n + " Mittlungen", fontsize = 18)
+        subfig1.set_title(r"Standardabweichung der spezifischen Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = " + linesJ + " nach " + n + " Mittlungen", fontsize = 18)
         subfig1.axhline(0, color = "grey")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
         filename = "n_" + n + "_N"
