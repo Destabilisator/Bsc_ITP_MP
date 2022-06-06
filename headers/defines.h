@@ -3,7 +3,7 @@
 //#define fixedPrecision // remove if not debug
 
 // nested multithreaded loops
-#define OUTER_NESTED_THREADS 12
+#define OUTER_NESTED_THREADS 16
 #define INNER_NESTED_THREADS 1
 
 // QT data output

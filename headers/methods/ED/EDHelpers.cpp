@@ -210,7 +210,7 @@ namespace ED {
     /////////////////////////////// saving data ///////////////////////////////
 
     void saveEiVals(const std::string &filename, const std::string &header, const std::list<double> &eiVals, const int &N) {
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -228,7 +228,7 @@ namespace ED {
     }
 
     void saveEiVals(const std::string &filename, const std::string &header, const std::vector<double> &eiVals, const int &N) {
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -241,11 +241,12 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveComplexEiVals(const std::string &filename, const std::string &header, const std::list<std::complex<double>> &eiVals, const int &N) {
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -258,11 +259,12 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveComplexEiVals(const std::string &filename, const std::string &header, const std::vector<std::complex<double>> &eiVals, const int &N) {
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -275,11 +277,12 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveHamilton(double** hamilton, const std::string &filename, const std::string &header, const int &size, const int &N) {
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -295,11 +298,12 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveComplexHamilton(std::complex<double> **hamilton,const std::string &filename, const std::string &header, const int &size, const int &N) {
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -319,11 +323,12 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveMatrixToFile(const Eigen::MatrixXd& matrix, const std::string &filename, const std::string &header, const int &N) {
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -333,11 +338,12 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveComplexMatrixToFile(const Eigen::MatrixXcd& matrix, const std::string &filename, const std::string &header, const int &N) {
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -347,13 +353,14 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                      const std::string &y_label, const std::vector<std::tuple<double, double>> &outData, const int &N) {
 
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -366,13 +373,14 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                      const std::string &y_label, const std::vector<std::tuple<int, double>> &outData, const int &N) {
 
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -385,13 +393,14 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                      const std::string &y_label, const std::vector<std::tuple<double, double, int, int>> &outData, const int &N) {
 
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -405,13 +414,14 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                      const std::string &y_label, const std::vector<std::tuple<double, double, int, int, int, int>> &outData, const int &N) {
 
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << "\n";
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -430,6 +440,7 @@ namespace ED {
             file.close();
             std::cout << "failed to save to file\n";
         }
+        std::cout << "done\n";
         file.close();
     }
 

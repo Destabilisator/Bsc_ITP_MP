@@ -379,13 +379,14 @@ namespace QT::MS {
 
 #ifdef SAVE_WITH_SETS_OF_n_SAMPLES
         // save for different amounts n of random states
-        for (int n : {1, 2, 3, 4}) {
+        for (int n = 1; n <= SAMPLES / 2; n++) {
             std::vector<std::vector<double>> C_Data_to_avg;
             // combine data for every i to i+n samples into one avg
-            for (int i = 0; i < SAMPLES; i += n) {
+            for (int i = 0; i+n < SAMPLES; i += n) {
                 std::vector<std::vector<double>> C_Data_raw;
                 // get data to avg
                 for (int j = i; j < i + n; j++) {
+//                    std:: cout << "n: " << n << ", i: " << i << ", j: " << j << std::endl;
                     C_Data_raw.emplace_back(outData.at(j));
                 }
                 std::vector<double> C_vector;
@@ -419,6 +420,7 @@ namespace QT::MS {
                              + "samples: " + std::to_string(SAMPLES) + "\n"
                              + "this took: " + formatTime(elapsed_seconds),
                              "beta in kb / J2", "C in J2", beta_Data, C_Data_save, CErr_Data_save, N);
+//            std::cout << std::endl;
         }
 
 #else

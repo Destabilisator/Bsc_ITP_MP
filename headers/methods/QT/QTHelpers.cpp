@@ -48,7 +48,7 @@ namespace QT::hlp {
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
                      const std::vector<std::tuple<double, double>> &outData, const int &N) {
 
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -68,7 +68,7 @@ namespace QT::hlp {
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
                      const std::vector<double> &xData, const std::vector<double> &yData, const int &N) {
 
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);
@@ -88,7 +88,7 @@ namespace QT::hlp {
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
                      const std::vector<double> &xData, const std::vector<double> &yData, const std::vector<double> &yErrData, const int &N) {
 
-        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'..." << std::endl;
+        std::cout << "saving to file '" << std::to_string(N) << "_" << filename << "'... ";// << std::endl;
         std::ofstream file;
         try {
             file.open("./results/" + std::to_string(N) + "_" + filename);

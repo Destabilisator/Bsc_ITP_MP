@@ -3,7 +3,7 @@ import numpy as np
 import sys
 plt.rcParams['text.usetex'] = True
 
-N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown")]#, ("16", "purple")]
+N_color = [("16", "red"), ("18", "blue"), ("20", "green"), ("22", "magenta"), ("24", "brown"), ("26", "purple"), ("28", "tomato")]
 n_color = [("1", "red"), ("2", "blue"), ("3", "green"), ("4", "tomato")]
 
 def plot_n_for_each_N(start: float, end: float):
@@ -179,6 +179,60 @@ def plot_N_for_each_n_sigma(start: float, end: float):
             filename += "_" + N
         plt.savefig("results/sigma_" + filename + "_specific_heat_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
+def plot_delta_ED(start: float, end: float):
+    print("plotting \Delta E ED - QT for fixed N ...")
+    fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+    for N, NC in N_color:
+        print("N = " + N)
+        # QT results
+        fileQT = open("results/" + N + "_1_data_specific_heat_J_const_QT.txt", 'r')
+        linesQT = fileQT.readlines()
+        linesJQT = linesQT[1][len("J1/J2: "):-1]
+        #linesh = lines[2][len("h: "):-1]
+        #lbl = "n = " + n
+        X_QT = []
+        Y_QT = []
+        for i in range(7,len(linesQT)):
+            x, y, yErr = linesQT[i].split("\t")
+            if float(x) < start or float(x) > end: continue
+            X_QT += [float(x)]
+            Y_QT += [float(y)]
+        # ED results
+        fileED = open("results/" + N + "_data_specific_heat_J_const.txt", 'r')
+        linesED = fileED.readlines()
+        linesJED = linesED[1][len("J1/J2: "):-1]
+        #linesh = lines[2][len("h: "):-1]
+        #lbl = "n = " + n
+        X_ED = []
+        Y_ED = []
+        for i in range(9,len(linesED)):
+            x, y = linesED[i].split("\t")
+            if float(x) < start or float(x) > end: continue
+            X_ED += [float(x)]
+            Y_ED += [float(y)]
+
+        X = []
+        Y = []
+
+        # print(len(X_QT))
+        # print(len(Y_QT))
+        # print(len(X_ED))
+        # print(len(Y_ED))
+
+        for i in range(0,len(X_QT)):
+            X += [X_QT[i]] # [(X_QT[i] + X_ED[i])/2]
+            Y += [Y_QT[i] - Y_ED[i]]
+
+        subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT-ED: N = " + N, alpha = 1.0)
+    # saving
+    subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 20)
+    subfig1.set_ylabel(r'Abweichung in $J_2$', fontsize = 20)
+    #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
+    subfig1.set_title(r"Abweichung der spezifischen Wärmekapazität pro Spin $C/N$ zwischen ED und QT mit $J_1$ / $J_2$ = " + linesJQT, fontsize = 20)
+    subfig1.axhline(0, color = "grey")
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 15)
+    plt.savefig("results/delta_ED_QT_" + N + "_specific_heat_J_" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
+
 if __name__ == "__main__":
     print("plotting specific heat (constant J1/J2, funtion of T):")
     start = float(sys.argv[1])
@@ -190,3 +244,5 @@ if __name__ == "__main__":
     plot_N_for_each_n(start, end)
     print()
     plot_N_for_each_n_sigma(start, end)
+    print()
+    plot_delta_ED(start, end)
