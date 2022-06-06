@@ -99,7 +99,7 @@ int main(int argc, char* argv[]) {
     QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
     ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
-    
+
 #endif
 
     std::cout << std::endl;
