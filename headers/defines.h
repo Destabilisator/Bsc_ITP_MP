@@ -3,8 +3,8 @@
 //#define fixedPrecision // remove if not debug
 
 // nested multithreaded loops
-#define OUTER_NESTED_THREADS 16
-#define INNER_NESTED_THREADS 1
+#define OUTER_NESTED_THREADS 24
+#define INNER_NESTED_THREADS 2
 
 // QT data output
 #define SAVE_WITH_SETS_OF_n_SAMPLES
