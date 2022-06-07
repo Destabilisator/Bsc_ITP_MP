@@ -318,12 +318,11 @@ namespace QT::MS {
                                      const double &J2, const double &h, const int &N, const int &SIZE, const int &SAMPLES) {
 
         auto start_timer = std::chrono::steady_clock::now();
-
         std::cout << "\n" << "C(T), J = const, QT, momentum states ..." << std::endl;
 
         std::vector<matrixType> matrixList = getHamilton(J1, J2, h, N, SIZE);
 
-        typedef std::vector<std::tuple<double, double>> dataVectorType;
+//        typedef std::vector<std::tuple<double, double>> dataVectorType;
         std::vector<std::vector<double>> outData;
 
         int prgbar_segm = 50;
@@ -462,6 +461,178 @@ namespace QT::MS {
 
     ///// X /////
 
+    std::vector<double> rungeKutta4_X(const double &start, const double &end, const double &step, const int &N,
+                                      const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List) {
+
+        std::vector<double> outData;
+        std::vector<Eigen::VectorXcd> vec = getVector(H_List);
+        int blockCount = (int) H_List.size();
+
+        double norm = 0.0;
+        for (int i = 0; i < blockCount; i++) {
+            norm += std::pow(vec.at(i).norm(), 2);
+        } norm = std::sqrt(norm);
+        for (int i = 0; i < blockCount; i++) {
+            vec.at(i) = vec.at(i) / norm;
+        }
+
+        double beta = start - step;
+        while (beta <= end) {
+
+            beta += step;
+            norm = 0.0;
+
+            // RK4 with vec on H to get new state
+#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
+            for (int i = 0; i < blockCount; i++) {
+                vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
+                double normnt = std::pow(vec.at(i).norm(), 2);
+#pragma omp critical
+                norm += normnt;
+            }
+
+            // ensure norm(vec) = 1
+            norm = std::sqrt(norm);
+            for (int i = 0; i < blockCount; i++) {
+                vec.at(i) = vec.at(i) / norm;
+            }
+
+            std::vector<double> vec_S2_vec_List;
+
+#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
+            for (int i = 0; i < blockCount; i++) {
+                const matrixType &S2 = S2_List.at(i);
+                const Eigen::VectorXcd &v = vec.at(i);
+                double vS2v = std::real((v.adjoint() * S2 * v)(0,0));
+#pragma omp critical
+                vec_S2_vec_List.emplace_back(vS2v);
+            }
+
+            double vec_S2_vec = std::accumulate(vec_S2_vec_List.begin(), vec_S2_vec_List.end(), 0.0);
+
+            double X = beta * vec_S2_vec / 3.0 / (double) N;
+
+            outData.emplace_back(X);
+
+        }
+
+        outData.shrink_to_fit();
+        return outData;
+
+    }
+
+    void start_calculation_X_J_const(const double &start, const double &end, const double &step, const double &J1,
+                                     const double &J2, const int &N, const int &SIZE, const int &SAMPLES) {
+
+        auto start_timer = std::chrono::steady_clock::now();
+        std::cout << "\n" << "C(T), J = const, QT, momentum states ..." << std::endl;
+
+        ///// get H and S2 /////
+        std::vector<matrixType> H_List;
+        std::vector<matrixType> S2_List;
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
+        std::vector<std::vector<std::vector<int>>> states(N + 1, std::vector<std::vector<int>>(N/2));
+        std::vector<std::vector<std::vector<int>>> R_vals(N + 1, std::vector<std::vector<int>>(N/2));
+        // get states
+        for (int s = 0; s < SIZE; s++) {
+            int m = ED::bitSum(s, N);
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = ED::checkState(s, k, N);
+                if (R >= 0) {
+                    states.at(m).at(k - k_lower).push_back(s);
+                    R_vals.at(m).at(k - k_lower).push_back(R);
+                }
+            }
+        }
+        // loop through indices
+        for (int m = 0; m <= N; m++) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                if (states.at(m).at(k - k_lower).empty()) {continue;}
+                Eigen::MatrixXcd H_Mtrx = fillHamiltonBlock(J1, J2, 0.0, k, states.at(m).at(k - k_lower),
+                                                          R_vals.at(m).at(k - k_lower), N);
+                Eigen::MatrixXcd S2_Mtrx = ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower));
+                H_List.emplace_back(H_Mtrx.sparseView());
+                S2_List.emplace_back(S2_Mtrx.sparseView());
+            }
+        }
+
+        // init progressbar
+        int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) SAMPLES * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) SAMPLES * 100.0 ) << "% (" << curr << "/" << SAMPLES << ")     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
+
+        std::vector<std::vector<double>> outData;
+
+        #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outData)
+        for (int s = 1; s <= SAMPLES; s++) {
+            std::vector<double> rawData = rungeKutta4_X(start, end, step, N, H_List, S2_List);
+
+            coutMutex.lock();
+            outData.emplace_back(rawData);
+            int p = (int) ( (float) curr / (float) SAMPLES * (float) prgbar_segm);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < prgbar_segm; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) curr / (float) SAMPLES * 100.0 ) << "% (" << curr << "/" << SAMPLES << ")     ";
+            std::cout.flush();
+            curr++;
+            coutMutex.unlock();
+        }
+
+        outData.shrink_to_fit();
+
+        auto end_timer = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+        std::cout << "preparing and saving data\n";
+
+        ///// avg and saving results (for different sample sizes n) /////
+
+        // gather x-data
+        std::vector<double> beta_Data;
+        double beta = start - step;
+        while (beta <= end) {
+            beta += step;
+            beta_Data.emplace_back(beta);
+        } beta_Data.shrink_to_fit();
+
+        std::vector<double> X_Data;
+        std::vector<double> XErr_Data;
+
+        // avg and stdv of X
+        for(int i = 0; i < outData.at(0).size(); i++) {
+            std::vector<double> X_temp_data;
+            for (std::vector<double> C_data_raw : outData) {
+                X_temp_data.emplace_back(C_data_raw.at(i));
+            }
+            std::tuple<double, double> mean_se = get_mean_and_se(X_temp_data);
+            X_Data.emplace_back(std::get<0>(mean_se));
+            XErr_Data.emplace_back(std::get<1>(mean_se));
+        }
+
+        hlp::saveOutData("data_susceptibility_J_const_QT.txt",
+                         "N: " + std::to_string(N) + "\n"
+                         + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                         + "samples: " + std::to_string(SAMPLES) + "\n"
+                         + "this took: " + formatTime(elapsed_seconds),
+                         "beta in kb / J2", "C in J2", beta_Data, X_Data, XErr_Data, N);
+
+    }
+
+/*
     std::vector<matrixType> getS2(const double &J1, const double &J2, const int &N, const int &SIZE) {
 
         int k_lower = -(N + 2) / 4 + 1;
@@ -676,5 +847,5 @@ namespace QT::MS {
         std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
     }
-
+*/
 }

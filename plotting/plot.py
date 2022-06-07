@@ -138,52 +138,58 @@ def plot_susceptibility_J_const(N):
     lbl = "N = " + N
     X = []
     Y = []
-    for i in range(8,len(lines)):
+    for i in range(9,len(lines)):
         x, y = lines[i].split("\t")
         X += [float(x)]
         Y += [float(y)]
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
-    lbl += " MB"
+    # lbl += " MB"
     subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'blue', label = lbl)
     subfig1.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 18)
     subfig1.set_ylabel('Suszeptibilität pro Spin $\\chi/N$ in $J_2$', fontsize = 18)
     subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$ für ' + r"$J_1$ / $J_2$ = " + linesJ + r", $k_B$ = 1", fontsize = 18)
 
-    file = open("results/" + N + "_momentum_susceptibility_J_const.txt", 'r')
-    lines = file.readlines()
-    linesJ = lines[0][len("J1/J2: "):-1]
-    lbl = "N = " + N
-    X = []
-    Y = []
-    for i in range(9,len(lines)):
-        x, y = lines[i].split("\t")
-        X += [float(x)]
-        Y += [float(y)]
-    subfig1.plot(X, Y, lw = 0.5, ls = "solid", markersize = 2, marker = "o", color = 'purple', label = "MS")
+    # file = open("results/" + N + "_momentum_susceptibility_J_const.txt", 'r')
+    # lines = file.readlines()
+    # linesJ = lines[0][len("J1/J2: "):-1]
+    # lbl = "N = " + N
+    # X = []
+    # Y = []
+    # for i in range(9,len(lines)):
+    #     x, y = lines[i].split("\t")
+    #     X += [float(x)]
+    #     Y += [float(y)]
+    # subfig1.plot(X, Y, lw = 0.5, ls = "solid", markersize = 2, marker = "o", color = 'purple', label = "MS")
 
-    file = open("results/" + N + "_data_susceptibility_J_const_QT_MB.txt", 'r')
-    lines = file.readlines()
-    linesJ = lines[0][len("J1/J2: "):-1]
-    lbl = "N = " + N
-    X = []
-    Y = []
-    for i in range(8,len(lines)):
-        x, y = lines[i].split("\t")
-        X += [float(x)]
-        Y += [float(y)]
-    subfig1.plot(X, Y, lw = 0.5, ls = "solid", markersize = 1, marker = "o", color = 'green', label = "QT MB")
+    # file = open("results/" + N + "_data_susceptibility_J_const_QT_MB.txt", 'r')
+    # lines = file.readlines()
+    # linesJ = lines[0][len("J1/J2: "):-1]
+    # lbl = "N = " + N
+    # X = []
+    # Y = []
+    # for i in range(8,len(lines)):
+    #     x, y = lines[i].split("\t")
+    #     X += [float(x)]
+    #     Y += [float(y)]
+    # subfig1.plot(X, Y, lw = 0.5, ls = "solid", markersize = 1, marker = "o", color = 'green', label = "QT MB")
 
-    file = open("results/" + N + "_data_susceptibility_J_const_QT_MS.txt", 'r')
+    file = open("results/" + N + "_data_susceptibility_J_const_QT.txt", 'r')
     lines = file.readlines()
     linesJ = lines[0][len("J1/J2: "):-1]
     lbl = "N = " + N
     X = []
     Y = []
-    for i in range(8,len(lines)):
-        x, y = lines[i].split("\t")
+    YErr = []
+    for i in range(6,len(lines)):
+        x, y, yErr = lines[i].split("\t")
         X += [float(x)]
         Y += [float(y)]
+        YErr = [float(yErr)]
     subfig1.plot(X, Y, lw = 0.5, ls = "solid", markersize = 1, marker = "o", color = 'red', label = "QT MS")
+    X = np.asarray(X)
+    Y = np.asarray(Y)
+    YErr = np.asarray(YErr)
+    subfig1.fill_between(X, Y - YErr, Y + YErr, color = 'red', alpha = 0.4)
     
 
     # file = open("results/" + N + "_momentum_susceptibility_J_const.txt", 'r')
@@ -267,7 +273,7 @@ if __name__ == "__main__":
     
     # plot_delta_E(N)
     # plot_specific_heat_T_const(N)
-    plot_specific_heat_J_const(N)
+    # plot_specific_heat_J_const(N)
     # if sys.argv[3] != "noX":
         # plot_susceptibility_T_const(N)
     plot_susceptibility_J_const(N)
