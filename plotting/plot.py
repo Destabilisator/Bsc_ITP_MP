@@ -145,7 +145,8 @@ def plot_susceptibility_J_const(N):
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     # lbl += " MB"
     subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = 'blue', label = "ED: MS; " + lbl)
-    subfig1.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 25)
+    subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
+    # subfig1.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 25)
     subfig1.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
     subfig1.set_title('$\\chi/N$ für ' + r"$J_1$ / $J_2$ = " + linesJ, fontsize = 25)
 
