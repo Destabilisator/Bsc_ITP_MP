@@ -30,7 +30,8 @@ int main(int argc, char* argv[]) {
     std::cout << "h_START = " << h_START << ", h_END = " << h_END << " and h_COUNT = " << h_COUNT << "\n";
     std::cout << "using " << cores << " cores (hardware limit: " << std::thread::hardware_concurrency() << " cores)\n";
     if (noX) {std::cout << "skipping susceptibility plots\n";}
-    std::cout << std::endl;
+    std::cout.flush();
+    //std::cout << std::endl;
 
 /////////////////////////////// calculate quantities ///////////////////////////////
 #ifndef CLUSTER
@@ -85,10 +86,16 @@ int main(int argc, char* argv[]) {
 //    ED::plot3D::start_C(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
 //    ED::plot3D::start_X(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
 
-    double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
-    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
-//    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 5);
-//    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+    double stepsize = step_size; //(T_END - T_START) / (double) T_COUNT; // 0.01 //step_size;
+
+//    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
+    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+//    ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
+
+
+    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
+    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
+    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
     ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
 #endif

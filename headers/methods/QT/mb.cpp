@@ -114,7 +114,7 @@ namespace QT::MB {
         for (int m = 0; m <= N; m++) {
 //            if (m != N/2) { continue;}
             if (states.at(m).empty()) {continue;}
-            Eigen::MatrixXd Mtrx = fillS2Block(N, states.at(m));
+            Eigen::MatrixXd Mtrx = ED::spinMatrix(N, states.at(m));//fillS2Block(N, states.at(m));
             matList.emplace_back(Mtrx.sparseView());
         }
 
@@ -166,7 +166,7 @@ namespace QT::MB {
 
             norm = 0.0;
 
-#pragma omp parallel for default(none) shared(blockCount, vec, H_List, step, norm)
+#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
@@ -187,7 +187,7 @@ namespace QT::MB {
             std::vector<double> vec_S2_vec_List;
 
             double C = 0.0;
-#pragma omp parallel for default(none) shared(blockCount, H_List, S2_List, vec, vec_S2_vec_List)
+#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, H_List, S2_List, vec, vec_S2_vec_List)
             for (int i = 0; i < blockCount; i++) {
                 const matrixType &S2 = S2_List.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
@@ -218,40 +218,78 @@ namespace QT::MB {
         std::vector<matrixType> H_List = getHamilton(J1, J2, N, SIZE);
         std::vector<matrixType> S2_List = getS2(J1, J2, N, SIZE);
 
-        typedef std::vector<std::tuple<double, double>> dataVectorType;
-        std::cout << 1 << "/" << SAMPLES << "\n";
-        std::vector<double> outData = rungeKutta4_X(start, end, step, N, H_List, S2_List);
+        // init progressbar
+        int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) SAMPLES * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) SAMPLES * 100.0 ) << "% (" << curr << "/" << SAMPLES << ")     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
 
-        for (int s = 2; s <= SAMPLES; s++) {
-            std::cout << s << "/" << SAMPLES << "\n";
+        typedef std::vector<std::tuple<double, double>> dataVectorType;
+        std::vector<std::vector<double>> outData;
+
+#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outData)
+        for (int s = 1; s <= SAMPLES; s++) {
             std::vector<double> rawData = rungeKutta4_X(start, end, step, N, H_List, S2_List);
-            for (int i = 0; i < rawData.size(); i++) {
-                outData.at(i) += rawData.at(i);
-            }
+
+            coutMutex.lock();
+            outData.emplace_back(rawData);
+            int p = (int) ( (float) curr / (float) SAMPLES * (float) prgbar_segm);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < prgbar_segm; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) curr / (float) SAMPLES * 100.0 ) << "% (" << curr << "/" << SAMPLES << ")     ";
+            std::cout.flush();
+            curr++;
+            coutMutex.unlock();
         }
 
         outData.shrink_to_fit();
 
-        for (double &dataPoint : outData) {
-            dataPoint = dataPoint / (double) SAMPLES;
-        }
+        auto end_timer = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+        std::cout << "preparing and saving data\n";
 
-        std::vector<double> betaData;
+        ///// avg and saving results (for different sample sizes n) /////
+
+        // gather x-data
+        std::vector<double> beta_Data;
         double beta = start - step;
         while (beta <= end) {
             beta += step;
-            betaData.emplace_back(beta);
-        } betaData.shrink_to_fit();
+            beta_Data.emplace_back(beta);
+        } beta_Data.shrink_to_fit();
+
+        std::vector<double> X_Data;
+        std::vector<double> XErr_Data;
+
+        // avg and stdv of X
+        for(int i = 0; i < outData.at(0).size(); i++) {
+            std::vector<double> X_temp_data;
+            for (std::vector<double> C_data_raw : outData) {
+                X_temp_data.emplace_back(C_data_raw.at(i));
+            }
+            std::tuple<double, double> mean_se = get_mean_and_se(X_temp_data);
+            X_Data.emplace_back(std::get<0>(mean_se));
+            XErr_Data.emplace_back(std::get<1>(mean_se));
+        }
 
 //        std::cout << "sizes: " << betaData.size() << "\t" << outData.size() << "\n";
 
         hlp::saveOutData("data_susceptibility_J_const_QT_MB.txt", "QT, MS für N = " + std::to_string(N)
                                                                + " mit " + std::to_string(SAMPLES) + " Samples",
-                         "T in J2 / kb", "C in J2", betaData, outData, N);
-
-        auto end_timer = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
-        std::cout << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+                         "T in J2 / kb", "C in J2", beta_Data, X_Data, XErr_Data, N);
 
     }
 

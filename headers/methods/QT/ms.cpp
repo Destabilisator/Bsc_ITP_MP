@@ -428,25 +428,14 @@ namespace QT::MS {
 
         // avg and stdv
         for(int i = 0; i < outData.at(0).size(); i++) {
-            std::vector<double> C_data;
+            std::vector<double> C_temp_data;
             for (std::vector<double> C_data_raw : outData) {
-                C_data.emplace_back(C_data_raw.at(i));
+                C_temp_data.emplace_back(C_data_raw.at(i));
             }
-            std::tuple<double, double> mean_se = get_mean_and_se(C_data);
+            std::tuple<double, double> mean_se = get_mean_and_se(C_temp_data);
             C_Data.emplace_back(std::get<0>(mean_se));
             CErr_Data.emplace_back(std::get<1>(mean_se));
         }
-
-        std::vector<double> beta_Data;
-        double beta = start - step;
-        while (beta <= end) {
-            beta += step;
-            beta_Data.emplace_back(beta);
-        } beta_Data.shrink_to_fit();
-
-        auto end_timer = std::chrono::steady_clock::now();
-        std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
-        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
 
         hlp::saveOutData("data_specific_heat_J_const_QT.txt",
                          "N: " + std::to_string(N) + "\n"

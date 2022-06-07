@@ -19,23 +19,19 @@ else
 	pth=python3
 fi
 
-# for h in $(seq 0 0.5 5); do
-#     ./$build/$prgm 6 $start $end 10000 $h -1 $noX silent && echo "" # 10000
-# 	./$build/$prgm 8 $start $end 5000 $h -1 $noX silent && echo "" # 10000
-# 	./$build/$prgm 10 $start $end 500 $h -1 $noX silent && echo "" # 5000
-# 	./$build/$prgm 12 $start $end 500 $h -1 $noX silent && echo "" # 1000
-# 	./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo "" # 50
-#     echo "plotting..."
-#     $pth ./plotting/plotSpecificHeatJConst.py
-#     echo ""
-#     echo ""
-# done
+for N in 6 8 10 12 14; do
+    ./$build/$prgm $N $start $end 500 0.0 -1 $noX silent && echo ""
+    echo "plotting..."
+    $pth ./plotting/plot.py $N no-show $noX
+    echo ""
+    echo ""
+done
 
-./$build/$prgm 6 $start $end 10000 $h -1 $noX silent && echo "" # 10000
-./$build/$prgm 8 $start $end 5000 $h -1 $noX silent && echo "" # 10000
-./$build/$prgm 10 $start $end 500 $h -1 $noX silent && echo "" # 5000
-./$build/$prgm 12 $start $end 500 $h -1 $noX silent && echo "" # 1000
-./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo "" # 50
+# ./$build/$prgm 6 $start $end 10000 $h -1 $noX silent && echo "" # 10000
+# ./$build/$prgm 8 $start $end 5000 $h -1 $noX silent && echo "" # 10000
+# ./$build/$prgm 10 $start $end 500 $h -1 $noX silent && echo "" # 5000
+# ./$build/$prgm 12 $start $end 500 $h -1 $noX silent && echo "" # 1000
+# ./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo "" # 50
 #./$build/$prgm 16 $start $end 50 $h -1 $noX silent && echo ""
 #./$build/$prgm 18 $start $end 20 $h -1 $noX silent && echo ""
 #./$build/$prgm 20 $start $end 25 $h -1 $noX silent && echo ""

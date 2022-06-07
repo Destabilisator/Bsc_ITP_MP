@@ -47,12 +47,12 @@ def plot_n_for_each_N(start: float, end: float):
             YErr = np.asarray(YErr)
             subfig1.fill_between(X, Y - YErr, Y + YErr, color = nc, alpha = 0.1)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 20)
-        subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 20)
+        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
+        subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = 25)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
-        subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + linesJ, fontsize = 20)
+        subfig1.set_title(r"$C/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + linesJ, fontsize = 25)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 15)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
         filename = "results/N_" + N + "_n"
         for n, nc in n_color:
             filename += "_" + n
@@ -81,12 +81,12 @@ def plot_n_for_each_N_sigma(start: float, end: float):
                 YErr += [float(yErr)]
             subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = nc, label = "QT: n = " + n)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 20)
-        subfig1.set_ylabel(r'Standardabweichung in $J_2$', fontsize = 20)
+        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
+        subfig1.set_ylabel(r'$\sigma$ in $J_2$', fontsize = 25)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
-        subfig1.set_title(r"Standardabweichung der spezifischen Wärmekapazität pro Spin $C/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = 20)
+        subfig1.set_title(r"Standardabweichung $\sigma$ von $C/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = 25)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 15)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
         filename = "N_" + N + "_n"
         for n, nc in n_color:
             filename += "_" + n
@@ -133,12 +133,12 @@ def plot_N_for_each_n(start: float, end: float):
             YErr = np.asarray(YErr)
             subfig1.fill_between(X, Y - YErr, Y + YErr, color = NC, alpha = 0.1)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 20)
-        subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 20)
+        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
+        subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = 25)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
-        subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei der QT mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 20)
+        subfig1.set_title(r"$C/N$ bei der QT mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 15)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
         filename = "results/n_" + n + "_N"
         for N, NC in N_color:
             filename += "_" + N
@@ -168,12 +168,12 @@ def plot_N_for_each_n_sigma(start: float, end: float):
                 YErr += [float(yErr)]
             subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT: N = " + N, alpha = 1.0)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 20)
-        subfig1.set_ylabel(r'Standardabweichung in $J_2$', fontsize = 20)
+        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
+        subfig1.set_ylabel(r'$\sigma$ in $J_2$', fontsize = 25)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
-        subfig1.set_title(r"Standardabweichung der spezifischen Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = " + linesJ + " nach " + n + " Startvektoren", fontsize = 20)
+        subfig1.set_title(r"Standardabweichung $\sigma$ von $C/N$ mit $J_1$ / $J_2$ = " + linesJ + " nach " + n + " Startvektoren", fontsize = 25)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 15)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
         filename = "n_" + n + "_N"
         for N, NC in N_color:
             filename += "_" + N
@@ -225,12 +225,12 @@ def plot_delta_ED(start: float, end: float):
 
         subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT-ED: N = " + N, alpha = 1.0)
     # saving
-    subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 20)
-    subfig1.set_ylabel(r'Abweichung in $J_2$', fontsize = 20)
+    subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
+    subfig1.set_ylabel(r'Abweichung in $J_2$', fontsize = 25)
     #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
-    subfig1.set_title(r"Abweichung der spezifischen Wärmekapazität pro Spin $C/N$ zwischen ED und QT mit $J_1$ / $J_2$ = " + linesJQT, fontsize = 20)
+    subfig1.set_title(r"Abweichung von $C/N$ zwischen ED und QT mit $J_1$ / $J_2$ = " + linesJQT, fontsize = 25)
     subfig1.axhline(0, color = "grey")
-    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 15)
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
     plt.savefig("results/delta_ED_QT_" + N + "_specific_heat_J_" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
 
 if __name__ == "__main__":

@@ -14,6 +14,8 @@
 
 namespace QT::MB {
 
+    static std::mutex coutMutex;
+
     typedef std::tuple<int, int, Eigen::SparseMatrix<double>> matrixDataMomentumType; // m, matrix
     typedef std::tuple<int, int, std::vector<int>, std::vector<int>> indexStateVectorType; // m, states,
     typedef Eigen::SparseMatrix<double> matrixType;
