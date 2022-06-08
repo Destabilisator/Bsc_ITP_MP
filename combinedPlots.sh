@@ -19,7 +19,7 @@ else
 	pth=python3
 fi
 
-for N in 6 8 10 12 14; do
+for N in 6 8 10 12; do
     ./$build/$prgm $N $start $end 500 0.0 -1 $noX silent && echo ""
     echo "plotting..."
     $pth ./plotting/plot.py $N no-show $noX

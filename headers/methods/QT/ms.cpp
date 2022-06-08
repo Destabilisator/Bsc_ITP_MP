@@ -421,8 +421,8 @@ namespace QT::MS {
                              "beta in kb / J2", "C in J2", beta_Data, C_Data_save, CErr_Data_save, N);
 //            std::cout << std::endl;
         }
-
-#else
+#endif
+#ifdef SAVE_WITH_DATA_FROM_ALL_SAMPLES
         std::vector<double> C_Data;
         std::vector<double> CErr_Data;
 

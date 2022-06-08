@@ -11,6 +11,7 @@
 
 // QT data output
 #define SAVE_WITH_SETS_OF_n_SAMPLES
+#define SAVE_WITH_DATA_FROM_ALL_SAMPLES
 
 // prevent multithreading in Eigen
 //#define EIGEN_DONT_PARALLELIZE

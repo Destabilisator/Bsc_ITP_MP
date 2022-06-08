@@ -1,8 +1,8 @@
 #include "main.h"
 
-#define DEBUG
-//#define ED_METHODS
-#define CLUSTER
+//#define DEBUG
+#define ED_METHODS
+//#define CLUSTER
 
 int main(int argc, char* argv[]) {
 
@@ -45,20 +45,22 @@ int main(int argc, char* argv[]) {
             ED::plot3D::start_X(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, cores, N, SIZE);
         }
     } else {
-        QT::MS::start_calculation_C_J_const(T_START, T_END * T_END, step_size, J1, J2, h, N, SIZE, 10); ///////////////////////
+        // C and X with QT
+        QT::MS::start_calculation_C_J_const(T_START, T_END, step_size, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS); /////////////////////// T_END * T_END
+        QT::MS::start_calculation_X_J_const(T_START, T_END, step_size, J1, J2, N, SIZE, OUTER_NESTED_THREADS); /////////////////////// T_END * T_END
 
         // excitation energy \Delta E(J) and specific heat C(J), T = const
-        ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END * J_END, h, cores, T, N, SIZE); ///////////////////////
+        ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE); /////////////////////// J_END * J_END
 
         // specific heat C(T), J = const
         if (N%4 == 0) {
-            ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END * T_END, T_COUNT); ///////////////////////
+            ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
         } else {
-            ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END * T_END, T_COUNT); ///////////////////////
+            ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
         }
 
         // spin gap E_gap (J)
-        ED::multi::start_SpinGap(J_COUNT, J_START, J_END / 2.0, cores, N, SIZE); ///////////////////////
+        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE); /////////////////////// J_END / 2.0
 
         // susceptibility \Chi(J), T = const
         if (!noX) {
