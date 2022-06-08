@@ -15,11 +15,15 @@ Hamilton*.txt
 EV*.txt
 benchmarkResults.txt
 
-#results/*.txt
-#results/*.png
-results/*
+results/oldData/
+results/QT_stats/
 
+results/*.txt
+results/*.png
 !results/data_placeholder.txt
+
+results/*/*.png
+results/*/data/*.txt
 !results/*/data/data_placeholder.txt
 
 !results/3DData/
