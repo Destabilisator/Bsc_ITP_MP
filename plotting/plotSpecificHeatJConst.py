@@ -7,9 +7,10 @@ N_color = [("12", "blue")]#, ("16", "red"), ("20", "green"), ("24", "orange")] #
 print("plotting specific heat (constant J1/J2, funtion of T) ...")
 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
 
+used_N = "N"
 
 for N, c in N_color:
-    file = open("results/" + N + "_data_specific_heat_J_const.txt", 'r')
+    file = open("results/" + N + "/data/data_specific_heat_J_const.txt", 'r')
     lines = file.readlines()
     linesJ = lines[0][len("J1/J2: "):-1]
     linesh = lines[2][len("h: "):-1]
@@ -43,6 +44,8 @@ for N, c in N_color:
     YErr = np.asarray(YErr)
     subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.05)
 
+    used_N += "_" + N
+
 subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 18)
 # subfig1.set_xlabel(r'$T$ in $k_B$ / $J_2$', fontsize = 18)
 subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 18)
@@ -51,6 +54,6 @@ subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2
 subfig1.axhline(0, color = "grey")
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
-plt.savefig("results/" + "specific_heat_J_const_" + linesh + ".png")
+plt.savefig("results/" + "C_" used_N + "_J" + linesJ + "_h" + linesh + ".png")
 #plt.savefig("results/" + "specific_heat_J_const.png")
 #plt.show

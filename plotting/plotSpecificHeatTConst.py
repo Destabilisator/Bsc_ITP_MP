@@ -6,8 +6,10 @@ N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "orange")]#, ("1
 print("plotting specific heat (constant T, funtion of J1/J2) ...")
 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
 
+used_N = "N"
+
 for N, c in N_color:
-    file = open("results/" + N + "_data_specific_heat_T_const.txt", 'r')
+    file = open("results/" + N + "/data/data_specific_heat_T_const.txt", 'r')
     lines = file.readlines()
     linesBeta = lines[0][len("beta: "):-1]
     linesh = lines[2][len("h: "):-1]
@@ -21,12 +23,14 @@ for N, c in N_color:
         Y += [float(y)]
     subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = c, label = lbl)
 
+    used_N += "_" + N
+
 subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 18)
-subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 18)
-subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $\beta$ = ' + linesBeta + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
+subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = 18)
+subfig1.set_title(r'$C/N$ mit $\beta$ = ' + linesBeta + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
 
 #subfig1.axhline(0, color = "grey")
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
 
-plt.savefig("results/" + "specific_heat_T_const.png")
+plt.savefig("results/" + "C_" used_N + "_beta" + linesBeta + "_h" + linesh + ".png")
 #plt.show()

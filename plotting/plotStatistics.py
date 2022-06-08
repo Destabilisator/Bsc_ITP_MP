@@ -3,7 +3,7 @@ import numpy as np
 import sys
 plt.rcParams['text.usetex'] = True
 
-N_color = [("16", "red"), ("18", "blue"), ("20", "green"), ("22", "magenta"), ("24", "brown"), ("26", "purple"), ("28", "tomato")]
+N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#[("16", "red"), ("18", "blue"), ("20", "green"), ("22", "magenta"), ("24", "brown"), ("26", "purple"), ("28", "tomato")]
 n_color = [("1", "red"), ("2", "blue"), ("3", "green"), ("4", "tomato")]
 
 def plot_n_for_each_N(start: float, end: float):
@@ -12,7 +12,7 @@ def plot_n_for_each_N(start: float, end: float):
         print("N = " + N)
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         # ED results
-        file = open("results/" + N + "_data_specific_heat_J_const.txt", 'r')
+        file = open("results/" + N + "/data/data_specific_heat_J_const.txt", 'r')
         lines = file.readlines()
         linesJ = lines[0][len("J1/J2: "):-1]
         #linesh = lines[2][len("h: "):-1]
@@ -27,7 +27,7 @@ def plot_n_for_each_N(start: float, end: float):
         subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "black", label = lbl)
         # QT results
         for n, nc in n_color:
-            file = open("results/" + N + "_" + n +"_data_specific_heat_J_const_QT.txt", 'r')
+            file = open("results/" + N + "/data/" + n +"_data_specific_heat_J_const_QT.txt", 'r')
             lines = file.readlines()
             linesJ = lines[1][len("J1/J2: "):-1]
             linesh = lines[2][len("h: "):-1]
@@ -53,10 +53,10 @@ def plot_n_for_each_N(start: float, end: float):
         subfig1.set_title(r"$C/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + linesJ, fontsize = 25)
         subfig1.axhline(0, color = "grey")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
-        filename = "results/N_" + N + "_n"
+        filename = "N_" + N + "_n"
         for n, nc in n_color:
             filename += "_" + n
-        plt.savefig(filename + "_specific_heat_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        plt.savefig("results/QT_stats/C_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
 def plot_n_for_each_N_sigma(start: float, end: float): 
     print("plotting dependance of n for fixed N (plotting only sigma) ...")
@@ -65,7 +65,7 @@ def plot_n_for_each_N_sigma(start: float, end: float):
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         # QT results
         for n, nc in n_color:
-            file = open("results/" + N + "_" + n +"_data_specific_heat_J_const_QT.txt", 'r')
+            file = open("results/" + N + "/data/" + n +"_data_specific_heat_J_const_QT.txt", 'r')
             lines = file.readlines()
             linesJ = lines[1][len("J1/J2: "):-1]
             #linesh = lines[2][len("h: "):-1]
@@ -90,7 +90,7 @@ def plot_n_for_each_N_sigma(start: float, end: float):
         filename = "N_" + N + "_n"
         for n, nc in n_color:
             filename += "_" + n
-        plt.savefig("results/sigma_" + filename + "_specific_heat_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        plt.savefig("results/QT_stats/C_sigma_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
 def plot_N_for_each_n(start: float, end: float):
     print("plotting dependance of N for fixed n (as error bands) ...")
@@ -99,7 +99,7 @@ def plot_N_for_each_n(start: float, end: float):
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         for N, NC in N_color:
             # ED results
-            file = open("results/" + N + "_data_specific_heat_J_const.txt", 'r')
+            file = open("results/" + N + "/data/data_specific_heat_J_const.txt", 'r')
             lines = file.readlines()
             linesJ = lines[0][len("J1/J2: "):-1]
             #linesh = lines[2][len("h: "):-1]
@@ -113,7 +113,7 @@ def plot_N_for_each_n(start: float, end: float):
                 Y += [float(y)]
             subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = NC, label = lbl)
             # QT results
-            file = open("results/" + N + "_" + n +"_data_specific_heat_J_const_QT.txt", 'r')
+            file = open("results/" + N + "/data/" + n +"_data_specific_heat_J_const_QT.txt", 'r')
             lines = file.readlines()
             linesJ = lines[1][len("J1/J2: "):-1]
             #linesh = lines[2][len("h: "):-1]
@@ -139,10 +139,10 @@ def plot_N_for_each_n(start: float, end: float):
         subfig1.set_title(r"$C/N$ bei der QT mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
         subfig1.axhline(0, color = "grey")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
-        filename = "results/n_" + n + "_N"
+        filename = "n_" + n + "_N"
         for N, NC in N_color:
             filename += "_" + N
-        plt.savefig(filename + "_specific_heat_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        plt.savefig("results/QT_stats/C_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
 def plot_N_for_each_n_sigma(start: float, end: float):
     print("plotting dependance of N for fixed n (plotting only sigma) ...")
@@ -152,7 +152,7 @@ def plot_N_for_each_n_sigma(start: float, end: float):
         # QT results
         for N, NC in N_color:
             # QT results
-            file = open("results/" + N + "_" + n +"_data_specific_heat_J_const_QT.txt", 'r')
+            file = open("results/" + N + "/data/" + n +"_data_specific_heat_J_const_QT.txt", 'r')
             lines = file.readlines()
             linesJ = lines[1][len("J1/J2: "):-1]
             #linesh = lines[2][len("h: "):-1]
@@ -177,15 +177,16 @@ def plot_N_for_each_n_sigma(start: float, end: float):
         filename = "n_" + n + "_N"
         for N, NC in N_color:
             filename += "_" + N
-        plt.savefig("results/sigma_" + filename + "_specific_heat_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        plt.savefig("results/QT_stats/C_sigma_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
 def plot_delta_ED(start: float, end: float):
     print("plotting \Delta E ED - QT for fixed N ...")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+    used_N = "N"
     for N, NC in N_color:
         print("N = " + N)
         # QT results
-        fileQT = open("results/" + N + "_1_data_specific_heat_J_const_QT.txt", 'r')
+        fileQT = open("results/" + N + "/data/1_data_specific_heat_J_const_QT.txt", 'r')
         linesQT = fileQT.readlines()
         linesJQT = linesQT[1][len("J1/J2: "):-1]
         #linesh = lines[2][len("h: "):-1]
@@ -198,7 +199,7 @@ def plot_delta_ED(start: float, end: float):
             X_QT += [float(x)]
             Y_QT += [float(y)]
         # ED results
-        fileED = open("results/" + N + "_data_specific_heat_J_const.txt", 'r')
+        fileED = open("results/" + N + "/data/data_specific_heat_J_const.txt", 'r')
         linesED = fileED.readlines()
         linesJED = linesED[1][len("J1/J2: "):-1]
         #linesh = lines[2][len("h: "):-1]
@@ -224,6 +225,9 @@ def plot_delta_ED(start: float, end: float):
             Y += [Y_QT[i] - Y_ED[i]]
 
         subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT-ED: N = " + N, alpha = 1.0)
+
+        used_N += "_" + N
+
     # saving
     subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
     subfig1.set_ylabel(r'Abweichung in $J_2$', fontsize = 25)
@@ -231,7 +235,7 @@ def plot_delta_ED(start: float, end: float):
     subfig1.set_title(r"Abweichung von $C/N$ zwischen ED und QT mit $J_1$ / $J_2$ = " + linesJQT, fontsize = 25)
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
-    plt.savefig("results/delta_ED_QT_" + N + "_specific_heat_J_" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
+    plt.savefig("results/QT_stats/C_delta_ED_QT_" + used_N + "_J" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
 
 if __name__ == "__main__":
     print("plotting specific heat (constant J1/J2, funtion of T):")

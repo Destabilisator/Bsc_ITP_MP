@@ -287,9 +287,12 @@ namespace QT::MB {
 
 //        std::cout << "sizes: " << betaData.size() << "\t" << outData.size() << "\n";
 
-        hlp::saveOutData("data_susceptibility_J_const_QT_MB.txt", "QT, MS für N = " + std::to_string(N)
-                                                               + " mit " + std::to_string(SAMPLES) + " Samples",
-                         "T in J2 / kb", "C in J2", beta_Data, X_Data, XErr_Data, N);
+        hlp::saveOutData("data_specific_heat_J_const_QT_MB.txt",
+                         "N: " + std::to_string(N) + "\n"
+                         + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                         + "samples: " + std::to_string(SAMPLES) + "\n"
+                         + "this took: " + formatTime(elapsed_seconds),
+                         "beta in kb / J2", "C in J2", beta_Data, X_Data, XErr_Data, N);
 
     }
 

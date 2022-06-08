@@ -2,7 +2,7 @@
 
 #define DEBUG
 //#define ED_METHODS
-//#define CLUSTER
+#define CLUSTER
 
 int main(int argc, char* argv[]) {
 
