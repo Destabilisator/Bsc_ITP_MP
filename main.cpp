@@ -1,8 +1,8 @@
 #include "main.h"
 
 //#define DEBUG
-#define ED_METHODS
-//#define CLUSTER
+//#define ED_METHODS
+#define CLUSTER
 
 int main(int argc, char* argv[]) {
 
@@ -69,7 +69,8 @@ int main(int argc, char* argv[]) {
 
         // susceptibility \Chi(T), J = const
         if (!noX) {
-            ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+            //ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+            ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
         }
 
 //        // dispersion with fixed J
@@ -105,10 +106,30 @@ int main(int argc, char* argv[]) {
 #ifdef CLUSTER
 
 ///// Abweichungen als Funktion der Systemgröße, Mittlungen und Temperatur (nur Rohdaten) /////
+
     double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
+
+    /// C ///
+    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
+        QT::MS::start_calculation_C_J_const(T_START, T_END, ss, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
+    }
+
     QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
-    ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
+    if (N%4 == 0) {
+        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+    } else {
+        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+    }
+
+    /// X ///
+    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
+        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
+    }
+
+    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
+    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
 #endif
 

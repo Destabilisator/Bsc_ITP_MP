@@ -3,6 +3,7 @@
 //#define fixedPrecision // remove if not debug
 
 // nested multithreaded loops
+#define OUTERMOST_NESTED_THREADS 1
 #define OUTER_NESTED_THREADS 8
 #define INNER_NESTED_THREADS 2
 
@@ -12,6 +13,7 @@
 // QT data output
 #define SAVE_WITH_SETS_OF_n_SAMPLES
 #define SAVE_WITH_DATA_FROM_ALL_SAMPLES
+#define SAVE_WITH_STEP_SIZE
 
 // prevent multithreading in Eigen
 //#define EIGEN_DONT_PARALLELIZE

@@ -503,7 +503,6 @@ namespace ED::momentumStates {
 
         std::string filenameSusceptibility_X = "data_susceptibility_J_const.txt"; // momentum_susceptibility_J_const.txt / data_susceptibility_J_const
         std::string headerSusceptibility_X = "N: " + std::to_string(N) + "\n"
-                                             + "h = " + std::to_string(h) + "\n"
                                              + "T START: " + std::to_string(START) + "\n"
                                              + "T END: " + std::to_string(END) + "\n"
                                              + "data-points: " + std::to_string(COUNT) + "\n"

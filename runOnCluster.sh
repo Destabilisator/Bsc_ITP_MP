@@ -36,8 +36,8 @@ fi
 # ./$build/$prgm 26 $start $end 20 $h -1 $noX silent && echo ""
 # ./$build/$prgm 28 $start $end 20 $h -1 $noX silent && echo ""
 
-$pth plotting/plotStatistics.py 0 $plotend
-#$pth plotting/plotStatistics.py 25 $plotend
+$pth plotting/plotStatisticsC.py 0 $plotend && echo "" && echo ""
+$pth plotting/plotStatisticsX.py 0 $plotend
 
 start_time_plots=$SECONDS
 
