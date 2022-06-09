@@ -3,6 +3,7 @@
 #include <complex>
 #include <random>
 #include "Eigen/SparseCore"
+#include <mutex>
 #include <omp.h>
 
 #include "helpers.h"

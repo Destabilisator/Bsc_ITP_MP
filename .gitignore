@@ -16,6 +16,9 @@ EV*.txt
 benchmarkResults.txt
 
 results/oldData/
+results/old/
+results/knowngood/
+
 results/QT_stats/*.png
 !results/QT_stats/data_placeholder.txt
 
