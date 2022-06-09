@@ -14,3 +14,10 @@ Alle entstehenden Plots sind im Ordner "results/" beziehungsweise im Unterordner
 Plots unterschiedlicher Systemgrößen (N) überschreiben sich nicht gegenseitig.
 Es können die Suszeptibilität, die speziifische Wärmekapazität, die Anregungsenergie und die Energiedispersion
 für unterschiedliche Temperaturen und Kopplungskonstanten dargestellt werden.
+
+
+# when compiling via the command line:
+mkdir Release
+cd Release
+cmake -DCMAKE_BUILD_TYPE=Release ..
+make
