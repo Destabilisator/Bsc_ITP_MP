@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
                   h, h_START, h_END, h_COUNT,
                   silent, cores, plotsIn3D, true, J1, J2, noX);
 
-    omp_set_num_threads(OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
+    omp_set_num_threads(OUTERMOST_NESTED_THREADS * OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
     omp_set_nested(1);
 
     std::cout << "N: " << N << "; size: " << SIZE << "\n";
@@ -110,22 +110,22 @@ int main(int argc, char* argv[]) {
     double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
 
     /// C ///
-    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
-        QT::MS::start_calculation_C_J_const(T_START, T_END, ss, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
-    }
-
-    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
-    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
-    if (N%4 == 0) {
-        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
-    } else {
-        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
-    }
+//    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
+//        QT::MS::start_calculation_C_J_const(T_START, T_END, ss, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
+//    }
+//
+//    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
+//    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+//    if (N%4 == 0) {
+//        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+//    } else {
+//        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+//    }
 
     /// X ///
-    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
-        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
-    }
+//    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
+//        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
+//    }
 
     QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );

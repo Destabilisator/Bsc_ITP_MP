@@ -4,7 +4,9 @@ import sys
 import os
 plt.rcParams['text.usetex'] = True
 
-N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#[("16", "red"), ("18", "blue"), ("20", "green"), ("22", "magenta"), ("24", "brown"), ("26", "purple"), ("28", "tomato")]
+N_color = []
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 n_color = [("1", "red"), ("2", "blue"), ("3", "green"), ("4", "tomato")]
 colors = ["red", "blue", "green", "magenta", "tomato", "brown", "purple"]
 
@@ -281,6 +283,12 @@ if __name__ == "__main__":
     print("plotting susceptibility (constant J1/J2, funtion of T):")
     start = float(sys.argv[1])
     end = float(sys.argv[2])
+    regime = sys.argv[3]
+
+    if regime == "low": N_color = N_color_LOW
+    elif regime == "high": N_color = N_color_HIGH
+    else: exit()
+
     plot_n_for_each_N(start, end)
     print()
     plot_n_for_each_N_sigma(start, end)
@@ -290,5 +298,5 @@ if __name__ == "__main__":
     plot_N_for_each_n_sigma(start, end)
     print()
     plot_delta_ED(start, end)
-    print()
-    plot_step_size(start, end)
+    # print()
+    # plot_step_size(start, end)
