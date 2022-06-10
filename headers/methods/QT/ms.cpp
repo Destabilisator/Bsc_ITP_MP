@@ -376,6 +376,15 @@ namespace QT::MS {
             beta_Data.emplace_back(beta);
         } beta_Data.shrink_to_fit();
 
+        hlp::saveStatisticsData("data_specific_heat_J_const_QT",
+                                "N: " + std::to_string(N) + "\n"
+                                + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                                + "h: " + std::to_string(h)+ "\n"
+                                + "samples: " + std::to_string(SAMPLES) + "\n"
+                                + "this took: " + formatTime(elapsed_seconds),
+                                "beta in kb / J2", "C in J2", beta_Data, outData, SAMPLES, step, N);
+
+/*
 #ifdef SAVE_WITH_SETS_OF_n_SAMPLES
         // save for different amounts n of random states
         for (int n = 1; n <= SAMPLES / 2; n++) {
@@ -467,7 +476,7 @@ namespace QT::MS {
 #endif
 
 #endif
-
+*/
     }
 
     ///// X /////
@@ -620,6 +629,14 @@ namespace QT::MS {
             beta_Data.emplace_back(beta);
         } beta_Data.shrink_to_fit();
 
+        hlp::saveStatisticsData("data_susceptibility_J_const_QT",
+                                "N: " + std::to_string(N) + "\n"
+                                + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                                + "samples: " + std::to_string(SAMPLES) + "\n"
+                                + "this took: " + formatTime(elapsed_seconds),
+                                "beta in kb / J2", "C in J2", beta_Data, outData, SAMPLES, step, N);
+
+/*
 #ifdef SAVE_WITH_SETS_OF_n_SAMPLES
         // save for different amounts n of random states
         for (int n = 1; n <= SAMPLES / 2; n++) {
@@ -707,7 +724,287 @@ namespace QT::MS {
 #endif
 
 #endif
+*/
+    }
 
+    ///// C_X /////
+
+    std::vector<std::tuple<double, double>> rungeKutta4_CX(const double &start, const double &end, const double &step, const int &N,
+                                      const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List) {
+
+        std::vector<std::tuple<double, double>> outData;
+        std::vector<Eigen::VectorXcd> vec = getVector(H_List);
+        int blockCount = (int) H_List.size();
+
+        double norm = 0.0;
+        for (int i = 0; i < blockCount; i++) {
+            norm += std::pow(vec.at(i).norm(), 2);
+        } norm = std::sqrt(norm);
+        for (int i = 0; i < blockCount; i++) {
+            vec.at(i) = vec.at(i) / norm;
+        }
+
+        double beta = start - step;
+        while (beta <= end) {
+
+            beta += step;
+            norm = 0.0;
+
+            // RK4 with vec on H to get new state
+#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
+            for (int i = 0; i < blockCount; i++) {
+                vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
+                double normnt = std::pow(vec.at(i).norm(), 2);
+#pragma omp critical
+                norm += normnt;
+            }
+
+            // ensure norm(vec) = 1
+            norm = std::sqrt(norm);
+            for (int i = 0; i < blockCount; i++) {
+                vec.at(i) = vec.at(i) / norm;
+            }
+
+            std::vector<double> vec_H_vec_List;
+            std::vector<double> vec_H2_vec_List;
+            std::vector<double> vec_S2_vec_List;
+
+#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, H_List, S2_List, vec, vec_S2_vec_List, vec_H_vec_List, vec_H2_vec_List)
+            for (int i = 0; i < blockCount; i++) {
+                const matrixType &H = H_List.at(i);
+                const matrixType &S2 = S2_List.at(i);
+                const Eigen::VectorXcd &v = vec.at(i);
+                double vS2v = std::real((v.adjoint() * S2 * v)(0,0));
+                double vHv = std::real((v.adjoint() * H * v)(0,0));
+                double vH2v = std::real((v.adjoint() * H * H * v)(0,0));
+#pragma omp critical
+                vec_S2_vec_List.emplace_back(vS2v);
+#pragma omp critical
+                vec_H_vec_List.emplace_back(vHv);
+#pragma omp critical
+                vec_H2_vec_List.emplace_back(vH2v);
+            }
+
+            double vec_H_vec = std::accumulate(vec_H_vec_List.begin(), vec_H_vec_List.end(), 0.0);
+            double vec_H2_vec = std::accumulate(vec_H2_vec_List.begin(), vec_H2_vec_List.end(), 0.0);
+            double H_diff = std::real(vec_H2_vec - std::pow(vec_H_vec, 2));
+            double C = beta * beta * H_diff / (double) N;
+
+            double vec_S2_vec = std::accumulate(vec_S2_vec_List.begin(), vec_S2_vec_List.end(), 0.0);
+            double X = beta * vec_S2_vec / 3.0 / (double) N;
+
+            outData.emplace_back(C,X);
+
+        }
+
+        outData.shrink_to_fit();
+        return outData;
+
+    }
+
+    void start_calculation_CX_J_const(const double &start, const double &end, const double &step, const double &J1,
+                                      const double &J2, const int &N, const int &SIZE, const int &SAMPLES) {
+
+        auto start_timer = std::chrono::steady_clock::now();
+        std::cout << "\n" << "C(T) & X(T), J = const, QT, momentum states, N: " << N << ", step size: " << step << " ..." << std::endl;
+
+        ///// get H and S2 /////
+        std::vector<matrixType> H_List;
+        std::vector<matrixType> S2_List;
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
+        std::vector<std::vector<std::vector<int>>> states(N + 1, std::vector<std::vector<int>>(N/2));
+        std::vector<std::vector<std::vector<int>>> R_vals(N + 1, std::vector<std::vector<int>>(N/2));
+        // get states
+        for (int s = 0; s < SIZE; s++) {
+            int m = ED::bitSum(s, N);
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = ED::checkState(s, k, N);
+                if (R >= 0) {
+                    states.at(m).at(k - k_lower).push_back(s);
+                    R_vals.at(m).at(k - k_lower).push_back(R);
+                }
+            }
+        }
+        // loop through indices
+        for (int m = 0; m <= N; m++) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                if (states.at(m).at(k - k_lower).empty()) {continue;}
+                Eigen::MatrixXcd H_Mtrx = fillHamiltonBlock(J1, J2, 0.0, k, states.at(m).at(k - k_lower),
+                                                            R_vals.at(m).at(k - k_lower), N);
+                Eigen::MatrixXcd S2_Mtrx = ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower));
+                H_List.emplace_back(H_Mtrx.sparseView());
+                S2_List.emplace_back(S2_Mtrx.sparseView());
+            }
+        }
+
+        // init progressbar
+        int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) SAMPLES * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) SAMPLES * 100.0 ) << "% (" << curr << "/" << SAMPLES << ")     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
+
+        std::vector<std::vector<double>> outDataC;
+        std::vector<std::vector<double>> outDataX;
+
+#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outDataC, outDataX)
+        for (int s = 1; s <= SAMPLES; s++) {
+            std::vector<std::tuple<double, double>> rawData = rungeKutta4_CX(start, end, step, N, H_List, S2_List);
+            std::vector<double> rawDataC;
+            std::vector<double> rawDataX;
+            for (std::tuple<double, double> tup : rawData) {
+                rawDataC.emplace_back(std::get<0>(tup));
+                rawDataX.emplace_back(std::get<1>(tup));
+            }
+
+            coutMutex.lock();
+            outDataC.emplace_back(rawDataC);
+            outDataX.emplace_back(rawDataX);
+            int p = (int) ( (float) curr / (float) SAMPLES * (float) prgbar_segm);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < prgbar_segm; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) curr / (float) SAMPLES * 100.0 ) << "% (" << curr << "/" << SAMPLES << ")     ";
+            std::cout.flush();
+            curr++;
+            coutMutex.unlock();
+        }
+
+        outDataC.shrink_to_fit();
+        outDataX.shrink_to_fit();
+
+        auto end_timer = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+        std::cout << "preparing and saving data\n";
+
+        ///// avg and saving results (for different sample sizes n) /////
+
+        // gather x-data
+        std::vector<double> beta_Data;
+        double beta = start - step;
+        while (beta <= end) {
+            beta += step;
+            beta_Data.emplace_back(beta);
+        } beta_Data.shrink_to_fit();
+
+        std::cout << "specific heat C:\n";
+        hlp::saveStatisticsData("data_specific_heat_J_const_QT",
+                                "N: " + std::to_string(N) + "\n"
+                                + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                                + "h: " + std::to_string(0.0)+ "\n"
+                                + "samples: " + std::to_string(SAMPLES) + "\n"
+                                + "this took: " + formatTime(elapsed_seconds),
+                                "beta in kb / J2", "C in J2", beta_Data, outDataC, SAMPLES, step, N);
+
+        std::cout << "magnetic susceptibility X:\n";
+        hlp::saveStatisticsData("data_susceptibility_J_const_QT",
+                                "N: " + std::to_string(N) + "\n"
+                                + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                                + "samples: " + std::to_string(SAMPLES) + "\n"
+                                + "this took: " + formatTime(elapsed_seconds),
+                                "beta in kb / J2", "C in J2", beta_Data, outDataX, SAMPLES, step, N);
+
+/*
+#ifdef SAVE_WITH_SETS_OF_n_SAMPLES
+        // save for different amounts n of random states
+        for (int n = 1; n <= SAMPLES / 2; n++) {
+            std::vector<std::vector<double>> X_Data_to_avg;
+            // combine data for every i to i+n samples into one avg
+            for (int i = 0; i+n < SAMPLES; i += n) {
+                std::vector<std::vector<double>> X_Data_raw;
+                // get data to avg
+                for (int j = i; j < i + n; j++) {
+//                    std:: cout << "n: " << n << ", i: " << i << ", j: " << j << std::endl;
+                    X_Data_raw.emplace_back(outData.at(j));
+                }
+                std::vector<double> X_vector;
+                // avg
+                for(int k = 0; k < X_Data_raw.at(0).size(); k++) {
+                    std::vector<double> X_vector_raw;
+                    for (std::vector<double> Xd : X_Data_raw) {
+                        X_vector_raw.emplace_back(Xd.at(k));
+                    }
+                    std::tuple<double, double> mean_se = get_mean_and_se(X_vector_raw);
+                    X_vector.emplace_back(std::get<0>(mean_se));
+                }
+                X_Data_to_avg.emplace_back(X_vector);
+            }
+            std::vector<double> X_Data_save;
+            std::vector<double> XErr_Data_save;
+            // avg and stdv of avg C with n samples each
+            for(int k = 0; k < X_Data_to_avg.at(0).size(); k++) {
+                std::vector<double> X_vector_raw;
+                for (std::vector<double> Xd : X_Data_to_avg) {
+                    X_vector_raw.emplace_back(Xd.at(k));
+                } std::tuple<double, double> mean_se_X = get_mean_and_se(X_vector_raw);
+                X_Data_save.emplace_back(std::get<0>(mean_se_X));
+                XErr_Data_save.emplace_back(std::get<1>(mean_se_X));
+            }
+            // save data N_n_data_specific_heat_J_const_QT_txt
+            std::string filename = std::to_string(n) + "_data_susceptibility_J_const_QT";
+            hlp::saveOutData(filename + ".txt",
+                             "N: " + std::to_string(N) + "\n"
+                             + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                             + "samples: " + std::to_string(SAMPLES) + "\n"
+                             + "this took: " + formatTime(elapsed_seconds),
+                             "beta in kb / J2", "C in J2", beta_Data, X_Data_save, XErr_Data_save, N);
+#ifdef SAVE_WITH_STEP_SIZE
+            hlp::saveOutData("step_size_data/" + filename + "_step" + std::to_string(step) + ".txt",
+                             "N: " + std::to_string(N) + "\n"
+                             + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                             + "samples: " + std::to_string(SAMPLES) + "\n"
+                             + "this took: " + formatTime(elapsed_seconds),
+                             "beta in kb / J2", "C in J2", beta_Data, X_Data_save, XErr_Data_save, N);
+#endif
+
+        }
+
+#endif
+
+#ifdef SAVE_WITH_DATA_FROM_ALL_SAMPLES
+        std::vector<double> X_Data;
+        std::vector<double> XErr_Data;
+
+        // avg and stdv of X
+        for(int i = 0; i < outData.at(0).size(); i++) {
+            std::vector<double> X_temp_data;
+            for (std::vector<double> C_data_raw : outData) {
+                X_temp_data.emplace_back(C_data_raw.at(i));
+            }
+            std::tuple<double, double> mean_se = get_mean_and_se(X_temp_data);
+            X_Data.emplace_back(std::get<0>(mean_se));
+            XErr_Data.emplace_back(std::get<1>(mean_se));
+        }
+        std::string filename = "data_susceptibility_J_const_QT";
+        hlp::saveOutData(filename + ".txt",
+                         "N: " + std::to_string(N) + "\n"
+                         + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                         + "samples: " + std::to_string(SAMPLES) + "\n"
+                         + "this took: " + formatTime(elapsed_seconds),
+                         "beta in kb / J2", "C in J2", beta_Data, X_Data, XErr_Data, N);
+#ifdef SAVE_WITH_STEP_SIZE
+        hlp::saveOutData("step_size_data/" + filename + "_step" + std::to_string(step) + ".txt",
+                         "N: " + std::to_string(N) + "\n"
+                         + "J1/J2: " + std::to_string(J1/J2)+ "\n"
+                         + "samples: " + std::to_string(SAMPLES) + "\n"
+                         + "this took: " + formatTime(elapsed_seconds),
+                         "beta in kb / J2", "C in J2", beta_Data, X_Data, XErr_Data, N);
+#endif
+
+#endif
+*/
     }
 
 }

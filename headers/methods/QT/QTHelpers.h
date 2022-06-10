@@ -10,6 +10,7 @@
 #include "Eigen/Eigenvalues"
 
 #include "defines.h"
+#include "helpers.h"
 
 namespace QT::hlp {
 
@@ -30,5 +31,9 @@ namespace QT::hlp {
 
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
                      const std::vector<double> &xData, const std::vector<double> &yData, const std::vector<double> &yErrData, const int &N);
+
+    void saveStatisticsData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
+                            const std::vector<double> &xData, const std::vector<std::vector<double>> &RAWyData,
+                            const int &SAMPLES, const double &step, const int &N);
 
 }

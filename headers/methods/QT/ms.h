@@ -65,4 +65,14 @@ namespace QT::MS {
     void start_calculation_X_J_const(const double &start, const double &end, const double &step,
                                      const double &J1, const double &J2, const int &N, const int &SIZE, const int &SAMPLES);
 
+    ///// C_X /////
+
+    // fourth order Runge-Kutta to calculate beta dependency of the specific heat and the susceptibility
+    std::vector<std::tuple<double, double>> rungeKutta4_CX(const double &start, const double &end, const double &step, const int &N,
+                                                           const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List);
+
+    // calculate and save the specific heat and the susceptibility as a function of temperature (beta) with h = 0.0
+    void start_calculation_CX_J_const(const double &start, const double &end, const double &step, const double &J1,
+                                      const double &J2, const int &N, const int &SIZE, const int &SAMPLES);
+
 }

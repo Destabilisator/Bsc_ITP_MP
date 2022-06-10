@@ -19,6 +19,11 @@ results/oldData/
 results/old/
 results/knowngood/
 
+results/QT_stats/generally_good_fit/
+results/QT_stats/good_fit_for_N_mod_4/
+results/QT_stats/knowngood/
+results/QT_stats/knowngood_2/
+
 results/QT_stats/*.png
 !results/QT_stats/data_placeholder.txt
 
