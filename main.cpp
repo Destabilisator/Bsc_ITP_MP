@@ -132,16 +132,21 @@ int main(int argc, char* argv[]) {
 //    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
     /// C and X ///
-    // ED
-    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
-    if (N%4 == 0) {
-        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
-    } else {
-        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
-    }
-    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-    // compined QT
-    QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, SAMPLES);
+//    // ED
+//    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+//    if (N%4 == 0) {
+//        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+//    } else {
+//        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+//    }
+//    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    // compined QT
+//    QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, SAMPLES);
+
+
+    /// spin gap ///
+    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, 0.0, 50, stepsize, N, SIZE, OUTER_NESTED_THREADS);
+    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
 #endif
 

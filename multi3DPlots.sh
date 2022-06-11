@@ -24,7 +24,7 @@ fi
 build=cmake-build-release
 
 for i in 6 8 10 12; do
-    $pth ./plotting/deleteData.py $i
+    $pth ./plotting/deleteData.py $i 3D
     ./$build/$prgm 3D $i $Jstart $Jend $Jcount $Tstart $Tend $Tcount $h -1 $noX silent
     echo "plotting..."
     $pth ./plotting/plot3D.py $i no-show C $noX

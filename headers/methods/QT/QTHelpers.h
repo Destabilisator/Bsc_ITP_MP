@@ -36,4 +36,7 @@ namespace QT::hlp {
                             const std::vector<double> &xData, const std::vector<std::vector<double>> &RAWyData,
                             const int &SAMPLES, const double &step, const int &N);
 
+    void saveAvgData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
+                     const std::vector<double> &xData, const std::vector<std::vector<double>> &RAWyData, const int &N);
+
 }

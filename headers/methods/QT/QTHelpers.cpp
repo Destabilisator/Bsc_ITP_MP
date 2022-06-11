@@ -177,4 +177,37 @@ namespace QT::hlp {
 #endif
     }
 
+    void saveAvgData(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
+                         const std::vector<double> &xData, const std::vector<std::vector<double>> &RAWyData, const int &N) {
+
+        std::vector<double> Y_Data;
+        std::vector<double> YErr_Data;
+
+        // avg and stdv
+        for(int i = 0; i < RAWyData.at(0).size(); i++) {
+            std::vector<double> Y_temp_data;
+            for (std::vector<double> Y_data_raw : RAWyData) {
+                Y_temp_data.emplace_back(Y_data_raw.at(i));
+            }
+            std::tuple<double, double> mean_se = get_mean_and_se(Y_temp_data);
+            Y_Data.emplace_back(std::get<0>(mean_se));
+            YErr_Data.emplace_back(std::get<1>(mean_se));
+        }
+
+        // save to file
+        std::ofstream file;
+        try {
+            file.open(filename);
+            file << header <<"\n\n";
+            file << x_lbl << "\t" << y_lbl << "\t" << "yErr" << "\n";
+            for (int i = 0; i < xData.size(); i++) {
+                file << xData.at(i) << "\t" << Y_Data.at(i) << "\t" << YErr_Data.at(i) << "\n";
+            }
+        } catch (...) {
+            file.close();
+            std::cout << "failed to save to file\n";
+        }
+        file.close();
+    }
+
 }

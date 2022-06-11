@@ -24,12 +24,12 @@ for N, c in N_color:
 
     used_N += "_" + N
 
-subfig1.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 18)
-subfig1.set_ylabel('Suszeptibilität pro Spin $\\chi/N$ in $J_2$', fontsize = 18)
-subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$ für ' + r"$J_1$ / $J_2$ = " + linesJ + r", $k_B$ = 1", fontsize = 18)
+subfig1.set_xlabel(r'$T$ $k_B$ / $J_2$', fontsize = 25)
+subfig1.set_ylabel('Suszeptibilität pro Spin $\\chi/N$ in $J_2$', fontsize = 25)
+subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$ für ' + r"$J_1$ / $J_2$ = " + linesJ + r", $k_B$ = 1", fontsize = 25)
 
 subfig1.axhline(0, color = "grey")
-subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
+subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-plt.savefig("results/" + "X_" used_N + "_J" + linesJ + ".png")
+plt.savefig("results/" + "X_" + used_N + "_J" + linesJ + ".png")
 #plt.show()

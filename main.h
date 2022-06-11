@@ -35,7 +35,7 @@ double J_START = 0.0, J_END = 2.0;
 int J_COUNT = 50;
 
 double step_size = 0.01;
-int SAMPLES = 24;
+int SAMPLES = 2;
 
 double h = 0.0;
 double h_START = 0.0, h_END = 2.0;

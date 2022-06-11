@@ -3,9 +3,9 @@
 //#define fixedPrecision // remove if not debug
 
 // nested multithreaded loops
-#define OUTERMOST_NESTED_THREADS 1
+#define OUTERMOST_NESTED_THREADS 4
 #define OUTER_NESTED_THREADS 4
-#define INNER_NESTED_THREADS 4
+#define INNER_NESTED_THREADS 1
 
 // ED data calculation
 #define calc_C_X_over_beta

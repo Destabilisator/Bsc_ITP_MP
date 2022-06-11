@@ -26,7 +26,7 @@ fi
 build=cmake-build-release
 
 for h in $(seq $h_START $h_STEP $h_END); do
-    $pth ./plotting/deleteData.py $N
+    $pth ./plotting/deleteData.py $N 3D
     ./$build/$prgm 3D $N $Jstart $Jend $Jcount $Tstart $Tend $Tcount $h -1 $noX silent
     echo "plotting..."
     $pth ./plotting/plot3D.py $N no-show C noX

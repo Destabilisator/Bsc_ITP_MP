@@ -75,4 +75,11 @@ namespace QT::MS {
     void start_calculation_CX_J_const(const double &start, const double &end, const double &step, const double &J1,
                                       const double &J2, const int &N, const int &SIZE, const int &SAMPLES);
 
+    ///// C_X /////
+
+    // calculate and save the susceptibility as a function of temperature (beta) for multiple J1/J2
+    void start_calc_spin_gap(const double &J_START, const double &J_END, const int &J_COUNT,
+                             const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
+                             const int &N, const int &SIZE, const int &SAMPLES);
+
 }

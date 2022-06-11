@@ -269,8 +269,9 @@ namespace QT::MS {
 
             beta += step;
             norm = 0.0;
-
+#if INNER_NESTED_THREADS > 1
             #pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, matrixList, step, norm)
+#endif
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), matrixList.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
@@ -287,7 +288,9 @@ namespace QT::MS {
             std::vector<double> vec_H2_vec_List;
 
             //double C = 0.0;
+#if INNER_NESTED_THREADS > 1
             #pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, matrixList, vec, vec_H_vec_List, vec_H2_vec_List)
+#endif
             for (int i = 0; i < blockCount; i++) {
                 const matrixType &H = matrixList.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
@@ -338,8 +341,9 @@ namespace QT::MS {
         std::cout.flush();
         curr++;
         coutMutex.unlock();
-
+#if OUTER_NESTED_THREADS > 1
         #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, matrixList, outData)
+#endif
         for (int s = 1; s <= SAMPLES; s++) {
 //            int p = (int) ( (float) s / (float) SAMPLES * (float) prgbar_segm);
             std::vector<double> rawData = rungeKutta4_C(start, end, step, N, matrixList);
@@ -503,7 +507,9 @@ namespace QT::MS {
             norm = 0.0;
 
             // RK4 with vec on H to get new state
+#if INNER_NESTED_THREADS > 1
 #pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
+#endif
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
@@ -519,7 +525,9 @@ namespace QT::MS {
 
             std::vector<double> vec_S2_vec_List;
 
+#if INNER_NESTED_THREADS > 1
 #pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
+#endif
             for (int i = 0; i < blockCount; i++) {
                 const matrixType &S2 = S2_List.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
@@ -593,8 +601,9 @@ namespace QT::MS {
         coutMutex.unlock();
 
         std::vector<std::vector<double>> outData;
-
+#if OUTER_NESTED_THREADS > 1
         #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outData)
+#endif
         for (int s = 1; s <= SAMPLES; s++) {
             std::vector<double> rawData = rungeKutta4_X(start, end, step, N, H_List, S2_List);
 
@@ -751,7 +760,9 @@ namespace QT::MS {
             norm = 0.0;
 
             // RK4 with vec on H to get new state
+#if INNER_NESTED_THREADS > 1
 #pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
+#endif
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
@@ -769,7 +780,9 @@ namespace QT::MS {
             std::vector<double> vec_H2_vec_List;
             std::vector<double> vec_S2_vec_List;
 
+#if INNER_NESTED_THREADS > 1
 #pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, H_List, S2_List, vec, vec_S2_vec_List, vec_H_vec_List, vec_H2_vec_List)
+#endif
             for (int i = 0; i < blockCount; i++) {
                 const matrixType &H = H_List.at(i);
                 const matrixType &S2 = S2_List.at(i);
@@ -856,7 +869,9 @@ namespace QT::MS {
         std::vector<std::vector<double>> outDataC;
         std::vector<std::vector<double>> outDataX;
 
+#if OUTER_NESTED_THREADS > 1
 #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outDataC, outDataX)
+#endif
         for (int s = 1; s <= SAMPLES; s++) {
             std::vector<std::tuple<double, double>> rawData = rungeKutta4_CX(start, end, step, N, H_List, S2_List);
             std::vector<double> rawDataC;
@@ -1007,4 +1022,100 @@ namespace QT::MS {
 */
     }
 
+    ///// spin gap /////
+
+    void start_calc_spin_gap(const double &J_START, const double &J_END, const int &J_COUNT,
+                             const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
+                             const int &N, const int &SIZE, const int &SAMPLES) {
+
+        auto start_timer = std::chrono::steady_clock::now();
+        std::cout << "\n" << "C(T) J = const, QT, momentum states, N: " << N << ", step size: " << BETA_STEP << " ..." << std::endl;
+
+        ///// get S2 /////
+        std::vector<matrixType> S2_List;
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
+        std::vector<std::vector<std::vector<int>>> states(N + 1, std::vector<std::vector<int>>(N/2));
+        std::vector<std::vector<std::vector<int>>> R_vals(N + 1, std::vector<std::vector<int>>(N/2));
+        // get states
+        for (int s = 0; s < SIZE; s++) {
+            int m = ED::bitSum(s, N);
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = ED::checkState(s, k, N);
+                if (R >= 0) {
+                    states.at(m).at(k - k_lower).push_back(s);
+                    R_vals.at(m).at(k - k_lower).push_back(R);
+                }
+            }
+        }
+        // loop through indices
+        for (int m = 0; m <= N; m++) {
+            for (int k = k_lower; k <= k_upper; k++) {
+                if (states.at(m).at(k - k_lower).empty()) {continue;}
+                Eigen::MatrixXcd S2_Mtrx = ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower));
+                S2_List.emplace_back(S2_Mtrx.sparseView());
+            }
+        }
+
+        ///// gather x-data /////
+        std::vector<double> beta_Data;
+        double beta = BETA_START - BETA_STEP;
+        while (beta <= BETA_END) {
+            beta += BETA_STEP;
+            beta_Data.emplace_back(beta);
+        } beta_Data.shrink_to_fit();
+
+        // init progressbar
+        int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
+
+#if OUTERMOST_NESTED_THREADS > 1
+#pragma omp parallel for num_threads(OUTERMOST_NESTED_THREADS) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
+#endif
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+            std::vector<matrixType> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
+            std::vector<std::vector<double>> rawDataX;
+#if OUTER_NESTED_THREADS > 1
+#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, rawDataX, beta_Data, N, SIZE)
+#endif
+            for (int s = 1; s <= SAMPLES; s++) {
+                std::vector<double> rawData = rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
+                rawDataX.emplace_back(rawData);
+            }
+            // save data (silent)
+            rawDataX.shrink_to_fit();
+            hlp::saveAvgData("./results/" + std::to_string(N) + "/data/spin_gap_data/X_J" + std::to_string(J) + ".txt",
+                             "samples: " + std::to_string(SAMPLES) + "\n",
+                             "beta in kb / J2", "C in J2", beta_Data, rawDataX, N);
+            // progressbar
+            coutMutex.lock();
+            int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < prgbar_segm; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+            std::cout.flush();
+            curr++;
+            coutMutex.unlock();
+        }
+
+        auto end_timer = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+    }
 }

@@ -25,12 +25,12 @@ for N, c in N_color:
 
     used_N += "_" + N
 
-subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 18)
-subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = 18)
-subfig1.set_title(r'$C/N$ mit $\beta$ = ' + linesBeta + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
+subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
+subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = 25)
+subfig1.set_title(r'$C/N$ mit $\beta$ = ' + linesBeta + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 25)
 
 #subfig1.axhline(0, color = "grey")
-subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
+subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-plt.savefig("results/" + "C_" used_N + "_beta" + linesBeta + "_h" + linesh + ".png")
+plt.savefig("results/" + "C_" + used_N + "_beta" + linesBeta + "_h" + linesh + ".png")
 #plt.show()

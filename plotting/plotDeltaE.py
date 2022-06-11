@@ -21,12 +21,12 @@ for N, c in N_color:
         Y += [float(y)]
     subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 2, marker = "o", color = c, label = lbl)
 
-subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 18)
-subfig1.set_ylabel(r'$\Delta E = E_1 - E_0$  in $J_2$', fontsize = 18)
-subfig1.set_title(r'Anregungsenergieren $\Delta E$, h = ' + linesh, fontsize = 18)
+subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
+subfig1.set_ylabel(r'$\Delta E = E_1 - E_0$  in $J_2$', fontsize = 25)
+subfig1.set_title(r'Anregungsenergieren $\Delta E$, h = ' + linesh, fontsize = 25)
 
 subfig1.axhline(0, color = "grey")
-subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
+subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
 plt.savefig("results/" + "delta_E.png")
 #plt.show()

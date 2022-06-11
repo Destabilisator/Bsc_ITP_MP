@@ -53,7 +53,7 @@ fi
 #build=build
 build=cmake-build-release
 
-$pth ./plotting/deleteData.py $N
+$pth ./plotting/deleteData.py $N 3D
 ./$build/$prgm 3D $N $J_START $J_END $J_COUNT $T_START $T_END $T_COUNT $h $CORES $noX $SILENT
 echo ""
 echo "plotting for N = $N:"

@@ -46,14 +46,14 @@ for N, c in N_color:
 
     used_N += "_" + N
 
-subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 18)
+subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
 # subfig1.set_xlabel(r'$T$ in $k_B$ / $J_2$', fontsize = 18)
-subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 18)
-subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
+subfig1.set_ylabel(r'spezifische Wärmekapazität pro Spin $C/N$ in $J_2$', fontsize = 25)
+subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 25)
 
 subfig1.axhline(0, color = "grey")
-subfig1.legend(loc = 'best' ,frameon = False, fontsize = 14)
+subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-plt.savefig("results/" + "C_" used_N + "_J" + linesJ + "_h" + linesh + ".png")
+plt.savefig("results/" + "C_" + used_N + "_J" + linesJ + "_h" + linesh + ".png")
 #plt.savefig("results/" + "specific_heat_J_const.png")
 #plt.show
