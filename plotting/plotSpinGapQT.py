@@ -46,15 +46,16 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
     subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
     subfig2.set_title("$\\chi/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + J, fontsize = 25)
 
-    subfig2.axhline(0, color = "grey")
+    # subfig2.axhline(0, color = "grey")
     subfig2.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
     plt.axvline(x=X_fit[len(X_fit)-1], color='black', linestyle='--')
-    subfig2.set_xscale("log")
+    # subfig2.set_xscale("log")
     subfig2.set_yscale("log")
     # plt.xscale("log")
     # plt.yscale('log')
-    plt.savefig("results/" + N + "/spin_gap_with_QT_J" + J + ".png")
+    plt.xlim(X[0] - 0.005, X_fit[len(X_fit)-1] + 0.005)
+    plt.savefig("results/" + N + "/data/spin_gap_data/X_J" + J + ".png")
     plt.close(fig2)
     return np.exp(b), m, 0.0, 0.0
     return A, k, x_0, y_0
@@ -72,6 +73,7 @@ for N, c in N_color:
     X = []; Y = []
     for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
         if filename == "dummyFile.txt" or filename == "data_placeholder.txt": continue
+        if filename[len(filename)-4:] == ".png": continue
         J = filename[len("X_J"):-len(".txt")]
         print(J)
         A, k, x_0, y_0 = get_spin_gap(N, J, filename)
