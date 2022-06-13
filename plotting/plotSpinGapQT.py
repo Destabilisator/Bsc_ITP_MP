@@ -5,12 +5,15 @@ import numpy as np
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
 N_color_HIGH = [("18", "tomato"), ("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
+N_color = [("6", "red")]
+
 peak_offset = 2000 #1500 # 1000
-R2_lim = 0.99
-search_start_percent = 3/4
+fit_samples = 10
+search_start_percent = 4/5
+search_end_percent = 1/5
 
 def sort_data(X, Y):
     length = len(X)
@@ -52,9 +55,10 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
     X_fit_range = X_fit; Y_fit_range = Y_fit
     X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
 
-    for i in range(0, peak_offset):
+    for p in range(1, fit_samples+1):
+        percent = search_start_percent + (search_end_percent - search_start_percent) * float(p) / float(fit_samples)
         X_fit = []; Y_fit = []
-        for i in range(0, int(len(X)*search_start_percent)-i):
+        for i in range(0, int(len(X)*percent)):
             X_fit += [X[i]]; Y_fit += [np.log(Y[i])] # log = ln [np.log(Y[i])]
         X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
         fitting_results = np.polyfit(X_fit, Y_fit, 1, full = True)
@@ -64,14 +68,14 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
         square_diff = diff ** 2
         SST = square_diff.sum()
         R2_new = 1 - SSE/SST
-
         if R2_new > R2:
             R2 = R2_new
             m = m_new
             b = b_new
             X_fit_range = X_fit; Y_fit_range = Y_fit
 
-    subfig2.plot(X_fit_range, Y_fit_range, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "green", label = "range")
+    Y_fitted_range = np.exp(Y_fit_range)
+    subfig2.plot(X_fit_range, Y_fitted_range, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "green", label = "range")
 
     #print("%f, %f, %f" % (R2, m, b))
 
@@ -95,8 +99,8 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
     # print(R2)
 
     subfig2.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "blue", label = "QT data")
-    Y_fitted = [np.exp(m * x + b) for x in X_fit]
-    subfig2.plot(X_fit, Y_fitted, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "red", label = "exp fit, R = " + str(R2))
+    Y_fitted = [np.exp(m * x + b) for x in X_fit_range]
+    subfig2.plot(X_fit_range, Y_fitted, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "red", label = "exp fit, R = " + str(R2))
     #subfig2.set_xlabel(r'T in $k_B$ / $J_2$', fontsize = 25)
     subfig2.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
     subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
@@ -105,10 +109,9 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
     # subfig2.axhline(0, color = "grey")
     subfig2.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-    plt.axvline(x=X_fit[len(X_fit)-1], color='black', linestyle='--')
+    plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
     #subfig2.set_xscale("log")
     subfig2.set_yscale("log")
-    # plt.xlim(X[0] - 0.005, X_fit[len(X_fit)-1] + 0.005)
     plt.savefig("results/" + N + "/data/spin_gap_data/X_J" + J + "_" + ED_QT + ".png")
     plt.close(fig2)
     return np.exp(b), abs(m), 0.0, 0.0
@@ -116,10 +119,12 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
 
 if __name__ == "__main__":
 
-    regime = sys.argv[1]
-    if regime == "low": N_color = N_color_LOW
-    elif regime == "high": N_color = N_color_HIGH
-    else: exit()
+    if len(sys.argv) > 1:
+        regime = sys.argv[1]
+        if regime == "low": N_color = N_color_LOW; print("low")
+        elif regime == "high": N_color = N_color_HIGH; print("high")
+        else: print("default (wrong args)")
+    else: print("default (no args)")
 
     print("plotting spin gap ...")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
@@ -135,7 +140,7 @@ if __name__ == "__main__":
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
             if filename[len(filename)-6:] != "QT.txt": continue
             J = filename[len("X_J"):-len("QT.txt")]
-            print(J)
+            # print(J)
             A, k, x_0, y_0 = get_spin_gap(N, J, filename)
             # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
             X += [float(J)]
@@ -157,6 +162,7 @@ if __name__ == "__main__":
         X, Y = sort_data(X, Y)
         subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, label = lbl, alpha = 0.5)
         # ED results
+        print("ED (dispersion)")
         lbl = "ED : N = " + N
         X = []; Y = []
         file = open("results/" + N + "/data/data_spin_gap.txt", 'r') # _data_spin_gap / _data_spin_gap_with_index
