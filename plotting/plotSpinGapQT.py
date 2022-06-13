@@ -2,17 +2,13 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import numpy as np
-import scipy.optimize
-import scipy.stats
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("18", "tomato"), ("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
 peak_offset = 500 # 1000
-
-# N_color = [("12", "orange")]
 
 def sort_data(X, Y):
     length = len(X)
@@ -40,29 +36,14 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
         X += [float(x)] # beta -> T
         Y += [float(y)]
 
-    # print(len(X))
-    # print(len(Y))
-
     X.reverse(); Y.reverse()
     X_fit = []; Y_fit = []
     for i in range(0, len(X)-peak_offset):
-        # print("%i, %f, %f, %f" %(i, X[i], Y[i+peak_offset], Y[i]))
-        # if X[i] < 10**(-5): continue
-        if Y[i] > Y[i+peak_offset]:
-            #print("break")
-            break
+        if Y[i] > Y[i+peak_offset]: break
         X_fit += [X[i]]; Y_fit += [np.log(Y[i])] # log = ln [np.log(Y[i])]
     if (len(X_fit) == 0):
         for i in range(0, len(X) - int(len(X)/3)):
             X_fit += [X[i]]; Y_fit += [np.log(Y[i])]
-    # print(len(X_fit))
-    # print(len(Y_fit))
-    #X_fit.reverse(); Y_fit.reverse()
-    # defaultParams = (1.0, 0.5, -0.05, 0.01)
-    # params, cv = scipy.optimize.curve_fit(expFunc, X_fit, Y_fit, defaultParams)
-    # A, k, x_0, y_0 = params
-    # res = scipy.stats.linregress(X_fit, Y_fit)
-    # m = res.slope; b = res.intercept
     m, b = np.polyfit(X_fit, Y_fit, 1)
     subfig2.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "blue", label = "QT data")
     # Y_fitted = [expFunc(x, A, k, x_0, y_0) for x in X_fit]
@@ -79,14 +60,10 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
     plt.axvline(x=X_fit[len(X_fit)-1], color='black', linestyle='--')
     #subfig2.set_xscale("log")
     subfig2.set_yscale("log")
-    # plt.xscale("log")
-    # plt.yscale('log')
     # plt.xlim(X[0] - 0.005, X_fit[len(X_fit)-1] + 0.005)
     plt.savefig("results/" + N + "/data/spin_gap_data/X_J" + J + "_" + ED_QT + ".png")
     plt.close(fig2)
     return np.exp(b), abs(m), 0.0, 0.0
-    # return A, k, x_0, y_0
-    # return 0.0, 0.0, 0.0, 0.0
 
 
 if __name__ == "__main__":
@@ -104,10 +81,9 @@ if __name__ == "__main__":
     for N, c in N_color:
         print("N = " + N)
         # QT results
-        lbl = "QT: N = " + N
+        lbl = "QT (exp fit): N = " + N
         X = []; Y = []
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
-            #if filename == "dummyFile.txt" or filename == "data_placeholder.txt": continue
             if filename[len(filename)-6:] != "QT.txt": continue
             J = filename[len("X_J"):-len("QT.txt")]
             # print(J)
@@ -118,10 +94,9 @@ if __name__ == "__main__":
         X, Y = sort_data(X, Y)
         subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = c, label = lbl)
         # ED results exp fit
-        lbl = "ED: N = " + N
+        lbl = "ED (exp fit): N = " + N
         X = []; Y = []
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
-            #if filename == "dummyFile.txt" or filename == "data_placeholder.txt": continue
             if filename[len(filename)-6:] != "ED.txt": continue
             J = filename[len("X_J"):-len("ED.txt")]
             # print(J)
@@ -132,7 +107,7 @@ if __name__ == "__main__":
         X, Y = sort_data(X, Y)
         subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, label = lbl, alpha = 0.5)
         # ED results
-        lbl = "ED (exp fir) : N = " + N
+        lbl = "ED : N = " + N
         X = []; Y = []
         file = open("results/" + N + "/data/data_spin_gap.txt", 'r') # _data_spin_gap / _data_spin_gap_with_index
         lines = file.readlines()

@@ -41,12 +41,12 @@ if [[ "$regime" == "low" ]]; then
 	./$build/$prgm 10 $start $end 50 $h -1 $noX silent && echo "" # 5000
     $pth plotting/deleteData.py 12 SG
 	./$build/$prgm 12 $start $end 50 $h -1 $noX silent && echo "" # 1000
-	$pth plotting/deleteData.py 14 SG
-	./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo "" # 50
-	$pth plotting/deleteData.py 16 SG
-	./$build/$prgm 16 $start $end 50 $h -1 $noX silent && echo ""
-	$pth plotting/deleteData.py 18 SG
-	./$build/$prgm 18 $start $end 50 $h -1 $noX silent && echo ""
+	# $pth plotting/deleteData.py 14 SG
+	# ./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo "" # 50
+	# $pth plotting/deleteData.py 16 SG
+	# ./$build/$prgm 16 $start $end 50 $h -1 $noX silent && echo ""
+	# $pth plotting/deleteData.py 18 SG
+	# ./$build/$prgm 18 $start $end 50 $h -1 $noX silent && echo ""
 	$pth plotting/plotSpinGapQT.py $regime && echo "" && echo ""
 elif [[ "$regime" == "high" ]]; then
 	echo "high regime" && echo ""
