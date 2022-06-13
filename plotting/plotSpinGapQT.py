@@ -8,7 +8,9 @@ N_color = []
 N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("18", "tomato"), ("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
-peak_offset = 500 # 1000
+peak_offset = 2000 #1500 # 1000
+R2_lim = 0.99
+search_start_percent = 3/4
 
 def sort_data(X, Y):
     length = len(X)
@@ -37,18 +39,64 @@ def get_spin_gap(N, J, filename) -> (float, float, float, float):
         Y += [float(y)]
 
     X.reverse(); Y.reverse()
-    X_fit = []; Y_fit = []
-    for i in range(0, len(X)-peak_offset):
-        if Y[i] > Y[i+peak_offset]: break
-        X_fit += [X[i]]; Y_fit += [np.log(Y[i])] # log = ln [np.log(Y[i])]
-    if (len(X_fit) == 0):
-        for i in range(0, len(X) - int(len(X)/3)):
-            X_fit += [X[i]]; Y_fit += [np.log(Y[i])]
-    m, b = np.polyfit(X_fit, Y_fit, 1)
+
+    X_fit = X[0:int(len(X)*search_start_percent)]; Y_fit = Y[0:int(len(X)*search_start_percent)]
+    X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
+    fitting_results = np.polyfit(X_fit, Y_fit, 1, full = True)
+    m, b = fitting_results[0]
+    SSE = fitting_results[1][0]
+    diff = Y_fit - Y_fit.mean()
+    square_diff = diff ** 2
+    SST = square_diff.sum()
+    R2 = 1 - SSE/SST
+    X_fit_range = X_fit; Y_fit_range = Y_fit
+    X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
+
+    for i in range(0, peak_offset):
+        X_fit = []; Y_fit = []
+        for i in range(0, int(len(X)*search_start_percent)-i):
+            X_fit += [X[i]]; Y_fit += [np.log(Y[i])] # log = ln [np.log(Y[i])]
+        X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
+        fitting_results = np.polyfit(X_fit, Y_fit, 1, full = True)
+        m_new, b_new = fitting_results[0]
+        SSE = fitting_results[1][0]
+        diff = Y_fit - Y_fit.mean()
+        square_diff = diff ** 2
+        SST = square_diff.sum()
+        R2_new = 1 - SSE/SST
+
+        if R2_new > R2:
+            R2 = R2_new
+            m = m_new
+            b = b_new
+            X_fit_range = X_fit; Y_fit_range = Y_fit
+
+    subfig2.plot(X_fit_range, Y_fit_range, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "green", label = "range")
+
+    #print("%f, %f, %f" % (R2, m, b))
+
+    # X_fit = []; Y_fit = []
+    # for i in range(0, len(X)-peak_offset):
+    #     if Y[i] > Y[i+peak_offset]: break
+    #     X_fit += [X[i]]; Y_fit += [np.log(Y[i])] # log = ln [np.log(Y[i])]
+    # if (len(X_fit) == 0):
+    #     for i in range(0, len(X) - int(len(X)/3)):
+    #         X_fit += [X[i]]; Y_fit += [np.log(Y[i])]
+    # X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
+    # # fitting
+    # fitting_results = np.polyfit(X_fit, Y_fit, 1, full = True)
+    # # evaluate quality of fit
+    # m, b = fitting_results[0]
+    # SSE = fitting_results[1][0]
+    # diff = Y_fit - Y_fit.mean()
+    # square_diff = diff ** 2
+    # SST = square_diff.sum()
+    # R2 = 1 - SSE/SST
+    # print(R2)
+
     subfig2.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "blue", label = "QT data")
-    # Y_fitted = [expFunc(x, A, k, x_0, y_0) for x in X_fit]
     Y_fitted = [np.exp(m * x + b) for x in X_fit]
-    subfig2.plot(X_fit, Y_fitted, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "red", label = "exp fit")
+    subfig2.plot(X_fit, Y_fitted, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "red", label = "exp fit, R = " + str(R2))
     #subfig2.set_xlabel(r'T in $k_B$ / $J_2$', fontsize = 25)
     subfig2.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
     subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
@@ -81,12 +129,13 @@ if __name__ == "__main__":
     for N, c in N_color:
         print("N = " + N)
         # QT results
+        print("QT (exp fit)")
         lbl = "QT (exp fit): N = " + N
         X = []; Y = []
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
             if filename[len(filename)-6:] != "QT.txt": continue
             J = filename[len("X_J"):-len("QT.txt")]
-            # print(J)
+            print(J)
             A, k, x_0, y_0 = get_spin_gap(N, J, filename)
             # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
             X += [float(J)]
@@ -94,6 +143,7 @@ if __name__ == "__main__":
         X, Y = sort_data(X, Y)
         subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = c, label = lbl)
         # ED results exp fit
+        print("ED (exp fit)")
         lbl = "ED (exp fit): N = " + N
         X = []; Y = []
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
