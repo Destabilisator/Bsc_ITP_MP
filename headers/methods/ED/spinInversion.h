@@ -17,6 +17,15 @@
 /////////////////////////////// spin inversion ///////////////////////////////
 
 namespace ED::spinInversion {
+    double get_gk(int k, int N);
+
+    int getClass_set_m_n(int &m, int &n, const int &mp, const int &mz, const int &mpz);
+
+    double getNa(const int &m, const int &n, const unsigned int &R, const int &sigma, const int &p, const int &z, const int &k, const int &c, const int &N);
+
+    double helement(const int &a, const int &b, const int &l, const int &q, const int &g, const int &k, const int &p,
+                    const int &z, const std::vector<int> &R_vals, const std::vector<int> &m_vals,
+                    const std::vector<int> &n_vals, const std::vector<int> &c_vals, int N);
 
     void fillHamiltonSIBlock(const double &J1, const double &J2, const double &h, int k, int p, int z, const std::vector<int> &states,
                              const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,

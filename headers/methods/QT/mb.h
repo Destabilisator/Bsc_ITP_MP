@@ -19,13 +19,13 @@ namespace QT::MB {
 
     typedef std::tuple<int, int, Eigen::SparseMatrix<double>> matrixDataMomentumType; // m, matrix
     typedef std::tuple<int, int, std::vector<int>, std::vector<int>> indexStateVectorType; // m, states,
-    typedef Eigen::SparseMatrix<double> matrixType;
+    typedef Eigen::SparseMatrix<std::complex<double>> matrixType;
 
     std::vector<Eigen::VectorXcd> getVector(const std::vector<matrixType> &matrixBlocks);
 
     std::vector<matrixType> getHamilton(const double &J1, const double &J2, const int &N, const int &SIZE);
 
-    Eigen::MatrixXd fillHamiltonBlock(const double &J1, const double &J2, const std::vector<int> &states, const int &N);
+    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const std::vector<int> &states, const int &N);
 
     std::vector<matrixType> getS2(const double &J1, const double &J2, const int &N, const int &SIZE);
 

@@ -2,6 +2,7 @@
 #include <vector>
 #include <complex>
 #include "Eigen/Eigenvalues"
+#include <omp.h>
 #include <mutex>
 #include <thread>
 #include <chrono>
@@ -67,5 +68,10 @@ namespace ED::multi {
 
     void start_SpinGap_with_index(const int &COUNT, const double &START, const double &END,
                                   int &cores, const int &N, const int &SIZE);
+
+
+    void startSusceptibilityMultiJ(const double &J_START, const double &J_END, const int &J_COUNT,
+                                   const double &BETA_START, const double &BETA_END, const double &BETA_COUNT,
+                                   const int &N, const int &SIZE);
 
 }

@@ -46,7 +46,7 @@ namespace QT::MB {
         for (int m = 0; m <= N; m++) {
 //            if (m != N/2) { continue;}
             if (states.at(m).empty()) {continue;}
-            Eigen::MatrixXd Mtrx = fillHamiltonBlock(J1, J2, states.at(m), N);
+            Eigen::MatrixXcd Mtrx = fillHamiltonBlock(J1, J2, states.at(m), N);
             matList.emplace_back(Mtrx.sparseView());
         }
 
@@ -55,10 +55,10 @@ namespace QT::MB {
 
     }
 
-    Eigen::MatrixXd fillHamiltonBlock(const double &J1, const double &J2, const std::vector<int> &states, const int &N) {
+    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const std::vector<int> &states, const int &N) {
 
         const int statesCount = (int) states.size();
-        Eigen::MatrixXd hamiltonBlock = Eigen::MatrixXd::Zero(statesCount,statesCount);
+        Eigen::MatrixXcd hamiltonBlock = Eigen::MatrixXcd::Zero(statesCount,statesCount);
 
         for (int a = 0; a < statesCount; a++) {
             int s = states.at(a);
@@ -114,7 +114,7 @@ namespace QT::MB {
         for (int m = 0; m <= N; m++) {
 //            if (m != N/2) { continue;}
             if (states.at(m).empty()) {continue;}
-            Eigen::MatrixXd Mtrx = ED::spinMatrix(N, states.at(m));//fillS2Block(N, states.at(m));
+            Eigen::MatrixXcd Mtrx = ED::spinMatrix(N, states.at(m));//fillS2Block(N, states.at(m));
             matList.emplace_back(Mtrx.sparseView());
         }
 

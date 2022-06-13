@@ -20,6 +20,7 @@ namespace QT::hlp {
         return v;
 
     }
+
 /*
     std::vector<Eigen::VectorXcd> getVector(const int &N, const int &SIZE, const std::vector<matrixDataMomentumType> &matrixBlocks) {
 
@@ -46,7 +47,8 @@ namespace QT::hlp {
 
     }
 */
-    std::vector<Eigen::VectorXcd> getVector(const std::vector<matrixType> &matrixBlocks) {
+
+    std::vector<Eigen::VectorXcd> getVector(const std::vector<matrixTypeComplex> &matrixBlocks) {
 
         // random number generation
         std::random_device rd{};
@@ -56,7 +58,7 @@ namespace QT::hlp {
         std::vector<Eigen::VectorXcd> vectors;
 
         // fill vector
-        for (const matrixType &block : matrixBlocks) {
+        for (const matrixTypeComplex &block : matrixBlocks) {
             int size = (int) block.rows();
             Eigen::VectorXcd v = Eigen::VectorXcd::Zero(size);
             for (int i = 0; i < size; i++) {
@@ -71,13 +73,47 @@ namespace QT::hlp {
 
     }
 
+    std::vector<Eigen::VectorXd> getVector(const std::vector<matrixTypeReal> &matrixBlocks) {
+
+        // random number generation
+        std::random_device rd{};
+        std::mt19937 gen{rd()};
+        std::normal_distribution<> randNum{0,1};
+
+        std::vector<Eigen::VectorXd> vectors;
+
+        // fill vector
+        for (const matrixTypeReal &block : matrixBlocks) {
+            int size = (int) block.rows();
+            Eigen::VectorXd v = Eigen::VectorXd::Zero(size);
+            for (int i = 0; i < size; i++) {
+                v(i) = randNum(gen);
+            }
+            v.normalize();
+            vectors.push_back(v);
+//            std::cout << v << std::endl;
+        }
+
+        return vectors;
+
+    }
+
     /////////////////////////////// Runge-Kutta 4 ///////////////////////////////
 
-    Eigen::VectorXcd rungeKutta4Block(const Eigen::VectorXcd &vec, const Eigen::MatrixXcd &H, const double &step) {
+    Eigen::VectorXcd rungeKutta4Block(const Eigen::VectorXcd &vec, const matrixTypeComplex &H, const double &step) {
         Eigen::VectorXcd k1 = - 0.5 * H * vec;
         Eigen::VectorXcd k2 = - 0.5 * H * (vec + step * 0.5 * k1);
         Eigen::VectorXcd k3 = - 0.5 * H * (vec + step * 0.5 * k2);
         Eigen::VectorXcd k4 = - 0.5 * H * (vec + step * k3);
+
+        return vec + step / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
+    }
+
+    Eigen::VectorXd rungeKutta4Block(const Eigen::VectorXd &vec, const matrixTypeReal &H, const double &step) {
+        Eigen::VectorXd k1 = - 0.5 * H * vec;
+        Eigen::VectorXd k2 = - 0.5 * H * (vec + step * 0.5 * k1);
+        Eigen::VectorXd k3 = - 0.5 * H * (vec + step * 0.5 * k2);
+        Eigen::VectorXd k4 = - 0.5 * H * (vec + step * k3);
 
         return vec + step / 6.0 * (k1 + 2.0 * k2 + 2.0 * k3 + k4);
     }
@@ -115,10 +151,10 @@ namespace QT::hlp {
     ///// C /////
 
     std::vector<double> rungeKutta4_C(const double &start, const double &end, const double &step, const int &N,
-                                      const std::vector<matrixType> &matrixList) {
+                                      const std::vector<matrixTypeComplex> &matrixList) {
 
         std::vector<double> outData;
-        std::vector<Eigen::VectorXcd> vec = getVector(matrixList);
+        std:std::vector<Eigen::VectorXcd> vec = getVector(matrixList);
         int blockCount = (int) matrixList.size();
 
         double norm = 0.0;
@@ -134,13 +170,13 @@ namespace QT::hlp {
 
             beta += step;
             norm = 0.0;
-#if INNER_NESTED_THREADS > 1
-#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, matrixList, step, norm)
-#endif
+//#if INNER_NESTED_THREADS > 1
+//#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, matrixList, step, norm)
+//#endif
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), matrixList.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
-#pragma omp critical
+//#pragma omp critical
                 norm += normnt;
             }
 
@@ -153,11 +189,11 @@ namespace QT::hlp {
             std::vector<double> vec_H2_vec_List;
 
             //double C = 0.0;
-#if INNER_NESTED_THREADS > 1
-#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, matrixList, vec, vec_H_vec_List, vec_H2_vec_List)
-#endif
+//#if INNER_NESTED_THREADS > 1
+//#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, matrixList, vec, vec_H_vec_List, vec_H2_vec_List)
+//#endif
             for (int i = 0; i < blockCount; i++) {
-                const matrixType &H = matrixList.at(i);
+                const matrixTypeComplex &H = matrixList.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
                 double vHv = std::real((v.adjoint() * H * v)(0,0));
                 double vH2v = std::real((v.adjoint() * H * H * v)(0,0));
@@ -172,7 +208,7 @@ namespace QT::hlp {
 
             double H_diff = std::real(vec_H2_vec - std::pow(vec_H_vec, 2));
             double C = beta * beta * H_diff / (double) N;
-
+//#pragma omp critical
             outData.emplace_back(C);
 
         }
@@ -185,7 +221,7 @@ namespace QT::hlp {
     ///// X /////
 
     std::vector<double> rungeKutta4_X(const double &start, const double &end, const double &step, const int &N,
-                                      const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List) {
+                                      const std::vector<matrixTypeComplex> &H_List, const std::vector<matrixTypeComplex> &S2_List) {
 
         std::vector<double> outData;
         std::vector<Eigen::VectorXcd> vec = getVector(H_List);
@@ -206,13 +242,13 @@ namespace QT::hlp {
             norm = 0.0;
 
             // RK4 with vec on H to get new state
-#if INNER_NESTED_THREADS > 1
-#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
-#endif
+//#if INNER_NESTED_THREADS > 1
+//#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
+//#endif
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
-#pragma omp critical
+//#pragma omp critical
                 norm += normnt;
             }
 
@@ -224,14 +260,14 @@ namespace QT::hlp {
 
             std::vector<double> vec_S2_vec_List;
 
-#if INNER_NESTED_THREADS > 1
-#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
-#endif
+//#if INNER_NESTED_THREADS > 1
+//#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
+//#endif
             for (int i = 0; i < blockCount; i++) {
-                const matrixType &S2 = S2_List.at(i);
+                const matrixTypeComplex &S2 = S2_List.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
                 double vS2v = std::real((v.adjoint() * S2 * v)(0,0));
-#pragma omp critical
+//#pragma omp critical
                 vec_S2_vec_List.emplace_back(vS2v);
             }
 
@@ -251,7 +287,7 @@ namespace QT::hlp {
     ///// C and X /////
 
     std::vector<std::tuple<double, double>> rungeKutta4_CX(const double &start, const double &end, const double &step, const int &N,
-                                                           const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List) {
+                                                           const std::vector<matrixTypeComplex> &H_List, const std::vector<matrixTypeComplex> &S2_List) {
 
         std::vector<std::tuple<double, double>> outData;
         std::vector<Eigen::VectorXcd> vec = getVector(H_List);
@@ -272,13 +308,13 @@ namespace QT::hlp {
             norm = 0.0;
 
             // RK4 with vec on H to get new state
-#if INNER_NESTED_THREADS > 1
-#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
-#endif
+//#if INNER_NESTED_THREADS > 1
+//#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
+//#endif
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
-#pragma omp critical
+//#pragma omp critical
                 norm += normnt;
             }
 
@@ -292,21 +328,21 @@ namespace QT::hlp {
             std::vector<double> vec_H2_vec_List;
             std::vector<double> vec_S2_vec_List;
 
-#if INNER_NESTED_THREADS > 1
-#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, H_List, S2_List, vec, vec_S2_vec_List, vec_H_vec_List, vec_H2_vec_List)
-#endif
+//#if INNER_NESTED_THREADS > 1
+//#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, H_List, S2_List, vec, vec_S2_vec_List, vec_H_vec_List, vec_H2_vec_List)
+//#endif
             for (int i = 0; i < blockCount; i++) {
-                const matrixType &H = H_List.at(i);
-                const matrixType &S2 = S2_List.at(i);
+                const matrixTypeComplex &H = H_List.at(i);
+                const matrixTypeComplex &S2 = S2_List.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
                 double vS2v = std::real((v.adjoint() * S2 * v)(0,0));
                 double vHv = std::real((v.adjoint() * H * v)(0,0));
                 double vH2v = std::real((v.adjoint() * H * H * v)(0,0));
-#pragma omp critical
+//#pragma omp critical
                 vec_S2_vec_List.emplace_back(vS2v);
-#pragma omp critical
+//#pragma omp critical
                 vec_H_vec_List.emplace_back(vHv);
-#pragma omp critical
+//#pragma omp critical
                 vec_H2_vec_List.emplace_back(vH2v);
             }
 

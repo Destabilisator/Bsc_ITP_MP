@@ -56,11 +56,11 @@ fi
 #build=build
 build=cmake-build-release
 
-$pth plotting/deleteData.py $N SG
+#$pth plotting/deleteData.py $N SG
 ./$build/$prgm $N $START $END $COUNT $h $CORES $noX $SILENT
 echo ""
 echo "plotting for N = $N:"
-# $pth ./plotting/plot.py $N $show $noX
+$pth ./plotting/plot.py $N $show $noX
 
 elapsed=$(( SECONDS - start_time ))
 echo "all done, total elapsed time: $elapsed seconds"

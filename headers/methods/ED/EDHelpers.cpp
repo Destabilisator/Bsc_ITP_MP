@@ -377,6 +377,24 @@ namespace ED {
         file.close();
     }
 
+    void saveOutDataSilent(const std::string &filename, const std::string &header, const std::string &x_label,
+                           const std::string &y_label, const std::vector<std::tuple<double, double>> &outData, const int &N) {
+
+        std::ofstream file;
+        try {
+            file.open("./results/" + std::to_string(N) + "/data/" + filename);
+            file << header << "\n\n";
+            file << x_label << "\t" << y_label << "\n";
+            for (std::tuple<double, double> data : outData) {
+                file << std::get<0>(data) << "\t" << std::get<1>(data) << "\n";
+            }
+        } catch (...) {
+            file.close();
+            std::cout << "failed to save to file\n";
+        }
+        file.close();
+    }
+
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                      const std::string &y_label, const std::vector<std::tuple<int, double>> &outData, const int &N) {
 

@@ -12,7 +12,7 @@ namespace ED::spinInversion {
         }
     }
 
-    int getClass_set_m_n(int &m, int &n, const int mp, const int mz, const int mpz) {
+    int getClass_set_m_n(int &m, int &n, const int &mp, const int &mz, const int &mpz) {
 
         if (mp == -1 && mz == -1 && mpz == -1) {m = -1; n = -1; return 1;}
         else if (mp != -1 && mz == -1 && mpz == -1) {m = mp; n = -1; return 2;}
@@ -22,7 +22,7 @@ namespace ED::spinInversion {
 
     }
 
-    double getNa(const int m, const int n, const unsigned int R, const int sigma, const int p, const int z, const int k, const int c, const int N) {
+    double getNa(const int &m, const int &n, const unsigned int &R, const int &sigma, const int &p, const int &z, const int &k, const int &c, const int &N) {
 
         double k_moment = 4.0 * PI * (double) k / (double) N;
         double Na = 2.0 * (double) pow(N, 2) / get_gk(k, N) / (double) R;
@@ -52,8 +52,9 @@ namespace ED::spinInversion {
 
     }
 
-    double helement(const int a, const int b, const int l, const int q, const int g, const int k, const int p, const int z, const std::vector<int> &R_vals,
-                    const std::vector<int> &m_vals, const std::vector<int> &n_vals, const std::vector<int> &c_vals, int N) {
+    double helement(const int &a, const int &b, const int &l, const int &q, const int &g, const int &k, const int &p,
+                    const int &z, const std::vector<int> &R_vals, const std::vector<int> &m_vals,
+                    const std::vector<int> &n_vals, const std::vector<int> &c_vals, int N) {
 
         // state b
         int sigma_a = R_vals.at(a) / abs(R_vals.at(a));
@@ -119,8 +120,8 @@ namespace ED::spinInversion {
     }
 
     void fillHamiltonSIBlock(const double &J1, const double &J2, const double &h, int k, int p, int z, const std::vector<int> &states,
-                                 const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
-                                 const std::vector<int> &c_vals, Eigen::MatrixXd &hamiltonBlock, const int &N) {
+                             const std::vector<int> &R_vals, const std::vector<int> &m_vals, const std::vector<int> &n_vals,
+                             const std::vector<int> &c_vals, Eigen::MatrixXd &hamiltonBlock, const int &N) {
 
         int statesCount = (int) states.size();
 

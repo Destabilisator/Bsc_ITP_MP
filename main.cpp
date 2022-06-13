@@ -17,7 +17,8 @@ int main(int argc, char* argv[]) {
                   h, h_START, h_END, h_COUNT,
                   silent, cores, plotsIn3D, true, J1, J2, noX);
 
-    omp_set_num_threads(OUTERMOST_NESTED_THREADS * OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
+    omp_set_num_threads(cores);
+    //omp_set_num_threads(OUTERMOST_NESTED_THREADS * OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
     omp_set_nested(1);
 
     std::cout << "N: " << N << "; size: " << SIZE << "\n";
@@ -126,10 +127,10 @@ int main(int argc, char* argv[]) {
 
     /// X ///
 //    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
-//        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
+//        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, 1);
 //    }
-
-//    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, SAMPLES);
+//
+//    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 1);
 //    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
 //    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
@@ -147,7 +148,9 @@ int main(int argc, char* argv[]) {
 
 
     /// spin gap ///
-    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, 0.0, 50, stepsize, N, SIZE, 5);
+    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, 0.0, 50, stepsize, N, SIZE, 1);
+    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, 0.0, 50, T_COUNT, N, SIZE);
     ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
 #endif

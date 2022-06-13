@@ -592,4 +592,84 @@ namespace ED::multi {
 
     }
 
+    void startSusceptibilityMultiJ(const double &J_START, const double &J_END, const int &J_COUNT,
+                                   const double &BETA_START, const double &BETA_END, const double &BETA_COUNT,
+                                   const int &N, const int &SIZE) {
+
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "susceptibility (momentum states): calculating..." << std::endl;
+
+        ///// gather x-data /////
+        std::vector<double> beta_Data;
+        for (int i = 0; i <= BETA_COUNT; i++) {
+            double current = BETA_START + (BETA_END - BETA_START) * i / BETA_COUNT;
+            beta_Data.emplace_back(current);
+        } beta_Data.shrink_to_fit();
+
+        // init progressbar
+        int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
+
+        ///// susceptibility /////
+
+#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, coutMutex, BETA_START, BETA_END, BETA_COUNT, curr, prgbar_segm, std::cout, beta_Data)
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+
+            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+
+            std::vector<std::vector<std::complex<double>>> eiVals;
+            std::vector<Eigen::MatrixXcd> matrixBlockU;
+            std::vector<Eigen::MatrixXcd> matrixBlockS2;
+            momentumStates::getEiValsZeroBlock(J, 1.0, eiVals, matrixBlockU, matrixBlockS2, N, SIZE);
+
+            std::vector<std::tuple<double, double>> susceptibility_magnetization;
+
+            std::vector<Eigen::MatrixXcd> Blocks_U_inv_S2_U;
+            for (int i = 0; i < matrixBlockU.size(); i++) {
+                Eigen::MatrixXcd M = matrixBlockU.at(i).adjoint() * matrixBlockS2.at(i) * matrixBlockU.at(i);
+                Blocks_U_inv_S2_U.push_back(M);
+            }
+
+            for (double beta : beta_Data) {
+                susceptibility_magnetization.emplace_back(beta, getSusceptibilityDegeneracy(beta, Blocks_U_inv_S2_U, eiVals, N));
+            }
+
+            ///// save /////
+
+            saveOutDataSilent("/spin_gap_data/X_J" + std::to_string(J) + "ED.txt",
+                              "\n", "J1/J2", "specific heat in J2", susceptibility_magnetization, N);
+
+            // progressbar
+            coutMutex.lock();
+            int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < prgbar_segm; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+            std::cout.flush();
+            curr++;
+            coutMutex.unlock();
+
+        }
+
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+    }
+
 }

@@ -92,6 +92,10 @@ namespace ED {
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                      const std::string &y_label, const std::vector<std::tuple<double, double>> &outData, const int &N);
 
+    // no cmd output
+    void saveOutDataSilent(const std::string &filename, const std::string &header, const std::string &x_label,
+                           const std::string &y_label, const std::vector<std::tuple<double, double>> &outData, const int &N);
+
     // saves a vector of tuples (int, double) to be processed by python
     void saveOutData(const std::string &filename, const std::string &header, const std::string &x_label,
                      const std::string &y_label, const std::vector<std::tuple<int, double>> &outData, const int &N);
