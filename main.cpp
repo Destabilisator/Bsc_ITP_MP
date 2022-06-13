@@ -81,6 +81,8 @@ int main(int argc, char* argv[]) {
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
 
+    ED::momentumStates::startSusceptibility(1.0, 1.0, 18, (int) std::pow(2, 18), T_START, T_END, T_COUNT);
+
 //    ED::momentumStates::start(J1, J2, h, N, SIZE);
 
 //    ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, cores, T, N, SIZE);
@@ -145,7 +147,7 @@ int main(int argc, char* argv[]) {
 
 
     /// spin gap ///
-    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, 0.0, 50, stepsize, N, SIZE, OUTER_NESTED_THREADS);
+    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, 0.0, 50, stepsize, N, SIZE, 5);
     ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
 #endif

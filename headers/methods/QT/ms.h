@@ -1,7 +1,6 @@
 #include <iostream>
 #include <vector>
 #include <complex>
-#include <random>
 #include "Eigen/SparseCore"
 #include <omp.h>
 #include <mutex>
@@ -15,19 +14,12 @@
 
 namespace QT::MS {
 
-    static std::mutex coutMutex;
+    ///// typedef and global (within namespace) /////
 
+    static std::mutex coutMutex;
     typedef std::tuple<int, int, Eigen::SparseMatrix<std::complex<double>>> matrixDataMomentumType; // m, k, matrix
     typedef std::tuple<int, int, std::vector<int>, std::vector<int>> indexStateVectorType; // m, k, states, R_vals
     typedef Eigen::SparseMatrix<std::complex<double>> matrixType;
-
-    // generates normalized random Eigen::Vectors of a given size
-    Eigen::VectorXcd getVector(int size);
-
-    // generates normalized random Eigen::Vectors for each matrix block
-    std::vector<Eigen::VectorXcd> getVector(const int &N, const int &SIZE, const std::vector<matrixDataMomentumType> &matrixBlocks);
-
-    std::vector<Eigen::VectorXcd> getVector(const std::vector<matrixType> &matrixBlocks);
 
     ///// C /////
 
@@ -44,8 +36,7 @@ namespace QT::MS {
     Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                                        const std::vector<int> &R_vals, const int &N);
 
-    // fourth order Runge-Kutta to calculate beta dependency of the specific heat
-    std::vector<double> rungeKutta4_C(const double &start, const double &end, const double &step, const int &N, const std::vector<matrixType> &matrixList);
+    ///// C /////
 
     // calculate and save the specific heat as a function of temperature (beta)
     void start_calculation_C_J_const(const double &start, const double &end, const double &step, const double &J1,
@@ -58,24 +49,17 @@ namespace QT::MS {
 
     Eigen::MatrixXcd fillS2Block(const int &k, const std::vector<int> &states, const std::vector<int> &R_vals, const int &N);
 
-    // fourth order Runge-Kutta to calculate beta dependency of the susceptibility
-    std::vector<double> rungeKutta4_X(const double &start, const double &end, const double &step, const int &N, const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List);
-
     // calculate and save the susceptibility as a function of temperature (beta)
     void start_calculation_X_J_const(const double &start, const double &end, const double &step,
                                      const double &J1, const double &J2, const int &N, const int &SIZE, const int &SAMPLES);
 
-    ///// C_X /////
-
-    // fourth order Runge-Kutta to calculate beta dependency of the specific heat and the susceptibility
-    std::vector<std::tuple<double, double>> rungeKutta4_CX(const double &start, const double &end, const double &step, const int &N,
-                                                           const std::vector<matrixType> &H_List, const std::vector<matrixType> &S2_List);
+    ///// C and X /////
 
     // calculate and save the specific heat and the susceptibility as a function of temperature (beta) with h = 0.0
     void start_calculation_CX_J_const(const double &start, const double &end, const double &step, const double &J1,
                                       const double &J2, const int &N, const int &SIZE, const int &SAMPLES);
 
-    ///// C_X /////
+    ///// spin gap /////
 
     // calculate and save the susceptibility as a function of temperature (beta) for multiple J1/J2
     void start_calc_spin_gap(const double &J_START, const double &J_END, const int &J_COUNT,
