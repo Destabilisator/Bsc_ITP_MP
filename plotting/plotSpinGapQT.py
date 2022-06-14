@@ -134,7 +134,8 @@ if __name__ == "__main__":
         print("N = " + N) + ":"
         # QT results
         print("QT (exp fit)...")
-        lbl = "QT (exp fit): N = " + N
+        #lbl = "QT (exp fit): N = " + N
+        lbl = "N = " + N
         X = []; Y = []
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
             if filename[len(filename)-6:] != "QT.txt": continue
@@ -161,7 +162,7 @@ if __name__ == "__main__":
                 X += [float(J)]
                 Y += [float(k)]
             X, Y = sort_data(X, Y)
-            subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, label = lbl, alpha = 0.5)
+            subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)#, label = lbl, alpha = 0.5)
             # ED results
             print("ED (dispersion)...")
             lbl = "ED : N = " + N
@@ -176,7 +177,7 @@ if __name__ == "__main__":
                 y = arr[1]
                 X += [float(x)]
                 Y += [float(y)]
-            subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl, alpha = 0.5)
+            subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, alpha = 0.4) #  label = lbl,
         
         print()
 
