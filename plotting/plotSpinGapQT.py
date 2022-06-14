@@ -5,10 +5,8 @@ import numpy as np
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown")]#, ("16", "purple")]#, ("18", "tomato")]
 N_color_HIGH = [("18", "tomato"), ("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
-
-N_color = [("6", "red")]
 
 peak_offset = 2000 #1500 # 1000
 fit_samples = 10
@@ -123,8 +121,8 @@ if __name__ == "__main__":
         regime = sys.argv[1]
         if regime == "low": N_color = N_color_LOW; print("low")
         elif regime == "high": N_color = N_color_HIGH; print("high")
-        else: print("default (wrong args)")
-    else: print("default (no args)")
+        else: N_color = N_color_LOW; print("default low (wrong args)")
+    else: N_color = N_color_LOW; print("default low (no args)")
 
     print("plotting spin gap ...")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
