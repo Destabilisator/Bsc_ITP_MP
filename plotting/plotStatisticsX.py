@@ -298,6 +298,6 @@ if __name__ == "__main__":
     plot_N_for_each_n_sigma(start, end)
     print()
     plot_delta_ED(start, end)
-    # print()
-    # plot_step_size(start, end)
+    print()
+    plot_step_size(start, end)
     print()
