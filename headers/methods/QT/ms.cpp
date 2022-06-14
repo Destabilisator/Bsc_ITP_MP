@@ -415,9 +415,11 @@ namespace QT::MS {
         std::vector<std::vector<double>> outDataC;
         std::vector<std::vector<double>> outDataX;
 
-#if OUTER_NESTED_THREADS > 1
-#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outDataC, outDataX)
-#endif
+
+//#if OUTER_NESTED_THREADS > 1
+//#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outDataC, outDataX)
+//#endif
+#pragma omp parallel for default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outDataC, outDataX)
         for (int s = 1; s <= SAMPLES; s++) {
             std::vector<std::tuple<double, double>> rawData = hlp::rungeKutta4_CX(start, end, step, N, H_List, S2_List);
             std::vector<double> rawDataC;

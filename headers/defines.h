@@ -4,7 +4,7 @@
 
 // nested multithreaded loops
 #define OUTERMOST_NESTED_THREADS 16
-#define OUTER_NESTED_THREADS 1
+#define OUTER_NESTED_THREADS 24
 #define INNER_NESTED_THREADS 1
 
 // ED data calculation

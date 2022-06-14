@@ -197,9 +197,9 @@ namespace QT::hlp {
                 const Eigen::VectorXcd &v = vec.at(i);
                 double vHv = std::real((v.adjoint() * H * v)(0,0));
                 double vH2v = std::real((v.adjoint() * H * H * v)(0,0));
-#pragma omp critical
+//#pragma omp critical
                 vec_H_vec_List.emplace_back(vHv);
-#pragma omp critical
+//#pragma omp critical
                 vec_H2_vec_List.emplace_back(vH2v);
             }
 

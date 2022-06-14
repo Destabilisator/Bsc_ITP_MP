@@ -5,8 +5,9 @@ import numpy as np
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown")]#, ("16", "purple")]#, ("18", "tomato")]
-N_color_HIGH = [("18", "tomato"), ("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
+no_ED = False
 
 peak_offset = 2000 #1500 # 1000
 fit_samples = 10
@@ -119,8 +120,8 @@ if __name__ == "__main__":
 
     if len(sys.argv) > 1:
         regime = sys.argv[1]
-        if regime == "low": N_color = N_color_LOW; print("low")
-        elif regime == "high": N_color = N_color_HIGH; print("high")
+        if regime == "low": N_color = N_color_LOW#; print("low regime")
+        elif regime == "high": N_color = N_color_HIGH; no_ED = True#; print("high regime")
         else: N_color = N_color_LOW; print("default low (wrong args)")
     else: N_color = N_color_LOW; print("default low (no args)")
 
@@ -130,9 +131,9 @@ if __name__ == "__main__":
     used_N = "N"
 
     for N, c in N_color:
-        print("N = " + N)
+        print("N = " + N) + ":"
         # QT results
-        print("QT (exp fit)")
+        print("QT (exp fit)...")
         lbl = "QT (exp fit): N = " + N
         X = []; Y = []
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
@@ -145,35 +146,39 @@ if __name__ == "__main__":
             Y += [float(k)]
         X, Y = sort_data(X, Y)
         subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = c, label = lbl)
-        # ED results exp fit
-        print("ED (exp fit)")
-        lbl = "ED (exp fit): N = " + N
-        X = []; Y = []
-        for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
-            if filename[len(filename)-6:] != "ED.txt": continue
-            J = filename[len("X_J"):-len("ED.txt")]
-            # print(J)
-            A, k, x_0, y_0 = get_spin_gap(N, J, filename)
-            # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
-            X += [float(J)]
-            Y += [float(k)]
-        X, Y = sort_data(X, Y)
-        subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, label = lbl, alpha = 0.5)
-        # ED results
-        print("ED (dispersion)")
-        lbl = "ED : N = " + N
-        X = []; Y = []
-        file = open("results/" + N + "/data/data_spin_gap.txt", 'r') # _data_spin_gap / _data_spin_gap_with_index
-        lines = file.readlines()
-        lbl = "ED: N = " + N
-        X = []; Y = []
-        for i in range(7,len(lines)):
-            arr = lines[i].split("\t")
-            x = arr[0]
-            y = arr[1]
-            X += [float(x)]
-            Y += [float(y)]
-        subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl, alpha = 0.5)
+
+        if not no_ED:
+            # ED results exp fit
+            print("ED (exp fit)...")
+            lbl = "ED (exp fit): N = " + N
+            X = []; Y = []
+            for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
+                if filename[len(filename)-6:] != "ED.txt": continue
+                J = filename[len("X_J"):-len("ED.txt")]
+                # print(J)
+                A, k, x_0, y_0 = get_spin_gap(N, J, filename)
+                # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
+                X += [float(J)]
+                Y += [float(k)]
+            X, Y = sort_data(X, Y)
+            subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, label = lbl, alpha = 0.5)
+            # ED results
+            print("ED (dispersion)...")
+            lbl = "ED : N = " + N
+            X = []; Y = []
+            file = open("results/" + N + "/data/data_spin_gap.txt", 'r') # _data_spin_gap / _data_spin_gap_with_index
+            lines = file.readlines()
+            lbl = "ED: N = " + N
+            X = []; Y = []
+            for i in range(7,len(lines)):
+                arr = lines[i].split("\t")
+                x = arr[0]
+                y = arr[1]
+                X += [float(x)]
+                Y += [float(y)]
+            subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl, alpha = 0.5)
+        
+        print()
 
         used_N += "_" + N
 
