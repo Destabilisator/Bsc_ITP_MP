@@ -31,14 +31,13 @@ else
 	pth=python3
 fi
 
-
-$pth plotting/deleteData.py 6 SG
+#$pth plotting/deleteData.py 6 SG
 ./$build/$prgm 6 $start $end 48 $h -1 $noX silent && echo ""
-$pth plotting/deleteData.py 8 SG
+#$pth plotting/deleteData.py 8 SG
 ./$build/$prgm 8 $start $end 48 $h -1 $noX silent && echo ""
-$pth plotting/deleteData.py 10 SG
+#$pth plotting/deleteData.py 10 SG
 ./$build/$prgm 10 $start $end 48 $h -1 $noX silent && echo ""
-$pth plotting/deleteData.py 12 SG
+#$pth plotting/deleteData.py 12 SG
 ./$build/$prgm 12 $start $end 48 $h -1 $noX silent && echo ""
 ./$build/$prgm 14 $start $end 48 $h -1 $noX silent && echo ""
 ./$build/$prgm 16 $start $end 48 $h -1 $noX silent && echo ""
