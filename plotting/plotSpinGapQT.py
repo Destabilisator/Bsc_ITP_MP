@@ -5,7 +5,7 @@ import numpy as np
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("10", "green"), ("12", "magenta"), ("14", "brown")]#, ("16", "purple"), ("18", "tomato")] # ("6", "red"), ("8", "blue"), 
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 no_ED = False
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     used_N = "N"
 
     for N, c in N_color:
-        print("N = " + N) + ":"
+        print("N = " + N + ":") 
         # QT results
         print("QT (exp fit)...")
         #lbl = "QT (exp fit): N = " + N

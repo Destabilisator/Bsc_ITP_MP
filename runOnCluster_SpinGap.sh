@@ -44,9 +44,9 @@ if [[ "$regime" == "low" ]]; then
 	$pth plotting/deleteData.py 14 SG
 	./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo "" # 50
 	$pth plotting/deleteData.py 16 SG
-	./$build/$prgm 16 $start $end 50 $h 4 $noX silent && echo ""
+	./$build/$prgm 16 $start $end 50 $h 1 $noX silent && echo ""
 	$pth plotting/deleteData.py 18 SG
-	./$build/$prgm 18 $start $end 25 $h 2 $noX silent && echo ""
+	./$build/$prgm 18 $start $end 25 $h 1 $noX silent && echo ""
 	$pth plotting/plotSpinGapQT.py $regime && echo "" && echo ""
 elif [[ "$regime" == "high" ]]; then
 	echo "high regime" && echo ""
