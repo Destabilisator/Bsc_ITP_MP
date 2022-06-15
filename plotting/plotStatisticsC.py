@@ -268,7 +268,8 @@ def plot_step_size(start: float, end: float):
         filenum = 0
         used_step_sizes = ""
         for filename in os.listdir("results/" + N + "/data/step_size_data/"):
-            if "data_specific_heat_J_const_QT_step" in filename:
+            if "data_specific_heat_J_const_QT_step" in filename and "_data_specific_heat_J_const_QT_step" not in filename:
+                # print(filename)
                 stepsize = filename[len("data_specific_heat_J_const_QT_step"): - len(".txt")]
                 file = open("results/" + N + "/data/step_size_data/data_specific_heat_J_const_QT_step" + stepsize + ".txt", 'r')
                 lines = file.readlines()

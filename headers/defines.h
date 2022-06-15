@@ -2,7 +2,7 @@
 #define EPSILON 1e-10
 //#define fixedPrecision // remove if not debug
 
-// nested multithreaded loops
+// nested multithreading loops
 #define OUTERMOST_NESTED_THREADS 16
 #define OUTER_NESTED_THREADS 24
 #define INNER_NESTED_THREADS 1
