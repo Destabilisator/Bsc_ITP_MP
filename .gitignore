@@ -46,6 +46,10 @@ results/*/data/spin_gap_data/*.txt
 results/*/data/spin_gap_data/*.png
 !results/*/data/spin_gap_data/data_placeholder.txt
 
+results/*/data/spin_gap_data/*/*.txt
+results/*/data/spin_gap_data/*/*.png
+!results/*/data/spin_gap_data/*/data_placeholder.txt
+
 results/*/data/excitation_energies_data/*.txt
 results/*/data/excitation_energies_data/*.png
 !results/*/data/excitation_energies_data/data_placeholder.txt
