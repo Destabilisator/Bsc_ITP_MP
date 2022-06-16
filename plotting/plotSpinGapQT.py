@@ -107,11 +107,10 @@ if __name__ == "__main__":
         else: N_color = N_color_LOW; print("default low (wrong args)")
     else: N_color = N_color_LOW; print("default low (no args)")
 
-    used_N = "N"
-
     for i in range(len(N_color)):
         print("plotting spin gap ...")
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+        used_N = "N"
         for j in range(i, len(N_color)):
             N, c = N_color [j]
     #for N, c in N_color:
