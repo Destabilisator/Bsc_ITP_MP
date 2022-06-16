@@ -40,7 +40,7 @@ fi
 # #$pth plotting/deleteData.py 12 SG
 # ./$build/$prgm 12 $start $end 48 $h -1 $noX silent && echo ""
 # ./$build/$prgm 14 $start $end 48 $h -1 $noX silent && echo ""
-# ./$build/$prgm 16 $start $end 48 $h -1 $noX silent && echo ""
+./$build/$prgm 16 $start $end 48 $h -1 $noX silent && echo ""
 ./$build/$prgm 18 $start $end 48 $h 24 $noX silent && echo ""
 
 # $pth plotting/plotStatisticsC.py 0 $plotend low && echo "" && echo ""
