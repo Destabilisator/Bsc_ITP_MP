@@ -43,14 +43,14 @@ fi
 # ./$build/$prgm 16 $start $end 48 $h -1 $noX silent && echo ""
 ./$build/$prgm 18 $start $end 48 $h 24 $noX silent && echo ""
 
-$pth plotting/plotStatisticsC.py 0 $plotend low && echo "" && echo ""
-$pth plotting/plotStatisticsX.py 0 $plotend low
-$pth plotting/plotSpinGapQT.py low && echo "" && echo ""
+# $pth plotting/plotStatisticsC.py 0 $plotend low && echo "" && echo ""
+# $pth plotting/plotStatisticsX.py 0 $plotend low
+# $pth plotting/plotSpinGapQT.py low && echo "" && echo ""
 
-./$build/$prgm 20 $start $end 48 $h 12 $noX silent && echo ""
-./$build/$prgm 22 $start $end 48 $h 12 $noX silent && echo ""
-./$build/$prgm 24 $start $end 48 $h 6 $noX silent && echo ""
-./$build/$prgm 26 $start $end 48 $h 6 $noX silent && echo ""
+# ./$build/$prgm 20 $start $end 48 $h 12 $noX silent && echo ""
+./$build/$prgm 22 $start $end 48 $h 6 $noX silent && echo ""
+./$build/$prgm 24 $start $end 48 $h 3 $noX silent && echo ""
+./$build/$prgm 26 $start $end 48 $h 1 $noX silent && echo ""
 # ./$build/$prgm 28 $start $end 20 $h -1 $noX silent && echo ""
 # ./$build/$prgm 30 $start $end 20 $h -1 $noX silent && echo ""
 # ./$build/$prgm 32 $start $end 20 $h -1 $noX silent && echo ""
