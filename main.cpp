@@ -17,7 +17,7 @@ int main(int argc, char* argv[]) {
                   h, h_START, h_END, h_COUNT,
                   silent, cores, plotsIn3D, true, J1, J2, noX);
 
-    omp_set_num_threads(cores);
+    omp_set_num_threads(cpu_cnt);
     //omp_set_num_threads(OUTERMOST_NESTED_THREADS * OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
     omp_set_nested(1);
 
@@ -164,7 +164,7 @@ int main(int argc, char* argv[]) {
 //    if (N > 20) {
         T_START = 0.0; T_END = 50.0;
         T_COUNT =  (int) ( (T_END - T_START) / stepsize );
-        QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, 1);
+        QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, 5, cores);
 //        if (N <= 18) {
 //            ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
 //            ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);

@@ -508,7 +508,7 @@ namespace QT::MS {
 
     void start_calc_spin_gap(const double &J_START, const double &J_END, const int &J_COUNT,
                              const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
-                             const int &N, const int &SIZE, const int &SAMPLES) {
+                             const int &N, const int &SIZE, const int &SAMPLES, const int &cores) {
 
         auto start_timer = std::chrono::steady_clock::now();
         std::cout << "\n" << "spin gap, QT, momentum states, N: " << N << ", step size: " << BETA_STEP << " ..." << std::endl;
@@ -542,6 +542,12 @@ namespace QT::MS {
                 matrixTypeComplex S2_mat(matSize,matSize);
                 S2_mat.setFromTriplets(S2_MtrxLst.begin(), S2_MtrxLst.end());
                 S2_List.emplace_back(S2_mat);
+//                if (!S2_mat.isApprox(ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower),
+//                                                       R_vals.at(m).at(k - k_lower)))) {
+//                    std::cout << "ALARM!!!\n";
+//                }
+                std::cout << Eigen::MatrixXcd(S2_mat) << std::endl;
+                std::cout << ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower)) << std::endl << std::endl;;
             }
         }
 
@@ -571,23 +577,27 @@ namespace QT::MS {
 //#if OUTERMOST_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(OUTERMOST_NESTED_THREADS) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
 //#endif
-//#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
-        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+//#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
+        for (int J_pos = 0; J_pos <= J_COUNT; J_pos++) {
             double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
-            std::vector<std::vector<double>> rawDataX;
+//            std::vector<std::vector<double>> rawDataX;
 //#if OUTER_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, rawDataX, beta_Data, N, SIZE)
 //#endif
-//            for (int s = 1; s <= SAMPLES; s++) {
-            std::vector<double> rawData = hlp::rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
-            rawDataX.emplace_back(rawData);
-//            }
-            // save data (silent)
-            rawDataX.shrink_to_fit();
-            hlp::saveAvgData("./results/" + std::to_string(N) + "/data/spin_gap_data/X_J" + std::to_string(J) + "QT.txt",
-                             "samples: " + std::to_string(SAMPLES) + "\n",
-                             "beta in kb / J2", "X in J2", beta_Data, rawDataX, N);
+//#pragma omp parallel for num_threads(SAMPLES) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J)
+            for (int s = 1; s <= SAMPLES; s++) {
+                std::vector<double> rawData = hlp::rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
+//                rawDataX.emplace_back(rawData);
+
+                // save data (silent)  "./results/" + std::to_string(N) + "/data/" + filename
+//                rawDataX.shrink_to_fit();
+                hlp::saveOutDataSilent(
+                        "spin_gap_data/" + std::to_string(s) + "/X_J" + std::to_string(J) + "QT.txt",
+                        "samples: " + std::to_string(1) + "\n",
+                        "beta in kb / J2", "X in J2", beta_Data, rawData, N);
+            }
+
             // progressbar
             coutMutex.lock();
             int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);

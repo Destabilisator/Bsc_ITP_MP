@@ -245,12 +245,12 @@ namespace QT::hlp {
 //#if INNER_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
 //#endif
-#pragma omp parallel for default(none) shared(blockCount, vec, H_List, step, norm)
+//#pragma omp parallel for default(none) shared(blockCount, vec, H_List, step, norm)
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
-                double normnt = std::pow(vec.at(i).norm(), 2);
-#pragma omp critical
-                norm += normnt;
+//                double normnt = std::pow(vec.at(i).norm(), 2);
+//#pragma omp critical
+                norm += std::pow(vec.at(i).norm(), 2);
             }
 
             // ensure norm(vec) = 1
@@ -264,12 +264,12 @@ namespace QT::hlp {
 //#if INNER_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
 //#endif
-#pragma omp parallel for default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
+//#pragma omp parallel for default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
             for (int i = 0; i < blockCount; i++) {
                 const matrixTypeComplex &S2 = S2_List.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
                 double vS2v = std::real((v.adjoint() * S2 * v)(0,0));
-#pragma omp critical
+//#pragma omp critical
                 vec_S2_vec_List.emplace_back(vS2v);
             }
 
@@ -295,9 +295,9 @@ namespace QT::hlp {
             for (int j = 0; j < N; j++) {
                 for (int i = 0; i < j; i++) {
                     if (((s >> i) & 1) == ((s >> j) & 1)) {
-                        S2.emplace_back(Trp(a, a, 0.5));
+                        S2.emplace_back(Trp(a, a, std::complex<double>(0.5, 0.0)));
                     } else {
-                        S2.emplace_back(Trp(a, a, - 0.5));
+                        S2.emplace_back(Trp(a, a, std::complex<double>(-0.5, 0.0)));
                         int d = s ^ (1 << i) ^ (1 << j);
                         int r = 0, l = 0;
                         ED::representative(d, &r, &l, N);
@@ -305,7 +305,7 @@ namespace QT::hlp {
                         if (b >= 0) {
                             std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
                             S2.emplace_back(Trp(a,b, (std::complex<double>) 1.0 * sqrt((double) R_vals.at(a)
-                                                                         / (double) R_vals.at(b)) * std::exp(numC)));
+                                                                         / (double) R_vals.at(b)) * std::exp(numC) ));
                         }
                     }
                 }
@@ -433,6 +433,24 @@ namespace QT::hlp {
             std::cout << "failed to save to file\n";
         }
         std::cout << "done\n";
+        file.close();
+    }
+
+    void saveOutDataSilent(const std::string &filename, const std::string &header, const std::string &x_lbl, const std::string &y_lbl,
+                           const std::vector<double> &xData, const std::vector<double> &yData, const int &N) {
+
+        std::ofstream file;
+        try {
+            file.open("./results/" + std::to_string(N) + "/data/" + filename);
+            file << header <<"\n\n";
+            file << x_lbl << "\t" << y_lbl << "\n";
+            for (int i = 0; i < xData.size(); i++) {
+                file << xData.at(i) << "\t" << yData.at(i) << "\n";
+            }
+        } catch (...) {
+            file.close();
+            std::cout << "failed to save to file\n";
+        }
         file.close();
     }
 

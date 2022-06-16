@@ -66,7 +66,7 @@ namespace QT::MS {
     // calculate and save the susceptibility as a function of temperature (beta) for multiple J1/J2
     void start_calc_spin_gap(const double &J_START, const double &J_END, const int &J_COUNT,
                              const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
-                             const int &N, const int &SIZE, const int &SAMPLES);
+                             const int &N, const int &SIZE, const int &SAMPLES, const int &cores);
 
     ///// excitation energies /////
 
