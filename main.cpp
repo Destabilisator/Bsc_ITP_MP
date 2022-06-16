@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
 //        for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) { // 1.0, 0.5 , 0.1, 0.05, 0.005, 0.001
 //            QT::MS::start_calculation_CX_J_const(T_START, T_END, ss, J1, J2, N, SIZE, 12);
 //        }
-        QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
+//        QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
 //    }
 
     /// spin gap ///

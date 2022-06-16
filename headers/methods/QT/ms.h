@@ -21,20 +21,21 @@ namespace QT::MS {
     typedef std::tuple<int, int, std::vector<int>, std::vector<int>> indexStateVectorType; // m, k, states, R_vals
     typedef Eigen::SparseMatrix<std::complex<double>> matrixTypeComplex;
     typedef Eigen::VectorXcd vectorTypeComplex;
+    typedef Eigen::Triplet<std::complex<double>> Trp;
 
     ///// hamilton /////
-
+/*
     // returns the MS as a complex SparseMatrix with indices (m, k, H_block)
     std::vector<matrixDataMomentumType> getIndexAndHamilton(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE);
-
+*/
     // returns the MS as a complex SparseMatrix
     std::vector<matrixTypeComplex> getHamilton(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE);
-
+/*
     // returns a vector with (m, k, states, R_vals)
     std::vector<indexStateVectorType> getIndexAndStates(const int &N, const int &SIZE);
-
+*/
     // fills the M,k blocks of the MS
-    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
+    std::vector<Trp> fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                                        const std::vector<int> &R_vals, const int &N);
 
     ///// C /////

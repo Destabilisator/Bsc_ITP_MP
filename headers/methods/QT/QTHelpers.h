@@ -14,12 +14,14 @@
 
 #include "defines.h"
 #include "helpers.h"
+#include "methods/ED/EDHelpers.h"
 
 namespace QT::hlp {
 
     ///// typedef /////
     typedef Eigen::SparseMatrix<std::complex<double>> matrixTypeComplex;
     typedef Eigen::SparseMatrix<double> matrixTypeReal;
+    typedef Eigen::Triplet<std::complex<double>> Trp;
 
     ///// random vectors /////
 
@@ -54,6 +56,9 @@ namespace QT::hlp {
     // fourth order Runge-Kutta to calculate beta dependency of the susceptibility
     std::vector<double> rungeKutta4_X(const double &start, const double &end, const double &step, const int &N,
                                       const std::vector<matrixTypeComplex> &H_List, const std::vector<matrixTypeComplex> &S2_List);
+
+    // returns the Matrix S^2 for a given set of momentum states
+    std::vector<Trp> spinMatrixMomentum(const int &N, const int &k, const std::vector<int> &states, const std::vector<int> &R_vals);
 
     ///// C and X /////
 

@@ -5,7 +5,7 @@
 namespace QT::MS {
 
     ///// hamilton /////
-
+/*
     std::vector<indexStateVectorType> getIndexAndStates(const int &N, const int &SIZE) {
 
         std::vector<std::tuple<int, int, std::vector<int>, std::vector<int>>> indexAndStates;
@@ -82,7 +82,7 @@ namespace QT::MS {
         return matList;
 
     }
-
+*/
     std::vector<matrixTypeComplex> getHamilton(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE) {
 
         int k_lower = -(N + 2) / 4 + 1;
@@ -108,9 +108,12 @@ namespace QT::MS {
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
                 if (states.at(m).at(k - k_lower).empty()) {continue;}
-                Eigen::MatrixXcd Mtrx = fillHamiltonBlock(J1, J2, h, k, states.at(m).at(k - k_lower),
+                std::vector<Trp> MtrxLst = fillHamiltonBlock(J1, J2, h, k, states.at(m).at(k - k_lower),
                                                           R_vals.at(m).at(k - k_lower), N);
-                matList.emplace_back(Mtrx.sparseView());
+                int matSize = (int) R_vals.at(m).at(k - k_lower).size();
+                matrixTypeComplex mat(matSize,matSize);
+                mat.setFromTriplets(MtrxLst.begin(), MtrxLst.end());
+                matList.emplace_back(mat);
             }
         }
 
@@ -119,16 +122,18 @@ namespace QT::MS {
 
     }
 
-    Eigen::MatrixXcd fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
+    std::vector<Trp> fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                                        const std::vector<int> &R_vals, const int &N) {
 
         const int statesCount = (int) states.size();
-        Eigen::MatrixXcd hamiltonBlock = Eigen::MatrixXcd::Zero(statesCount,statesCount);
+        std::vector<Trp> hamiltonBlock;
 
         for (int a = 0; a < statesCount; a++) {
             int s = states.at(a);
-            int mag = ED::bitSum(s, N) - N/2;
-            hamiltonBlock(a,a) += (double) mag * h;
+            if (h > 0.0) {
+                int mag = ED::bitSum(s, N) - N/2;
+                hamiltonBlock.emplace_back(Trp(a,a, (double) mag * h));
+            }
             for (int n = 0; n < N / 2; n++) {
                 // declaring indices
                 int j_0 = 2 * n;
@@ -136,45 +141,45 @@ namespace QT::MS {
                 int j_2 = (j_0 + 2) % N;
                 // applying H to state s
                 if (((s >> j_0) & 1) == ((s >> j_2) & 1)) {
-                    hamiltonBlock(a,a) += std::complex<double>(0.25 * J1, 0.0);
+                    hamiltonBlock.emplace_back(Trp(a,a, std::complex<double>(0.25 * J1, 0.0)));
                 } else {
-                    hamiltonBlock(a,a) -= std::complex<double>(0.25 * J1, 0.0);
+                    hamiltonBlock.emplace_back(Trp(a,a, - std::complex<double>(0.25 * J1, 0.0)));
                     int d = s ^ (1 << j_0) ^ (1 << j_2);
                     int r = 0, l = 0;
                     ED::representative(d, &r, &l, N);
                     int b = ED::findState(states, r);
                     if (b >= 0) {
                         std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
-                        hamiltonBlock(a,b) += (std::complex<double>) 0.5 * J1 * sqrt((double) R_vals.at(a)
-                                                                                     / (double) R_vals.at(b)) * std::exp(numC);
+                        hamiltonBlock.emplace_back(Trp(a,b, (std::complex<double>) 0.5 * J1 * sqrt((double) R_vals.at(a)
+                                                                                     / (double) R_vals.at(b)) * std::exp(numC)));
                     }
                 }
                 if (((s >> j_0) & 1) == ((s >> j_1) & 1)) {
-                    hamiltonBlock(a,a) += std::complex<double>(0.25 * J2, 0.0);
+                    hamiltonBlock.emplace_back(Trp(a,a, std::complex<double>(0.25 * J2, 0.0)));
                 } else {
-                    hamiltonBlock(a,a) -= std::complex<double>(0.25 * J2, 0.0);
+                    hamiltonBlock.emplace_back(Trp(a,a, - std::complex<double>(0.25 * J2, 0.0)));
                     int d = s ^ (1 << j_0) ^ (1 << j_1);
                     int r = 0, l = 0;
                     ED::representative(d, &r, &l, N);
                     int b = ED::findState(states, r);
                     if (b >= 0) {
                         std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
-                        hamiltonBlock(a,b) += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a)
-                                                                                     / (double) R_vals.at(b)) * std::exp(numC);
+                        hamiltonBlock.emplace_back(Trp(a,b, (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a)
+                                                                                     / (double) R_vals.at(b)) * std::exp(numC)));
                     }
                 }
                 if (((s >> j_1) & 1) == ((s >> j_2) & 1)) {
-                    hamiltonBlock(a,a) += std::complex<double>(0.25 * J2, 0.0);
+                    hamiltonBlock.emplace_back(Trp(a,a, std::complex<double>(0.25 * J2, 0.0)));
                 } else {
-                    hamiltonBlock(a,a) -= std::complex<double>(0.25 * J2, 0.0);
+                    hamiltonBlock.emplace_back(Trp(a,a, - std::complex<double>(0.25 * J2, 0.0)));
                     int d = s ^ (1 << j_1) ^ (1 << j_2);
                     int r = 0, l = 0;
                     ED::representative(d, &r, &l, N);
                     int b = ED::findState(states, r);
                     if (b >= 0) {
                         std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
-                        hamiltonBlock(a,b) += (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a)
-                                                                                     / (double) R_vals.at(b)) * std::exp(numC);
+                        hamiltonBlock.emplace_back(Trp(a,b, (std::complex<double>) 0.5 * J2 * sqrt((double) R_vals.at(a)
+                                                                                     / (double) R_vals.at(b)) * std::exp(numC)));
                     }
                 }
             }
@@ -289,11 +294,20 @@ namespace QT::MS {
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
                 if (states.at(m).at(k - k_lower).empty()) {continue;}
-                Eigen::MatrixXcd H_Mtrx = fillHamiltonBlock(J1, J2, 0.0, k, states.at(m).at(k - k_lower),
+                std::vector<Trp> H_MtrxLst = fillHamiltonBlock(J1, J2, 0.0, k, states.at(m).at(k - k_lower),
                                                           R_vals.at(m).at(k - k_lower), N);
-                Eigen::MatrixXcd S2_Mtrx = ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower));
-                H_List.emplace_back(H_Mtrx.sparseView());
-                S2_List.emplace_back(S2_Mtrx.sparseView());
+                std::vector<Trp> S2_MtrxLst = hlp::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower),
+                                                                     R_vals.at(m).at(k - k_lower));
+
+                int matSize = (int) R_vals.at(m).at(k - k_lower).size();
+
+                matrixTypeComplex H_mat(matSize,matSize);
+                H_mat.setFromTriplets(H_MtrxLst.begin(), H_MtrxLst.end());
+                H_List.emplace_back(H_mat);
+
+                matrixTypeComplex S2_mat(matSize,matSize);
+                S2_mat.setFromTriplets(S2_MtrxLst.begin(), S2_MtrxLst.end());
+                S2_List.emplace_back(S2_mat);
             }
         }
 
@@ -389,11 +403,20 @@ namespace QT::MS {
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
                 if (states.at(m).at(k - k_lower).empty()) {continue;}
-                Eigen::MatrixXcd H_Mtrx = fillHamiltonBlock(J1, J2, 0.0, k, states.at(m).at(k - k_lower),
-                                                            R_vals.at(m).at(k - k_lower), N);
-                Eigen::MatrixXcd S2_Mtrx = ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower));
-                H_List.emplace_back(H_Mtrx.sparseView());
-                S2_List.emplace_back(S2_Mtrx.sparseView());
+                std::vector<Trp> H_MtrxLst = fillHamiltonBlock(J1, J2, 0.0, k, states.at(m).at(k - k_lower),
+                                                               R_vals.at(m).at(k - k_lower), N);
+                std::vector<Trp> S2_MtrxLst = hlp::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower),
+                                                                      R_vals.at(m).at(k - k_lower));
+
+                int matSize = (int) R_vals.at(m).at(k - k_lower).size();
+
+                matrixTypeComplex H_mat(matSize,matSize);
+                H_mat.setFromTriplets(H_MtrxLst.begin(), H_MtrxLst.end());
+                H_List.emplace_back(H_mat);
+
+                matrixTypeComplex S2_mat(matSize,matSize);
+                S2_mat.setFromTriplets(S2_MtrxLst.begin(), S2_MtrxLst.end());
+                S2_List.emplace_back(S2_mat);
             }
         }
 
@@ -511,8 +534,14 @@ namespace QT::MS {
         for (int m = 0; m <= N; m++) {
             for (int k = k_lower; k <= k_upper; k++) {
                 if (states.at(m).at(k - k_lower).empty()) {continue;}
-                Eigen::MatrixXcd S2_Mtrx = ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower));
-                S2_List.emplace_back(S2_Mtrx.sparseView());
+                std::vector<Trp> S2_MtrxLst = hlp::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower),
+                                                                      R_vals.at(m).at(k - k_lower));
+
+                int matSize = (int) R_vals.at(m).at(k - k_lower).size();
+
+                matrixTypeComplex S2_mat(matSize,matSize);
+                S2_mat.setFromTriplets(S2_MtrxLst.begin(), S2_MtrxLst.end());
+                S2_List.emplace_back(S2_mat);
             }
         }
 
@@ -542,7 +571,7 @@ namespace QT::MS {
 //#if OUTERMOST_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(OUTERMOST_NESTED_THREADS) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
 //#endif
-#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
+//#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
         for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
             double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
@@ -550,10 +579,10 @@ namespace QT::MS {
 //#if OUTER_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, rawDataX, beta_Data, N, SIZE)
 //#endif
-            for (int s = 1; s <= SAMPLES; s++) {
-                std::vector<double> rawData = hlp::rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
-                rawDataX.emplace_back(rawData);
-            }
+//            for (int s = 1; s <= SAMPLES; s++) {
+            std::vector<double> rawData = hlp::rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
+            rawDataX.emplace_back(rawData);
+//            }
             // save data (silent)
             rawDataX.shrink_to_fit();
             hlp::saveAvgData("./results/" + std::to_string(N) + "/data/spin_gap_data/X_J" + std::to_string(J) + "QT.txt",

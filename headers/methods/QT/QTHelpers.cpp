@@ -245,10 +245,11 @@ namespace QT::hlp {
 //#if INNER_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, vec, H_List, step, norm)
 //#endif
+#pragma omp parallel for default(none) shared(blockCount, vec, H_List, step, norm)
             for (int i = 0; i < blockCount; i++) {
                 vec.at(i) = hlp::rungeKutta4Block(vec.at(i), H_List.at(i), step);
                 double normnt = std::pow(vec.at(i).norm(), 2);
-//#pragma omp critical
+#pragma omp critical
                 norm += normnt;
             }
 
@@ -263,11 +264,12 @@ namespace QT::hlp {
 //#if INNER_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(INNER_NESTED_THREADS) default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
 //#endif
+#pragma omp parallel for default(none) shared(blockCount, S2_List, vec, vec_S2_vec_List)
             for (int i = 0; i < blockCount; i++) {
                 const matrixTypeComplex &S2 = S2_List.at(i);
                 const Eigen::VectorXcd &v = vec.at(i);
                 double vS2v = std::real((v.adjoint() * S2 * v)(0,0));
-//#pragma omp critical
+#pragma omp critical
                 vec_S2_vec_List.emplace_back(vS2v);
             }
 
@@ -282,6 +284,35 @@ namespace QT::hlp {
         outData.shrink_to_fit();
         return outData;
 
+    }
+
+    std::vector<Trp> spinMatrixMomentum(const int &N, const int &k, const std::vector<int> &states, const std::vector<int> &R_vals) {
+
+        const int size = (int) states.size();
+        std::vector<Trp> S2;
+        for (int a = 0; a < size; a++) {
+            int s = states.at(a);
+            for (int j = 0; j < N; j++) {
+                for (int i = 0; i < j; i++) {
+                    if (((s >> i) & 1) == ((s >> j) & 1)) {
+                        S2.emplace_back(Trp(a, a, 0.5));
+                    } else {
+                        S2.emplace_back(Trp(a, a, - 0.5));
+                        int d = s ^ (1 << i) ^ (1 << j);
+                        int r = 0, l = 0;
+                        ED::representative(d, &r, &l, N);
+                        int b = ED::findState(states, r);
+                        if (b >= 0) {
+                            std::complex<double> numC(0.0, 4 * PI * (double) k * (double) l / (double) N);
+                            S2.emplace_back(Trp(a,b, (std::complex<double>) 1.0 * sqrt((double) R_vals.at(a)
+                                                                         / (double) R_vals.at(b)) * std::exp(numC)));
+                        }
+                    }
+                }
+            }
+        }
+        //std::cout << S2 << std::endl;
+        return S2;
     }
 
     ///// C and X /////

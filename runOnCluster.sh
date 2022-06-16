@@ -20,8 +20,8 @@ noX=-X
 #noX=noX
 
 start_time=$SECONDS
-build=build
-#build=cmake-build-release
+#build=build
+build=cmake-build-release
 
 if [[ "$OSTYPE" == "msys" ]]; then
 	prgm=Bsc_ITP_MP.exe
@@ -47,7 +47,7 @@ fi
 # $pth plotting/plotStatisticsX.py 0 $plotend low
 # $pth plotting/plotSpinGapQT.py low && echo "" && echo ""
 
-# ./$build/$prgm 20 $start $end 48 $h 12 $noX silent && echo ""
+./$build/$prgm 20 $start $end 48 $h 12 $noX silent && echo ""
 ./$build/$prgm 22 $start $end 48 $h 6 $noX silent && echo ""
 ./$build/$prgm 24 $start $end 48 $h 3 $noX silent && echo ""
 ./$build/$prgm 26 $start $end 48 $h 1 $noX silent && echo ""
@@ -55,7 +55,7 @@ fi
 # ./$build/$prgm 30 $start $end 20 $h -1 $noX silent && echo ""
 # ./$build/$prgm 32 $start $end 20 $h -1 $noX silent && echo ""
 
-$pth plotting/plotSpinGapQT.py high && echo "" && echo ""
+#$pth plotting/plotSpinGapQT.py high && echo "" && echo ""
 
 elapsed=$(( SECONDS - start_time ))
 echo "all done, total elapsed time: $elapsed seconds"
