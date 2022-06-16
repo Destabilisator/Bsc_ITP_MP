@@ -67,4 +67,11 @@ namespace QT::MS {
                              const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
                              const int &N, const int &SIZE, const int &SAMPLES);
 
+    ///// excitation energies /////
+
+    // calculate and save the specific heat as a function of temperature (beta) for multiple J1/J2
+    void start_calc_excitation_energies(const double &J_START, const double &J_END, const int &J_COUNT,
+                                        const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
+                                        const int &N, const int &SIZE, const int &SAMPLES);
+
 }

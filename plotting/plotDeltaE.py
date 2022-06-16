@@ -8,7 +8,7 @@ print("plotting Delta E ...")
 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
 
 for N, c in N_color:
-    file = open("results/" + N + "_data_delta_E.txt", 'r')
+    file = open("results/" + N + "/data/data_delta_E.txt", 'r')
     lines = file.readlines()
     lbl = "N = " + N
     linesh = lines[1][len("h: "):-1]

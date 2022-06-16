@@ -137,39 +137,44 @@ int main(int argc, char* argv[]) {
 //    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
     /// C and X ///
-    if (N == 18) {
+//    if (N == 18) {
         // ED
-        T_COUNT =  (int) ( (T_END - T_START) / 0.01 );
+//        T_COUNT =  (int) ( (T_END - T_START) / 0.01 );
 //        if (N%4 == 0) {
 //            ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
 //        } else {
 //            ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
 //        }
-        ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//        ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
         // combined QT
 //        for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) { // 1.0, 0.5 , 0.1, 0.05, 0.005, 0.001
 //            QT::MS::start_calculation_CX_J_const(T_START, T_END, ss, J1, J2, N, SIZE, 12);
 //        }
-//        QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
-    }
+        QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
+//    }
 
     /// spin gap ///
 
-    if (N == 16) {
-        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
-        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
-    }
+//    if (N == 16) {
+//        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
+//        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+//    }
 
-    if (N > 20) {
+//    if (N > 20) {
         T_START = 0.0; T_END = 50.0;
         T_COUNT =  (int) ( (T_END - T_START) / stepsize );
         QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, 1);
-        if (N <= 18) {
-            ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
-            ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
-        }
-    }
+//        if (N <= 18) {
+//            ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
+//            ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+//        }
+//    }
+
+    /// excitation energies ///
+
+//    ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
+//    QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, 1);
 
 #endif
 

@@ -23,7 +23,7 @@ if which == "3D":
             shutil.rmtree("results/3DData/" + N + "/X/" + filename, ignore_errors=False, onerror=False)
         except:
             os.remove("results/" + N + "/X/" + filename)
-if which == "SG":
+elif which == "SG":
     print("removing old spin gap data (" + N + ") ...")
     for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
         if filename == "dummyFile.txt" or filename == "data_placeholder.txt":
@@ -32,5 +32,14 @@ if which == "SG":
             shutil.rmtree("results/" + N + "/data/spin_gap_data/" + filename, ignore_errors=False, onerror=False)
         except:
             os.remove("results/" + N + "/data/spin_gap_data/" + filename)
+elif which == "EE":
+    print("removing old spin gap data (" + N + ") ...")
+    for filename in os.listdir("results/" + N + "/data/excitation_energies_data/"):
+        if filename == "dummyFile.txt" or filename == "data_placeholder.txt":
+            continue
+        try:
+            shutil.rmtree("results/" + N + "/data/excitation_energies_data/" + filename, ignore_errors=False, onerror=False)
+        except:
+            os.remove("results/" + N + "/data/excitation_energies_data/" + filename)
 else:
     print("no valid data to delete")

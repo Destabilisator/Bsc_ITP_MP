@@ -558,7 +558,74 @@ namespace QT::MS {
             rawDataX.shrink_to_fit();
             hlp::saveAvgData("./results/" + std::to_string(N) + "/data/spin_gap_data/X_J" + std::to_string(J) + "QT.txt",
                              "samples: " + std::to_string(SAMPLES) + "\n",
-                             "beta in kb / J2", "C in J2", beta_Data, rawDataX, N);
+                             "beta in kb / J2", "X in J2", beta_Data, rawDataX, N);
+            // progressbar
+            coutMutex.lock();
+            int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < prgbar_segm; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+            std::cout.flush();
+            curr++;
+            coutMutex.unlock();
+        }
+
+        auto end_timer = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end_timer-start_timer;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+    }
+
+    ///// excitation energies /////
+
+    void start_calc_excitation_energies(const double &J_START, const double &J_END, const int &J_COUNT,
+                                        const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
+                                        const int &N, const int &SIZE, const int &SAMPLES) {
+
+        auto start_timer = std::chrono::steady_clock::now();
+        std::cout << "\n" << "excitation energies, QT, momentum states, N: " << N << ", step size: " << BETA_STEP << " ..." << std::endl;
+
+        ///// gather x-data /////
+        std::vector<double> beta_Data;
+        double beta = BETA_START - BETA_STEP;
+        while (beta <= BETA_END) {
+            beta += BETA_STEP;
+            beta_Data.emplace_back(beta);
+        } beta_Data.shrink_to_fit();
+
+        // init progressbar
+        int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
+
+#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, beta_Data, curr, prgbar_segm, std::cout)
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+            std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
+            std::vector<std::vector<double>> rawDataC;
+
+            for (int s = 1; s <= SAMPLES; s++) {
+                std::vector<double> rawData = hlp::rungeKutta4_C(BETA_START, BETA_END, BETA_STEP, N, H_List);
+                rawDataC.emplace_back(rawData);
+            }
+            // save data (silent)
+            rawDataC.shrink_to_fit();
+            hlp::saveAvgData("./results/" + std::to_string(N) + "/data/excitation_energies_data/C_J" + std::to_string(J) + "QT.txt",
+                             "samples: " + std::to_string(SAMPLES) + "\n",
+                             "beta in kb / J2", "C in J2", beta_Data, rawDataC, N);
             // progressbar
             coutMutex.lock();
             int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
