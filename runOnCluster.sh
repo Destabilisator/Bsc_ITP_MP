@@ -32,29 +32,29 @@ else
 fi
 
 # #$pth plotting/deleteData.py 6 SG
-./$build/$prgm 6 $start $end 48 $h -1 $noX silent && echo ""
+./$build/$prgm 6 $start $end 50 $h -1 $noX silent && echo ""
 # #$pth plotting/deleteData.py 8 SG
-./$build/$prgm 8 $start $end 48 $h -1 $noX silent && echo ""
+./$build/$prgm 8 $start $end 50 $h -1 $noX silent && echo ""
 # #$pth plotting/deleteData.py 10 SG
-./$build/$prgm 10 $start $end 48 $h -1 $noX silent && echo ""
+./$build/$prgm 10 $start $end 50 $h -1 $noX silent && echo ""
 # #$pth plotting/deleteData.py 12 SG
-./$build/$prgm 12 $start $end 48 $h -1 $noX silent && echo ""
-./$build/$prgm 14 $start $end 48 $h -1 $noX silent && echo ""
-./$build/$prgm 16 $start $end 48 $h 24 $noX silent && echo ""
-./$build/$prgm 18 $start $end 48 $h 24 $noX silent && echo ""
+./$build/$prgm 12 $start $end 50 $h -1 $noX silent && echo ""
+./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo ""
+./$build/$prgm 16 $start $end 50 $h 24 $noX silent && echo ""
+./$build/$prgm 18 $start $end 50 $h 24 $noX silent && echo ""
 
 # $pth plotting/plotStatisticsC.py 0 $plotend low && echo "" && echo ""
 # $pth plotting/plotStatisticsX.py 0 $plotend low
 # $pth plotting/plotSpinGapQT.py low && echo "" && echo ""
 # $pth plotting/plotDeltaEQT.py low && echo "" && echo ""
 
-./$build/$prgm 20 $start $end 48 $h 12 $noX silent && echo ""
-./$build/$prgm 22 $start $end 48 $h 6 $noX silent && echo ""
-./$build/$prgm 24 $start $end 48 $h 3 $noX silent && echo ""
-./$build/$prgm 26 $start $end 48 $h 1 $noX silent && echo ""
-./$build/$prgm 28 $start $end 20 $h 1 $noX silent && echo ""
-./$build/$prgm 30 $start $end 20 $h 1 $noX silent && echo ""
-./$build/$prgm 32 $start $end 20 $h 1 $noX silent && echo ""
+./$build/$prgm 20 $start $end 50 $h 12 $noX silent && echo ""
+./$build/$prgm 22 $start $end 50 $h 6 $noX silent && echo ""
+./$build/$prgm 24 $start $end 50 $h 3 $noX silent && echo ""
+./$build/$prgm 26 $start $end 50 $h 1 $noX silent && echo ""
+./$build/$prgm 28 $start $end 50 $h 1 $noX silent && echo ""
+./$build/$prgm 30 $start $end 50 $h 1 $noX silent && echo ""
+./$build/$prgm 32 $start $end 50 $h 1 $noX silent && echo ""
 
 #$pth plotting/plotSpinGapQT.py high && echo "" && echo ""
 
