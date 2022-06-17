@@ -542,12 +542,6 @@ namespace QT::MS {
                 matrixTypeComplex S2_mat(matSize,matSize);
                 S2_mat.setFromTriplets(S2_MtrxLst.begin(), S2_MtrxLst.end());
                 S2_List.emplace_back(S2_mat);
-//                if (!S2_mat.isApprox(ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower),
-//                                                       R_vals.at(m).at(k - k_lower)))) {
-//                    std::cout << "ALARM!!!\n";
-//                }
-                std::cout << Eigen::MatrixXcd(S2_mat) << std::endl;
-                std::cout << ED::spinMatrixMomentum(N, k, states.at(m).at(k - k_lower), R_vals.at(m).at(k - k_lower)) << std::endl << std::endl;;
             }
         }
 
@@ -585,7 +579,7 @@ namespace QT::MS {
 //#if OUTER_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, rawDataX, beta_Data, N, SIZE)
 //#endif
-//#pragma omp parallel for num_threads(SAMPLES) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J)
+#pragma omp parallel for num_threads(SAMPLES) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J)
             for (int s = 1; s <= SAMPLES; s++) {
                 std::vector<double> rawData = hlp::rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
 //                rawDataX.emplace_back(rawData);

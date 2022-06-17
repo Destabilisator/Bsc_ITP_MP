@@ -291,6 +291,9 @@ namespace QT::hlp {
         const int size = (int) states.size();
         std::vector<Trp> S2;
         for (int a = 0; a < size; a++) {
+            S2.emplace_back(Trp(a, a, std::complex<double>(0.75 * (double) N, 0.0)));
+        }
+        for (int a = 0; a < size; a++) {
             int s = states.at(a);
             for (int j = 0; j < N; j++) {
                 for (int i = 0; i < j; i++) {

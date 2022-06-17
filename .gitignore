@@ -54,10 +54,16 @@ results/*/data/excitation_energies_data/*.txt
 results/*/data/excitation_energies_data/*.png
 !results/*/data/excitation_energies_data/data_placeholder.txt
 
+results/*/data/excitation_energies_data/*/*.txt
+results/*/data/excitation_energies_data/*/*.png
+!results/*/data/excitation_energies_data/*/data_placeholder.txt
+
+
 results/3DData/*
-#results/3DData/*.png
-#results/3DData/*.gif
-#results/3DData/*/*/*.txt
+results/3DData/*.png
+results/3DData/*.gif
+results/3DData/*/*/*.txt
 !results/3DData/*/*/dummyFile.txt
-#results/3DData/knowngood/
+results/3DData/knowngood/
+
 

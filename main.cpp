@@ -165,16 +165,16 @@ int main(int argc, char* argv[]) {
         T_START = 0.0; T_END = 50.0;
         T_COUNT =  (int) ( (T_END - T_START) / stepsize );
         QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, 5, cores);
-//        if (N <= 18) {
-//            ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
-//            ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
-//        }
+        if (N <= 18) {
+            ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
+            ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+        }
 //    }
 
     /// excitation energies ///
 
-//    ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
-//    QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, 1);
+    ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
+    QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, 1);
 
 #endif
 

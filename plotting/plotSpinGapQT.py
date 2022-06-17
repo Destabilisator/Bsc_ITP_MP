@@ -6,15 +6,15 @@ import scipy.optimize
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red")]#, ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
-max_n = 5
-no_ED = False
 
-peak_offset = 2000 #1500 # 1000
+peak_offset = 2000
 fit_samples = 5
 search_start_percent = 4/5
 search_end_percent = 1/5
+max_n = 2 # min = 1; max = 5
+no_ED = False
 
 def sort_data(X, Y):
     length = len(X)
@@ -33,7 +33,7 @@ def expFunc(x: float, A: float, k: float) -> float:
     return x * A * np.exp(k * x)
 
 def get_spin_gap(n: int, N: int, J, filename) -> (float, float, float, float):
-    file = open("results/" + N + "/data/spin_gap_data/" + str(n) + "/" + filename, 'r')
+    file = open("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + filename, 'r')
     ED_QT = filename[len(filename)-6:-4]
     lines = file.readlines()
     fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
@@ -49,9 +49,6 @@ def get_spin_gap(n: int, N: int, J, filename) -> (float, float, float, float):
 
     X_fit = X[0:int(len(X)*search_start_percent)]; Y_fit = Y[0:int(len(X)*search_start_percent)]
     X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
-    # Y_fit = np.log(Y_fit) ######
-    # fitting_results = np.polyfit(X_fit, Y_fit, 1, full = True)
-    # m, b = fitting_results[0]
     params, cv = scipy.optimize.curve_fit(expFunc, X_fit, Y_fit, (1.0, 0.1))
     A, k = params
     # calc R2
@@ -61,14 +58,6 @@ def get_spin_gap(n: int, N: int, J, filename) -> (float, float, float, float):
     square_diff = diff ** 2
     SST = square_diff.sum()
     R2 = 1 - SSE/SST
-    # SSE = fitting_results[1][0]
-    # diff = Y_fit - Y_fit.mean()
-    # square_diff = diff ** 2
-    # SST = square_diff.sum()
-    # R2 = 1 - SSE/SST
-    # # set ranges
-    # X_fit_range = X_fit; Y_fit_range = Y_fit
-    # X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
     X_fit_range = np.array(X_fit); Y_fit_range = np.array(Y_fit)
 
     for p in range(1, fit_samples+1):
@@ -79,8 +68,6 @@ def get_spin_gap(n: int, N: int, J, filename) -> (float, float, float, float):
         X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
         params, cv = scipy.optimize.curve_fit(expFunc, X_fit, Y_fit, (1.0, 0.1))
         A_new, k_new = params
-        # fitting_results = np.polyfit(X_fit, Y_fit, 1, full = True)
-        # m_new, b_new = fitting_results[0]
         # calc R2
         residuals = Y_fit - expFunc(X_fit, A_new, k_new)
         SSE = np.sum(residuals**2)
@@ -88,11 +75,6 @@ def get_spin_gap(n: int, N: int, J, filename) -> (float, float, float, float):
         square_diff = diff ** 2
         SST = square_diff.sum()
         R2_new = 1 - SSE/SST
-        # SSE = fitting_results[1][0]
-        # diff = Y_fit - Y_fit.mean()
-        # square_diff = diff ** 2
-        # SST = square_diff.sum()
-        # R2_new = 1 - SSE/SST
         # compare to current best
         if R2_new > R2:
             R2 = R2_new
@@ -117,7 +99,7 @@ def get_spin_gap(n: int, N: int, J, filename) -> (float, float, float, float):
     plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
     #subfig2.set_xscale("log")
     subfig2.set_yscale("log")
-    plt.savefig("results/" + N + "/data/spin_gap_data/" + str(n) + "/" + "X_J" + J + "_" + ED_QT + ".png")
+    plt.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
     plt.close(fig2)
     return np.exp(A), abs(k), 0.0, 0.0
 
@@ -132,11 +114,11 @@ def save_spin_gap_data(N, X, Y, YErr) -> None:
         outFile.write("%f\t%ft%f" % (X[i], Y[i], YErr[i]) )
     outFile.close()
     fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
-    subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "red", label = lbl)
+    subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "red", label = lbl)
     X = np.asarray(X)
     Y = np.asarray(Y)
     YErr = np.asarray(YErr)
-    subfig1.fill_between(X, Y - YErr, Y + YErr, color = "blue", alpha = 0.2)
+    subfig3.fill_between(X, Y - YErr, Y + YErr, color = "blue", alpha = 0.2)
     subfig3.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
     subfig3.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
     subfig3.set_title(r'Spingap Energien $\Delta E_{gap}$', fontsize = 25)
@@ -166,11 +148,12 @@ if __name__ == "__main__":
             # QT results
             print("QT (exp fit)...")#
             X_arr = [[]] * max_n; Y_arr = [[]] * max_n
-            for n in range(1, max_n + 1):
+            for n in range(0, max_n):
+                print("n = " + str(n+1) + "\r")
                 #lbl = "QT (exp fit): N = " + N
                 lbl = "N = " + N
                 X_arr[n] = []; Y_arr[n] = []
-                for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n) + "/"):
+                for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/"):
                     if filename[len(filename)-6:] != "QT.txt": continue
                     J = filename[len("X_J"):-len("QT.txt")]
                     # print(J)
@@ -200,11 +183,11 @@ if __name__ == "__main__":
                 print("ED (exp fit)...")
                 lbl = "ED (exp fit): N = " + N
                 X = []; Y = []
-                for filename in os.listdir("results/" + N + "/data/spin_gap_data/"):
+                for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
                     if filename[len(filename)-6:] != "ED.txt": continue
                     J = filename[len("X_J"):-len("ED.txt")]
                     # print(J)
-                    A, k, x_0, y_0 = get_spin_gap(N, J, filename)
+                    A, k, x_0, y_0 = get_spin_gap(0, N, J, filename)
                     # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
                     X += [float(J)]
                     Y += [float(k)]

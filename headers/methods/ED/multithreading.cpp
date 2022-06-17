@@ -648,7 +648,7 @@ namespace ED::multi {
 
             ///// save /////
 
-            saveOutDataSilent("/spin_gap_data/X_J" + std::to_string(J) + "ED.txt",
+            saveOutDataSilent("/spin_gap_data/1/X_J" + std::to_string(J) + "ED.txt",
                               "\n", "J1/J2", "specific heat in J2", susceptibility_magnetization, N);
 
             // progressbar
