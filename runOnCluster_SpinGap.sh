@@ -34,13 +34,13 @@ fi
 if [[ "$regime" == "low" ]]; then
 	echo "low regime" && echo ""
     # # $pth plotting/deleteData.py 6 SG
-	./$build/$prgm 6 $start $end 50 $h -1 $noX silent && echo "" # 10000
-    # # $pth plotting/deleteData.py 8 SG
-	./$build/$prgm 8 $start $end 50 $h -1 $noX silent && echo "" # 10000
-    # # $pth plotting/deleteData.py 10 SG
-	./$build/$prgm 10 $start $end 50 $h -1 $noX silent && echo "" # 5000
-    # # $pth plotting/deleteData.py 12 SG
-	./$build/$prgm 12 $start $end 50 $h -1 $noX silent && echo "" # 1000
+	# ./$build/$prgm 6 $start $end 50 $h -1 $noX silent && echo "" # 10000
+    # # # $pth plotting/deleteData.py 8 SG
+	# ./$build/$prgm 8 $start $end 50 $h -1 $noX silent && echo "" # 10000
+    # # # $pth plotting/deleteData.py 10 SG
+	# ./$build/$prgm 10 $start $end 50 $h -1 $noX silent && echo "" # 5000
+    # # # $pth plotting/deleteData.py 12 SG
+	# ./$build/$prgm 12 $start $end 50 $h -1 $noX silent && echo "" # 1000
 	# $pth plotting/deleteData.py 14 SG
 	# ./$build/$prgm 14 $start $end 50 $h -1 $noX silent && echo "" # 50
 	# $pth plotting/deleteData.py 16 SG

@@ -35,7 +35,7 @@ double J_START = 0.0, J_END = 2.0;
 int J_COUNT = 50;
 
 double step_size = 0.01; // 0.01; 0.01 and 0.1 yield similar results for N = 16 and 0.1 yields good results for N = 18
-int SAMPLES = 1;
+int SAMPLES = 5;
 
 double h = 0.0;
 double h_START = 0.0, h_END = 2.0;

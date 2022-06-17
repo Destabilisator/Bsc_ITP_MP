@@ -571,7 +571,7 @@ namespace QT::MS {
 //#if OUTERMOST_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(OUTERMOST_NESTED_THREADS) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
 //#endif
-//#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
+#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
         for (int J_pos = 0; J_pos <= J_COUNT; J_pos++) {
             double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
@@ -616,7 +616,7 @@ namespace QT::MS {
 
     void start_calc_excitation_energies(const double &J_START, const double &J_END, const int &J_COUNT,
                                         const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
-                                        const int &N, const int &SIZE, const int &SAMPLES) {
+                                        const int &N, const int &SIZE, const int &SAMPLES, const int &cores) {
 
         auto start_timer = std::chrono::steady_clock::now();
         std::cout << "\n" << "excitation energies, QT, momentum states, N: " << N << ", step size: " << BETA_STEP << " ..." << std::endl;
@@ -644,21 +644,26 @@ namespace QT::MS {
         curr++;
         coutMutex.unlock();
 
-#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, beta_Data, curr, prgbar_segm, std::cout)
+#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, beta_Data, curr, prgbar_segm, std::cout)
         for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
             double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
             std::vector<std::vector<double>> rawDataC;
 
+#pragma omp parallel for num_threads(SAMPLES) default(none) shared(SAMPLES, BETA_START, BETA_END, BETA_STEP, N, H_List, J, beta_Data)
             for (int s = 1; s <= SAMPLES; s++) {
                 std::vector<double> rawData = hlp::rungeKutta4_C(BETA_START, BETA_END, BETA_STEP, N, H_List);
-                rawDataC.emplace_back(rawData);
+//                rawDataC.emplace_back(rawData);
+                hlp::saveOutDataSilent(
+                        "excitation_energies_data/" + std::to_string(s) + "/C_J" + std::to_string(J) + "QT.txt",
+                        "samples: " + std::to_string(1) + "\n",
+                        "beta in kb / J2", "C in J2", beta_Data, rawData, N);
             }
-            // save data (silent)
-            rawDataC.shrink_to_fit();
-            hlp::saveAvgData("./results/" + std::to_string(N) + "/data/excitation_energies_data/C_J" + std::to_string(J) + "QT.txt",
-                             "samples: " + std::to_string(SAMPLES) + "\n",
-                             "beta in kb / J2", "C in J2", beta_Data, rawDataC, N);
+//            // save data (silent)
+//            rawDataC.shrink_to_fit();
+//            hlp::saveAvgData("./results/" + std::to_string(N) + "/data/excitation_energies_data/C_J" + std::to_string(J) + "QT.txt",
+//                             "samples: " + std::to_string(SAMPLES) + "\n",
+//                             "beta in kb / J2", "C in J2", beta_Data, rawDataC, N);
             // progressbar
             coutMutex.lock();
             int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);

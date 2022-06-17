@@ -94,8 +94,6 @@ namespace ED::multi {
 
     }
 
-
-
     void start_DeltaE_CT_const(const int &COUNT, const double &START, const double &END, const double &h,
                                int cores, const double &temp, const int &N, const int &SIZE) {
 
@@ -538,7 +536,7 @@ namespace ED::multi {
     }
 
     void start_SpinGap_with_index(const int &COUNT, const double &START, const double &END,
-                       int &cores, const int &N, const int &SIZE) {
+                                  int &cores, const int &N, const int &SIZE) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -649,7 +647,7 @@ namespace ED::multi {
             ///// save /////
 
             saveOutDataSilent("/spin_gap_data/1/X_J" + std::to_string(J) + "ED.txt",
-                              "\n", "J1/J2", "specific heat in J2", susceptibility_magnetization, N);
+                              "\n", "J1/J2", "susceptibility in J2", susceptibility_magnetization, N);
 
             // progressbar
             coutMutex.lock();
@@ -672,10 +670,94 @@ namespace ED::multi {
 
     }
 
-//    /////////////////////////////// excitation energies ///////////////////////////////
-//
-//    void startSpecificHeatMultiJ(const double &J_START, const double &J_END, const int &J_COUNT,
-//                                   const double &BETA_START, const double &BETA_END, const double &BETA_COUNT,
-//                                   const int &N, const int &SIZE)
+    /////////////////////////////// excitation energies ///////////////////////////////
+
+    void startSpecificHeatMultiJ(const double &J_START, const double &J_END, const int &J_COUNT,
+                                 const double &BETA_START, const double &BETA_END, const double &BETA_COUNT,
+                                 const int &N, const int &SIZE, const double &h) {
+
+        auto start = std::chrono::steady_clock::now();
+
+        std::cout << "\n" << "specific heat (momentum states): calculating..." << std::endl;
+
+        ///// gather x-data /////
+        std::vector<double> beta_Data;
+        for (int i = 0; i <= BETA_COUNT; i++) {
+            double current = BETA_START + (BETA_END - BETA_START) * i / BETA_COUNT;
+            beta_Data.emplace_back(current);
+        } beta_Data.shrink_to_fit();
+
+        // init progressbar
+        int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
+
+        ///// specific heat /////
+
+#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, h, coutMutex, BETA_START, BETA_END, BETA_COUNT, curr, prgbar_segm, std::cout, beta_Data)
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+
+            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+
+            if (N%4 == 0) {
+                std::vector<double> eiVals;
+                std::vector<Eigen::MatrixXd> matrixBlocks;
+                spinInversion::getEiVals(J, 1.0, h, &eiVals, &matrixBlocks, N, SIZE);
+
+                std::vector<std::tuple<double, double>> spec_heat;
+                for (int i = 0; i <= BETA_COUNT; i++) {
+                    double beta = BETA_START + (BETA_END - BETA_START) * i / BETA_COUNT;
+                    spec_heat.emplace_back(beta, getSpecificHeat(beta, eiVals, N));
+                } spec_heat.shrink_to_fit();
+
+                ///// save /////
+                saveOutDataSilent("/excitation_energies_data/1/C_J" + std::to_string(J) + "ED.txt",
+                                  "\n", "J1/J2", "specific heat in J2", spec_heat, N);
+            } else {
+                std::vector<std::complex<double>> eiVals;
+                std::vector<Eigen::MatrixXcd> matrixBlocks;
+                momentumStates::getEiVals(J, 1.0, h, eiVals, matrixBlocks, N, SIZE);
+
+                std::vector<std::tuple<double, double>> spec_heat;
+                for (int i = 0; i <= BETA_COUNT; i++) {
+                    double beta = BETA_START + (BETA_END - BETA_START) * i / BETA_COUNT;
+                    spec_heat.emplace_back(beta, getSpecificHeat(beta, eiVals, N));
+                } spec_heat.shrink_to_fit();
+
+                ///// save /////
+                saveOutDataSilent("/excitation_energies_data/1/C_J" + std::to_string(J) + "ED.txt",
+                                  "\n", "J1/J2", "specific heat in J2", spec_heat, N);
+            }
+
+            // progressbar
+            coutMutex.lock();
+            int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+            std::cout << "\r[";
+            for (int _ = 0; _ < p; _++) {
+                std::cout << "#";
+            } for (int _ = p; _ < prgbar_segm; _++) {
+                std::cout << ".";
+            } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+            std::cout.flush();
+            curr++;
+            coutMutex.unlock();
+
+        }
+
+        auto end = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end - start;
+        std::cout << "\n" << "calculations done; this took: " << formatTime(elapsed_seconds) << "\n";
+
+    }
 
 }

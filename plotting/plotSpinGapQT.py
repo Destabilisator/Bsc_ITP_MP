@@ -6,14 +6,14 @@ import scipy.optimize
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
 peak_offset = 2000
-fit_samples = 5
+fit_samples = 5 # 5
 search_start_percent = 4/5
 search_end_percent = 1/5
-max_n = 2 # min = 1; max = 5
+max_n = 5 # min = 1; max = 5
 no_ED = False
 
 def sort_data(X, Y):
@@ -146,10 +146,10 @@ if __name__ == "__main__":
     #for N, c in N_color:
             print("N = " + N + ":") 
             # QT results
-            print("QT (exp fit)...")#
+            print("QT (exp fit)...")
             X_arr = [[]] * max_n; Y_arr = [[]] * max_n
             for n in range(0, max_n):
-                print("n = " + str(n+1) + "\r")
+                print("n = " + str(n+1))
                 #lbl = "QT (exp fit): N = " + N
                 lbl = "N = " + N
                 X_arr[n] = []; Y_arr[n] = []
@@ -162,6 +162,7 @@ if __name__ == "__main__":
                     X_arr[n] += [float(J)]
                     Y_arr[n] += [float(k)]
                 X_arr[n], Y_arr[n] = sort_data(X_arr[n], Y_arr[n])
+
             X = []; Y = []; YErr = []
             for pos in range(len(X_arr[0])):
                 y = []
@@ -215,11 +216,14 @@ if __name__ == "__main__":
 
             subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
             subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
-            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$', fontsize = 25)
+            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = 25)
 
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
             plt.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
-            plt.close(fig1)
+            # plt.close(fig1)
             #plt.show()
+
+        plt.close(fig1)
+        #exit()
