@@ -20,6 +20,8 @@ search_end_percent = 1/5
 max_n = 5 # min = 1; max = 5
 no_ED = False
 
+SAVE_FULL_PLOTS = False
+
 def sort_data(X, Y, A):
     length = len(X)
     for i in range(length-1):
@@ -41,7 +43,6 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
     file = open("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + filename, 'r')
     ED_QT = filename[len(filename)-6:-4]
     lines = file.readlines()
-    fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
     X = []; Y = []
     for i in range(5,len(lines)):
         arr = lines[i].split("\t")
@@ -87,28 +88,33 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
             k = k_new
             X_fit_range = X_fit; Y_fit_range = Y_fit
 
-    # Y_fitted_range = np.exp(Y_fit_range)
-    subfig2.plot(X_fit_range, Y_fit_range, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "green", label = "range")
+    if SAVE_FULL_PLOTS:
+        fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
 
-    subfig2.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "blue", label = "QT data")
-    # Y_fitted = [np.exp(m * x + b) for x in X_fit_range]
-    Y_fitted = [expFunc(x, A, k) for x in X_fit_range]
-    subfig2.plot(X_fit_range, Y_fitted, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "red", label = "exp fit, R = " + str(R2))
-    subfig2.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-    subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
-    subfig2.set_title("$\\chi/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + J, fontsize = 25)
+        # Y_fitted_range = np.exp(Y_fit_range)
+        subfig2.plot(X_fit_range, Y_fit_range, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "green", label = "range")
 
-    # subfig2.axhline(0, color = "grey")
-    subfig2.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        subfig2.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "blue", label = "QT data")
+        # Y_fitted = [np.exp(m * x + b) for x in X_fit_range]
+        Y_fitted = [expFunc(x, A, k) for x in X_fit_range]
+        subfig2.plot(X_fit_range, Y_fitted, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "red", label = "exp fit, R = " + str(R2))
+        subfig2.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
+        subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
+        subfig2.set_title("$\\chi/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + J, fontsize = 25)
 
-    plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
-    #subfig2.set_xscale("log")
-    subfig2.set_yscale("log")
-    fig2.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
-    plt.close(fig2)
-    plt.cla()
-    plt.clf()
-    gc.collect()
+        # subfig2.axhline(0, color = "grey")
+        subfig2.legend(loc = 'best' ,frameon = False, fontsize = 20)
+
+        plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
+        #subfig2.set_xscale("log")
+        subfig2.set_yscale("log")
+        fig2.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
+        plt.close(fig2)
+        plt.cla()
+        plt.clf()
+        del fig2, subfig2
+        gc.collect()
+
     return float(A), abs(k)
 
 def save_spin_gap_data(N, X, Y, YErr, A, AErr) -> None:
@@ -126,36 +132,41 @@ def save_spin_gap_data(N, X, Y, YErr, A, AErr) -> None:
         outFile.write("%f\t%ft%f" % (X[i], A[i], AErr[i]) )
     outFile.close()
     # save spin gap
-    fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
-    subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "red", label = lbl)
-    X = np.asarray(X)
-    Y = np.asarray(Y)
-    YErr = np.asarray(YErr)
-    subfig3.fill_between(X, Y - YErr, Y + YErr, color = "blue", alpha = 0.2)
-    subfig3.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-    subfig3.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
-    subfig3.set_title(r'Spingap Energien $\Delta E_{gap}$', fontsize = 25)
-    subfig3.axhline(0, color = "grey")
-    subfig3.legend(loc = 'best' ,frameon = False, fontsize = 20)
-    fig3.savefig("results/" + N + "/spin_gap_data_" + str(cnt+1) + "_QT.png")
-    plt.close(fig3)
-    # save amplitude
-    fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
-    subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "red", label = lbl)
-    X = np.asarray(X)
-    Y = np.asarray(Y)
-    YErr = np.asarray(YErr)
-    subfig3.fill_between(X, Y - YErr, Y + YErr, color = "blue", alpha = 0.2)
-    subfig3.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-    subfig3.set_ylabel(r'$A$  in $J_2$', fontsize = 25)
-    subfig3.set_title(r'Amplituden $A$', fontsize = 25)
-    subfig3.axhline(0, color = "grey")
-    subfig3.legend(loc = 'best' ,frameon = False, fontsize = 20)
-    fig3.savefig("results/" + N + "/spin_gap_data_AMP_" + str(cnt+1) + "_QT.png")
-    plt.close(fig3)
-    plt.cla()
-    plt.clf()
-    gc.collect()
+    if SAVE_FULL_PLOTS:
+        fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
+        subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "red", label = lbl)
+        X = np.asarray(X)
+        Y = np.asarray(Y)
+        YErr = np.asarray(YErr)
+        subfig3.fill_between(X, Y - YErr, Y + YErr, color = "blue", alpha = 0.2)
+        subfig3.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
+        subfig3.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
+        subfig3.set_title(r'Spingap Energien $\Delta E_{gap}$', fontsize = 25)
+        subfig3.axhline(0, color = "grey")
+        subfig3.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        fig3.savefig("results/" + N + "/spin_gap_data_" + str(cnt+1) + "_QT.png")
+        plt.cla()
+        plt.clf()
+        plt.close(fig3)
+        del fig3, subfig3
+        # save amplitude
+        fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
+        subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "red", label = lbl)
+        X = np.asarray(X)
+        Y = np.asarray(Y)
+        YErr = np.asarray(YErr)
+        subfig3.fill_between(X, Y - YErr, Y + YErr, color = "blue", alpha = 0.2)
+        subfig3.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
+        subfig3.set_ylabel(r'$A$  in $J_2$', fontsize = 25)
+        subfig3.set_title(r'Amplituden $A$', fontsize = 25)
+        subfig3.axhline(0, color = "grey")
+        subfig3.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        fig3.savefig("results/" + N + "/spin_gap_data_AMP_" + str(cnt+1) + "_QT.png")
+        plt.close(fig3)
+        del fig3, subfig3
+        plt.cla()
+        plt.clf()
+        gc.collect()
 
 
 if __name__ == "__main__":
@@ -274,12 +285,17 @@ if __name__ == "__main__":
             subfigAmp.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
             figAmp.savefig("results/" + "spin_gap_with_QT_AMP_" + used_N + ".png")
+
+            # gc.collect(generation=2)
+
             #plt.show()
 
         plt.close(fig1)
         plt.close(figAmp)
-        plt.close('all')
-        plt.cla()
-        plt.clf()
-        gc.collect()
+        # plt.close('all')
+        # plt.cla()
+        # plt.clf()
+        # del fig1, subfig1
+        # del figAmp, subfigAmp
+        # gc.collect()
         #exit()
