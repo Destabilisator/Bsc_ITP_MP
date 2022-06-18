@@ -101,7 +101,7 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
     plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
     #subfig2.set_xscale("log")
     subfig2.set_yscale("log")
-    plt.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
+    fig2.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
     plt.close(fig2)
     return float(A), abs(k)
 
@@ -126,7 +126,7 @@ def save_spin_gap_data(N, X, Y, YErr) -> None:
     subfig3.set_title(r'Spingap Energien $\Delta E_{gap}$', fontsize = 25)
     subfig3.axhline(0, color = "grey")
     subfig3.legend(loc = 'best' ,frameon = False, fontsize = 20)
-    plt.savefig("results/" + N + "/spin_gap_data_" + str(cnt+1) + "_QT.png")
+    fig3.savefig("results/" + N + "/spin_gap_data_" + str(cnt+1) + "_QT.png")
     plt.close(fig3)
 
 
@@ -234,6 +234,8 @@ if __name__ == "__main__":
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
             fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
+
+            subfigAmp.set_yscale("log")
 
             subfigAmp.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
             subfigAmp.set_ylabel(r'A in $J_2$', fontsize = 25)
