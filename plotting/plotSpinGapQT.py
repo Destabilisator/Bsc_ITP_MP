@@ -3,10 +3,11 @@ import os
 import sys
 import numpy as np
 import scipy.optimize
+from typing import Tuple
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
 peak_offset = 2000
@@ -16,7 +17,7 @@ search_end_percent = 1/5
 max_n = 5 # min = 1; max = 5
 no_ED = False
 
-def sort_data(X, Y):
+def sort_data(X, Y, A):
     length = len(X)
     for i in range(length-1):
         for j in range(0, length-i-1):
@@ -24,7 +25,8 @@ def sort_data(X, Y):
             if x1 > x2:
                 X[j], X[j+1] = X[j+1], X[j]
                 Y[j], Y[j+1] = Y[j+1], Y[j]
-    return X, Y
+                A[j], A[j+1] = A[j+1], A[j]
+    return X, Y, A
 
 # def expFunc(x: float, A: float, k: float, x_0: float, y_0: float) -> float:
 #     return x * A * np.exp(k * (x + x_0)) + y_0
@@ -32,7 +34,7 @@ def sort_data(X, Y):
 def expFunc(x: float, A: float, k: float) -> float:
     return x * A * np.exp(k * x)
 
-def get_spin_gap(n: int, N: int, J, filename) -> (float, float, float, float):
+def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
     file = open("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + filename, 'r')
     ED_QT = filename[len(filename)-6:-4]
     lines = file.readlines()
@@ -101,7 +103,7 @@ def get_spin_gap(n: int, N: int, J, filename) -> (float, float, float, float):
     subfig2.set_yscale("log")
     plt.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
     plt.close(fig2)
-    return np.exp(A), abs(k), 0.0, 0.0
+    return float(A), abs(k)
 
 def save_spin_gap_data(N, X, Y, YErr) -> None:
     cnt = -1
@@ -140,6 +142,7 @@ if __name__ == "__main__":
     for i in range(len(N_color)):
         print("plotting spin gap ...")
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+        figAmp, subfigAmp = plt.subplots(1,1,figsize=(16,9))
         used_N = "N"
         for j in range(i, len(N_color)):
             N, c = N_color [j]
@@ -147,29 +150,31 @@ if __name__ == "__main__":
             print("N = " + N + ":") 
             # QT results
             print("QT (exp fit)...")
-            X_arr = [[]] * max_n; Y_arr = [[]] * max_n
+            X_arr = [[]] * max_n; Y_arr = [[]] * max_n; A_arr = [[]] * max_n
             for n in range(0, max_n):
                 print("n = " + str(n+1))
                 #lbl = "QT (exp fit): N = " + N
                 lbl = "N = " + N
-                X_arr[n] = []; Y_arr[n] = []
+                X_arr[n] = []; Y_arr[n] = [];  A_arr[n] = []
                 for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/"):
                     if filename[len(filename)-6:] != "QT.txt": continue
                     J = filename[len("X_J"):-len("QT.txt")]
                     # print(J)
-                    A, k, x_0, y_0 = get_spin_gap(n, N, J, filename)
+                    A, k = get_spin_gap(n, N, J, filename)
                     # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
                     X_arr[n] += [float(J)]
                     Y_arr[n] += [float(k)]
-                X_arr[n], Y_arr[n] = sort_data(X_arr[n], Y_arr[n])
+                    A_arr[n] += [float(A)]
+                X_arr[n], Y_arr[n], A_arr[n] = sort_data(X_arr[n], Y_arr[n], A_arr[n])
 
-            X = []; Y = []; YErr = []
+            X = []; Y = []; YErr = []; A = []; AErr = []
             for pos in range(len(X_arr[0])):
-                y = []
+                y = []; a = []
                 for n in range(max_n):
                     y += [Y_arr[n][pos]]
-                y = np.array(y)
-                X += [X_arr[0][pos]]; Y += [y.mean()]; YErr += [y.std()]
+                    a += [A_arr[n][pos]]
+                y = np.array(y); a = np.array(a)
+                X += [X_arr[0][pos]]; Y += [y.mean()]; YErr += [y.std()]; A += [a.mean()]; AErr += [a.std()]
 
             save_spin_gap_data(N, X, Y, YErr)
 
@@ -179,21 +184,28 @@ if __name__ == "__main__":
             YErr = np.asarray(YErr)
             subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.2)
 
+            subfigAmp.plot(X, A, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = c, label = lbl)
+            A = np.asarray(A)
+            AErr = np.asarray(AErr)
+            subfigAmp.fill_between(X, A - AErr, A + AErr, color = c, alpha = 0.2)
+
             if not no_ED:
                 # ED results exp fit
                 print("ED (exp fit)...")
                 lbl = "ED (exp fit): N = " + N
-                X = []; Y = []
+                X = []; Y = []; A_arr = []
                 for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
                     if filename[len(filename)-6:] != "ED.txt": continue
                     J = filename[len("X_J"):-len("ED.txt")]
                     # print(J)
-                    A, k, x_0, y_0 = get_spin_gap(0, N, J, filename)
+                    A, k = get_spin_gap(0, N, J, filename)
                     # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
                     X += [float(J)]
                     Y += [float(k)]
-                X, Y = sort_data(X, Y)
+                    A_arr += [float(A)]
+                X, Y, A_arr = sort_data(X, Y, A_arr)
                 subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)#, label = lbl, alpha = 0.5)
+                subfigAmp.plot(X, A_arr, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)
                 # ED results
                 print("ED (dispersion)...")
                 lbl = "ED : N = " + N
@@ -221,9 +233,19 @@ if __name__ == "__main__":
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-            plt.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
+            fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
+
+            subfigAmp.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
+            subfigAmp.set_ylabel(r'A in $J_2$', fontsize = 25)
+            subfigAmp.set_title(r'Amplituden $A$ der exp. Fits mit ' + str(max_n) + " Startvektoren (QT)", fontsize = 25)
+
+            subfigAmp.axhline(0, color = "grey")
+            subfigAmp.legend(loc = 'best' ,frameon = False, fontsize = 20)
+
+            figAmp.savefig("results/" + "spin_gap_with_QT_AMP_" + used_N + ".png")
             # plt.close(fig1)
             #plt.show()
 
         plt.close(fig1)
+        plt.close(figAmp)
         #exit()
