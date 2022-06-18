@@ -1,9 +1,12 @@
+import matplotlib
 import matplotlib.pyplot as plt
+matplotlib.use('TkAgg')
 import os
 import sys
 import numpy as np
 import scipy.optimize
 from typing import Tuple
+import gc
 plt.rcParams['text.usetex'] = True
 
 N_color = []
@@ -46,7 +49,7 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
         y = arr[1]
         X += [float(x)] # beta -> T
         Y += [float(y)]
-
+    file.close()
     X.reverse(); Y.reverse()
 
     X_fit = X[0:int(len(X)*search_start_percent)]; Y_fit = Y[0:int(len(X)*search_start_percent)]
@@ -103,18 +106,26 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
     subfig2.set_yscale("log")
     fig2.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
     plt.close(fig2)
+    plt.cla()
+    plt.clf()
+    gc.collect()
     return float(A), abs(k)
 
-def save_spin_gap_data(N, X, Y, YErr) -> None:
+def save_spin_gap_data(N, X, Y, YErr, A, AErr) -> None:
     cnt = -1
     for filename in os.listdir("results/" + N + "/data/"):
-        if "spin_gap_data_" in filename:
+        if "spin_gap_data_" in filename and "AMP" not in filename and "Amp" not in filename:
             _cnt = filename[len("spin_gap_data_"):-len("_QT.txt")]
             if int(_cnt) > cnt: cnt = int(_cnt)
     outFile = open("results/" + N + "/data/spin_gap_data_" + str(cnt+1) + "_QT.txt", "w")
     for i in range(len(X)):
         outFile.write("%f\t%ft%f" % (X[i], Y[i], YErr[i]) )
     outFile.close()
+    outFile = open("results/" + N + "/data/spin_gap_data_AMP_" + str(cnt+1) + "_QT.txt", "w")
+    for i in range(len(X)):
+        outFile.write("%f\t%ft%f" % (X[i], A[i], AErr[i]) )
+    outFile.close()
+    # save spin gap
     fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
     subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "red", label = lbl)
     X = np.asarray(X)
@@ -128,6 +139,23 @@ def save_spin_gap_data(N, X, Y, YErr) -> None:
     subfig3.legend(loc = 'best' ,frameon = False, fontsize = 20)
     fig3.savefig("results/" + N + "/spin_gap_data_" + str(cnt+1) + "_QT.png")
     plt.close(fig3)
+    # save amplitude
+    fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
+    subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "red", label = lbl)
+    X = np.asarray(X)
+    Y = np.asarray(Y)
+    YErr = np.asarray(YErr)
+    subfig3.fill_between(X, Y - YErr, Y + YErr, color = "blue", alpha = 0.2)
+    subfig3.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
+    subfig3.set_ylabel(r'$A$  in $J_2$', fontsize = 25)
+    subfig3.set_title(r'Amplituden $A$', fontsize = 25)
+    subfig3.axhline(0, color = "grey")
+    subfig3.legend(loc = 'best' ,frameon = False, fontsize = 20)
+    fig3.savefig("results/" + N + "/spin_gap_data_AMP_" + str(cnt+1) + "_QT.png")
+    plt.close(fig3)
+    plt.cla()
+    plt.clf()
+    gc.collect()
 
 
 if __name__ == "__main__":
@@ -176,7 +204,7 @@ if __name__ == "__main__":
                 y = np.array(y); a = np.array(a)
                 X += [X_arr[0][pos]]; Y += [y.mean()]; YErr += [y.std()]; A += [a.mean()]; AErr += [a.std()]
 
-            save_spin_gap_data(N, X, Y, YErr)
+            save_spin_gap_data(N, X, Y, YErr, A, AErr)
 
             subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = c, label = lbl)
             X = np.asarray(X)
@@ -220,6 +248,7 @@ if __name__ == "__main__":
                     y = arr[1]
                     X += [float(x)]
                     Y += [float(y)]
+                file.close()
                 subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, alpha = 0.4) #  label = lbl,
             
             print()
@@ -245,9 +274,12 @@ if __name__ == "__main__":
             subfigAmp.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
             figAmp.savefig("results/" + "spin_gap_with_QT_AMP_" + used_N + ".png")
-            # plt.close(fig1)
             #plt.show()
 
         plt.close(fig1)
         plt.close(figAmp)
+        plt.close('all')
+        plt.cla()
+        plt.clf()
+        gc.collect()
         #exit()
