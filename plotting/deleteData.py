@@ -45,3 +45,4 @@ elif which == "EE":
                 os.remove("results/" + N + "/data/excitation_energies_data/" + str(i) + "/" + filename)
 else:
     print("no valid data to delete")
+    
