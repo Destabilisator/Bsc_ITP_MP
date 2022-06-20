@@ -218,9 +218,9 @@ if __name__ == "__main__":
             X = np.asarray(X)
             Y = np.asarray(Y)
             YErr = np.asarray(YErr)
-            subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.2)
+            subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.1)
 
-            subfigAmp.plot(X, AErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl, alpha = 0.5)
+            subfigAmp.plot(X, AErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)#, alpha = 0.5)
             # A = np.asarray(A)
             # AErr = np.asarray(AErr)
             # subfigAmp.fill_between(X, A - AErr, A + AErr, color = c, alpha = 0.2)
@@ -240,7 +240,7 @@ if __name__ == "__main__":
                     Y += [float(k)]
                     A_arr += [float(A)]
                 X, Y, A_arr = sort_data(X, Y, A_arr)
-                subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)#, label = lbl, alpha = 0.5)
+                subfig1.plot(X, Y, lw = 0, ls = "", markersize = 2, marker = "o", color = c)#, alpha = 0.5)#, label = lbl, alpha = 0.5)
                 # subfigAmp.plot(X, A_arr, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)
                 # ED results
                 print("ED (dispersion)...")
@@ -257,7 +257,7 @@ if __name__ == "__main__":
                     X += [float(x)]
                     Y += [float(y)]
                 file.close()
-                subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, alpha = 0.4) #  label = lbl,
+                subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c)#, alpha = 0.4) #  label = lbl,
             
             print()
 
