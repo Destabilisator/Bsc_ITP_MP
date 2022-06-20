@@ -22,6 +22,7 @@ int main(int argc, char* argv[]) {
     omp_set_nested(1);
 
     std::cout << "N: " << N << "; size: " << SIZE << "\n";
+    /*
     std::cout << "default J1 and J2 for plots with J = const: J1 = " << J1 << " and J2 = " << J2 << " (currently unchangeable)\n";
     std::cout << "default magnetic field for plots with h = const: h = " << h << "\n";
     std::cout << "default step size for RK4: " << step_size << "\n";
@@ -31,6 +32,7 @@ int main(int argc, char* argv[]) {
     std::cout << "h_START = " << h_START << ", h_END = " << h_END << " and h_COUNT = " << h_COUNT << "\n";
     std::cout << "using " << cores << " cores (hardware limit: " << std::thread::hardware_concurrency() << " cores)\n";
     if (noX) {std::cout << "skipping susceptibility plots\n";}
+     */
     std::cout.flush();
     //std::cout << std::endl;
 
@@ -114,64 +116,57 @@ int main(int argc, char* argv[]) {
     T_START = 0.0; T_END = 50.0;
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
 
-    /// C ///
-//    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
-//        QT::MS::start_calculation_C_J_const(T_START, T_END, ss, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
-//    }
-//
-//    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, SAMPLES);
-//    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
-//    if (N%4 == 0) {
-//        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
-//    } else {
-//        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
-//    }
-
-    /// X ///
-//    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
-//        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, 1);
-//    }
-//
-//    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 1);
-//    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
-//    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-
-    /// C and X ///
-//    if (N == 18) {
-        // ED
-//        T_COUNT =  (int) ( (T_END - T_START) / 0.01 );
-//        if (N%4 == 0) {
-//            ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
-//        } else {
-//            ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
-//        }
-//        ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-
-        // combined QT
-//        for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) { // 1.0, 0.5 , 0.1, 0.05, 0.005, 0.001
-//            QT::MS::start_calculation_CX_J_const(T_START, T_END, ss, J1, J2, N, SIZE, 12);
-//        }
-//        QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
-//    }
-
-    /// spin gap ///
-
-//    if (N == 16) {
-//        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
-//        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
-//    }
-
     if (N >= 22) {SAMPLES = 1;}
-
-//    SAMPLES = 1;
     cores = SAMPLES;
     omp_set_num_threads(cores);
 
-//    T_START = 0.0; T_END = 50.0;
-//    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+    /// C ///
+    /*
+    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
+        QT::MS::start_calculation_C_J_const(T_START, T_END, ss, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
+    }
+
+    QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, SAMPLES);
+    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+    if (N%4 == 0) {
+        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+    } else {
+        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+    }
+*/
+    /// X ///
+    /*
+    for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
+        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, 1);
+    }
+
+    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 1);
+    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+*/
+    /// C and X ///
+    /*
+    if (N == 18) {
+        // ED
+        T_COUNT =  (int) ( (T_END - T_START) / 0.01 );
+        if (N%4 == 0) {
+            ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+        } else {
+            ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+        }
+        ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+
+        // combined QT
+        for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) { // 1.0, 0.5 , 0.1, 0.05, 0.005, 0.001
+            QT::MS::start_calculation_CX_J_const(T_START, T_END, ss, J1, J2, N, SIZE, 12);
+        }
+        QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
+    }
+*/
+    /// spin gap ///
+
     QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
     if (N <= 18) {
-//        omp_set_num_threads(5);
         ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
         ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
     }
@@ -182,7 +177,6 @@ int main(int argc, char* argv[]) {
 
     QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
     if (N <= 18) {
-//        omp_set_num_threads(5);
         ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
         ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
     }
