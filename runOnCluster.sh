@@ -38,10 +38,10 @@ fi
 # #$pth plotting/deleteData.py 10 SG
 ./$build/$prgm 10 $start $end 50 $h -1 $noX silent && echo ""
 # #$pth plotting/deleteData.py 12 SG
-./$build/$prgm 12 $start $end 50 $h -1 $noX silent && echo ""
-./$build/$prgm 14 $start $end 50 $h 25 $noX silent && echo ""
-./$build/$prgm 16 $start $end 50 $h 25 $noX silent && echo ""
-./$build/$prgm 18 $start $end 50 $h 25 $noX silent && echo ""
+./$build/$prgm 12 $start $end 50 $h 25 $noX silent && echo ""
+./$build/$prgm 14 $start $end 50 $h 10 $noX silent && echo "" # 25
+./$build/$prgm 16 $start $end 50 $h 10 $noX silent && echo "" # 25
+./$build/$prgm 18 $start $end 50 $h 10 $noX silent && echo "" # 25
 
 # $pth plotting/plotStatisticsC.py 0 $plotend low && echo "" && echo ""
 # $pth plotting/plotStatisticsX.py 0 $plotend low

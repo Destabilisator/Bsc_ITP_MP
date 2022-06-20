@@ -163,14 +163,18 @@ int main(int argc, char* argv[]) {
 
     if (N >= 22) {SAMPLES = 1;}
 
+    SAMPLES = 1;
+    cores = SAMPLES;
+    omp_set_num_threads(cores);
+
 //    T_START = 0.0; T_END = 50.0;
 //    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
     QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
     if (N <= 18) {
+//        omp_set_num_threads(5);
         ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
         ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
     }
-
 
     /// excitation energies ///
 
@@ -178,6 +182,7 @@ int main(int argc, char* argv[]) {
 
     QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
     if (N <= 18) {
+//        omp_set_num_threads(5);
         ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
         ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
     }

@@ -87,7 +87,7 @@ def plot_n_for_each_N_sigma_abs(start: float, end: float):
             subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = nc, label = "QT: n = " + n)
         # saving
         subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel(r'$\sigma$ in $J_2$', fontsize = 25)
+        subfig1.set_ylabel(r'$\sigma_{abs}$ in $J_2$', fontsize = 25)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
         subfig1.set_title(r"abs. $\sigma$ von $C/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = 25)
         subfig1.axhline(0, color = "grey")
@@ -123,7 +123,7 @@ def plot_n_for_each_N_sigma_rel(start: float, end: float):
             subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = nc, label = "QT: n = " + n)
         # saving
         subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel(r'$\sigma$ in $J_2$', fontsize = 25)
+        subfig1.set_ylabel(r'$\sigma_{rel}$ in $J_2$', fontsize = 25)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
         subfig1.set_title(r"rel. $\sigma$ von $C/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = 25)
         subfig1.axhline(0, color = "grey")
@@ -212,7 +212,7 @@ def plot_N_for_each_n_sigma_abs(start: float, end: float):
             subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT: N = " + N, alpha = 1.0)
         # saving
         subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel(r'$\sigma$ in $J_2$', fontsize = 25)
+        subfig1.set_ylabel(r'$\sigma_{abs}$ in $J_2$', fontsize = 25)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
         subfig1.set_title(r"abs. $\sigma$ von $C/N$ mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
         subfig1.axhline(0, color = "grey")
@@ -249,7 +249,7 @@ def plot_N_for_each_n_sigma_rel(start: float, end: float):
             subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT: N = " + N, alpha = 1.0)
         # saving
         subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel(r'$\sigma$ in $J_2$', fontsize = 25)
+        subfig1.set_ylabel(r'$\sigma_{rel}$ in $J_2$', fontsize = 25)
         #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
         subfig1.set_title(r"rel. $\sigma$ von $C/N$ mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
         subfig1.axhline(0, color = "grey")

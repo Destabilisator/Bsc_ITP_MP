@@ -10,7 +10,7 @@ import gc
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown")]#, ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
 peak_offset = 2000
@@ -32,9 +32,6 @@ def sort_data(X, Y, A):
                 Y[j], Y[j+1] = Y[j+1], Y[j]
                 A[j], A[j+1] = A[j+1], A[j]
     return X, Y, A
-
-# def expFunc(x: float, A: float, k: float, x_0: float, y_0: float) -> float:
-#     return x * A * np.exp(k * (x + x_0)) + y_0
 
 def expFunc(x: float, A: float, k: float) -> float:
     return x * A * np.exp(k * x)
@@ -109,9 +106,9 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
         #subfig2.set_xscale("log")
         subfig2.set_yscale("log")
         fig2.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
-        plt.close(fig2)
         plt.cla()
         plt.clf()
+        plt.close(fig2)
         del fig2, subfig2
         gc.collect()
 
@@ -162,10 +159,10 @@ def save_spin_gap_data(N, X, Y, YErr, A, AErr) -> None:
         subfig3.axhline(0, color = "grey")
         subfig3.legend(loc = 'best' ,frameon = False, fontsize = 20)
         fig3.savefig("results/" + N + "/spin_gap_data_AMP_" + str(cnt+1) + "_QT.png")
-        plt.close(fig3)
-        del fig3, subfig3
         plt.cla()
         plt.clf()
+        plt.close(fig3)
+        del fig3, subfig3
         gc.collect()
 
 
@@ -213,7 +210,7 @@ if __name__ == "__main__":
                     y += [Y_arr[n][pos]]
                     a += [A_arr[n][pos]]
                 y = np.array(y); a = np.array(a)
-                X += [X_arr[0][pos]]; Y += [y.mean()]; YErr += [y.std()]; A += [a.mean()]; AErr += [a.std()]
+                X += [X_arr[0][pos]]; Y += [y.mean()]; YErr += [y.std()]; A += [a.mean()]; AErr += [a.std()/a.mean()]
 
             save_spin_gap_data(N, X, Y, YErr, A, AErr)
 
@@ -223,10 +220,10 @@ if __name__ == "__main__":
             YErr = np.asarray(YErr)
             subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.2)
 
-            subfigAmp.plot(X, A, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = c, label = lbl)
-            A = np.asarray(A)
-            AErr = np.asarray(AErr)
-            subfigAmp.fill_between(X, A - AErr, A + AErr, color = c, alpha = 0.2)
+            subfigAmp.plot(X, AErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl, alpha = 0.5)
+            # A = np.asarray(A)
+            # AErr = np.asarray(AErr)
+            # subfigAmp.fill_between(X, A - AErr, A + AErr, color = c, alpha = 0.2)
 
             if not no_ED:
                 # ED results exp fit
@@ -244,7 +241,7 @@ if __name__ == "__main__":
                     A_arr += [float(A)]
                 X, Y, A_arr = sort_data(X, Y, A_arr)
                 subfig1.plot(X, Y, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)#, label = lbl, alpha = 0.5)
-                subfigAmp.plot(X, A_arr, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)
+                # subfigAmp.plot(X, A_arr, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)
                 # ED results
                 print("ED (dispersion)...")
                 lbl = "ED : N = " + N
@@ -275,11 +272,11 @@ if __name__ == "__main__":
 
             fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
 
-            subfigAmp.set_yscale("log")
+            # subfigAmp.set_yscale("log")
 
             subfigAmp.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-            subfigAmp.set_ylabel(r'A in $J_2$', fontsize = 25)
-            subfigAmp.set_title(r'Amplituden $A$ der exp. Fits mit ' + str(max_n) + " Startvektoren (QT)", fontsize = 25)
+            subfigAmp.set_ylabel(r'$\sigma_{rel}(A)$ in $J_2$', fontsize = 25)
+            subfigAmp.set_title(r'rel. Standardabweichung Amplituden $\sigma(A)$ der exp. Fits mit ' + str(max_n) + " Startvektoren (QT)", fontsize = 25)
 
             subfigAmp.axhline(0, color = "grey")
             subfigAmp.legend(loc = 'best' ,frameon = False, fontsize = 20)
@@ -298,4 +295,4 @@ if __name__ == "__main__":
         # del fig1, subfig1
         # del figAmp, subfigAmp
         # gc.collect()
-        #exit()
+        # exit()
