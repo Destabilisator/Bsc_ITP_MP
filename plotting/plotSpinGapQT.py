@@ -10,7 +10,7 @@ import gc
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown")]#, ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown")]#, ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
 peak_offset = 2000

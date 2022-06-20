@@ -20,8 +20,8 @@ noX=-X
 #noX=noX
 
 start_time=$SECONDS
-build=build
-#build=cmake-build-release
+#build=build
+build=cmake-build-release
 
 if [[ "$OSTYPE" == "msys" ]]; then
 	prgm=Bsc_ITP_MP.exe
@@ -31,29 +31,39 @@ else
 	pth=python3
 fi
 
-# #$pth plotting/deleteData.py 6 SG
+$pth plotting/deleteData.py 6 SG
 ./$build/$prgm 6 $start $end 50 $h -1 $noX silent && echo ""
-# #$pth plotting/deleteData.py 8 SG
+$pth plotting/deleteData.py 8 SG
 ./$build/$prgm 8 $start $end 50 $h -1 $noX silent && echo ""
-# #$pth plotting/deleteData.py 10 SG
+$pth plotting/deleteData.py 10 SG
 ./$build/$prgm 10 $start $end 50 $h -1 $noX silent && echo ""
-# #$pth plotting/deleteData.py 12 SG
+$pth plotting/deleteData.py 12 SG
 ./$build/$prgm 12 $start $end 50 $h 25 $noX silent && echo ""
+$pth plotting/deleteData.py 14 SG
 ./$build/$prgm 14 $start $end 50 $h 10 $noX silent && echo "" # 25
-./$build/$prgm 16 $start $end 50 $h 10 $noX silent && echo "" # 25
-./$build/$prgm 18 $start $end 50 $h 10 $noX silent && echo "" # 25
+# $pth plotting/deleteData.py 16 SG
+# ./$build/$prgm 16 $start $end 50 $h 10 $noX silent && echo "" # 25
+# $pth plotting/deleteData.py 18 SG
+# ./$build/$prgm 18 $start $end 50 $h 10 $noX silent && echo "" # 25
 
 # $pth plotting/plotStatisticsC.py 0 $plotend low && echo "" && echo ""
 # $pth plotting/plotStatisticsX.py 0 $plotend low
-# $pth plotting/plotSpinGapQT.py low && echo "" && echo ""
-# $pth plotting/plotDeltaEQT.py low && echo "" && echo ""
+$pth plotting/plotSpinGapQT.py low && echo "" && echo ""
+$pth plotting/plotDeltaEQT.py low && echo "" && echo ""
 
+$pth plotting/deleteData.py 20 SG
 ./$build/$prgm 20 $start $end 50 $h 10 $noX silent && echo ""
+$pth plotting/deleteData.py 22 SG
 ./$build/$prgm 22 $start $end 50 $h 5 $noX silent && echo ""
+$pth plotting/deleteData.py 24 SG
 ./$build/$prgm 24 $start $end 50 $h 5 $noX silent && echo ""
+$pth plotting/deleteData.py 26 SG
 ./$build/$prgm 26 $start $end 50 $h 1 $noX silent && echo ""
+$pth plotting/deleteData.py 28 SG
 ./$build/$prgm 28 $start $end 50 $h 1 $noX silent && echo ""
+$pth plotting/deleteData.py 30 SG
 ./$build/$prgm 30 $start $end 50 $h 1 $noX silent && echo ""
+$pth plotting/deleteData.py 32 SG
 ./$build/$prgm 32 $start $end 50 $h 1 $noX silent && echo ""
 
 #$pth plotting/plotSpinGapQT.py high && echo "" && echo ""

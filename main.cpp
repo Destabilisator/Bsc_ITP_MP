@@ -163,7 +163,7 @@ int main(int argc, char* argv[]) {
 
     if (N >= 22) {SAMPLES = 1;}
 
-    SAMPLES = 1;
+//    SAMPLES = 1;
     cores = SAMPLES;
     omp_set_num_threads(cores);
 
