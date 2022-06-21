@@ -645,8 +645,14 @@ namespace QT::MS {
         coutMutex.unlock();
 
 //#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, beta_Data, curr, prgbar_segm, std::cout)
-        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
-            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+        double J = 0.0;
+        while (J <= J_END) {
+        //for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+//            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+
+            if (J >= 0.7 && J <= 1.6) { J += 0.01;}
+            else {J += 0.1;}
+
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
             std::vector<std::vector<double>> rawDataC;
 
@@ -666,13 +672,13 @@ namespace QT::MS {
 //                             "beta in kb / J2", "C in J2", beta_Data, rawDataC, N);
             // progressbar
             coutMutex.lock();
-            int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+            int p = (int) ( J / J_END * (float) prgbar_segm);
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
                 std::cout << "#";
             } for (int _ = p; _ < prgbar_segm; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+            } std::cout << "] " << int( J / J_END * 100.0 ) << "% (" << J << "/" << J_END << "), J1/J2 = " << J << "     ";
             std::cout.flush();
             curr++;
             coutMutex.unlock();

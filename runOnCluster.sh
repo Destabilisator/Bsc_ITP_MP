@@ -31,8 +31,8 @@ else
 	pth=python3
 fi
 
-for N in 6 8 10 12 14; do
-    $pth plotting/deleteData.py $N SG
+for N in 6 8 10 12 14; do # 6 8 10 12 14
+    # $pth plotting/deleteData.py $N SG
 	$pth plotting/deleteData.py $N EE
 	./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
 done
@@ -40,11 +40,11 @@ done
 $pth plotting/plotSpinGapQT.py low && echo "" && echo ""
 $pth plotting/plotDeltaEQT.py low && echo "" && echo ""
 
-for N in 16 18 20 22 24 26 28 30 32; do
-    $pth plotting/deleteData.py $N SG
-	$pth plotting/deleteData.py $N EE
-	./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
-done
+# for N in 16 18 20 22 24 26 28 30 32; do
+#     $pth plotting/deleteData.py $N SG
+# 	$pth plotting/deleteData.py $N EE
+# 	./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
+# done
 
 elapsed=$(( SECONDS - start_time ))
 echo "all done, total elapsed time: $elapsed seconds"

@@ -46,6 +46,8 @@ def get_excitation_energie(n, N, J, filename) -> Tuple[float, float]:
         arr = lines[i].split("\t")
         x = arr[0]
         y = arr[1]
+        if "nan" in y or "inf" in y: continue
+        if float(x) > 50.0: continue
         X += [float(x)]
         Y += [float(y)]
     file.close()
@@ -240,6 +242,7 @@ if __name__ == "__main__":
                     A, k = get_excitation_energie(0, N, J, filename)
                     # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
                     X += [float(J)]
+                    Y += [float(k)]
                     A_arr += [float(A)]
                 X, Y, A_arr = sort_data(X, Y, A_arr)
                 subfig1.plot(X, Y, lw = 0, ls = "", markersize = 2, marker = "o", color = c)#, alpha = 0.5)#, label = lbl, alpha = 0.5)
@@ -283,7 +286,7 @@ if __name__ == "__main__":
             subfigAmp.axhline(0, color = "grey")
             subfigAmp.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-            figAmp.savefig("results/" + "spin_gap_with_QT_AMP_" + used_N + ".png")
+            figAmp.savefig("results/" + "excitation_energies_data_with_QT_AMP_" + used_N + ".png")
 
             # gc.collect(generation=2)
 
@@ -297,4 +300,4 @@ if __name__ == "__main__":
         # del fig1, subfig1
         # del figAmp, subfigAmp
         # gc.collect()
-        exit()
+        # exit()
