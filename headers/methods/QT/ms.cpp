@@ -215,9 +215,10 @@ namespace QT::MS {
         std::cout.flush();
         curr++;
         coutMutex.unlock();
-#if OUTER_NESTED_THREADS > 1
-        #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, matrixList, outData)
-#endif
+//#if OUTER_NESTED_THREADS > 1
+//        #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, matrixList, outData)
+//#endif
+#pragma omp parallel for num_threads(SAMPLES) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, matrixList, outData)
         for (int s = 1; s <= SAMPLES; s++) {
 //            int p = (int) ( (float) s / (float) SAMPLES * (float) prgbar_segm);
             std::vector<double> rawData = hlp::rungeKutta4_C(start, end, step, N, matrixList);
@@ -327,9 +328,10 @@ namespace QT::MS {
         coutMutex.unlock();
 
         std::vector<std::vector<double>> outData;
-#if OUTER_NESTED_THREADS > 1
-        #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outData)
-#endif
+//#if OUTER_NESTED_THREADS > 1
+//        #pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outData)
+//#endif
+#pragma omp parallel for num_threads(SAMPLES) default(none) shared(SAMPLES, coutMutex, curr, prgbar_segm, std::cout, start, end, step, N, H_List, S2_List, outData)
         for (int s = 1; s <= SAMPLES; s++) {
             std::vector<double> rawData = hlp::rungeKutta4_X(start, end, step, N, H_List, S2_List);
 

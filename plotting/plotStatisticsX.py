@@ -305,46 +305,53 @@ def plot_step_size(start: float, end: float):
     print("plotting step size dependance for fixed N ...")
     for N, NC in N_color:
         print("N = " + N)
-        fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
-        # ED results
-        file = open("results/" + N + "/data/data_susceptibility_J_const.txt", 'r')
-        lines = file.readlines()
-        linesJ = lines[0][len("J1/J2: "):-1]
-        lbl = "ED: N = " + N
-        X = []
-        Y = []
-        for i in range(8,len(lines)):
-            x, y = lines[i].split("\t")
-            if float(x) < start or float(x) > end: continue
-            X += [float(x)]
-            Y += [float(y)]
-        subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "black", label = lbl)
-        # QT results
-        filenum = 0
-        used_step_sizes = ""
-        for filename in os.listdir("results/" + N + "/data/step_size_data/"):
-            if "data_susceptibility_J_const_QT_step" in filename and "_data_susceptibility_J_const_QT_step" not in filename:
-                stepsize = filename[len("data_susceptibility_J_const_QT_step"): - len(".txt")]
-                file = open("results/" + N + "/data/step_size_data/data_susceptibility_J_const_QT_step" + stepsize + ".txt", 'r')
-                lines = file.readlines()
-                X = []
-                Y = []
-                for i in range(6,len(lines)):
-                    x, y, yErr = lines[i].split("\t")
-                    if float(x) < start or float(x) > end: continue
-                    X += [float(x)]
-                    Y += [float(y)]
-                subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = colors[filenum], label = "QT: " + str(float(stepsize)))
-                filenum += 1
-                used_step_sizes += "_" + str(float(stepsize))
-        # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
-        subfig1.set_title("Abhängigkeit von $\\chi/N$ von der Schrittweite in RK4 mit $J_1$ / $J_2$ = " + linesJ, fontsize = 25)
-        subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
-        plt.savefig("results/QT_stats/X_N_" + N + "_step_size" + used_step_sizes + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
-        plt.close(fig1)
+        for n, nc in n_color:
+            print("n = " + n)
+            fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+            # ED results
+            file = open("results/" + N + "/data/data_susceptibility_J_const.txt", 'r')
+            lines = file.readlines()
+            linesJ = lines[0][len("J1/J2: "):-1]
+            lbl = "ED: N = " + N
+            X = []
+            Y = []
+            for i in range(8,len(lines)):
+                x, y = lines[i].split("\t")
+                if float(x) < start or float(x) > end: continue
+                X += [float(x)]
+                Y += [float(y)]
+            subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "black", label = lbl)
+            # QT results
+            filenum = 0
+            used_step_sizes = ""
+            for filename in os.listdir("results/" + N + "/data/step_size_data/"):
+                if n + "_data_susceptibility_J_const_QT_step" in filename:# and "_data_susceptibility_J_const_QT_step" not in filename:
+                    stepsize = filename[len(n + "_data_susceptibility_J_const_QT_step"): - len(".txt")]
+                    file = open("results/" + N + "/data/step_size_data/" + n + "_data_susceptibility_J_const_QT_step" + stepsize + ".txt", 'r')
+                    lines = file.readlines()
+                    X = []; Y = []; YErr = []
+                    for i in range(6,len(lines)):
+                        x, y, yErr = lines[i].split("\t")
+                        if float(x) < start or float(x) > end: continue
+                        X += [float(x)]
+                        Y += [float(y)]
+                        YErr += [float(yErr)]
+                    subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = colors[filenum], label = "QT: " + str(float(stepsize)))
+                    X = np.asarray(X)
+                    Y = np.asarray(Y)
+                    YErr = np.asarray(YErr)
+                    subfig1.fill_between(X, Y - YErr, Y + YErr, color = colors[filenum], alpha = 0.1)
+                    filenum += 1
+                    used_step_sizes += "_" + str(float(stepsize))
+            # saving
+            subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
+            subfig1.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
+            subfig1.set_title("Abhängigkeit von $\\chi/N$ von der Schrittweite in RK4 mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
+            subfig1.axhline(0, color = "grey")
+            subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+            plt.savefig("results/QT_stats/X_N_" + N + "n_" + n + "_step_size" + used_step_sizes + "_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+            plt.close(fig1)
+        print()
 
 if __name__ == "__main__":
     print("plotting susceptibility (constant J1/J2, funtion of T):")
@@ -356,19 +363,19 @@ if __name__ == "__main__":
     elif regime == "high": N_color = N_color_HIGH
     else: exit()
 
-    plot_n_for_each_N(start, end)
-    print()
-    plot_n_for_each_N_sigma_abs(start, end)
-    print()
-    plot_n_for_each_N_sigma_rel(start, end)
-    print()
-    plot_N_for_each_n(start, end)
-    print()
-    plot_N_for_each_n_sigma_abs(start, end)
-    print()
-    plot_N_for_each_n_sigma_rel(start, end)
-    print()
-    plot_delta_ED(start, end)
-    print()
+    # plot_n_for_each_N(start, end)
+    # print()
+    # plot_n_for_each_N_sigma_abs(start, end)
+    # print()
+    # plot_n_for_each_N_sigma_rel(start, end)
+    # print()
+    # plot_N_for_each_n(start, end)
+    # print()
+    # plot_N_for_each_n_sigma_abs(start, end)
+    # print()
+    # plot_N_for_each_n_sigma_rel(start, end)
+    # print()
+    # plot_delta_ED(start, end)
+    # print()
     plot_step_size(start, end)
     print()

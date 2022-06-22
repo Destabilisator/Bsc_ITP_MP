@@ -116,34 +116,35 @@ int main(int argc, char* argv[]) {
     T_START = 0.0; T_END = 50.0;
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
 
-    if (N >= 22) {SAMPLES = 1;}
+    SAMPLES = 12;
+//    if (N >= 22) {SAMPLES = 1;}
     cores = SAMPLES;
     omp_set_num_threads(cores);
 
     /// C ///
-    /*
+///*
     for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
-        QT::MS::start_calculation_C_J_const(T_START, T_END, ss, J1, J2, h, N, SIZE, OUTER_NESTED_THREADS);
+        QT::MS::start_calculation_C_J_const(T_START, T_END, ss, J1, J2, h, N, SIZE, SAMPLES);
     }
 
     QT::MS::start_calculation_C_J_const(T_START, T_END, stepsize, J1, J2, h, N, SIZE, SAMPLES);
-    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+//    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
     if (N%4 == 0) {
-        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+        ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
     } else {
-        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT); /////////////////////// T_END * T_END
+        ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
     }
-*/
+//*/
     /// X ///
-    /*
+///*
     for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
-        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, 1);
+        QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, SAMPLES);
     }
 
-    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 1);
-    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, SAMPLES);
+//    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
     ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-*/
+//*/
     /// C and X ///
     /*
     if (N == 18) {
@@ -172,7 +173,7 @@ int main(int argc, char* argv[]) {
 //    }
 
     /// excitation energies ///
-
+/*
     //T_END = 2 * T_END;
 
     QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
@@ -180,6 +181,7 @@ int main(int argc, char* argv[]) {
         ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
         ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
     }
+*/
 
 #endif
 
