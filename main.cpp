@@ -122,7 +122,7 @@ int main(int argc, char* argv[]) {
     omp_set_num_threads(cores);
 
     /// C ///
-///*
+/*
     for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
         QT::MS::start_calculation_C_J_const(T_START, T_END, ss, J1, J2, h, N, SIZE, SAMPLES);
     }
@@ -134,9 +134,9 @@ int main(int argc, char* argv[]) {
     } else {
         ED::momentumStates::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
     }
-//*/
+*/
     /// X ///
-///*
+/*
     for (double ss : {1.0, 0.5 , 0.1, 0.05, 0.005, 0.001}) {
         QT::MS::start_calculation_X_J_const(T_START, T_END, ss, J1, J2, N, SIZE, SAMPLES);
     }
@@ -144,7 +144,7 @@ int main(int argc, char* argv[]) {
     QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, SAMPLES);
 //    T_COUNT =  (int) ( (T_END - T_START) / stepsize );
     ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-//*/
+*/
     /// C and X ///
     /*
     if (N == 18) {
@@ -165,15 +165,15 @@ int main(int argc, char* argv[]) {
     }
 */
     /// spin gap ///
-
-//    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
-//    if (N <= 18) {
-//        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
-//        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
-//    }
-
+///*
+    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+    if (N <= 18) {
+        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE);
+        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+    }
+//*/
     /// excitation energies ///
-/*
+///*
     //T_END = 2 * T_END;
 
     QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
@@ -181,7 +181,7 @@ int main(int argc, char* argv[]) {
         ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
         ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
     }
-*/
+//*/
 
 #endif
 
