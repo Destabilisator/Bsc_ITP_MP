@@ -17,7 +17,8 @@ int main(int argc, char* argv[]) {
                   h, h_START, h_END, h_COUNT,
                   silent, cores, plotsIn3D, true, J1, J2, noX);
 
-    omp_set_num_threads(cpu_cnt);
+//    omp_set_num_threads(cpu_cnt);
+    omp_set_num_threads(cores);
     //omp_set_num_threads(OUTERMOST_NESTED_THREADS * OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
     omp_set_nested(1);
 
