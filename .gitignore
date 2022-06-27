@@ -19,6 +19,8 @@ results/oldData/*
 results/old/*
 results/knowngood/*
 results/less_old_data/*
+results/C_bis_18/*
+results/X_bis_18/*
 
 results/QT_stats/generally_good_fit/*
 results/QT_stats/good_fit_for_N_mod_4/*
