@@ -18,6 +18,7 @@ benchmarkResults.txt
 results/oldData/*
 results/old/*
 results/knowngood/*
+results/less_old_data/*
 
 results/QT_stats/generally_good_fit/*
 results/QT_stats/good_fit_for_N_mod_4/*
