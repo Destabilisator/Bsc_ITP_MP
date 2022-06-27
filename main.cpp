@@ -120,7 +120,7 @@ int main(int argc, char* argv[]) {
 
     SAMPLES = 5;
 //    if (N >= 22) {SAMPLES = 1;}
-//    cores = SAMPLES;
+    cores = SAMPLES;
     omp_set_num_threads(cores);
 
     /// C ///
@@ -166,6 +166,11 @@ int main(int argc, char* argv[]) {
         QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
     }
 */
+
+for (int n = 6; n <= 18; n += 2) {
+    N = n;
+    SIZE = (int) std::pow(2,N);
+
     /// spin gap ///
 ///*
     QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
@@ -184,9 +189,9 @@ int main(int argc, char* argv[]) {
         ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
     }
 //*/
-
+}
     N = 20;
-    SIZE = (int) std::pow(22,N);
+    SIZE = (int) std::pow(2,N);
     ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 
 #endif
