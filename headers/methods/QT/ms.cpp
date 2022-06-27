@@ -573,7 +573,7 @@ namespace QT::MS {
 //#if OUTERMOST_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(OUTERMOST_NESTED_THREADS) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
 //#endif
-#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
+//#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
         for (int J_pos = 0; J_pos <= J_COUNT; J_pos++) {
             double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
@@ -581,7 +581,7 @@ namespace QT::MS {
 //#if OUTER_NESTED_THREADS > 1
 //#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, rawDataX, beta_Data, N, SIZE)
 //#endif
-//#pragma omp parallel for default(none) num_threads(SAMPLES) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J) // num_threads(SAMPLES)
+#pragma omp parallel for default(none) num_threads(SAMPLES) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J) // num_threads(SAMPLES)
             for (int s = 1; s <= SAMPLES; s++) {
                 std::vector<double> rawData = hlp::rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
 //                rawDataX.emplace_back(rawData);
@@ -646,7 +646,7 @@ namespace QT::MS {
         curr++;
         coutMutex.unlock();
 
-#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, beta_Data, curr, prgbar_segm, std::cout)
+//#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, beta_Data, curr, prgbar_segm, std::cout)
         for (int J_pos = 0; J_pos <= J_COUNT; J_pos++) {
             double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
         //for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
@@ -658,7 +658,7 @@ namespace QT::MS {
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
             std::vector<std::vector<double>> rawDataC;
 
-//#pragma omp parallel for num_threads(SAMPLES) default(none) shared(SAMPLES, BETA_START, BETA_END, BETA_STEP, N, H_List, J, beta_Data)
+#pragma omp parallel for num_threads(SAMPLES) default(none) shared(SAMPLES, BETA_START, BETA_END, BETA_STEP, N, H_List, J, beta_Data)
             for (int s = 1; s <= SAMPLES; s++) {
                 std::vector<double> rawData = hlp::rungeKutta4_C(BETA_START, BETA_END, BETA_STEP, N, H_List);
 //                rawDataC.emplace_back(rawData);
