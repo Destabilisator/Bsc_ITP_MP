@@ -31,9 +31,10 @@ int main(int argc, char* argv[]) {
     std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << "\n";
     std::cout << "T_START = " << T_START << ", T_END = " << T_END << " and T_COUNT = " << T_COUNT << "\n";
     std::cout << "h_START = " << h_START << ", h_END = " << h_END << " and h_COUNT = " << h_COUNT << "\n";
+      */
     std::cout << "using " << cores << " cores (hardware limit: " << std::thread::hardware_concurrency() << " cores)\n";
     if (noX) {std::cout << "skipping susceptibility plots\n";}
-     */
+
     std::cout.flush();
     //std::cout << std::endl;
 
@@ -117,9 +118,9 @@ int main(int argc, char* argv[]) {
     T_START = 0.0; T_END = 50.0;
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
 
-    SAMPLES = 12;
+    SAMPLES = 1;
 //    if (N >= 22) {SAMPLES = 1;}
-    cores = SAMPLES;
+//    cores = SAMPLES;
     omp_set_num_threads(cores);
 
     /// C ///
