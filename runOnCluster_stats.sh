@@ -44,11 +44,11 @@ if [[ "$regime" == "low" ]]; then
 	$pth plotting/plotStatisticsX.py 0 $plotend $regime
 elif [[ "$regime" == "high" ]]; then
 	echo "high regime" && echo ""
-	# ./$build/$prgm 18 $start $end 20 $h -1 $noX silent && echo ""
+	./$build/$prgm 18 $start $end 20 $h 25 $noX silent && echo ""
 	./$build/$prgm 20 $start $end 25 $h 10 $noX silent && echo ""
-	./$build/$prgm 22 $start $end 25 $h 5 $noX silent && echo ""
-	./$build/$prgm 24 $start $end 20 $h 2 $noX silent && echo ""
-	./$build/$prgm 26 $start $end 20 $h 1 $noX silent && echo ""
+	./$build/$prgm 22 $start $end 25 $h 10 $noX silent && echo ""
+	./$build/$prgm 24 $start $end 20 $h 5 $noX silent && echo ""
+	./$build/$prgm 26 $start $end 20 $h 2 $noX silent && echo ""
 	./$build/$prgm 28 $start $end 20 $h 1 $noX silent && echo ""
 	./$build/$prgm 30 $start $end 20 $h 1 $noX silent && echo ""
 	./$build/$prgm 32 $start $end 20 $h 1 $noX silent && echo ""
