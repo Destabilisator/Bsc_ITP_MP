@@ -65,7 +65,7 @@ for end in [25.0, 50.0]:
                 plt.xticks(fontsize = 25)
                 plt.yticks(fontsize = 25)
 
-                fig3.savefig("results/" + "x_ED_QT_" + N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+                fig3.savefig("results/" + "X_ED_QT_" + N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
                 plt.close(fig3)
 
                 subfig2.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)
