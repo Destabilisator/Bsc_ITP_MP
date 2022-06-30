@@ -570,18 +570,30 @@ namespace QT::MS {
         curr++;
         coutMutex.unlock();
 
-//#if OUTERMOST_NESTED_THREADS > 1
-//#pragma omp parallel for num_threads(OUTERMOST_NESTED_THREADS) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
-//#endif
-//#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout)
-        for (int J_pos = 0; J_pos <= J_COUNT; J_pos++) {
-            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+        // init J vals
+#ifdef SG_EE_EVEN_J_DIST
+        std::vector<double> J_vals;
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        } J_vals.shrink_to_fit();
+#else
+        std::vector<double> J_vals;
+        double J_init = J_START;
+        while (J_init <= J_END) {
+            J_vals.emplace_back(J_init);
+//            std::cout << "pushing back J = " << J_init << "\n";
+            if (J_init >= 0.75 && J_init < 1.25) {
+                J_init += 0.02;
+            } else {J_init += 0.1;}
+        } J_vals.shrink_to_fit();
+#endif
+
+#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout, J_vals)
+        for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+            double J = J_vals.at(J_pos); //J_START + (J_END - J_START) * J_pos / J_COUNT;
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
-//            std::vector<std::vector<double>> rawDataX;
-//#if OUTER_NESTED_THREADS > 1
-//#pragma omp parallel for num_threads(OUTER_NESTED_THREADS) default(none) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, rawDataX, beta_Data, N, SIZE)
-//#endif
-#pragma omp parallel for default(none) num_threads(SAMPLES) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J) // num_threads(SAMPLES)
+
+//#pragma omp parallel for default(none) num_threads(SAMPLES) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J) // num_threads(SAMPLES)
             for (int s = 1; s <= SAMPLES; s++) {
                 std::vector<double> rawData = hlp::rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
 //                rawDataX.emplace_back(rawData);
@@ -596,13 +608,13 @@ namespace QT::MS {
 
             // progressbar
             coutMutex.lock();
-            int p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
+            int p = (int) ( (float) curr / (float) J_vals.size() * (float) prgbar_segm);
             std::cout << "\r[";
             for (int _ = 0; _ < p; _++) {
                 std::cout << "#";
             } for (int _ = p; _ < prgbar_segm; _++) {
                 std::cout << ".";
-            } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
+            } std::cout << "] " << int( (float) curr / (float) J_vals.size() * 100.0 ) << "% (" << curr << "/" << J_vals.size() << "), J1/J2 = " << J_vals.at(J_pos) << "     ";
             std::cout.flush();
             curr++;
             coutMutex.unlock();

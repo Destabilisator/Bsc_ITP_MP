@@ -338,6 +338,7 @@ def plot_step_size(start: float, end: float):
                 if float(x) < start or float(x) > end: continue
                 X += [float(x)]
                 Y += [float(y)]
+            file.close()
             subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "black", label = lbl)
             # QT results
             filenum = 0
@@ -355,6 +356,7 @@ def plot_step_size(start: float, end: float):
                         X += [float(x)]
                         Y += [float(y)]
                         YErr += [float(yErr)]
+                    file.close()
                     subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = colors[filenum], label = "QT: " + str(float(stepsize)))
                     X = np.asarray(X)
                     Y = np.asarray(Y)

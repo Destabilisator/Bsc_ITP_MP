@@ -15,5 +15,8 @@
 #define SAVE_WITH_DATA_FROM_ALL_SAMPLES
 #define SAVE_WITH_STEP_SIZE
 
+// QT calculation
+#define SG_EE_EVEN_J_DIST
+
 // prevent multithreading in Eigen
 //#define EIGEN_DONT_PARALLELIZE

@@ -110,7 +110,7 @@ namespace ED::multi {
 //            if (N >= 12) {
                 std::cout << ", spin inversion\n";
                 int curr = 0;
-#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, temp, N, SIZE, coutMutex, std::cout, curr, h)
+#pragma omp parallel for default(none)  num_threads(cores) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, temp, N, SIZE, coutMutex, std::cout, curr, h)
                 for (int i = 0; i <= COUNT; i++) {
                     double J = START + (END - START) * i / COUNT;
                     coutMutex.lock();
@@ -468,7 +468,7 @@ namespace ED::multi {
         if (N%4 == 0) {
             std::cout << ", spin inversion\n";
             int curr = 0;
-#pragma omp parallel for default(none) shared(START, END, COUNT, outDataSpinGap, N, SIZE, coutMutex, std::cout, curr)
+#pragma omp parallel for num_threads(cores) default(none) shared(START, END, COUNT, outDataSpinGap, N, SIZE, coutMutex, std::cout, curr)
             for (int i = 0; i <= COUNT; i++) {
                 double J = START + (END - START) * i / COUNT;
                 coutMutex.lock();
@@ -592,7 +592,7 @@ namespace ED::multi {
 
     void startSusceptibilityMultiJ(const double &J_START, const double &J_END, const int &J_COUNT,
                                    const double &BETA_START, const double &BETA_END, const double &BETA_COUNT,
-                                   const int &N, const int &SIZE) {
+                                   const int &N, const int &SIZE, const int &cores) {
 
         auto start = std::chrono::steady_clock::now();
 
@@ -622,7 +622,7 @@ namespace ED::multi {
 
         ///// susceptibility /////
 
-#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, coutMutex, BETA_START, BETA_END, BETA_COUNT, curr, prgbar_segm, std::cout, beta_Data)
+#pragma omp parallel for num_threads(cores) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, coutMutex, BETA_START, BETA_END, BETA_COUNT, curr, prgbar_segm, std::cout, beta_Data)
         for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
 
             double J = J_START + (J_END - J_START) * J_pos / J_COUNT;

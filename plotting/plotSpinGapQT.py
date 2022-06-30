@@ -207,6 +207,7 @@ if __name__ == "__main__":
             for pos in range(len(X_arr[0])):
                 y = []; a = []
                 for n in range(max_n):
+                    if len(X_arr[n]) == 0: continue
                     y += [Y_arr[n][pos]]
                     a += [A_arr[n][pos]]
                 y = np.array(y); a = np.array(a)

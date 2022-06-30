@@ -12,10 +12,11 @@
 
 //// ED /////
 #include "helpers.h"
-#include "methods/EDMethods.h"
-#include "methods/ED/multithreading.h"
+//#include "methods/EDMethods.h"
+//#include "methods/ED/multithreading.h"
 #include "methods/ED/3DPlots.h"
-#include "methods/QTMethods.h"
+//#include "methods/QTMethods.h"
+#include "benchmarking.h"
 
 #define multiCalc
 

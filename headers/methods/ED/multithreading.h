@@ -72,7 +72,7 @@ namespace ED::multi {
 
     void startSusceptibilityMultiJ(const double &J_START, const double &J_END, const int &J_COUNT,
                                    const double &BETA_START, const double &BETA_END, const double &BETA_COUNT,
-                                   const int &N, const int &SIZE);
+                                   const int &N, const int &SIZE, const int &cores);
 
     /////////////////////////////// excitation energies ///////////////////////////////
 
