@@ -12,7 +12,7 @@ else
 	pth=python3
 fi
 
-/$build/$prgm && echo "" && echo ""
+./$build/$prgm && echo "" && echo ""
 $pyth plotting/plotBenchmarking.py
 
 elapsed=$(( SECONDS - start_time ))

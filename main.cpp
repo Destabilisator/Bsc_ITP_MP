@@ -187,7 +187,7 @@ int main(int argc, char* argv[]) {
 
     /// benchmarking ///
 
-    bench::bench_ED_QT_SG(6, 12, 1);
+    bench::bench_ED_QT_SG(6, 24);
 
 #endif
 

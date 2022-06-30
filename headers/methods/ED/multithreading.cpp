@@ -491,7 +491,7 @@ namespace ED::multi {
         } else {
             std::cout << ", momentum states\n";
             int curr = 0;
-#pragma omp parallel for default(none) shared(START, END, COUNT, outDataSpinGap, N, SIZE, coutMutex, std::cout, curr)
+#pragma omp parallel for num_threads(cores) default(none) shared(START, END, COUNT, outDataSpinGap, N, SIZE, coutMutex, std::cout, curr)
             for (int i = 0; i <= COUNT; i++) {
                 double J = START + (END - START) * i / COUNT;
                 coutMutex.lock();

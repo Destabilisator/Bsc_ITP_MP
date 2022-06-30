@@ -12,7 +12,7 @@ namespace bench {
 
     /////////////////////////////// benchmarking ///////////////////////////////
 
-    void bench_ED_QT_SG(int N_start, int N_end, int cores);
+    void bench_ED_QT_SG(int N_start, int N_end);
 
     void save_bench_val(const std::string &filename, const std::string &content);
 
