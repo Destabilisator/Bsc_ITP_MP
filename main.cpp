@@ -3,6 +3,7 @@
 //#define DEBUG
 //#define ED_METHODS
 #define CLUSTER
+#define BENCH
 
 int main(int argc, char* argv[]) {
 
@@ -111,6 +112,7 @@ int main(int argc, char* argv[]) {
 #endif
 #endif
 #ifdef CLUSTER
+#ifndef BENCH
 
 ///// Abweichungen als Funktion der Systemgröße, Mittlungen und Temperatur (nur Rohdaten) /////
 
@@ -184,11 +186,20 @@ int main(int argc, char* argv[]) {
         ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
     }
 */
+#endif
+#ifdef BENCH
 
     /// benchmarking ///
 
-    bench::bench_ED_QT_SG(6, 24);
+    // run time
+//    bench::bench_ED_QT_SG(6, 24);
 
+    // memory usage
+
+    bench::bench_ED_QT_memory_usage(6, 32);
+
+
+#endif
 #endif
 
     std::cout << std::endl;
