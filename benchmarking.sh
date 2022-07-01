@@ -13,7 +13,7 @@ else
 fi
 
 ./$build/$prgm && echo "" && echo ""
-$pyth plotting/plotBenchmarking.py
+$pth plotting/plotBenchmarking.py
 
 elapsed=$(( SECONDS - start_time ))
 echo "all done, total elapsed time: $elapsed seconds"

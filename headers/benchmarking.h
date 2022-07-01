@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <sys/resource.h>
 
 #include "methods/EDMethods.h"
 #include "methods/ED/multithreading.h"

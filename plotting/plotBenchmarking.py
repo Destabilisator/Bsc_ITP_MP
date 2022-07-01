@@ -9,7 +9,7 @@ colors = ["red", "blue", "green", "tomato", "purple"]
 line_width = 3
 marker_size = 5
 
-samples = ["1", "2", "3"]
+samples = ["1"]#, "2", "3"]
 stepsizes = ["0.100000", "0.010000"]
 cores = ["1"] # ["1", "2", "5", "10"]
 
