@@ -192,10 +192,10 @@ int main(int argc, char* argv[]) {
     /// benchmarking ///
 
     // memory usage
-    bench::bench_ED_QT_memory_usage(6, 32);
+    bench::bench_ED_QT_H_S2_memory_usage(6, 32);
 
     // run time
-    bench::bench_ED_QT_SG(6, 32);
+    bench::bench_ED_QT_SG_runtime(6, 32);
 
 #endif
 #endif

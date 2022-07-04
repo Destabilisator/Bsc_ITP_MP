@@ -16,9 +16,9 @@ namespace bench {
 
     /////////////////////////////// benchmarking ///////////////////////////////
 
-    void bench_ED_QT_SG(int N_start, int N_end);
+    void bench_ED_QT_SG_runtime(int N_start, int N_end);
 
-    void bench_ED_QT_memory_usage(int N_start, int N_end);
+    void bench_ED_QT_H_S2_memory_usage(int N_start, int N_end);
 
     void save_bench_val(const std::string &filename, const std::string &content);
 
