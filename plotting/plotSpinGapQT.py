@@ -10,14 +10,14 @@ import gc
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown")]#, ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown")]#, ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
 peak_offset = 2000
 fit_samples = 5 # 5
 search_start_percent = 4/5
 search_end_percent = 1/5
-max_n = 5 # min = 1; max = 5
+max_n = 1 # min = 1; max = 5
 no_ED = False
 
 SAVE_FULL_PLOTS = False
@@ -215,7 +215,7 @@ if __name__ == "__main__":
 
             save_spin_gap_data(N, X, Y, YErr, A, AErr)
 
-            subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = c, label = lbl)
+            subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = c, label = lbl)
             X = np.asarray(X)
             Y = np.asarray(Y)
             YErr = np.asarray(YErr)

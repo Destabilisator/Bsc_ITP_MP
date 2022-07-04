@@ -555,22 +555,7 @@ namespace QT::MS {
             beta_Data.emplace_back(beta);
         } beta_Data.shrink_to_fit();
 
-        // init progressbar
-        int prgbar_segm = 50;
-        int curr = 0;
-        coutMutex.lock();
-        int _p = (int) ( (float) curr / (float) J_COUNT * (float) prgbar_segm);
-        std::cout << "\r[";
-        for (int _ = 0; _ < _p; _++) {
-            std::cout << "#";
-        } for (int _ = _p; _ < prgbar_segm; _++) {
-            std::cout << ".";
-        } std::cout << "] " << int( (float) curr / (float) J_COUNT * 100.0 ) << "% (" << curr << "/" << J_COUNT << "), J1/J2 = " << J_START + (J_END - J_START) * curr / J_COUNT << "     ";
-        std::cout.flush();
-        curr++;
-        coutMutex.unlock();
-
-        // init J vals
+        ///// init J vals /////
 #ifdef SG_EE_EVEN_J_DIST
         std::vector<double> J_vals;
         for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
@@ -582,11 +567,28 @@ namespace QT::MS {
         while (J_init <= J_END) {
             J_vals.emplace_back(J_init);
 //            std::cout << "pushing back J = " << J_init << "\n";
-            if (J_init >= 0.75 && J_init < 1.25) {
-                J_init += 0.02;
+            if (J_init >= 0.6 && J_init < 1.25) {
+                J_init += 0.04;
             } else {J_init += 0.1;}
         } J_vals.shrink_to_fit();
 #endif
+
+        // init progressbar
+        int prgbar_segm = 50;
+        int curr = 0;
+        coutMutex.lock();
+        int _p = (int) ( (float) curr / (float) J_vals.size() * (float) prgbar_segm);
+        std::cout << "\r[";
+        for (int _ = 0; _ < _p; _++) {
+            std::cout << "#";
+        } for (int _ = _p; _ < prgbar_segm; _++) {
+            std::cout << ".";
+        } std::cout << "] " << int( (float) curr / (float) J_vals.size() * 100.0 ) << "% (" << curr << "/" << J_vals.size() << "), J1/J2 = " << J_vals.at(0) << "     ";
+        std::cout.flush();
+        curr++;
+        coutMutex.unlock();
+
+
 
 #pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout, J_vals)
         for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
