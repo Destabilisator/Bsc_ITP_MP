@@ -46,13 +46,13 @@ elif which == "EE":
 elif which == "BRT":
     print("removing old benchmarking run time ...")
     for i in range(1,6):
-        for filename in os.listdir("results/benchmarking/runtiume/data/"):
+        for filename in os.listdir("results/benchmarking/runtime/data/"):
             if filename == "dummyFile.txt" or filename == "data_placeholder.txt":
                 continue
             try:
-                shutil.rmtree("results/benchmarking/runtiume/data/" + filename, ignore_errors=False, onerror=False)
+                shutil.rmtree("results/benchmarking/runtime/data/" + filename, ignore_errors=False, onerror=False)
             except:
-                os.remove("results/benchmarking/runtiume/data/" + filename)
+                os.remove("results/benchmarking/runtime/data/" + filename)
 elif which == "BMU":
     print("removing old benchmarking memory usage ...")
     for i in range(1,6):

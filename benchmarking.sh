@@ -1,8 +1,8 @@
 #!/bin/bash
 
 start_time=$SECONDS
-#build=build
-build=cmake-build-release
+build=build
+#build=cmake-build-release
 
 if [[ "$OSTYPE" == "msys" ]]; then
 	prgm=Bsc_ITP_MP.exe
