@@ -17,6 +17,7 @@ namespace bench {
             for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
                 if (N > 20 && cores != 1) { continue;}
                 for (double stepsize: {0.1, 0.01}) {
+                    if (N > 20 && stepsize < 0.05) { continue;}
                     int T_COUNT = (int) ((T_END - T_START) / stepsize);
                     for (int SAMPLES: {1, 2, 3}) { /// 1, 2, 3
                         if (N > 20 && SAMPLES != 1) { continue;}
