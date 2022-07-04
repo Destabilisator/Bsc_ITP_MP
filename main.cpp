@@ -3,7 +3,7 @@
 //#define DEBUG
 //#define ED_METHODS
 #define CLUSTER
-//#define BENCH
+#define BENCH
 
 int main(int argc, char* argv[]) {
 
@@ -191,13 +191,11 @@ int main(int argc, char* argv[]) {
 
     /// benchmarking ///
 
-    // run time
-//    bench::bench_ED_QT_SG(6, 24);
-
     // memory usage
-
     bench::bench_ED_QT_memory_usage(6, 32);
 
+    // run time
+    bench::bench_ED_QT_SG(6, 32);
 
 #endif
 #endif

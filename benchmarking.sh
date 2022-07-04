@@ -12,11 +12,11 @@ else
 	pth=python3
 fi
 
-# delete ord data
+# delete old data
 $pth ./plotting/deleteData.py -1 BRT
 $pth ./plotting/deleteData.py -1 BMU
 
-#generate new data
+# generate new data
 ./$build/$prgm && echo "" && echo ""
 
 # plot data

@@ -9,15 +9,17 @@ namespace bench {
         auto start_timer = std::chrono::steady_clock::now();
 
         double J_START = 0.0, J_END = 2.0;
-        int J_COUNT = 50;
+        int J_COUNT = 1;
         double T_START = 0.0, T_END = 50.0;
 
         for (int N = N_start; N <= N_end; N += 2) {
             int SIZE = (int) std::pow(2, N);
-            for (int cores: {1}) { /// 1, 2, 5, 10
+            for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
+                if (N > 20 && cores != 1) { continue;}
                 for (double stepsize: {0.1, 0.01}) {
                     int T_COUNT = (int) ((T_END - T_START) / stepsize);
-                    for (int SAMPLES: {1}) { /// 1, 2, 3
+                    for (int SAMPLES: {1, 2, 3}) { /// 1, 2, 3
+                        if (N > 20 && SAMPLES != 1) { continue;}
 
                         // QT
                         std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize
