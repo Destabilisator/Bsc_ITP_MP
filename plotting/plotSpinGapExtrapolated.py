@@ -14,13 +14,19 @@ N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), 
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
 peak_offset = 2000
-fit_samples = 5 # 5
+fit_samples = 3 # 5
 search_start_percent = 4/5
 search_end_percent = 1/5
-max_n = 5 # min = 1; max = 5
+max_n = 1 # min = 1; max = 5
 
 extrapolate_QT = True
 extrapolate_ED = True
+
+SHANK_ALG = False
+EXP_FIT = False
+EXPSILON_ALG = True
+
+counter = 0
 
 
 def shank_Alg(A, n):
@@ -28,15 +34,69 @@ def shank_Alg(A, n):
     return (Anp1 * Anm1 - An * An) / (Anp1 - 2 * An + Anm1)
     # return Anp1 - ( (Anp1 - An) * (Anp1 - An) ) / ( (Anp1 - An) - (An - Anm1) )
 
-def shank_Alg_raw(A_raw):
+def epsilon_Alg(A):
+    length = len(A)
+    eps = [[0] * (length + 1) for _ in range(length)]
+    #for i in eps: print(i)
+    for i in range(length):
+        eps[i][0] = 0.0; eps[i][1] = A[i]
+    for i in eps: print(i)
+    for k in range(1, length + 1):
+        for j in range(length - k):
+            #print("j: %i, k: %i" % (j, k))
+            eps[j][k+1] = eps[j+1][k-1] + 1.0 / (eps[j+1][k] - eps[j][k])
+            #for i in eps: print(i)
+    for i in eps: print(i)
+    epslim = -1.0
+    if (length+1) % 2 == 0: epslim = eps[0][length]
+    else: epslim = eps[1][length-1]
+    print(epslim)
+    return epslim
+
+def expFunc_offset(x: float, A: float, k: float, x_0: float) -> float:
+    return A * np.exp(k * x) + x_0
+
+def expFunc(x: float, A: float, k: float) -> float:
+    return x * A * np.exp(k * x)
+
+def extrapolation_alg_raw(A_raw):
+    global counter
     len_N = len(A_raw); len_Y = len(A_raw[0])
     outdata = []
     for i in range(len_Y):
         A = []
         for j in range(len_N): A += [A_raw[j][i]]
-        S = []
-        for j in range(1, len(A)-1): S += [shank_Alg(A, j)]
-        outdata += [S[-1]]
+
+        # fitting exp to data
+        if EXP_FIT:
+            X = [x for x in range(1, len(A)+1)]
+            fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
+            subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
+            counter += 1
+            try:
+                X = np.array(X); A = np.array(A)
+                params, cv = scipy.optimize.curve_fit(expFunc_offset, X, A, (1.0, 0.1, 0.1))
+                A_param, k_param, x_0_param = params
+                X = np.linspace(0, X[-1], 100)
+                Y = expFunc_offset(X, A_param, k_param, x_0_param)
+                subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "black")
+                outdata += [x_0_param]
+            except RuntimeError:
+                print("fit failed")
+                outdata += [-1]
+            fig3.savefig("results/" + "extrapolation_temp/data_" + str(counter) + "_.png")
+            plt.close(fig3)
+
+        # shank algorithm
+        elif SHANK_ALG:
+            S = []
+            for j in range(1, len(A)-1): S += [shank_Alg(A, j)]
+            outdata += [S[-1]]
+
+        # epsilon algorithm
+        elif EXPSILON_ALG:
+            outdata += [epsilon_Alg(A)]
+
     return outdata
 
 def sort_data(X, Y, A):
@@ -49,9 +109,6 @@ def sort_data(X, Y, A):
                 Y[j], Y[j+1] = Y[j+1], Y[j]
                 A[j], A[j+1] = A[j+1], A[j]
     return X, Y, A
-
-def expFunc(x: float, A: float, k: float) -> float:
-    return x * A * np.exp(k * x)
 
 def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
     file = open("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + filename, 'r')
@@ -110,13 +167,17 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
 def QT_extrapolation(N_color):
     print("extrapolating QT ...")
     for max_N in range(len(N_color)+1):
+        if max_N != len(N_color): continue #########################
         for i in range(max_N):
+            if i != 0: continue #########################
             fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
             print("---------------NEW QT---------------")
             used_N = "N"
-            Shank_Array = []
+            Ns = []
+            extrapolationArray = []
             for j in range(i, max_N):
                 N, c = N_color[j]
+                Ns += [int(N)]
                 print("N = " + N + ":") 
                 # QT results
                 print("QT (exp fit)...")
@@ -150,12 +211,21 @@ def QT_extrapolation(N_color):
                 YErr = np.asarray(YErr)
                 subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.1)
 
-                Shank_Array += [Y]
+                extrapolationArray += [Y]
 
                 used_N += "_" + N
 
-            if len(Shank_Array) >= 3:
-                Y = shank_Alg_raw(Shank_Array)
+            for i in range(len(extrapolationArray[0])):
+                fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
+                Y_data = []
+                for j in range(len(extrapolationArray)):
+                    Y_data += [extrapolationArray[j][i]]
+                subfig2.plot(Ns, Y_data, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = str(X[i]))
+                fig2.savefig("results/" + "extrapolation_temp/QT_" + used_N + "_J_" + str(X[i]) + ".png")
+                plt.close(fig2)
+
+            if len(extrapolationArray) >= 3 or True:
+                Y = extrapolation_alg_raw(extrapolationArray)
             
                 X_new = []; Y_new = []
                 for dat in range(len(X)):
@@ -179,14 +249,18 @@ def QT_extrapolation(N_color):
 
 def ED_extrapolation(N_color):
     print("extrapolating ED ...")
-    for max_N in range(len(N_color)):
+    for max_N in range(len(N_color)+1):
+        if max_N != len(N_color): continue #########################
         for i in range(max_N):
+            if i != 0: continue #########################
             fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
             print("---------------NEW ED---------------")
             used_N = "N"
-            Shank_Array = []
+            Ns = []
+            extrapolationArray = []
             for j in range(i, len(N_color)):
                 N, c = N_color[j]
+                Ns += [int(N)]
                 print("N = " + N + ":") 
                 # ED results exp fit
                 print("ED (exp fit)...")
@@ -218,11 +292,20 @@ def ED_extrapolation(N_color):
                 file.close()
                 subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = N)
 
-                Shank_Array += [Y]
+                extrapolationArray += [Y]
 
                 used_N += "_" + N
 
-            Y = shank_Alg_raw(Shank_Array)
+            for i in range(len(X)):
+                fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
+                Y_data = []
+                for j in range(len(extrapolationArray)):
+                    Y_data += [extrapolationArray[j][i]]
+                subfig2.plot(Ns, Y_data, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = str(X[i]))
+                fig2.savefig("results/" + "extrapolation_temp/ED_" + used_N + "_J_" + str(X[i]) + ".png")
+                plt.close(fig2)
+
+            Y = extrapolation_alg_raw(extrapolationArray)
 
             X_new = []; Y_new = []
             for dat in range(len(X)):
