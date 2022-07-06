@@ -1,7 +1,7 @@
 #include "main.h"
 
-//#define DEBUG
-//#define ED_METHODS
+#define DEBUG
+#define ED_METHODS
 #define CLUSTER
 #define BENCH
 
@@ -84,10 +84,10 @@ int main(int argc, char* argv[]) {
     }
 #endif
 #endif
+#endif
 /////////////////////////////// testing ///////////////////////////////
 #ifdef DEBUG
-
-    ED::momentumStates::startSusceptibility(1.0, 1.0, 18, (int) std::pow(2, 18), T_START, T_END, T_COUNT);
+//    ED::momentumStates::startSusceptibility(1.0, 1.0, 18, (int) std::pow(2, 18), T_START, T_END, T_COUNT);
 
 //    ED::momentumStates::start(J1, J2, h, N, SIZE);
 
@@ -103,15 +103,17 @@ int main(int argc, char* argv[]) {
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
 //    ED::spinInversion::startSpecificHeat(J1, J2, h, N, SIZE, T_START, T_END, T_COUNT);
 
+    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
-    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
-    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
-    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
-
-#endif
+//    QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, SAMPLES);
+//    QT::MS::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
+//    QT::MB::start_calculation_X_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, OUTER_NESTED_THREADS);
+//    ED::magnetizationBlocks::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
+//    ED::momentumStates::startSusceptibility(J1, J2, N, SIZE, T_START, T_END, T_COUNT);
 #endif
 #ifdef CLUSTER
+#ifndef DEBUG
 #ifndef BENCH
 
 ///// Abweichungen als Funktion der Systemgröße, Mittlungen und Temperatur (nur Rohdaten) /////
@@ -197,6 +199,7 @@ int main(int argc, char* argv[]) {
     // run time
     bench::bench_ED_QT_SG_runtime(18, 32);
 
+#endif
 #endif
 #endif
 

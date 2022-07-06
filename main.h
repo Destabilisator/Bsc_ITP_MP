@@ -27,6 +27,8 @@
     //#define parityStateAnsatz
 #endif
 
+//#define NDEBUG
+
 ///// global variables /////
 int N = 8;  // has to be at least 6 and even to preserve the periodic boundary conditions of the delta chain
             // has to be divisible by 4 to use parity and spin inversion

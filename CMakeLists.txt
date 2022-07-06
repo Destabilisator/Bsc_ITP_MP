@@ -20,7 +20,7 @@ else()
     else()
         find_package(MKL REQUIRED)
         set(MKLROOT /opt/intel/oneapi/mkl/latest)
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL -fopenmp -march=native") # -march=native
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL -fopenmp -march=native -pg") # -march=native
         set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0 -m64 -I${MKLROOT}/include -DEIGEN_USE_MKL_ALL")
     endif()
 endif()

@@ -15,6 +15,11 @@ Hamilton*.txt
 EV*.txt
 benchmarkResults.txt
 
+analysis.txt
+analysis_2.txt
+analysis_with_NDEBUG.txt
+gmon.out
+
 results/oldData/*
 results/old/*
 results/knowngood/*
