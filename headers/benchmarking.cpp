@@ -37,6 +37,7 @@ namespace bench {
                                 "_cores_" + std::to_string(cores) + ".txt",
                                 std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
                     }
+                    /*
                     // ED with fit
                     std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize << ", cores = " << cores;
                     auto start_timer_ED_MJ = std::chrono::steady_clock::now();
@@ -49,6 +50,7 @@ namespace bench {
                     save_bench_val(
                             "runtime/data/ED_MJ_step_" + std::to_string(stepsize) + "_cores_" + std::to_string(cores) + ".txt",
                             std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MJ.count()));
+                            */
                 }
                 // ED from EV
                 std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores;

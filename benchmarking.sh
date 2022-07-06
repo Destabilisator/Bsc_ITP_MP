@@ -13,8 +13,8 @@ else
 fi
 
 # delete old data
-$pth ./plotting/deleteData.py -1 BRT
-$pth ./plotting/deleteData.py -1 BMU
+# $pth ./plotting/deleteData.py -1 BRT
+# $pth ./plotting/deleteData.py -1 BMU
 
 # generate new data
 ./$build/$prgm && echo "" && echo ""

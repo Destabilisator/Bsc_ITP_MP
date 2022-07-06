@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
 */
     /// spin gap ///
 ///*
-    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+//    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
 //    if (N <= 18) {
 //        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
 //        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
@@ -192,10 +192,10 @@ int main(int argc, char* argv[]) {
     /// benchmarking ///
 
     // memory usage
-    bench::bench_ED_QT_H_S2_memory_usage(6, 32);
+//    bench::bench_ED_QT_H_S2_memory_usage(6, 32);
 
     // run time
-    bench::bench_ED_QT_SG_runtime(6, 32);
+    bench::bench_ED_QT_SG_runtime(18, 32);
 
 #endif
 #endif
