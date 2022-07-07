@@ -14,13 +14,13 @@ start = 0.0
 
 print("plotting specific heat (constant J1/J2, funtion of T) ...")
 
-for end in [25.0, 50.0]: 
+for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: 
     print("from %d to %d" %(start, end))
     for N_outer in range(len(N_color)):
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
         X_high_T = np.linspace(0.01, end, 5000)
-        Y_high_T = 3/4 / X_high_T**2
+        Y_high_T = 3/2 / X_high_T**2
         used_N = "N"
         fig1_y_max = 0; fig2_y_max = 0
         for N_inner in range(N_outer, len(N_color)):
@@ -37,7 +37,8 @@ for end in [25.0, 50.0]:
             Y = []
             for i in range(9,len(lines)):
                 x, y = lines[i].split("\t")
-                if float(x) <= start or float(x) > end: continue
+                #if float(x) <= start or float(x) > end: continue
+                if float(x) <= 0.0: continue
                 X += [1/float(x)]
                 Y += [float(y)]
             file.close()
@@ -56,7 +57,8 @@ for end in [25.0, 50.0]:
             YErr = []
             for i in range(7,len(lines)):
                 x, y, yErr = lines[i].split("\t")
-                if float(x) <= start or float(x) > end: continue
+                #if float(x) <= start or float(x) > end: continue
+                if float(x) <= 0.0: continue
                 X += [1/float(x)]
                 Y += [float(y)]
                 YErr += [float(yErr)]
@@ -78,9 +80,9 @@ for end in [25.0, 50.0]:
             plt.xticks(fontsize = 25)
             plt.yticks(fontsize = 25)
 
-            subfig3.set_xlim(start + 0.1, end)
+            subfig3.set_xlim(start, end)
             # subfig3.set_ylim(0.0, 0.5)
-            subfig3.set_xscale("log")
+            # subfig3.set_xscale("log")
 
             fig3.savefig("results/" + "C_ED_QT_" + N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".png")
             plt.close(fig3)
@@ -103,13 +105,14 @@ for end in [25.0, 50.0]:
         subfig1.tick_params(axis="both", which="major", labelsize=25)
         #subfig1.tick_params(axis="both", which="major", labelsize=25)
 
-        subfig1.set_xlim(start + 0.1, end)
+        subfig1.set_xlim(start, end)
         subfig1.set_ylim(0.0, fig1_y_max + 0.025)
-        subfig1.set_xscale("log")
+        # subfig1.set_xscale("log")
 
         fig1.savefig("results/" + "C_ED_" + used_N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".png")
 
         subfig1.plot(X_high_T, Y_high_T, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "black", label = "high T")
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
         fig1.savefig("results/" + "C_ED_high_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
         plt.close(fig1)
@@ -126,13 +129,14 @@ for end in [25.0, 50.0]:
         plt.xticks(fontsize = 25)
         plt.yticks(fontsize = 25)
 
-        subfig2.set_xlim(start + 0.1, end)
+        subfig2.set_xlim(start, end)
         subfig2.set_ylim(0.0, fig2_y_max + 0.025)
-        subfig2.set_xscale("log")
+        # subfig2.set_xscale("log")
 
         fig2.savefig("results/" + "C_QT_" + used_N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".png")
 
         subfig2.plot(X_high_T, Y_high_T, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "black", label = "high T")
+        subfig2.legend(loc = 'best' ,frameon = False, fontsize = 30)
         fig2.savefig("results/" + "X_QT_hight_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
         plt.close(fig2)
@@ -154,6 +158,7 @@ for end in [25.0, 50.0]:
                     for i in range(5,len(lines)):
                         x, y= lines[i].split("\t")
                         #if float(x) < start or float(x) > end: continue
+                        if float(x) <= 0.0: continue
                         X += [1/float(x)]
                         Y += [float(y)]
                     file.close()
@@ -165,7 +170,7 @@ for end in [25.0, 50.0]:
                 subfigMultiQT.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
                 subfigMultiQT.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "\n" + "bei unterschiedlichen Startvektoren", fontsize = 40)
 
-                subfigMultiQT.set_xscale("log")
+                # subfigMultiQT.set_xscale("log")
                 subfigMultiQT.set_xlim(x_min, end)
 
                 subfigMultiQT.axhline(0, color = "grey")

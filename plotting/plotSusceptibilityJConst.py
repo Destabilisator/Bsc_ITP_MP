@@ -13,7 +13,7 @@ start = 0.0
 
 print("plotting susceptibility (constant J1/J2, funtion of T) ...")
 
-for end in [25.0, 50.0]: 
+for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: 
     print("from %d to %d" %(start, end))
     for N_outer in range(len(N_color)):
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
@@ -34,7 +34,8 @@ for end in [25.0, 50.0]:
             Y = []
             for i in range(8,len(lines)):
                 x, y = lines[i].split("\t")
-                if float(x) <= start or float(x) > end: continue
+                # if float(x) <= start or float(x) > end: continue
+                if float(x) <= 0.0: continue
                 X += [1/float(x)]
                 Y += [float(y)]
             file.close()
@@ -51,7 +52,8 @@ for end in [25.0, 50.0]:
             YErr = []
             for i in range(6,len(lines)):
                 x, y, yErr = lines[i].split("\t")
-                if float(x) <= start or float(x) > end : continue
+                # if float(x) <= start or float(x) > end : continue
+                if float(x) <= 0.0: continue
                 X += [1/float(x)]
                 Y += [float(y)]
                 YErr += [float(yErr)]
@@ -73,9 +75,9 @@ for end in [25.0, 50.0]:
             plt.xticks(fontsize = 25)
             plt.yticks(fontsize = 25)
 
-            subfig3.set_xlim(start+0.1, end)
+            subfig3.set_xlim(start, end)
             # subfig3.set_ylim(0.0, 0.5)
-            subfig3.set_xscale("log")
+            # subfig3.set_xscale("log")
 
             fig3.savefig("results/" + "X_ED_QT_" + N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
             plt.close(fig3)
@@ -98,9 +100,9 @@ for end in [25.0, 50.0]:
         subfig1.tick_params(axis="both", which="major", labelsize=25)
         #subfig1.tick_params(axis="both", which="major", labelsize=25)
 
-        subfig1.set_xlim(start+0.1, end)
+        subfig1.set_xlim(start, end)
         # subfig1.set_ylim(0.0, 0.5)
-        subfig1.set_xscale("log")
+        # subfig1.set_xscale("log")
 
         fig1.savefig("results/" + "X_ED_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
@@ -121,9 +123,9 @@ for end in [25.0, 50.0]:
         plt.xticks(fontsize = 25)
         plt.yticks(fontsize = 25)
 
-        subfig2.set_xlim(start+0.1, end)
+        subfig2.set_xlim(start, end)
         # subfig2.set_ylim(0.0, 0.5)
-        subfig2.set_xscale("log")
+        # subfig2.set_xscale("log")
 
         fig2.savefig("results/" + "X_QT_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
@@ -132,39 +134,40 @@ for end in [25.0, 50.0]:
 
         plt.close(fig2)
 
-        # N, C = N_color[N_outer]
-        # for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
-        #     if "ED" in filename: continue
-        #     figMultiQT, subfigMultiQT = plt.subplots(1,1,figsize=(16,9))
-        #     J = filename[len("X_J"):-len("QT.txt")]
-        #     color_count = 0
-        #     x_min = 42069
-        #     try:
-        #         for n in range(1, max_n+1):
-        #             file = open("results/" + N + "/data/spin_gap_data/" + str(n) + "/" + filename, 'r')
-        #             lines = file.readlines()
-        #             X = []
-        #             Y = []
-        #             YErr = []
-        #             for i in range(5,len(lines)):
-        #                 x, y= lines[i].split("\t")
-        #                 #if float(x) < start or float(x) > end: continue
-        #                 X += [1/float(x)]
-        #                 Y += [float(y)]
-        #             file.close()
-        #             subfigMultiQT.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = colors[color_count])
-        #             color_count += 1
-        #             if min(X) < x_min: x_min = min(X)
+        N, C = N_color[N_outer]
+        for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
+            if "ED" in filename: continue
+            figMultiQT, subfigMultiQT = plt.subplots(1,1,figsize=(16,9))
+            J = filename[len("X_J"):-len("QT.txt")]
+            color_count = 0
+            x_min = 42069
+            try:
+                for n in range(1, max_n+1):
+                    file = open("results/" + N + "/data/spin_gap_data/" + str(n) + "/" + filename, 'r')
+                    lines = file.readlines()
+                    X = []
+                    Y = []
+                    YErr = []
+                    for i in range(5,len(lines)):
+                        x, y= lines[i].split("\t")
+                        #if float(x) < start or float(x) > end: continue
+                        if float(x) <= 0.0: continue
+                        X += [1/float(x)]
+                        Y += [float(y)]
+                    file.close()
+                    subfigMultiQT.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = colors[color_count])
+                    color_count += 1
+                    if min(X) < x_min: x_min = min(X)
 
-        #         subfigMultiQT.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
-        #         subfigMultiQT.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
-        #         subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ mit bei unterschiedlichen Startvektoren', fontsize = 40)
+                subfigMultiQT.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+                subfigMultiQT.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
+                subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ mit bei unterschiedlichen Startvektoren', fontsize = 40)
 
-        #         subfigMultiQT.set_xscale("log")
-        #         subfigMultiQT.set_xlim(x_min, end)
+                # subfigMultiQT.set_xscale("log")
+                subfigMultiQT.set_xlim(x_min, end)
 
-        #         subfigMultiQT.axhline(0, color = "grey")
-        #         figMultiQT.savefig("results/" + N +  "/X_QT_J_" + J + "_0.0_" + str(end) + ".png")
-        #     except:
-        #         print("could not plot multiple runs (QT) N = %s" %N)
-        #     plt.close(figMultiQT)
+                subfigMultiQT.axhline(0, color = "grey")
+                figMultiQT.savefig("results/" + N +  "/X_QT_J_" + J + "_0.0_" + str(end) + ".png")
+            except:
+                print("could not plot multiple runs (QT) N = %s" %N)
+            plt.close(figMultiQT)

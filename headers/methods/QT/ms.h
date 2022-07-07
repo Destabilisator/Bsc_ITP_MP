@@ -30,6 +30,8 @@ namespace QT::MS {
 */
     // returns the MS as a complex SparseMatrix
     std::vector<matrixTypeComplex> getHamilton(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE);
+
+    std::vector<matrixTypeComplex> getHamilton_mag_zero_block(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE);
 /*
     // returns a vector with (m, k, states, R_vals)
     std::vector<indexStateVectorType> getIndexAndStates(const int &N, const int &SIZE);

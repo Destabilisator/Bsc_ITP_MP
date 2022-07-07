@@ -122,6 +122,46 @@ namespace QT::MS {
 
     }
 
+    std::vector<matrixTypeComplex> getHamilton_mag_zero_block(const double &J1, const double &J2, const double &h, const int &N, const int &SIZE) {
+
+        int k_lower = -(N + 2) / 4 + 1;
+        int k_upper = N / 4;
+
+        std::vector<std::vector<std::vector<int>>> states(N + 1, std::vector<std::vector<int>>(N/2));
+        std::vector<std::vector<std::vector<int>>> R_vals(N + 1, std::vector<std::vector<int>>(N/2));
+
+        // get states
+        for (int s = 0; s < SIZE; s++) {
+            int m = ED::bitSum(s, N);
+            for (int k = k_lower; k <= k_upper; k++) {
+                int R = ED::checkState(s, k, N);
+                if (R >= 0) {
+                    states.at(m).at(k - k_lower).push_back(s);
+                    R_vals.at(m).at(k - k_lower).push_back(R);
+                }
+            }
+        }
+
+        std::vector<matrixTypeComplex> matList;
+
+        for (int m = 0; m <= N; m++) {
+            if (m != N/2) { continue;}
+            for (int k = k_lower; k <= k_upper; k++) {
+                if (states.at(m).at(k - k_lower).empty()) {continue;}
+                std::vector<Trp> MtrxLst = fillHamiltonBlock(J1, J2, h, k, states.at(m).at(k - k_lower),
+                                                             R_vals.at(m).at(k - k_lower), N);
+                int matSize = (int) R_vals.at(m).at(k - k_lower).size();
+                matrixTypeComplex mat(matSize,matSize);
+                mat.setFromTriplets(MtrxLst.begin(), MtrxLst.end());
+                matList.emplace_back(mat);
+            }
+        }
+
+        matList.shrink_to_fit();
+        return matList;
+
+    }
+
     std::vector<Trp> fillHamiltonBlock(const double &J1, const double &J2, const double &h, const int &k, const std::vector<int> &states,
                                        const std::vector<int> &R_vals, const int &N) {
 
