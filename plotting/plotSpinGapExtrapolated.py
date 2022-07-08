@@ -96,14 +96,17 @@ def extrapolation_alg_raw(A_raw):
         elif ONE_OVER_N_FIT:
             X = [x for x in range(1, len(A)+1)]
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
-            subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
             counter += 1
             try:
                 X = np.array(X); A = np.array(A)
-                params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
-                A_param, b_param = params
-                X = np.linspace(0.8, X[-1], 100)
-                Y = one_over_N(X, A_param, b_param)
+                X = 1 / X
+                subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
+                # params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
+                # A_param, b_param = params
+                A_param, b_param = np.polyfit(X, A, 1)
+                X = np.linspace(0.0, X[0], 100)
+                # Y = one_over_N(X, A_param, b_param)
+                Y = A_param * X + b_param
                 subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "black")
                 outdata += [abs(b_param)]
             except RuntimeError:
