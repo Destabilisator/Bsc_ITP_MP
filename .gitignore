@@ -36,6 +36,9 @@ results/QT_stats/knowngood_2/*
 results/QT_stats/*
 !results/QT_stats/data_placeholder.txt
 
+results/highT/*
+!results/highT/data_placeholder.txt
+
 results/benchmarking/*.txt
 results/benchmarking/*.png
 results/benchmarking/runtime/*.txt
