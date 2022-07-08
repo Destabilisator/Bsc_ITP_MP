@@ -7,6 +7,7 @@ import numpy as np
 import scipy.optimize
 from typing import Tuple
 import gc
+import time
 plt.rcParams['text.usetex'] = True
 
 N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
@@ -24,7 +25,8 @@ extrapolate_ED = True
 
 SHANK_ALG = False
 EXP_FIT = False
-EXPSILON_ALG = True
+ONE_OVER_N_FIT = True
+EXPSILON_ALG = False
 
 counter = 0
 
@@ -56,6 +58,9 @@ def epsilon_Alg(A):
 def expFunc_offset(x: float, A: float, k: float, x_0: float) -> float:
     return A * np.exp(k * x) + x_0
 
+def one_over_N(x: float, A: float, b: float) -> float:
+    return A / x + b
+
 def expFunc(x: float, A: float, k: float) -> float:
     return x * A * np.exp(k * x)
 
@@ -81,6 +86,26 @@ def extrapolation_alg_raw(A_raw):
                 Y = expFunc_offset(X, A_param, k_param, x_0_param)
                 subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "black")
                 outdata += [x_0_param]
+            except RuntimeError:
+                print("fit failed")
+                outdata += [-1]
+            fig3.savefig("results/" + "extrapolation_temp/data_" + str(counter) + "_.png")
+            plt.close(fig3)
+
+        # fitting 1/N to data
+        elif ONE_OVER_N_FIT:
+            X = [x for x in range(1, len(A)+1)]
+            fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
+            subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
+            counter += 1
+            try:
+                X = np.array(X); A = np.array(A)
+                params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
+                A_param, b_param = params
+                X = np.linspace(0.8, X[-1], 100)
+                Y = one_over_N(X, A_param, b_param)
+                subfig3.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "black")
+                outdata += [abs(b_param)]
             except RuntimeError:
                 print("fit failed")
                 outdata += [-1]
@@ -163,13 +188,12 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
 
     return float(A), abs(k)
 
-
 def QT_extrapolation(N_color):
     print("extrapolating QT ...")
     for max_N in range(len(N_color)+1):
-        if max_N != len(N_color): continue #########################
+        #if max_N != len(N_color): continue #########################
         for i in range(max_N):
-            if i != 0: continue #########################
+            #if i != 0: continue #########################
             fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
             print("---------------NEW QT---------------")
             used_N = "N"
@@ -215,16 +239,18 @@ def QT_extrapolation(N_color):
 
                 used_N += "_" + N
 
-            for i in range(len(extrapolationArray[0])):
+            print("plotting data to be extrapolated")
+            for ii in range(len(extrapolationArray[0])):
                 fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
                 Y_data = []
-                for j in range(len(extrapolationArray)):
-                    Y_data += [extrapolationArray[j][i]]
-                subfig2.plot(Ns, Y_data, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = str(X[i]))
-                fig2.savefig("results/" + "extrapolation_temp/QT_" + used_N + "_J_" + str(X[i]) + ".png")
+                for jj in range(len(extrapolationArray)):
+                    Y_data += [extrapolationArray[jj][ii]]
+                subfig2.plot(Ns, Y_data, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = str(X[ii]))
+                fig2.savefig("results/" + "extrapolation_temp/QT_" + used_N + "_J_" + str(X[ii]) + ".png")
                 plt.close(fig2)
 
-            if len(extrapolationArray) >= 3 or True:
+            print("extrapolating data")
+            if len(extrapolationArray) >= 3:
                 Y = extrapolation_alg_raw(extrapolationArray)
             
                 X_new = []; Y_new = []
@@ -250,9 +276,9 @@ def QT_extrapolation(N_color):
 def ED_extrapolation(N_color):
     print("extrapolating ED ...")
     for max_N in range(len(N_color)+1):
-        if max_N != len(N_color): continue #########################
+        #if max_N != len(N_color): continue #########################
         for i in range(max_N):
-            if i != 0: continue #########################
+            #if i != 0: continue #########################
             fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
             print("---------------NEW ED---------------")
             used_N = "N"
@@ -296,24 +322,27 @@ def ED_extrapolation(N_color):
 
                 used_N += "_" + N
 
-            for i in range(len(X)):
+            print("plotting data to be extrapolated")
+            for ii in range(len(X)):
                 fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
                 Y_data = []
-                for j in range(len(extrapolationArray)):
-                    Y_data += [extrapolationArray[j][i]]
-                subfig2.plot(Ns, Y_data, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = str(X[i]))
-                fig2.savefig("results/" + "extrapolation_temp/ED_" + used_N + "_J_" + str(X[i]) + ".png")
+                for jj in range(len(extrapolationArray)):
+                    Y_data += [extrapolationArray[jj][ii]]
+                subfig2.plot(Ns, Y_data, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = str(X[ii]))
+                fig2.savefig("results/" + "extrapolation_temp/ED_" + used_N + "_J_" + str(X[ii]) + ".png")
                 plt.close(fig2)
 
-            Y = extrapolation_alg_raw(extrapolationArray)
+            print("extrapolating data")
+            if len(extrapolationArray) >= 3:
+                Y = extrapolation_alg_raw(extrapolationArray)
 
-            X_new = []; Y_new = []
-            for dat in range(len(X)):
-                if Y[dat] >= -0.1:
-                    X_new += [X[dat]]; Y_new += [Y[dat]]
+                X_new = []; Y_new = []
+                for dat in range(len(X)):
+                    if Y[dat] >= -0.1:
+                        X_new += [X[dat]]; Y_new += [Y[dat]]
 
-            X = X_new; Y = Y_new
-            subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = "Extrapolation")
+                X = X_new; Y = Y_new
+                subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = "Extrapolation")
 
             subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
             subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
@@ -328,8 +357,20 @@ def ED_extrapolation(N_color):
 
             plt.close(fig1)
 
+def format_time(start_time: float, end_time: float) -> str:
+    elapsed_time = end_time- start_time
+    hours = int( elapsed_time / 3600 )
+    minutes = int( (elapsed_time - hours * 3600) / 60 )
+    seconds = elapsed_time - hours * 3600 - minutes * 60
+    ret = ""
+    if hours > 0: ret += str(hours) + " hours " + str(minutes) + " minutes "
+    elif minutes > 0: ret += str(minutes) + " minutes "
+    ret += str(seconds) + " seconds"
+    return ret
 
 if __name__ == "__main__":
+    start_time = time.time()
+
     if len(sys.argv) > 1:
         regime = sys.argv[1]
         if regime == "low": N_color = N_color_LOW#; print("low regime")
@@ -341,3 +382,7 @@ if __name__ == "__main__":
     print()
     ED_extrapolation(N_color_LOW)
     print()
+
+    end_time = time.time()
+
+    print("done; this took %s" % format_time(start_time, end_time))
