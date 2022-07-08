@@ -1,8 +1,9 @@
 # build directories
 .idea
-/cmake-build-debug
-/build
-/cmake-build-release
+cmake-build-debug/
+/build/*
+!build/compile.sh
+cmake-build-release/
 .vscode/
 
 # executables
