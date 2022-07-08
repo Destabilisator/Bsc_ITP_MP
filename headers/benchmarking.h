@@ -33,7 +33,7 @@ namespace bench {
                                             const double &BETA_START, const double &BETA_END, const double &BETA_STEP,
                                             const int &N, const int &SIZE, const int &SAMPLES, const int &cores);
 
-    ed_ms_getEiValsZeroBlock(const double &J1, const double &J2, const int &N, const int &SIZE);
+    void ed_ms_getEiValsZeroBlock(const double &J1, const double &J2, const int &N, const int &SIZE);
 
     void ed_si_getEiValsZeroBlock(const double &J1, const double &J2, const int &N, const int &SIZE);
 
