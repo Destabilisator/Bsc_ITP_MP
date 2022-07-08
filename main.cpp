@@ -3,7 +3,7 @@
 //#define DEBUG
 //#define ED_METHODS
 #define CLUSTER
-#define BENCH
+//#define BENCH
 
 int main(int argc, char* argv[]) {
 
