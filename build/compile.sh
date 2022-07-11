@@ -1,20 +1,31 @@
 #!/bin/bash
 
-start_time_configure=$SECONDS
+# configure cmake
+device_name=$(hostname)
+start_time_configure=$(date +%s%3N)
 echo "configuring cmake..."
 
 cmake -DCMAKE_BUILD_TYPE=Release ..
 
-elapsed_configure=$(( SECONDS - start_time_configure ))
-echo "done, this took $elapsed_configure seconds"
-start_time_compile=$SECONDS
+current=$(date +%s%3N)
+elapsed_configure="$(($current-$start_time_configure))"
+echo "done, this took $elapsed_configure milliseconds"
+
+# compile program
+start_time_compile=$(date +%s%3N)
 echo "compiling..."
 
 make
 
-elapsed_compile=$(( SECONDS - start_time_compile ))
-elapsed_total=$(( SECONDS - start_time_configure ))
-echo "done, this took $elapsed_compile seconds"
+current=$(date +%s%3N)
+elapsed_compile="$(($current-$start_time_compile))"
+elapsed_total="$(($current-$start_time_configure))"
+echo "done, this took $elapsed_compile milliseconds"
+
+# write times to history.txt
 echo "" && echo "all done"
-echo "configure time: $elapsed_configure seconds, compile time: $elapsed_compile seconds"
-echo "total time: $elapsed_total seconds"
+echo "configure time: $elapsed_configure milliseconds, compile time: $elapsed_compile milliseconds"
+echo "total time: $elapsed_total milliseconds"
+
+output="$device_name: $elapsed_configure - $elapsed_compile - $elapsed_total"
+echo $output >> "history.txt"

@@ -1,0 +1,2 @@
+device name: confige time - compile time - total time 	in milliseconds
+TUXEDO-Cheesus: 530 - 115921 - 116452
