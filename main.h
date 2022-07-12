@@ -10,12 +10,18 @@
 #include <complex>
 #include <Eigen/Eigenvalues>
 
-//// ED /////
+//// helpers /////
 #include "helpers.h"
+
+//// ED /////
 //#include "methods/EDMethods.h"
 //#include "methods/ED/multithreading.h"
 #include "methods/ED/3DPlots.h"
+
+//// QT /////
 //#include "methods/QTMethods.h"
+
+//// benchmarks /////
 #include "benchmarking.h"
 
 #define multiCalc
