@@ -95,6 +95,9 @@ namespace bench {
                     int T_COUNT = (int) ((T_END - T_START) / stepsize);
                     for (int SAMPLES: {1, 2, 3}) { /// 1, 2, 3
                         if (N > 20 && SAMPLES != 1) { continue;}
+#ifdef ONLY_MAG_ZERO_BLOCK
+                        if (cores != 1) { continue;}
+#endif
 
                         // QT
 #ifdef QT_BENCH
