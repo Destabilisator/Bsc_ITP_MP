@@ -37,8 +37,8 @@ def extrap_func(x: float, A: float, k: float) -> float:
 
 def extrapolate_data(N, T):
     fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
-    subfig1.plot(N_ED_SG, T_ED_SG, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "black")
-    fig1.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
+    subfig2.plot(N_ED_SG, T_ED_SG, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "black")
+    fig2.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
     counter += 1
 
     params, cv = scipy.optimize.curve_fit(extrap_func, N, T, (0.1, 0.1))
