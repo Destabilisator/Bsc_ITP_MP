@@ -1,12 +1,12 @@
-#-*- coding:utf-8 -*-
+
 import matplotlib
 import matplotlib.pyplot as plt
-matplotlib.use('TkAgg')
+# matplotlib.use('TkAgg')
 import os
 import sys
 import numpy as np
 import scipy.optimize
-from typing import Tuple
+# from typing import Tuple
 import gc
 plt.rcParams['text.usetex'] = True
 
@@ -31,8 +31,8 @@ def sort_data(N, T):
                 T[j], T[j+1] = T[j+1], T[j]
     return N, T
 
-def extrap_func(x: float, A: float, k: float, x_0: float) -> float:
-#def extrap_func(x, A, k):
+#def extrap_func(x: float, A: float, k: float, x_0: float) -> float:
+def extrap_func(x, A, k):
     return A * np.exp(k * x - x_0)
 
 def extrapolate_data(N, T):
