@@ -53,6 +53,7 @@ results/benchmarking/runtime/*.txt
 results/benchmarking/runtime/*.png
 results/benchmarking/runtime/data/*.txt
 results/benchmarking/runtime/data/*.png
+results/benchmarking/runtime/data/old/
 results/benchmarking/memoryusage/*.txt
 results/benchmarking/memoryusage/*.png
 results/benchmarking/memoryusage/data/*.txt

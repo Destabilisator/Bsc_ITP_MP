@@ -32,13 +32,14 @@ def sort_data(N, T):
     return N, T
 
 #def extrap_func(x: float, A: float, k: float, x_0: float) -> float:
-def extrap_func(x, A, k):
+def extrap_func(x, A, k, x_0):
     return A * np.exp(k * x - x_0)
 
-def extrapolate_data(N, T):
+def extrapolate_data(N, T, title):
     global counter
     fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
     subfig2.plot(N, T, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "black")
+    subfig2.set_title(title, fontsize = 40)
     fig2.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
     counter += 1
 
@@ -47,6 +48,9 @@ def extrapolate_data(N, T):
     X = np.linspace(6, 32, 1000)
     Y = extrap_func(X, A_param, k_param, x_0_param)
     return X, Y
+
+# def extrapolate_data(N, T):
+#     return extrapolate_data(N, T, "generic")
 
 # run time, full matrix
 def RT_plot_raw_files():
@@ -60,7 +64,7 @@ def RT_plot_raw_files():
         for line in ED_SG_lines:
             n, t = line.split("\t")
             N_ED_SG += [int(n)]; T_ED_SG += [float(t)]
-        N_ED_SG, T_ED_SG = sort_data(N_ED_SG, T_ED_SG)
+        N_ED_SG, T_ED_SG = sort_data(N_ED_SG, T_ED_SG)#, "ed sg full")
 
         for stepsize in stepsizes:
             # ED fit data
@@ -71,7 +75,7 @@ def RT_plot_raw_files():
             for line in ED_MJ_lines:
                 n, t = line.split("\t")
                 N_ED_MJ += [int(n)]; T_ED_MJ += [float(t)]
-            N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)
+            N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)#, "ed mj")
 
             for sample in samples:
                 # QT data
@@ -82,7 +86,7 @@ def RT_plot_raw_files():
                 for line in QT_lines:
                     n, t = line.split("\t")
                     N_QT += [int(n)]; T_QT += [float(t)]
-                N_QT, T_QT = sort_data(N_QT, T_QT)
+                N_QT, T_QT = sort_data(N_QT, T_QT)#, "qt full")
 
                 # plotting
                 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
@@ -116,7 +120,7 @@ def RT_plot_only_ED():
         for line in ED_SG_lines:
             n, t = line.split("\t")
             N_ED_SG += [int(n)]; T_ED_SG += [float(t)]
-        N_ED_SG, T_ED_SG = sort_data(N_ED_SG, T_ED_SG)
+        N_ED_SG, T_ED_SG = sort_data(N_ED_SG, T_ED_SG)#, "ed")
 
         subfig1.plot(N_ED_SG, T_ED_SG, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED-ev")
         color_count += 1
@@ -130,7 +134,7 @@ def RT_plot_only_ED():
             for line in ED_MJ_lines:
                 n, t = line.split("\t")
                 N_ED_MJ += [int(n)]; T_ED_MJ += [float(t)]
-            N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)
+            N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)#, "ed mj")
 
             subfig1.plot(N_ED_MJ, T_ED_MJ, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED-fit: Schrittweite %.2f" % float(stepsize))
             color_count += 1
@@ -159,7 +163,7 @@ def RT_plot_step_size_influence():
                 for line in ED_MJ_lines:
                     n, t = line.split("\t")
                     N_ED_MJ += [int(n)]; T_ED_MJ += [float(t)]
-                N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)
+                N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)#, "mj, step " + stepsize)
                 # plotting stepsize influence
                 subfig1.plot(N_ED_MJ, T_ED_MJ, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED-fit: Schrittweite %.2f" % float(stepsize))
 
@@ -171,7 +175,7 @@ def RT_plot_step_size_influence():
                 for line in QT_lines:
                     n, t = line.split("\t")
                     N_QT += [int(n)]; T_QT += [float(t)]
-                N_QT, T_QT = sort_data(N_QT, T_QT)
+                N_QT, T_QT = sort_data(N_QT, T_QT)#, "qt, step " + stepsize)
                 # plotting stepsize influence
                 subfig1.plot(N_QT, T_QT, lw = line_width, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count], label = "QT-fit:  Schrittweite %.2f" % float(stepsize))
                 color_count += 1
@@ -201,7 +205,7 @@ def RT_plot_raw_files_mag_zero():
             n, t = line.split("\t")
             N_ED_MS += [int(n)]; T_ED_MS += [float(t)]
         N_ED_MS, T_ED_MS = sort_data(N_ED_MS, T_ED_MS)
-        N_ED_MS_extrap, T_ED_MS_extrap = extrapolate_data(N_ED_MS, T_ED_MS)
+        N_ED_MS_extrap, T_ED_MS_extrap = extrapolate_data(N_ED_MS, T_ED_MS, "ed ms")
 
         # spin inversion
         ED_SI_file = open("./results/benchmarking/runtime/data/" + "ED_SI_" + core + ".txt")
@@ -212,7 +216,7 @@ def RT_plot_raw_files_mag_zero():
             n, t = line.split("\t")
             N_ED_SI += [int(n)]; T_ED_SI += [float(t)]
         N_ED_SI, T_ED_SI = sort_data(N_ED_SI, T_ED_SI)
-        N_ED_SI_extrap, T_ED_SI_extrap = extrapolate_data(N_ED_SI, T_ED_SI)
+        N_ED_SI_extrap, T_ED_SI_extrap = extrapolate_data(N_ED_SI, T_ED_SI, "ed si")
 
         for stepsize in stepsizes:
 
@@ -226,7 +230,7 @@ def RT_plot_raw_files_mag_zero():
                     n, t = line.split("\t")
                     N_QT += [int(n)]; T_QT += [float(t)]
                 N_QT, T_QT = sort_data(N_QT, T_QT)
-                N_QT_extrap, T_QT_extrap = extrapolate_data(N_QT, T_QT)
+                N_QT_extrap, T_QT_extrap = extrapolate_data(N_QT, T_QT, "qt")
 
                 # plotting
                 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
@@ -262,7 +266,7 @@ def RT_plot_only_ED_mag_zero():
             n, t = line.split("\t")
             N_ED_MS += [int(n)]; T_ED_MS += [float(t)]
         N_ED_MS, T_ED_MS = sort_data(N_ED_MS, T_ED_MS)
-        N_ED_MS_extrap, T_ED_MS_extrap = extrapolate_data(N_ED_MS, T_ED_MS)
+        N_ED_MS_extrap, T_ED_MS_extrap = extrapolate_data(N_ED_MS, T_ED_MS, "ed only ms")
 
         # spin inversion
         ED_SI_file = open("./results/benchmarking/runtime/data/" + "ED_SI_" + core + ".txt")
@@ -273,7 +277,7 @@ def RT_plot_only_ED_mag_zero():
             n, t = line.split("\t")
             N_ED_SI += [int(n)]; T_ED_SI += [float(t)]
         N_ED_SI, T_ED_SI = sort_data(N_ED_SI, T_ED_SI)
-        N_ED_SI_extrap, T_ED_SI_extrap = extrapolate_data(N_ED_SI, T_ED_SI)
+        N_ED_SI_extrap, T_ED_SI_extrap = extrapolate_data(N_ED_SI, T_ED_SI,  "ed only si")
 
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         color_count = 0
