@@ -31,9 +31,9 @@ def sort_data(N, T):
                 T[j], T[j+1] = T[j+1], T[j]
     return N, T
 
-def extrap_func(x: float, A: float, k: float) -> float:
+def extrap_func(x: float, A: float, k: float, x_0: float) -> float:
 #def extrap_func(x, A, k):
-    return A * np.exp(k * x)
+    return A * np.exp(k * x - x_0)
 
 def extrapolate_data(N, T):
     global counter
@@ -42,10 +42,10 @@ def extrapolate_data(N, T):
     fig2.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
     counter += 1
 
-    params, cv = scipy.optimize.curve_fit(extrap_func, N, T, (0.1, 0.1))
-    A_param, k_param = params
+    params, cv = scipy.optimize.curve_fit(extrap_func, N, T, (0.1, 0.1, 0.1))
+    A_param, k_param, x_0_param = params
     X = np.linspace(6, 32, 1000)
-    Y = extrap_func(X, A_param, k_param)
+    Y = extrap_func(X, A_param, k_param, x_0_param)
     return X, Y
 
 # run time, fll matrix
