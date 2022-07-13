@@ -1,4 +1,3 @@
-
 import matplotlib
 import matplotlib.pyplot as plt
 # matplotlib.use('TkAgg')
@@ -17,11 +16,25 @@ marker_size = 5
 
 counter = 0
 
+SAVE_FULL_PLOTS = True
+ONLY_NEWEST_RUN = True
+
 samples = ["1"]#, "2", "3"]
 stepsizes = ["0.100000", "0.010000"]
 cores = ["1"] # ["1", "2", "5", "10"]
 
+def strip_data(N,T):
+    arr = [0] * 35
+    out_N = []; out_T = []
+    for i in range(len(N)):
+        arr[N[i]] = T[i]
+    for n in range(len(arr)):
+        if arr[n] != 0:
+            out_N += [n]; out_T += [arr[n]]
+    return out_N, out_T
+    
 def sort_data(N, T):
+    if ONLY_NEWEST_RUN: N, T = strip_data(N, T)
     length = len(N)
     for i in range(length-1):
         for j in range(0, length-i-1):
@@ -31,26 +44,25 @@ def sort_data(N, T):
                 T[j], T[j+1] = T[j+1], T[j]
     return N, T
 
-#def extrap_func(x: float, A: float, k: float, x_0: float) -> float:
-def extrap_func(x, A, k, x_0):
+def extrap_func(x: float, A: float, k: float, x_0: float) -> float:
     return A * np.exp(k * x - x_0)
 
 def extrapolate_data(N, T, title):
-    global counter
-    fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
-    subfig2.plot(N, T, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "black")
-    subfig2.set_title(title, fontsize = 40)
-    fig2.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
-    counter += 1
-
     params, cv = scipy.optimize.curve_fit(extrap_func, N, T, (0.1, 0.1, 0.1))
     A_param, k_param, x_0_param = params
     X = np.linspace(6, 32, 1000)
     Y = extrap_func(X, A_param, k_param, x_0_param)
-    return X, Y
 
-# def extrapolate_data(N, T):
-#     return extrapolate_data(N, T, "generic")
+    if SAVE_FULL_PLOTS:
+        global counter
+        fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
+        subfig2.plot(N, T, lw = 0, ls = "solid", markersize = 5, marker = "o", color = "black")
+        subfig2.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "black")
+        subfig2.set_title(title, fontsize = 40)
+        fig2.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
+        counter += 1
+
+    return X, Y
 
 # run time, full matrix
 def RT_plot_raw_files():
