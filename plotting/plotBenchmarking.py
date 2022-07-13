@@ -15,6 +15,8 @@ colors = ["red", "blue", "green", "tomato", "purple"]
 line_width = 3
 marker_size = 5
 
+counter = 0
+
 samples = ["1"]#, "2", "3"]
 stepsizes = ["0.100000", "0.010000"]
 cores = ["1"] # ["1", "2", "5", "10"]
@@ -34,6 +36,11 @@ def extrap_func(x: float, A: float, k: float) -> float:
     return A * np.exp(k * x)
 
 def extrapolate_data(N, T):
+    fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
+    subfig1.plot(N_ED_SG, T_ED_SG, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "black")
+    fig1.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
+    counter += 1
+
     params, cv = scipy.optimize.curve_fit(extrap_func, N, T, (0.1, 0.1))
     A_param, k_param = params
     X = np.linspace(6, 32, 1000)

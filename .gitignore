@@ -46,6 +46,9 @@ results/highT/*
 
 results/benchmarking/*.txt
 results/benchmarking/*.png
+results/benchmarking/temp/*.txt
+!results/benchmarking/temp/data_placeholder.txt
+results/benchmarking/temp/*.png
 results/benchmarking/runtime/*.txt
 results/benchmarking/runtime/*.png
 results/benchmarking/runtime/data/*.txt
