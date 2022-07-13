@@ -46,7 +46,6 @@ fi
 # 	./$build/$prgm $N $start $end 50 $h -1 $noX silent && echo ""
 # done
 
-exit()
 
 # N=14
 # $pth plotting/deleteData.py $N SG
