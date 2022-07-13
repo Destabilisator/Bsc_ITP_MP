@@ -48,7 +48,7 @@ def extrapolate_data(N, T):
     Y = extrap_func(X, A_param, k_param, x_0_param)
     return X, Y
 
-# run time, fll matrix
+# run time, full matrix
 def RT_plot_raw_files():
     print("plotting raw files")
     for core in cores:
@@ -238,7 +238,7 @@ def RT_plot_raw_files_mag_zero():
                 subfig1.plot(N_ED_SI_extrap, T_ED_SI_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count])
                 color_count += 1
                 subfig1.plot(N_QT, T_QT, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "QT: MS")
-                subfig1.plot(N_QT, T_QT_extrap, lw = line_width_extrap, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count])
+                subfig1.plot(N_QT_extrap, T_QT_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count])
                 color_count += 1
                 subfig1.set_xlabel(r'$N$', fontsize = 40)
                 subfig1.set_ylabel(r'$t$ in $s$', fontsize = 40)
