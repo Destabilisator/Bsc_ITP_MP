@@ -37,7 +37,7 @@ def extrap_func(x: float, A: float, k: float) -> float:
 
 def extrapolate_data(N, T):
     fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
-    subfig2.plot(N_ED_SG, T_ED_SG, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "black")
+    subfig2.plot(N, T, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "black")
     fig2.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
     counter += 1
 
