@@ -63,40 +63,40 @@ exit()
 # $pth plotting/deleteData.py $N EE
 # ./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
 
-# N=20
-# $pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-# ./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
-
-# N=22
-# $pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-# ./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
-
-# N=24
-# $pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-# ./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
-
-# N=26
-# $pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-# ./$build/$prgm $N $start $end 50 $h 5 $noX silent && echo ""
-
-N=28
+N=20
 $pth plotting/deleteData.py $N SG
-$pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
+# $pth plotting/deleteData.py $N EE
+./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
 
-N=30
+N=22
 $pth plotting/deleteData.py $N SG
-$pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
+# $pth plotting/deleteData.py $N EE
+./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
 
-N=32
+N=24
 $pth plotting/deleteData.py $N SG
-$pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
+# $pth plotting/deleteData.py $N EE
+./$build/$prgm $N $start $end 50 $h 5 $noX silent && echo ""
+
+N=26
+$pth plotting/deleteData.py $N SG
+# $pth plotting/deleteData.py $N EE
+./$build/$prgm $N $start $end 50 $h 2 $noX silent && echo ""
+
+# N=28
+# $pth plotting/deleteData.py $N SG
+# $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
+
+# N=30
+# $pth plotting/deleteData.py $N SG
+# $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
+
+# N=32
+# $pth plotting/deleteData.py $N SG
+# $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
 
 
 elapsed=$(( SECONDS - start_time ))

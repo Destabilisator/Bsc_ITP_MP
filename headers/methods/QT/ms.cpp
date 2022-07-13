@@ -635,7 +635,7 @@ namespace QT::MS {
             double J = J_vals.at(J_pos); //J_START + (J_END - J_START) * J_pos / J_COUNT;
             std::vector<matrixTypeComplex> H_List = getHamilton(J, 1.0, 0.0, N, SIZE);
 
-//#pragma omp parallel for default(none) num_threads(SAMPLES) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J) // num_threads(SAMPLES)
+#pragma omp parallel for default(none) num_threads(cores) shared(SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, H_List, beta_Data, N, SIZE, J) // num_threads(SAMPLES)
             for (int s = 1; s <= SAMPLES; s++) {
                 std::vector<double> rawData = hlp::rungeKutta4_X(BETA_START, BETA_END, BETA_STEP, N, H_List, S2_List);
 //                rawDataX.emplace_back(rawData);

@@ -121,10 +121,10 @@ int main(int argc, char* argv[]) {
     T_START = 0.0; T_END = 50.0;
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
 
-    SAMPLES = 1;
-//    if (N >= 22) {SAMPLES = 1;}
-    cores = SAMPLES;
-    omp_set_num_threads(cores);
+//    SAMPLES = 1;
+////    if (N >= 22) {SAMPLES = 1;}
+//    cores = SAMPLES;
+//    omp_set_num_threads(cores);
 
     /// C ///
 /*
