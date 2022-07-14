@@ -17,7 +17,15 @@ für unterschiedliche Temperaturen und Kopplungskonstanten dargestellt werden.
 
 
 # when compiling via the command line:
+
+manual: <br />
+
 mkdir build <br />
 cd build <br />
 cmake -DCMAKE_BUILD_TYPE=Release .. <br />
 make
+
+or with the script: <br />
+
+cd build <br />
+bash compile.sh
