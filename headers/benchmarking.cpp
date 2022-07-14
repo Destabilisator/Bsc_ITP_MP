@@ -22,6 +22,7 @@ namespace bench {
             int SIZE = (int) std::pow(2, N);
             for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
                 if (N > 20 && cores != 1) { continue;}
+                if (cores != 1) { continue;}
                 for (double stepsize: {0.1, 0.01}) {
                     if (N > 20 && stepsize < 0.05) { continue;}
                     int T_COUNT = (int) ((T_END - T_START) / stepsize);
@@ -43,7 +44,7 @@ namespace bench {
                                 "_cores_" + std::to_string(cores) + ".txt",
                                 std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
                     }
-                    /*
+//                    /*
                     // ED with fit
                     std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize << ", cores = " << cores;
                     auto start_timer_ED_MJ = std::chrono::steady_clock::now();
@@ -56,7 +57,7 @@ namespace bench {
                     save_bench_val(
                             "runtime/data/ED_MJ_step_" + std::to_string(stepsize) + "_cores_" + std::to_string(cores) + ".txt",
                             std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MJ.count()));
-                            */
+//                            */
                 }
                 // ED from EV
                 std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores;

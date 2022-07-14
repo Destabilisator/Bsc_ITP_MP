@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import os
 import sys
 import numpy as np
+import numpy.polynomial.polynomial as poly
 import scipy.optimize
 # from typing import Tuple
 import gc
@@ -44,14 +45,17 @@ def sort_data(N, T):
                 T[j], T[j+1] = T[j+1], T[j]
     return N, T
 
-def extrap_func(x: float, A: float, k: float, x_0: float) -> float:
-    return A * np.exp(k * x - x_0)
+def extrap_func(x: float, A: float, k: float, x_0: float, b: float) -> float:
+    return A * np.exp(k * x - x_0) + b
 
 def extrapolate_data(N, T, title):
-    params, cv = scipy.optimize.curve_fit(extrap_func, N, T, (0.1, 0.1, 0.1))
-    A_param, k_param, x_0_param = params
+    Y_fit = np.log(T)
+    N = np.asarray(N)
+    params = poly.polyfit(N, Y_fit, 1) # , w = N + 1/2 * N**2
+    fit_func = poly.Polynomial(params)
     X = np.linspace(6, 32, 1000)
-    Y = extrap_func(X, A_param, k_param, x_0_param)
+    Y = fit_func(X)
+    Y = np.exp(Y)
 
     if SAVE_FULL_PLOTS:
         global counter
@@ -59,12 +63,38 @@ def extrapolate_data(N, T, title):
         subfig2.plot(N, T, lw = 0, ls = "solid", markersize = 5, marker = "o", color = "black")
         subfig2.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = "black")
         subfig2.set_title(title, fontsize = 40)
+        subfig2.set_yscale('log')
         fig2.savefig("./results/benchmarking/temp/" + str(counter) + ".png")
         counter += 1
+        plt.close(fig2)
 
     return X, Y
 
-# run time, full matrix
+def add_time_steps(subfig):
+    width = 2; c = "black"; alph = 0.5
+    # 1 second
+    subfig.hlines(y = 1, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5, 0.8, "1 s", fontsize = 20)
+    # 1 minute
+    subfig.hlines(y = 60, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5, 0.8 * 60, "1 m", fontsize = 20)
+    # 1 hour
+    subfig.hlines(y = 60 * 60, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5, 0.8 * 60 * 60, "1 h", fontsize = 20)
+    # 1 day
+    subfig.hlines(y = 60 * 60 * 24, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5, 0.8 * 60 * 60 * 24, "1 d", fontsize = 20)
+    # 1 week
+    subfig.hlines(y = 60 * 60 * 24 * 7, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5, 0.8 * 60 * 60 * 24 * 7, "1 w", fontsize = 20)
+    # 1 month
+    subfig.hlines(y = 60 * 60 * 24 * 31, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(4.8, 0.8 * 60 * 60 * 24 * 31, "31 d", fontsize = 20)
+    # 1 year
+    subfig.hlines(y = 60 * 60 * 24 * 365, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5, 0.8 * 60 * 60 * 24 * 365, "1 y", fontsize = 20)
+
+##### run time, full matrix #####
 def RT_plot_raw_files():
     print("plotting raw files")
     for core in cores:
@@ -76,7 +106,8 @@ def RT_plot_raw_files():
         for line in ED_SG_lines:
             n, t = line.split("\t")
             N_ED_SG += [int(n)]; T_ED_SG += [float(t)]
-        N_ED_SG, T_ED_SG = sort_data(N_ED_SG, T_ED_SG)#, "ed sg full")
+        N_ED_SG, T_ED_SG = sort_data(N_ED_SG, T_ED_SG)
+        N_ED_SG_extrap, T_ED_SG_extrap = extrapolate_data(N_ED_SG, T_ED_SG, "ed sg full")
 
         for stepsize in stepsizes:
             # ED fit data
@@ -87,7 +118,8 @@ def RT_plot_raw_files():
             for line in ED_MJ_lines:
                 n, t = line.split("\t")
                 N_ED_MJ += [int(n)]; T_ED_MJ += [float(t)]
-            N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)#, "ed mj")
+            N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)
+            N_ED_MJ_extrap, T_ED_MJ_extrap = extrapolate_data(N_ED_MJ, T_ED_MJ, "ed mj")
 
             for sample in samples:
                 # QT data
@@ -98,16 +130,20 @@ def RT_plot_raw_files():
                 for line in QT_lines:
                     n, t = line.split("\t")
                     N_QT += [int(n)]; T_QT += [float(t)]
-                N_QT, T_QT = sort_data(N_QT, T_QT)#, "qt full")
+                N_QT, T_QT = sort_data(N_QT, T_QT)
+                N_QT_extrap, T_QT_extrap = extrapolate_data(N_QT, T_QT, "qt full")
 
                 # plotting
                 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
                 color_count = 0
-                subfig1.plot(N_ED_SG, T_ED_SG, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED-ev")
+                subfig1.plot(N_ED_SG, T_ED_SG, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                subfig1.plot(N_ED_SG_extrap, T_ED_SG_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED-ev")
                 color_count += 1
-                subfig1.plot(N_ED_MJ, T_ED_MJ, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED-fit")
+                subfig1.plot(N_ED_MJ, T_ED_MJ, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                subfig1.plot(N_ED_MJ_extrap, T_ED_MJ_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED-fit")
                 color_count += 1
-                subfig1.plot(N_QT, T_QT, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "QT-fit")
+                subfig1.plot(N_QT, T_QT, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                subfig1.plot(N_QT_extrap, T_QT_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "QT-fit")
                 color_count += 1
                 subfig1.set_xlabel(r'$N$', fontsize = 40)
                 subfig1.set_ylabel(r'$t$ in $s$', fontsize = 40)
@@ -116,7 +152,12 @@ def RT_plot_raw_files():
                 subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$" + "\n" + "Schrittweite (nur Fits) = %.2f, %s %s (nur QT)" % (float(stepsize), sample, vec), fontsize = 40)
                 subfig1.axhline(0, color = "grey")
                 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+                plt.xticks(fontsize = 25)
+                plt.yticks(fontsize = 25)
+                add_time_steps(subfig1)
                 fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_SG_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+                subfig1.set_yscale('log')
+                fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_SG_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
                 plt.close(fig1)
 
 def RT_plot_only_ED():
@@ -132,9 +173,11 @@ def RT_plot_only_ED():
         for line in ED_SG_lines:
             n, t = line.split("\t")
             N_ED_SG += [int(n)]; T_ED_SG += [float(t)]
-        N_ED_SG, T_ED_SG = sort_data(N_ED_SG, T_ED_SG)#, "ed")
+        N_ED_SG, T_ED_SG = sort_data(N_ED_SG, T_ED_SG)
+        N_ED_SG_extrap, T_ED_SG_extrap = extrapolate_data(N_ED_SG, T_ED_SG, "ed sg ed")
 
-        subfig1.plot(N_ED_SG, T_ED_SG, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED-ev")
+        subfig1.plot(N_ED_SG, T_ED_SG, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+        subfig1.plot(N_ED_SG_extrap, T_ED_SG_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED-ev")
         color_count += 1
 
         for stepsize in stepsizes:
@@ -147,8 +190,10 @@ def RT_plot_only_ED():
                 n, t = line.split("\t")
                 N_ED_MJ += [int(n)]; T_ED_MJ += [float(t)]
             N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)#, "ed mj")
+            N_ED_MJ_extrap, T_ED_MJ_extrap = extrapolate_data(N_ED_MJ, T_ED_MJ, "ed mj ed")
 
-            subfig1.plot(N_ED_MJ, T_ED_MJ, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED-fit: Schrittweite %.2f" % float(stepsize))
+            subfig1.plot(N_ED_MJ, T_ED_MJ, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+            subfig1.plot(N_ED_MJ_extrap, T_ED_MJ_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED-fit: Schrittweite %.2f" % float(stepsize))
             color_count += 1
 
         subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = 40)
@@ -156,7 +201,10 @@ def RT_plot_only_ED():
         subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$", fontsize = 40)
         subfig1.axhline(0, color = "grey")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        add_time_steps(subfig1)
         fig1.savefig("./results/benchmarking/runtime/" + "ED_SG_MJ" + "_cores_" + core + ".png")
+        subfig1.set_yscale('log')
+        fig1.savefig("./results/benchmarking/runtime/" + "log_ED_SG_MJ" + "_cores_" + core + ".png")
         plt.close(fig1)
 
 def RT_plot_step_size_influence():
@@ -175,9 +223,11 @@ def RT_plot_step_size_influence():
                 for line in ED_MJ_lines:
                     n, t = line.split("\t")
                     N_ED_MJ += [int(n)]; T_ED_MJ += [float(t)]
-                N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)#, "mj, step " + stepsize)
+                N_ED_MJ, T_ED_MJ = sort_data(N_ED_MJ, T_ED_MJ)
+                N_ED_MJ_extrap, T_ED_MJ_extrap = extrapolate_data(N_ED_MJ, T_ED_MJ, "ed mj step " + stepsize)
                 # plotting stepsize influence
-                subfig1.plot(N_ED_MJ, T_ED_MJ, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED-fit: Schrittweite %.2f" % float(stepsize))
+                subfig1.plot(N_ED_MJ, T_ED_MJ, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                subfig1.plot(N_ED_MJ_extrap, T_ED_MJ_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED-fit: Schrittweite %.2f" % float(stepsize))
 
                 # QT data
                 QT_file = open("./results/benchmarking/runtime/data/" + "QT_SG_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".txt")
@@ -187,9 +237,11 @@ def RT_plot_step_size_influence():
                 for line in QT_lines:
                     n, t = line.split("\t")
                     N_QT += [int(n)]; T_QT += [float(t)]
-                N_QT, T_QT = sort_data(N_QT, T_QT)#, "qt, step " + stepsize)
+                N_QT, T_QT = sort_data(N_QT, T_QT)
+                N_QT_extrap, T_QT_extrap = extrapolate_data(N_QT, T_QT, "qt, step " + stepsize)
                 # plotting stepsize influence
-                subfig1.plot(N_QT, T_QT, lw = line_width, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count], label = "QT-fit:  Schrittweite %.2f" % float(stepsize))
+                subfig1.plot(N_QT, T_QT, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count])
+                subfig1.plot(N_QT_extrap, T_QT_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count], label = "QT-fit:  Schrittweite %.2f" % float(stepsize))
                 color_count += 1
     
             subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = 40)
@@ -199,10 +251,13 @@ def RT_plot_step_size_influence():
             subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$" + "\n" + "mit %s %s bei der QT" % (sample, vec), fontsize = 40)
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+            add_time_steps(subfig1)
             fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+            subfig1.set_yscale('log')
+            fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
             plt.close(fig1)
 
-# run time, m_z = 0 block
+##### run time, m_z = 0 block #####
 def RT_plot_raw_files_mag_zero():
     print("plotting raw files (m_z = 0 block)")
     for core in cores:
@@ -247,14 +302,14 @@ def RT_plot_raw_files_mag_zero():
                 # plotting
                 fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
                 color_count = 0
-                subfig1.plot(N_ED_MS, T_ED_MS, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED: MS")
-                subfig1.plot(N_ED_MS_extrap, T_ED_MS_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count])
+                subfig1.plot(N_ED_MS, T_ED_MS, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                subfig1.plot(N_ED_MS_extrap, T_ED_MS_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED: MS")
                 color_count += 1
-                subfig1.plot(N_ED_SI, T_ED_SI, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED: SI")
-                subfig1.plot(N_ED_SI_extrap, T_ED_SI_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count])
+                subfig1.plot(N_ED_SI, T_ED_SI, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                subfig1.plot(N_ED_SI_extrap, T_ED_SI_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED: SI")
                 color_count += 1
-                subfig1.plot(N_QT, T_QT, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "QT: MS")
-                subfig1.plot(N_QT_extrap, T_QT_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count])
+                subfig1.plot(N_QT, T_QT, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                subfig1.plot(N_QT_extrap, T_QT_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "QT: MS")
                 color_count += 1
                 subfig1.set_xlabel(r'$N$', fontsize = 40)
                 subfig1.set_ylabel(r'$t$ in $s$', fontsize = 40)
@@ -263,7 +318,10 @@ def RT_plot_raw_files_mag_zero():
                 subfig1.set_title(r"Laufzeit $t$ des $m_z = 0$ Blocks für unterschiedliche Systemgrößen $N$" + "\n" + "nur QT: Schrittweite = %.2f, %s %s" % (float(stepsize), sample, vec), fontsize = 40)
                 subfig1.axhline(0, color = "grey")
                 subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+                add_time_steps(subfig1)
                 fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_SG_MS_SI_QT_MS_zero_block_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+                subfig1.set_yscale('log')
+                fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_SG_MS_SI_QT_MS_zero_block_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
                 plt.close(fig1)
 
 def RT_plot_only_ED_mag_zero():
@@ -293,11 +351,11 @@ def RT_plot_only_ED_mag_zero():
 
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         color_count = 0
-        subfig1.plot(N_ED_MS, T_ED_MS, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED: MS")
-        subfig1.plot(N_ED_MS_extrap, T_ED_MS_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count])
+        subfig1.plot(N_ED_MS, T_ED_MS, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+        subfig1.plot(N_ED_MS_extrap, T_ED_MS_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED: MS")
         color_count += 1
-        subfig1.plot(N_ED_SI, T_ED_SI, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = "ED: SI")
-        subfig1.plot(N_ED_SI_extrap, T_ED_SI_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count])
+        subfig1.plot(N_ED_SI, T_ED_SI, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+        subfig1.plot(N_ED_SI_extrap, T_ED_SI_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED: SI")
         color_count += 1
 
         subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = 40)
@@ -305,10 +363,13 @@ def RT_plot_only_ED_mag_zero():
         subfig1.set_title(r"Laufzeit $t$ des $m_z = 0$ Blocks für unterschiedliche Systemgrößen $N$", fontsize = 40)
         subfig1.axhline(0, color = "grey")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        add_time_steps(subfig1)
         fig1.savefig("./results/benchmarking/runtime/" + "ED_SG_MS_SI_zero_block" + "_cores_" + core + ".png")
+        subfig1.set_yscale('log')
+        fig1.savefig("./results/benchmarking/runtime/" + "log_ED_SG_MS_SI_zero_block" + "_cores_" + core + ".png")
         plt.close(fig1)
 
-# memory usage
+##### memory usage #####
 def MU_plot_raw_files():
     print("plotting raw files")
     # QT H
@@ -319,18 +380,21 @@ def MU_plot_raw_files():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "QT H")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     color_count = 0
-    subfig1.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = r"QT")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"QT")
     color_count += 1
     subfig1.set_xlabel(r'$N$', fontsize = 40)
     subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
     subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$ bei der QT", fontsize = 40)
     subfig1.set_xticks(N)
-    subfig1.set_yscale("log")
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
     fig1.savefig("./results/benchmarking/memoryusage/QT_H.png")
+    subfig1.set_yscale("log")
+    fig1.savefig("./results/benchmarking/memoryusage/log_QT_H.png")
     plt.close(fig1)
 
     # QT S2
@@ -341,18 +405,21 @@ def MU_plot_raw_files():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "QT S2")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     color_count = 0
-    subfig1.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = r"QT")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"QT")
     color_count += 1
     subfig1.set_xlabel(r'$N$', fontsize = 40)
     subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
     subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Spinmatrix $S^2$ bei der QT", fontsize = 40)
     subfig1.set_xticks(N)
-    subfig1.set_yscale("log")
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
     fig1.savefig("./results/benchmarking/memoryusage/QT_S2.png")
+    subfig1.set_yscale("log")
+    fig1.savefig("./results/benchmarking/memoryusage/log_QT_S2.png")
     plt.close(fig1)
 
     # ED H S2 MS
@@ -363,18 +430,21 @@ def MU_plot_raw_files():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED H S2")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     color_count = 0
-    subfig1.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = r"ED")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"ED")
     color_count += 1
     subfig1.set_xlabel(r'$N$', fontsize = 40)
     subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
     subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamilton- $H$ \& Spinmatrix $S^2$ bei der ED (Impulszutände)", fontsize = 40)
     subfig1.set_xticks(N)
-    subfig1.set_yscale("log")
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
     fig1.savefig("./results/benchmarking/memoryusage/ED_H_S2_MS.png")
+    subfig1.set_yscale("log")
+    fig1.savefig("./results/benchmarking/memoryusage/log_ED_H_S2_MS.png")
     plt.close(fig1)
 
     # ED H SI
@@ -385,18 +455,21 @@ def MU_plot_raw_files():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED H SI")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     color_count = 0
-    subfig1.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = r"ED")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"ED")
     color_count += 1
     subfig1.set_xlabel(r'$N$', fontsize = 40)
     subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
     subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$ bei der ED (Spininversion)", fontsize = 40)
     subfig1.set_xticks(N)
-    subfig1.set_yscale("log")
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
     fig1.savefig("./results/benchmarking/memoryusage/ED_H_SI.png")
+    subfig1.set_yscale("log")
+    fig1.savefig("./results/benchmarking/memoryusage/log_ED_H_SI.png")
     plt.close(fig1)
 
 def MU_plot_only_ED():
@@ -412,8 +485,10 @@ def MU_plot_only_ED():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED H S2 comp")
     color_count = 0
-    subfig1.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = r"MS")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"MS")
     color_count += 1
 
     # ED H SI
@@ -424,16 +499,19 @@ def MU_plot_only_ED():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
-    subfig1.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count], label = r"SI")
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED H SI comp")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"SI")
     color_count += 1
     subfig1.set_xlabel(r'$N$', fontsize = 40)
     subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
     subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$, Spininversion (SI) \& Impulszustände (MS)", fontsize = 40)
     subfig1.set_xticks(N)
-    subfig1.set_yscale("log")
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
     fig1.savefig("./results/benchmarking/memoryusage/ED_MS_SI.png")
+    subfig1.set_yscale("log")
+    fig1.savefig("./results/benchmarking/memoryusage/log_ED_MS_SI.png")
     plt.close(fig1)
 
 def MU_ED_vs_QT():
@@ -454,9 +532,12 @@ def MU_ED_vs_QT():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
-    subfig1.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1], label = r"QT")
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt H")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"QT")
     color_count1 += 1
-    subfig3.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3], label = r"QT: $H$")
+    subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3])
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"QT: $H$")
     color_count3 += 1
 
     # QT S2
@@ -467,9 +548,12 @@ def MU_ED_vs_QT():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
-    subfig2.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2], label = r"QT")
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2")
+    subfig2.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2])
+    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"QT")
     color_count2 += 1
-    subfig3.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3], label = r"QT: $S^2$")
+    subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3])
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"QT: $S^2$")
     color_count3 += 1
 
     # ED H S2 MS
@@ -480,11 +564,15 @@ def MU_ED_vs_QT():
     for line in lines:
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
-    subfig1.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1], label = r"ED")
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1], label = r"ED")
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"ED")
     color_count1 += 1
-    subfig2.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2], label = r"ED")
+    subfig2.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2], label = r"ED")
+    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"ED")
     color_count2 += 1
-    subfig3.plot(N, RAM, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3], label = r"ED: $H$ \& $S^2$")
+    subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3], label = r"ED: $H$ \& $S^2$")
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"ED: $H$ \& $S^2$")
     color_count3 += 1
 
     subfig1.set_xlabel(r'$N$', fontsize = 40)
@@ -495,6 +583,8 @@ def MU_ED_vs_QT():
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
     fig1.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H.png")
+    subfig1.set_yscale("log")
+    fig1.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H.png")
     plt.close(fig1)
 
     subfig2.set_xlabel(r'$N$', fontsize = 40)
@@ -505,6 +595,8 @@ def MU_ED_vs_QT():
     subfig2.axhline(0, color = "grey")
     subfig2.legend(loc = 'best' ,frameon = False, fontsize = 30)
     fig2.savefig("./results/benchmarking/memoryusage/ED_vs_QT_S2.png")
+    subfig2.set_yscale("log")
+    fig2.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_S2.png")
     plt.close(fig2)
 
     subfig3.set_xlabel(r'$N$', fontsize = 40)
@@ -515,9 +607,11 @@ def MU_ED_vs_QT():
     subfig3.axhline(0, color = "grey")
     subfig3.legend(loc = 'best' ,frameon = False, fontsize = 30)
     fig3.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H_S2.png")
+    subfig3.set_yscale("log")
+    fig3.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H_S2.png")
     plt.close(fig3)
 
-
+##### main #####
 if __name__ == "__main__":
 
     print("plotting bechmarking (run time):")
