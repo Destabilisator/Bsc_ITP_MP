@@ -19,7 +19,7 @@ namespace bench {
         double T_START = 0.0, T_END = 50.0;
 
         for (int N = N_start; N <= N_end; N += 2) {
-            for (int run = 0; run < runs; run++) {
+            for (int run = 1; run <= runs; run++) {
                 int SIZE = (int) std::pow(2, N);
                 for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
                     if (N > 20 && cores != 1) { continue;}
@@ -91,7 +91,7 @@ namespace bench {
         double T_START = 0.0, T_END = 50.0;
 
         for (int N = N_start; N <= N_end; N += 2) {
-            for (int run = 0; run < runs; run++) {
+            for (int run = 1; run <= runs; run++) {
                 int SIZE = (int) std::pow(2, N);
                 for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
                     if (N > 20 && cores != 1) { continue; }
