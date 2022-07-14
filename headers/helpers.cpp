@@ -32,6 +32,13 @@ void validateInput(int &argc, char *argv[], const unsigned int &cpu_cnt, int &N,
                    bool &silent, int &cores, bool &plotsIn3D, bool skipSilent, const double &J1, const double &J2, bool &noX) {
 
     if (argc >= 2) {
+        std::string nofactor = "NOFACTOR";
+        if (argv[1] == nofactor) {
+            return;
+        }
+    }
+
+    if (argc >= 2) {
         std::string DDD = "3D";
         if (argv[1] != DDD) {
             goto no3D;
