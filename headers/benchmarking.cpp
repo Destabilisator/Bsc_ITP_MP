@@ -10,7 +10,7 @@ namespace bench {
 
     /////////////////////////////// benchmarking ///////////////////////////////
 
-    void bench_ED_QT_SG_runtime(int N_start, int N_end) {
+    void bench_ED_QT_SG_runtime(int N_start, int N_end, int runs) {
 
         auto start_timer = std::chrono::steady_clock::now();
 
@@ -19,56 +19,60 @@ namespace bench {
         double T_START = 0.0, T_END = 50.0;
 
         for (int N = N_start; N <= N_end; N += 2) {
-            int SIZE = (int) std::pow(2, N);
-            for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
-                if (N > 20 && cores != 1) { continue;}
-                if (cores != 1) { continue;}
-                for (double stepsize: {0.1, 0.01}) {
-                    if (N > 20 && stepsize < 0.05) { continue;}
-                    int T_COUNT = (int) ((T_END - T_START) / stepsize);
-                    for (int SAMPLES: {1, 2, 3}) { /// 1, 2, 3
-                        if (N > 20 && SAMPLES != 1) { continue;}
+            for (int run = 0; run < runs; run++) {
+                int SIZE = (int) std::pow(2, N);
+                for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
+                    if (N > 20 && cores != 1) { continue;}
+                    if (cores != 1) { continue;}
+                    for (double stepsize: {0.1, 0.01}) {
+                        if (N > 20 && stepsize < 0.05) { continue;}
+                        int T_COUNT = (int) ((T_END - T_START) / stepsize);
+                        for (int SAMPLES: {1, 2, 3}) { /// 1, 2, 3
+                            if (N > 20 && SAMPLES != 1) { continue;}
 
-                        // QT
+                            // QT
+                            std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize
+                                      << ", SAMPLES = " << SAMPLES << ", cores = " << cores << ", run " << run << " of " << runs;
+                            auto start_timer_QT = std::chrono::steady_clock::now();
+
+                            QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES,
+                                                        cores);
+
+                            auto end_timer_QT = std::chrono::steady_clock::now();
+                            std::chrono::duration<double> elapsed_seconds_QT = end_timer_QT - start_timer_QT;
+                            save_bench_val(
+                                    "runtime/data/QT_SG_step_" + std::to_string(stepsize) + "_SAMPLES_" + std::to_string(SAMPLES) +
+                                    "_cores_" + std::to_string(cores) + ".txt",
+                                    std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
+                        }
+    //                    /*
+                        // ED with fit
                         std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize
-                                  << ", SAMPLES = " << SAMPLES << ", cores = " << cores;
-                        auto start_timer_QT = std::chrono::steady_clock::now();
+                                  << ", cores = " << cores << ", run " << run << " of " << runs;
+                        auto start_timer_ED_MJ = std::chrono::steady_clock::now();
 
-                        QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES,
-                                                    cores);
+                        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE,
+                                                             cores);
 
-                        auto end_timer_QT = std::chrono::steady_clock::now();
-                        std::chrono::duration<double> elapsed_seconds_QT = end_timer_QT - start_timer_QT;
+                        auto end_timer_ED_MJ = std::chrono::steady_clock::now();
+                        std::chrono::duration<double> elapsed_seconds_ED_MJ = end_timer_ED_MJ - start_timer_ED_MJ;
                         save_bench_val(
-                                "runtime/data/QT_SG_step_" + std::to_string(stepsize) + "_SAMPLES_" + std::to_string(SAMPLES) +
-                                "_cores_" + std::to_string(cores) + ".txt",
-                                std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
+                                "runtime/data/ED_MJ_step_" + std::to_string(stepsize) + "_cores_" + std::to_string(cores) + ".txt",
+                                std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MJ.count()));
+    //                            */
                     }
-//                    /*
-                    // ED with fit
-                    std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize << ", cores = " << cores;
-                    auto start_timer_ED_MJ = std::chrono::steady_clock::now();
+                    // ED from EV
+                    std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
+                              << ", run " << run << " of " << runs;
+                    auto start_timer_ED_SG = std::chrono::steady_clock::now();
 
-                    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE,
-                                                         cores);
+                    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
-                    auto end_timer_ED_MJ = std::chrono::steady_clock::now();
-                    std::chrono::duration<double> elapsed_seconds_ED_MJ = end_timer_ED_MJ - start_timer_ED_MJ;
-                    save_bench_val(
-                            "runtime/data/ED_MJ_step_" + std::to_string(stepsize) + "_cores_" + std::to_string(cores) + ".txt",
-                            std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MJ.count()));
-//                            */
+                    auto end_timer_ED_SG = std::chrono::steady_clock::now();
+                    std::chrono::duration<double> elapsed_seconds_ED_SG = end_timer_ED_SG - start_timer_ED_SG;
+                    save_bench_val("runtime/data/ED_SG_cores_" + std::to_string(cores) + ".txt",
+                                   std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_SG.count()));
                 }
-                // ED from EV
-                std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores;
-                auto start_timer_ED_SG = std::chrono::steady_clock::now();
-
-                ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
-
-                auto end_timer_ED_SG = std::chrono::steady_clock::now();
-                std::chrono::duration<double> elapsed_seconds_ED_SG = end_timer_ED_SG - start_timer_ED_SG;
-                save_bench_val("runtime/data/ED_SG_cores_" + std::to_string(cores) + ".txt",
-                               std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_SG.count()));
             }
         }
 
@@ -76,10 +80,9 @@ namespace bench {
         std::chrono::duration<double> elapsed_seconds = end_timer - start_timer;
         std::cout << "BENCHMARKING: done\n";
         std::cout << "this took " + formatTime(elapsed_seconds) << "\n";
-
     }
 
-    void bench_ED_QT_SG_runtime_mag_zero_block(int N_start, int N_end) {
+    void bench_ED_QT_SG_runtime_mag_zero_block(int N_start, int N_end, int runs) {
 
         auto start_timer = std::chrono::steady_clock::now();
 
@@ -88,96 +91,102 @@ namespace bench {
         double T_START = 0.0, T_END = 50.0;
 
         for (int N = N_start; N <= N_end; N += 2) {
-            int SIZE = (int) std::pow(2, N);
-            for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
-                if (N > 20 && cores != 1) { continue;}
-                for (double stepsize: {0.1, 0.01}) {
-                    if (N > 20 && stepsize < 0.05) { continue;}
-                    int T_COUNT = (int) ((T_END - T_START) / stepsize);
-                    for (int SAMPLES: {1, 2, 3}) { /// 1, 2, 3
-                        if (N > 20 && SAMPLES != 1) { continue;}
+            for (int run = 0; run < runs; run++) {
+                int SIZE = (int) std::pow(2, N);
+                for (int cores: {1, 2, 5, 10}) { /// 1, 2, 5, 10
+                    if (N > 20 && cores != 1) { continue; }
+                    for (double stepsize: {0.1, 0.01}) {
+                        if (N > 20 && stepsize < 0.05) { continue; }
+                        int T_COUNT = (int) ((T_END - T_START) / stepsize);
+                        for (int SAMPLES: {1, 2, 3}) { /// 1, 2, 3
+                            if (N > 20 && SAMPLES != 1) { continue; }
 #ifdef ONLY_MAG_ZERO_BLOCK
-                        if (cores != 1) { continue;}
+                            if (cores != 1) { continue; }
 #endif
 
-                        // QT
+                            // QT
 #ifdef QT_BENCH
-                        std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize
-                                  << ", SAMPLES = " << SAMPLES << ", cores = " << cores;
-                        auto start_timer_QT = std::chrono::steady_clock::now();
+                            std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize
+                                      << ", SAMPLES = " << SAMPLES << ", cores = " << cores;
+                            auto start_timer_QT = std::chrono::steady_clock::now();
 #ifndef ONLY_MAG_ZERO_BLOCK
-                        QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+                            QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
 #else
-                        start_calc_spin_gap_mag_zero_block(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+                            start_calc_spin_gap_mag_zero_block(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N,
+                                                               SIZE, SAMPLES, cores);
 #endif
 
-                        auto end_timer_QT = std::chrono::steady_clock::now();
-                        std::chrono::duration<double> elapsed_seconds_QT = end_timer_QT - start_timer_QT;
+                            auto end_timer_QT = std::chrono::steady_clock::now();
+                            std::chrono::duration<double> elapsed_seconds_QT = end_timer_QT - start_timer_QT;
 #ifndef ONLY_MAG_ZERO_BLOCK
-                        save_bench_val(
-                                "runtime/data/QT_SG_step_" + std::to_string(stepsize) + "_SAMPLES_" + std::to_string(SAMPLES) +
-                                "_cores_" + std::to_string(cores) + ".txt",
-                                std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
+                            save_bench_val(
+                                    "runtime/data/QT_SG_step_" + std::to_string(stepsize) + "_SAMPLES_" + std::to_string(SAMPLES) +
+                                    "_cores_" + std::to_string(cores) + ".txt",
+                                    std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
 #else
+                            save_bench_val(
+                                    "runtime/data/QT_SG_zero_block_step_" + std::to_string(stepsize) + "_SAMPLES_" +
+                                    std::to_string(SAMPLES) +
+                                    "_cores_" + std::to_string(cores) + ".txt",
+                                    std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
+#endif
+#endif
+                        }
+                        // ED with fit
+#ifdef ED_BENCH_FITS
+#ifndef ONLY_MAG_ZERO_BLOCK
+                        std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize << ", cores = " << cores;
+                        auto start_timer_ED_MJ = std::chrono::steady_clock::now();
+
+                        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE,
+                                                             cores);
+
+                        auto end_timer_ED_MJ = std::chrono::steady_clock::now();
+                        std::chrono::duration<double> elapsed_seconds_ED_MJ = end_timer_ED_MJ - start_timer_ED_MJ;
                         save_bench_val(
-                                "runtime/data/QT_SG_zero_block_step_" + std::to_string(stepsize) + "_SAMPLES_" + std::to_string(SAMPLES) +
-                                "_cores_" + std::to_string(cores) + ".txt",
-                                std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
+                                "runtime/data/ED_MJ_step_" + std::to_string(stepsize) + "_cores_" + std::to_string(cores) + ".txt",
+                                std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MJ.count()));
 #endif
 #endif
                     }
-                    // ED with fit
-#ifdef ED_BENCH_FITS
-#ifndef ONLY_MAG_ZERO_BLOCK
-                    std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize << ", cores = " << cores;
-                    auto start_timer_ED_MJ = std::chrono::steady_clock::now();
-
-                    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE,
-                                                         cores);
-
-                    auto end_timer_ED_MJ = std::chrono::steady_clock::now();
-                    std::chrono::duration<double> elapsed_seconds_ED_MJ = end_timer_ED_MJ - start_timer_ED_MJ;
-                    save_bench_val(
-                            "runtime/data/ED_MJ_step_" + std::to_string(stepsize) + "_cores_" + std::to_string(cores) + ".txt",
-                            std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MJ.count()));
-#endif
-#endif
-                }
-                // ED from EV
+                    // ED from EV
 #ifdef ED_BENCH_EV_SG
 #ifndef ONLY_MAG_ZERO_BLOCK
-                std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores;
-                auto start_timer_ED_SG = std::chrono::steady_clock::now();
+                    std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores;
+                    auto start_timer_ED_SG = std::chrono::steady_clock::now();
 
-                ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
+                    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 
-                auto end_timer_ED_SG = std::chrono::steady_clock::now();
-                std::chrono::duration<double> elapsed_seconds_ED_SG = end_timer_ED_SG - start_timer_ED_SG;
-                save_bench_val("runtime/data/ED_SG_cores_" + std::to_string(cores) + ".txt",
-                               std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_SG.count()));
+                    auto end_timer_ED_SG = std::chrono::steady_clock::now();
+                    std::chrono::duration<double> elapsed_seconds_ED_SG = end_timer_ED_SG - start_timer_ED_SG;
+                    save_bench_val("runtime/data/ED_SG_cores_" + std::to_string(cores) + ".txt",
+                                   std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_SG.count()));
 #endif
 #endif
 #ifdef ED_BENCH_EV
 #ifdef ONLY_MAG_ZERO_BLOCK
-                if (cores != 1) { continue;}
-                std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores << " MS ED m_z = 0\n";
-                auto start_timer_ED_MS = std::chrono::steady_clock::now();
-                ed_ms_getEiValsZeroBlock(1.0, 1.0, N, SIZE);
-                auto end_timer_ED_MS = std::chrono::steady_clock::now();
-                std::chrono::duration<double> elapsed_seconds_ED_MS = end_timer_ED_MS - start_timer_ED_MS;
-                save_bench_val("runtime/data/ED_MS_" + std::to_string(cores) + ".txt",
-                               std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MS.count()));
-                if (N%4 == 0) {
-                    std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores << " MS ED m_z = 0\n";
-                    auto start_timer_ED_SI = std::chrono::steady_clock::now();
-                    ed_si_getEiValsZeroBlock(1.0, 1.0, N, SIZE);
-                    auto end_timer_ED_SI = std::chrono::steady_clock::now();
-                    std::chrono::duration<double> elapsed_seconds_ED_SI = end_timer_ED_SI - start_timer_ED_SI;
-                    save_bench_val("runtime/data/ED_SI_" + std::to_string(cores) + ".txt",
-                                   std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_SI.count()));
+                    if (cores != 1) { continue; }
+                    std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
+                              << " MS ED m_z = 0\n";
+                    auto start_timer_ED_MS = std::chrono::steady_clock::now();
+                    ed_ms_getEiValsZeroBlock(1.0, 1.0, N, SIZE);
+                    auto end_timer_ED_MS = std::chrono::steady_clock::now();
+                    std::chrono::duration<double> elapsed_seconds_ED_MS = end_timer_ED_MS - start_timer_ED_MS;
+                    save_bench_val("runtime/data/ED_MS_" + std::to_string(cores) + ".txt",
+                                   std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MS.count()));
+                    if (N % 4 == 0) {
+                        std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
+                                  << " MS ED m_z = 0\n";
+                        auto start_timer_ED_SI = std::chrono::steady_clock::now();
+                        ed_si_getEiValsZeroBlock(1.0, 1.0, N, SIZE);
+                        auto end_timer_ED_SI = std::chrono::steady_clock::now();
+                        std::chrono::duration<double> elapsed_seconds_ED_SI = end_timer_ED_SI - start_timer_ED_SI;
+                        save_bench_val("runtime/data/ED_SI_" + std::to_string(cores) + ".txt",
+                                       std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_SI.count()));
+                    }
+#endif
+#endif
                 }
-#endif
-#endif
             }
         }
 
