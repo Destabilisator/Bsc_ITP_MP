@@ -209,6 +209,9 @@ for end in [0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                 # subfigMultiQT.set_xscale("log")
                 subfigMultiQT.set_xlim(x_min, end)
 
+                plt.xticks(fontsize = 25)
+                plt.yticks(fontsize = 25)
+
                 subfigMultiQT.axhline(0, color = "grey")
                 # subfigMultiQT.legend(loc = 'best' ,frameon = False, fontsize = 30)
                 figMultiQT.savefig("results/" + N +  "/C_QT_J_" + J + "_0.0_" + str(end) + ".png")
@@ -276,6 +279,9 @@ for end in [0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                 # subfig4.set_xlim(x_min, end)
                 subfig4.set_xlim(0.0, end)
                 subfig4.set_ylim(0.0, y_max + 0.025)
+
+                plt.xticks(fontsize = 25)
+                plt.yticks(fontsize = 25)
 
                 subfig4.axhline(0, color = "grey")
                 subfig4.legend(loc = 'best' ,frameon = False, fontsize = 30)
