@@ -9,6 +9,8 @@ colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato"]
 
 max_n = 5
 
+einheit_x = r'$T$ in $k_B$ / $J_2$'
+
 start = 0.0
 
 print("plotting susceptibility (constant J1/J2, funtion of T) ...")
@@ -65,7 +67,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             subfig3.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.20)
 
             # subfig3.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 40)
-            subfig3.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+            subfig3.set_xlabel(einheit_x, fontsize = 40)
             subfig3.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
             subfig3.set_title("Suszeptibilität pro Spin $\\chi/N$ bei N = " + N, fontsize = 40)
 
@@ -88,7 +90,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             used_N += "_" + N
 
         # subfig1.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
-        subfig1.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+        subfig1.set_xlabel(einheit_x, fontsize = 40)
         subfig1.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
         subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$', fontsize = 40)
 
@@ -113,7 +115,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
 
 
         #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
-        subfig2.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+        subfig2.set_xlabel(einheit_x, fontsize = 40)
         subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
         subfig2.set_title('Suszeptibilität pro Spin $\\chi/N$ mit einem Startvektor', fontsize = 40)
 
@@ -159,7 +161,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                     color_count += 1
                     if min(X) < x_min: x_min = min(X)
 
-                subfigMultiQT.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+                subfigMultiQT.set_xlabel(einheit_x, fontsize = 40)
                 subfigMultiQT.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
                 subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ mit bei unterschiedlichen Startvektoren', fontsize = 40)
 

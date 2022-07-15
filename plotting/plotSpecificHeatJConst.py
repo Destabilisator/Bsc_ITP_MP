@@ -10,6 +10,7 @@ colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato", "cyan"
 
 max_n = 5
 
+einheit_x = r'$T$ in $k_B$ / $J_2$'
 
 start = 0.0
 
@@ -18,7 +19,7 @@ print("plotting specific heat (constant J1/J2, funtion of T) ...")
 for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: 
     print("from %f to %f" %(start, end))
     for N_outer in range(len(N_color)):
-        if N_outer != 0: continue
+        #if N_outer != 0: continue
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
         X_high_T = np.linspace(0.01, end, 5000)
@@ -72,7 +73,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             subfig3.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.20)
 
             # subfig3.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 40)
-            subfig3.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+            subfig3.set_xlabel(einheit_x, fontsize = 40)
             subfig3.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
             subfig3.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei N = " + N, fontsize = 40)
 
@@ -97,7 +98,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             used_N += "_" + N
 
         # subfig1.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
-        subfig1.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+        subfig1.set_xlabel(einheit_x, fontsize = 40)
         subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
         subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$", fontsize = 40)
 
@@ -121,7 +122,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
 
 
         #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
-        subfig2.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+        subfig2.set_xlabel(einheit_x, fontsize = 40)
         subfig2.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
         subfig2.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ mit einem Startvektor", fontsize = 40)
 
@@ -177,7 +178,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                     color_count += 1
                     if min(X) < x_min: x_min = min(X)
 
-                subfigMultiQT.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+                subfigMultiQT.set_xlabel(einheit_x, fontsize = 40)
                 subfigMultiQT.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
                 subfigMultiQT.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "\n" + "bei unterschiedlichen Startvektoren", fontsize = 40)
 
@@ -202,9 +203,9 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             if "QT" in filename: continue
             if "placeholder" in filename: continue
             fig4, subfig4 = plt.subplots(1,1,figsize=(16,9))
-            J = filename[len("X_J"):-len("ED.txt")]
+            J = filename[len("C_J"):-len("ED.txt")]
             if float(J) > 1.5: continue
-            print("%s, %s" % (N, J))
+            #print("%s, %s" % (N, J))
             Y_high_T = (3 * (1 + float(J)**2) / 4 / 4) / X_high_T**2
             subfig4.plot(X_high_T, Y_high_T, lw = 4, ls = "dashed", markersize = 0, marker = "o", color = "black", label = "high T")
             used_N = "N"
@@ -235,11 +236,11 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                     if max(Y) > y_max: y_max = max(Y)
                     used_N += "_" + n
                 except:
-                    print("could not plot multiple runs (QT) N = %s and J = %s" %(n, J))
+                    print("could not plot hight T, N = %s and J = %s" %(n, J))
 
                 if N_inner != len(N_color)-1: continue
 
-                subfig4.set_xlabel(r'$T$ in $J_2$ / $k_B$', fontsize = 40)
+                subfig4.set_xlabel(einheit_x, fontsize = 40)
                 subfig4.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
                 subfig4.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei $J_1/J_2$ = " + J, fontsize = 40)
 

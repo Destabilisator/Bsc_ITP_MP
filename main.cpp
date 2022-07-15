@@ -3,7 +3,7 @@
 //#define DEBUG
 //#define ED_METHODS
 #define CLUSTER
-#define BENCH
+//#define BENCH
 
 int main(int argc, char* argv[]) {
 
@@ -170,23 +170,24 @@ int main(int argc, char* argv[]) {
     }
 */
     /// spin gap ///
-///*
-    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
-//    if (N <= 18) {
-//        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
-//        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
-//    }
-//*/
-    /// excitation energies ///
 /*
-    //T_END = 2 * T_END;
-
-    QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
     if (N <= 18) {
-        ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
-        ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
+        ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
+        ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
     }
 */
+    /// excitation energies ///
+///*
+    //T_END = 2 * T_END;
+
+//    QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+//    if (N <= 18) {
+    N = 18; SIZE = (int) std::pow(2,N); J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; cores = 1;
+    ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
+    ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
+//    }
+//*/
 #endif
 #ifdef BENCH
     /// benchmarking ///
