@@ -5,6 +5,7 @@ import gc
 plt.rcParams['text.usetex'] = True
 
 N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color = [("16", "purple")]
 
 colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato", "cyan"]
 
@@ -16,10 +17,11 @@ start = 0.0
 
 print("plotting specific heat (constant J1/J2, funtion of T) ...")
 
-for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: 
+for end in [0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: 
     print("from %f to %f" %(start, end))
     for N_outer in range(len(N_color)):
-        #if N_outer != 0: continue
+        continue
+        # if N_outer != 0: continue
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
         X_high_T = np.linspace(0.01, end, 5000)
@@ -88,7 +90,6 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             # subfig3.set_xscale("log")
 
             fig3.savefig("results/" + "C_ED_QT_" + N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".png")
-            plt.close(fig3)
 
             if max(Y) > fig2_y_max: fig2_y_max = max(Y)
 
@@ -118,8 +119,6 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
         fig1.savefig("results/highT/" + "C_ED_high_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
-        plt.close(fig1)
-
 
         #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
         subfig2.set_xlabel(einheit_x, fontsize = 40)
@@ -142,14 +141,21 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
         subfig2.legend(loc = 'best' ,frameon = False, fontsize = 30)
         fig2.savefig("results/highT/" + "C_QT_hight_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
-        plt.close(fig2)
-
-        plt.cla()
+        
+        #plt.cla()
         plt.clf()
+        plt.close(fig1)
+        plt.close(fig2)
+        plt.close(fig3)
+        plt.close('all')
         del fig1, subfig1
         del fig2, subfig2
         del fig3, subfig3
         gc.collect()
+
+    # continue
+
+    for N_outer in range(len(N_color)):
 
         print("multiple runs (QT)")
         N, C = N_color[N_outer]
@@ -160,6 +166,24 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             J = filename[len("C_J"):-len("QT.txt")]
             color_count = 0
             x_min = 42069
+            try:
+                filenameED = filename[:-len("QT.txt")] + "ED.txt"
+                file = open("results/" + N + "/data/excitation_energies_data/1/" + filenameED, 'r')
+                lines = file.readlines()
+                X = []
+                Y = []
+                YErr = []
+                for i in range(5,len(lines)):
+                    x, y = lines[i].split("\t")
+                    #if float(x) < start or float(x) > end: continue
+                    if float(x) <= 0.0: continue
+                    X += [1/float(x)]
+                    Y += [float(y)]
+                file.close()
+                subfigMultiQT.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "black", label = "ED")
+                if min(X) < x_min: x_min = min(X)
+            except:
+                print("could not plot multiple runs (ED ref) N = %s" %N)
             try:
                 for n in range(1, max_n+1):
                     file = open("results/" + N + "/data/excitation_energies_data/" + str(n) + "/" + filename, 'r')
@@ -190,11 +214,14 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                 figMultiQT.savefig("results/" + N +  "/C_QT_J_" + J + "_0.0_" + str(end) + ".png")
             except:
                 print("could not plot multiple runs (QT) N = %s" %N)
-            plt.cla()
+            #plt.cla()
             plt.clf()
             plt.close(figMultiQT)
+            plt.close('all')
             del figMultiQT, subfigMultiQT
             gc.collect()
+
+        continue
 
         N, C = N_color[N_outer]
         #if N_outer != 0: continue
@@ -206,6 +233,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             J = filename[len("C_J"):-len("ED.txt")]
             if float(J) > 1.5: continue
             #print("%s, %s" % (N, J))
+            X_high_T = np.linspace(0.01, end, 5000)
             Y_high_T = (3 * (1 + float(J)**2) / 4 / 4) / X_high_T**2
             subfig4.plot(X_high_T, Y_high_T, lw = 4, ls = "dashed", markersize = 0, marker = "o", color = "black", label = "high T")
             used_N = "N"
@@ -236,7 +264,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                     if max(Y) > y_max: y_max = max(Y)
                     used_N += "_" + n
                 except:
-                    print("could not plot hight T, N = %s and J = %s" %(n, J))
+                    print("could not plot high T, N = %s and J = %s" %(n, J))
 
                 if N_inner != len(N_color)-1: continue
 
@@ -253,8 +281,9 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                 subfig4.legend(loc = 'best' ,frameon = False, fontsize = 30)
                 fig4.savefig("results/highT/C_J_" + J + "_" + used_N + "_0.0_" + str(end) + ".png")
             
-            plt.cla()
+            #plt.cla()
             plt.clf()
             plt.close(fig4)
+            plt.close('all')
             del fig4, subfig4
             gc.collect()
