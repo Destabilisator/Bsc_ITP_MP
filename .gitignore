@@ -35,15 +35,6 @@ results/QT_stats/good_fit_for_N_mod_4/*
 results/QT_stats/knowngood/*
 results/QT_stats/knowngood_2/*
 
-results/QT_stats/*
-!results/QT_stats/data_placeholder.txt
-
-results/extrapolation_temp/*
-!results/extrapolation_temp/data_placeholder.txt
-
-results/highT/*
-!results/highT/data_placeholder.txt
-
 results/benchmarking/*.txt
 results/benchmarking/*.png
 results/benchmarking/temp/*.txt
@@ -71,6 +62,15 @@ results/*/*.png
 results/*/data/*.txt
 results/*/data/*.png
 !results/*/data/data_placeholder.txt
+
+results/QT_stats/*
+!results/QT_stats/data_placeholder.txt
+
+results/extrapolation_temp/*
+!results/extrapolation_temp/data_placeholder.txt
+
+results/highT/*
+!results/highT/data_placeholder.txt
 
 results/*/data/step_size_data/*.txt
 results/*/data/step_size_data/*.png
