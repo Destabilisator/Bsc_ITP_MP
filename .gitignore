@@ -63,10 +63,13 @@ results/*/data/*.txt
 results/*/data/*.png
 !results/*/data/data_placeholder.txt
 
-results/QT_stats/*
+results/QT_stats/*/*
+results/QT_stats/*.txt
+results/QT_stats/*.png
 !results/QT_stats/data_placeholder.txt
 
-results/extrapolation_temp/*
+results/extrapolation_temp/*.txt
+results/extrapolation_temp/*.png
 !results/extrapolation_temp/data_placeholder.txt
 
 results/highT/*
