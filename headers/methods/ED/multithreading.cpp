@@ -627,10 +627,14 @@ namespace ED::multi {
 
             double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
 
+            std::cout << "J = " << J << std::endl;
+
             std::vector<std::vector<std::complex<double>>> eiVals;
             std::vector<Eigen::MatrixXcd> matrixBlockU;
             std::vector<Eigen::MatrixXcd> matrixBlockS2;
+            std::cout << "matrix list init" << std::endl;
             momentumStates::getEiValsZeroBlock(J, 1.0, eiVals, matrixBlockU, matrixBlockS2, N, SIZE);
+            std::cout << "got ev" << std::endl;
 
             std::vector<std::tuple<double, double>> susceptibility_magnetization;
 
