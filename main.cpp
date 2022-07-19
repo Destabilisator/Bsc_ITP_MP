@@ -22,9 +22,8 @@ int main(int argc, char* argv[]) {
     omp_set_num_threads(cores);
     //omp_set_num_threads(OUTERMOST_NESTED_THREADS * OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
     omp_set_nested(1);
-
+/*
     std::cout << "N: " << N << "; size: " << SIZE << "\n";
-    /*
     std::cout << "default J1 and J2 for plots with J = const: J1 = " << J1 << " and J2 = " << J2 << " (currently unchangeable)\n";
     std::cout << "default magnetic field for plots with h = const: h = " << h << "\n";
     std::cout << "default step size for RK4: " << step_size << "\n";
@@ -32,10 +31,9 @@ int main(int argc, char* argv[]) {
     std::cout << "J_START = " << J_START << ", J_END = " << J_END << " and J_COUNT = " << J_COUNT << "\n";
     std::cout << "T_START = " << T_START << ", T_END = " << T_END << " and T_COUNT = " << T_COUNT << "\n";
     std::cout << "h_START = " << h_START << ", h_END = " << h_END << " and h_COUNT = " << h_COUNT << "\n";
-      */
     std::cout << "using " << cores << " cores (hardware limit: " << std::thread::hardware_concurrency() << " cores)\n";
     if (noX) {std::cout << "skipping susceptibility plots\n";}
-
+*/
     std::cout.flush();
     //std::cout << std::endl;
 
@@ -120,6 +118,8 @@ int main(int argc, char* argv[]) {
     double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
     T_START = 0.0; T_END = 50.0;
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
+    cores = 1;
+    omp_set_num_threads(cores);
 
 //    SAMPLES = 1;
 ////    if (N >= 22) {SAMPLES = 1;}
