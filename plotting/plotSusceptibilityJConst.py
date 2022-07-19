@@ -9,14 +9,13 @@ colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato"]
 
 max_n = 5
 
-einheit_x = r'$T$ in $k_B$ / $J_2$'
+einheit_x = r'$k_B T$ / $J_2$' #'$T$ in $k_B$ / $J_2$'
 
 start = 0.0
 
 print("plotting susceptibility (constant J1/J2, funtion of T) ...")
 
-for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: 
-    print("from %d to %d" %(start, end))
+for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0
     for N_outer in range(len(N_color)):
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
@@ -24,8 +23,9 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
         # Y_high_T = 3/4 / X_high_T**2
         used_N = "N"
         for N_inner in range(N_outer, len(N_color)):
+            x_min_ED = 42069.0; x_min_QT = 42069.0
+            print("end: %f, N_outer: %s, N_inner: %s" % (end, N_color[N_outer][0], N_color[N_inner][0]))
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
-            print("(%i,%i)" % (N_outer,N_inner))
             # ED
             N, c = N_color [N_inner]
             file = open("results/" + N + "/data/data_susceptibility_J_const.txt", 'r')
@@ -41,6 +41,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                 X += [1/float(x)]
                 Y += [float(y)]
             file.close()
+            if min(X) < x_min_ED: x_min_ED = min(X)
             subfig1.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)
             subfig3.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = c, label = "ED")
 
@@ -60,6 +61,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
                 Y += [float(y)]
                 YErr += [float(yErr)]
             file.close()
+            if min(X) < x_min_QT: x_min_QT = min(X)
             subfig3.plot(X, Y, lw = 4, ls = "dashed", markersize = 0, marker = "o", color = c, label = "QT")
             X = np.asarray(X)
             Y = np.asarray(Y)
@@ -77,7 +79,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
             plt.xticks(fontsize = 25)
             plt.yticks(fontsize = 25)
 
-            subfig3.set_xlim(start, end)
+            subfig3.set_xlim(min(x_min_ED, x_min_QT), end)
             # subfig3.set_ylim(0.0, 0.5)
             # subfig3.set_xscale("log")
 
@@ -102,7 +104,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
         subfig1.tick_params(axis="both", which="major", labelsize=25)
         #subfig1.tick_params(axis="both", which="major", labelsize=25)
 
-        subfig1.set_xlim(start, end)
+        subfig1.set_xlim(x_min_ED, end)
         # subfig1.set_ylim(0.0, 0.5)
         # subfig1.set_xscale("log")
 
@@ -125,7 +127,7 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
         plt.xticks(fontsize = 25)
         plt.yticks(fontsize = 25)
 
-        subfig2.set_xlim(start, end)
+        subfig2.set_xlim(x_min_QT, end)
         # subfig2.set_ylim(0.0, 0.5)
         # subfig2.set_xscale("log")
 
@@ -135,6 +137,8 @@ for end in [1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]:
         # fig2.savefig("results/" + "X_QT_hight_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
 
         plt.close(fig2)
+
+        continue
 
         N, C = N_color[N_outer]
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
