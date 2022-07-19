@@ -165,6 +165,7 @@ namespace bench {
 #endif
 #ifdef ED_BENCH_EV
 #ifdef ONLY_MAG_ZERO_BLOCK
+                    if (N > 12) { continue; }
                     if (cores != 1) { continue; }
                     std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
                               << " MS ED m_z = 0\n";
