@@ -108,7 +108,7 @@ namespace bench {
                             // QT
 #ifdef QT_BENCH
                             std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize
-                                      << ", SAMPLES = " << SAMPLES << ", cores = " << cores;
+                                      << ", SAMPLES = " << SAMPLES << ", cores = " << cores << ", run " << run << " of " << runs;
                             auto start_timer_QT = std::chrono::steady_clock::now();
 #ifndef ONLY_MAG_ZERO_BLOCK
                             QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
@@ -169,7 +169,7 @@ namespace bench {
                     if (N > 14) { continue; }
                     if (cores != 1) { continue; }
                     std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
-                              << " MS ED m_z = 0\n";
+                              << " MS ED m_z = 0" << ", run " << run << " of " << runs << std::endl;
                     auto start_timer_ED_MS = std::chrono::steady_clock::now();
                     ed_ms_getEiValsZeroBlock(1.0, 1.0, N, SIZE);
                     auto end_timer_ED_MS = std::chrono::steady_clock::now();
@@ -178,7 +178,7 @@ namespace bench {
                                    std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MS.count()));
                     if (N % 4 == 0) {
                         std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
-                                  << " MS ED m_z = 0\n";
+                                  << " MS ED m_z = 0" << ", run " << run << " of " << runs << std::endl;
                         auto start_timer_ED_SI = std::chrono::steady_clock::now();
                         ed_si_getEiValsZeroBlock(1.0, 1.0, N, SIZE);
                         auto end_timer_ED_SI = std::chrono::steady_clock::now();
