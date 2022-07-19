@@ -100,6 +100,7 @@ namespace bench {
                         int T_COUNT = (int) ((T_END - T_START) / stepsize);
                         for (int SAMPLES: {1, 2, 3}) { /// 1, 2, 3
                             if (N > 20 && SAMPLES != 1) { continue; }
+                            if (SAMPLES != 1) { continue; }
 #ifdef ONLY_MAG_ZERO_BLOCK
                             if (cores != 1) { continue; }
 #endif
@@ -165,7 +166,7 @@ namespace bench {
 #endif
 #ifdef ED_BENCH_EV
 #ifdef ONLY_MAG_ZERO_BLOCK
-                    if (N > 12) { continue; }
+                    if (N > 14) { continue; }
                     if (cores != 1) { continue; }
                     std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
                               << " MS ED m_z = 0\n";
