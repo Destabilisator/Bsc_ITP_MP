@@ -71,28 +71,29 @@ def extrapolate_data(N, T, title):
     return X, Y
 
 def add_time_steps(subfig):
+    # Namen aus DIN 1355-1
     width = 2; c = "black"; alph = 0.5
     # 1 second
     subfig.hlines(y = 1, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(5, 0.8, "1 s", fontsize = 20)
+    subfig.text(4.8, 0.8, "1 Sek.", fontsize = 20)
     # 1 minute
     subfig.hlines(y = 60, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(5, 0.8 * 60, "1 m", fontsize = 20)
+    subfig.text(4.8, 0.8 * 60, "1 Min.", fontsize = 20)
     # 1 hour
     subfig.hlines(y = 60 * 60, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(5, 0.8 * 60 * 60, "1 h", fontsize = 20)
+    subfig.text(4.8, 0.8 * 60 * 60, "1 Std.", fontsize = 20)
     # 1 day
     subfig.hlines(y = 60 * 60 * 24, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(5, 0.8 * 60 * 60 * 24, "1 d", fontsize = 20)
+    subfig.text(4.8, 0.8 * 60 * 60 * 24, "1 Tg.", fontsize = 20)
     # 1 week
     subfig.hlines(y = 60 * 60 * 24 * 7, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(5, 0.8 * 60 * 60 * 24 * 7, "1 w", fontsize = 20)
+    subfig.text(4.8, 0.8 * 60 * 60 * 24 * 7, "1 Wo.", fontsize = 20)
     # 1 month
     subfig.hlines(y = 60 * 60 * 24 * 31, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(4.8, 0.8 * 60 * 60 * 24 * 31, "31 d", fontsize = 20)
+    subfig.text(4.8, 0.8 * 60 * 60 * 24 * 31, "31 Tg.", fontsize = 20) # 1 Mon.
     # 1 year
     subfig.hlines(y = 60 * 60 * 24 * 365, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(5, 0.8 * 60 * 60 * 24 * 365, "1 y", fontsize = 20)
+    subfig.text(4.8, 0.8 * 60 * 60 * 24 * 365, "1 J.", fontsize = 20)
 
 ##### run time, full matrix #####
 def RT_plot_raw_files():
