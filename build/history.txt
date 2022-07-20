@@ -1,3 +1,4 @@
 device name: confige time - compile time - total time 	in milliseconds
 TUXEDO-Cheesus: 530 - 115921 - 116452
 Nosferatu: 473 - 64607 - 65081
+TUXEDO-Cheesus: 443 - 114823 - 115267
