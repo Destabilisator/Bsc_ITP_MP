@@ -6,7 +6,7 @@ plt.rcParams['text.usetex'] = True
 
 N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 N_color = [("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
-N_color = [("16", "purple")]
+N_color = [("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 
 colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato"]
 
@@ -20,7 +20,7 @@ ends = [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]#, 20.0, 50.0, 100.0]
 print("plotting susceptibility (constant J1/J2, funtion of T) ...")
 
 for N_outer in range(len(N_color)):
-    continue
+    # continue
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
     # X_high_T = np.linspace(0.01, end, 5000)
