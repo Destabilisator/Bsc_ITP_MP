@@ -10,17 +10,19 @@ import gc
 plt.rcParams['text.usetex'] = True
 
 N_color = []
-N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta")]#, ("14", "brown")]#, ("16", "purple"), ("18", "tomato")]
+N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
 peak_offset = 2000
 fit_samples = 5 # 5
 search_start_percent = 4/5
 search_end_percent = 1/5
-max_n = 1 # min = 1; max = 5
-no_ED = False
+max_n = 5 # min = 1; max = 5
+no_ED = False # True / False
 
-SAVE_FULL_PLOTS = False
+SAVE_FULL_PLOTS = False # True / False
+
+SCALE_SUM_J = True # True / False
 
 def sort_data(X, Y, A):
     length = len(X)
@@ -175,6 +177,8 @@ if __name__ == "__main__":
         else: N_color = N_color_LOW; print("default low (wrong args)")
     else: N_color = N_color_LOW; print("default low (no args)")
 
+    N_color = [("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
+
     for i in range(len(N_color)):
         print("plotting spin gap ...")
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
@@ -199,7 +203,8 @@ if __name__ == "__main__":
                     A, k = get_spin_gap(n, N, J, filename)
                     # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
                     X_arr[n] += [float(J)]
-                    Y_arr[n] += [float(k)]
+                    if SCALE_SUM_J: Y_arr[n] += [float(k) / (1.0 + float(J))]
+                    else: Y_arr[n] += [float(k)]
                     A_arr[n] += [float(A)]
                 X_arr[n], Y_arr[n], A_arr[n] = sort_data(X_arr[n], Y_arr[n], A_arr[n])
 
@@ -215,13 +220,13 @@ if __name__ == "__main__":
 
             save_spin_gap_data(N, X, Y, YErr, A, AErr)
 
-            subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = c, label = lbl)
+            subfig1.plot(X, Y, lw = 3, ls = "dashed", markersize = 0, marker = "o", color = c)#, label = lbl)
             X = np.asarray(X)
             Y = np.asarray(Y)
             YErr = np.asarray(YErr)
             subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.1)
 
-            subfigAmp.plot(X, AErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)#, alpha = 0.5)
+            subfigAmp.plot(X, AErr, lw = 3, ls = "solid", markersize = 0, marker = "o", color = c)#, label = lbl)#, alpha = 0.5)
             # A = np.asarray(A)
             # AErr = np.asarray(AErr)
             # subfigAmp.fill_between(X, A - AErr, A + AErr, color = c, alpha = 0.2)
@@ -238,10 +243,11 @@ if __name__ == "__main__":
                     A, k = get_spin_gap(0, N, J, filename)
                     # print(str(A) + " " + str(k)  + " " + str(x_0)  + " " + str(y_0))
                     X += [float(J)]
-                    Y += [float(k)]
+                    if SCALE_SUM_J: Y += [float(k) / (1.0 + float(J))]
+                    else: Y += [float(k)]
                     A_arr += [float(A)]
                 X, Y, A_arr = sort_data(X, Y, A_arr)
-                subfig1.plot(X, Y, lw = 0, ls = "", markersize = 2, marker = "o", color = c)#, alpha = 0.5)#, label = lbl, alpha = 0.5)
+                subfig1.plot(X, Y, lw = 3, ls = "solid", markersize = 0, marker = "o", color = c)#, alpha = 0.5)#, label = lbl, alpha = 0.5)
                 # subfigAmp.plot(X, A_arr, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)
                 # ED results
                 print("ED (dispersion)...")
@@ -249,29 +255,34 @@ if __name__ == "__main__":
                 X = []; Y = []
                 file = open("results/" + N + "/data/data_spin_gap.txt", 'r') # _data_spin_gap / _data_spin_gap_with_index
                 lines = file.readlines()
-                lbl = "ED: N = " + N
+                lbl = "N = " + N
                 X = []; Y = []
                 for i in range(7,len(lines)):
                     arr = lines[i].split("\t")
                     x = arr[0]
                     y = arr[1]
                     X += [float(x)]
-                    Y += [float(y)]
+                    if SCALE_SUM_J: Y += [float(y) / (1.0 + float(x))]
+                    else: Y += [float(y)]
                 file.close()
-                subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c)#, alpha = 0.4) #  label = lbl,
+                subfig1.plot(X, Y, lw = 0, ls = "solid", markersize = 5, marker = "o", color = c, label = lbl)#, alpha = 0.4) #  label = lbl,
             
             print()
 
             used_N += "_" + N
 
             subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-            subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
+            if SCALE_SUM_J: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $(J_1 + J_2)$', fontsize = 25)
+            else: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = 25)
             subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = 25)
 
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-            fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
+            subfig1.tick_params(axis="both", which="major", labelsize=25)
+
+            if SCALE_SUM_J: fig1.savefig("results/" + "spin_gap_with_QT_J_sum_scale_" + used_N + ".png")
+            else: fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
 
             # subfigAmp.set_yscale("log")
 
@@ -282,7 +293,10 @@ if __name__ == "__main__":
             subfigAmp.axhline(0, color = "grey")
             subfigAmp.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-            figAmp.savefig("results/" + "spin_gap_with_QT_AMP_" + used_N + ".png")
+            subfigAmp.tick_params(axis="both", which="major", labelsize=25)
+
+            if SCALE_SUM_J: figAmp.savefig("results/" + "spin_gap_with_QT_AMP_J_sum_scale_" + used_N + ".png")
+            else: figAmp.savefig("results/" + "spin_gap_with_QT_AMP_" + used_N + ".png")
 
             # gc.collect(generation=2)
 
