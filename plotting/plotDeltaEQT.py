@@ -12,6 +12,7 @@ plt.rcParams['text.usetex'] = True
 N_color = []
 N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown")]#, ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta")]#, ("28", "brown"), ("30", "purple"), ("32", "tomato")]
+split_index = [("6", 0.96, 1.05), ("8", 0.96, 1.05), ("10", 0.96, 400), ("10QT", 0.90, 400), ("12", 0.9, 400), ("12QT", 0.77, 400), ("14", 0.92, 400), ("14QT", 0.73, 400), ("16", 0.87, 400), ("16QT", 0.82, 400), ("18", 0.96, 1.05)]
 
 peak_offset = 2000 #1500 # 1000
 fit_samples = 5 # 5
@@ -21,6 +22,15 @@ max_n = 5 # min = 1; max = 5
 no_ED = False
 
 SAVE_FULL_PLOTS = False
+
+def split_data(X, Y, YErr, N):
+    for n, l, r in split_index: 
+        if n == N: left_split = l; right_split = r
+    X1 = []; X2 = []; Y1 = []; Y2 = []; YErr1 = []; YErr2 = []
+    for i in range(len(X)):
+        if X[i] <= left_split: X1 += [X[i]]; Y1 += [Y[i]]; YErr1 += [YErr[i]]
+        if X[i] >= right_split: X2 += [X[i]]; Y2 += [Y[i]]; YErr2 += [YErr[i]]
+    return X1, Y1, YErr1, X2, Y2, YErr2
 
 def sort_data(X, Y, A):
     length = len(X)
@@ -179,13 +189,15 @@ if __name__ == "__main__":
         else: N_color = N_color_LOW; print("default low (wrong args)")
     else: N_color = N_color_LOW; print("default low (no args)")
 
+    N_color = [("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
+
     for i in range(len(N_color)):
         print("plotting excitation energies ...")
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         figAmp, subfigAmp = plt.subplots(1,1,figsize=(16,9))
         used_N = "N"
         for j in range(i, len(N_color)):
-            N, c = N_color [j]
+            N, c = N_color[j]
     #for N, c in N_color:
             print("N = " + N + ":") 
             # QT results
@@ -219,13 +231,20 @@ if __name__ == "__main__":
 
             save_excitation_energy_data(N, X, Y, YErr, A, AErr)
 
-            subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = c, label = lbl)
-            X = np.asarray(X)
-            Y = np.asarray(Y)
-            YErr = np.asarray(YErr)
-            subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.1)
+            X1, Y1, YErr1, X2, Y2, YErr2 = split_data(X, Y, YErr, N)
 
-            subfigAmp.plot(X, AErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)#, alpha = 0.5)
+            NQT = N + "QT"
+            if N == "10" or N == "12" or N == "14" or N == "16":
+                X1, Y1, YErr1, X2, Y2, YErr2 = split_data(X, Y, YErr, NQT)
+
+            for X, Y, YErr in [(X1, Y1, YErr1), (X2, Y2, YErr2)]:
+                subfig1.plot(X, Y, lw = 3, ls = "dashed", markersize = 0, marker = "o", color = c)
+                X = np.asarray(X)
+                Y = np.asarray(Y)
+                YErr = np.asarray(YErr)
+                subfig1.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.1)
+
+            #subfigAmp.plot(X, AErr, lw = 3, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)#, alpha = 0.5)
             # A = np.asarray(A)
             # AErr = np.asarray(AErr)
             # subfigAmp.fill_between(X, A - AErr, A + AErr, color = c, alpha = 0.2)
@@ -245,7 +264,12 @@ if __name__ == "__main__":
                     Y += [float(k)]
                     A_arr += [float(A)]
                 X, Y, A_arr = sort_data(X, Y, A_arr)
-                subfig1.plot(X, Y, lw = 0, ls = "", markersize = 2, marker = "o", color = c)#, alpha = 0.5)#, label = lbl, alpha = 0.5)
+
+                YErr = Y
+                X1, Y1, YErr1, X2, Y2, YErr2 = split_data(X, Y, YErr, N)
+
+                for X, Y, YErr in [(X1, Y1, YErr1), (X2, Y2, YErr2)]:
+                    subfig1.plot(X, Y, lw = 3, ls = "solid", markersize = 0, marker = "o", color = c)#, alpha = 0.5)#, label = lbl, alpha = 0.5)
                 # subfigAmp.plot(X, A_arr, lw = 0, ls = "dotted", markersize = 2, marker = "o", color = c, alpha = 0.5)
                 # ED results
                 print("ED (dispersion)...")
@@ -253,7 +277,7 @@ if __name__ == "__main__":
                 X = []; Y = []
                 file = open("results/" + N + "/data/data_delta_E.txt", 'r')
                 lines = file.readlines()
-                lbl = "ED: N = " + N
+                lbl = "N = " + N
                 X = []; Y = []
                 for i in range(8,len(lines)):
                     arr = lines[i].split("\t")
@@ -262,15 +286,18 @@ if __name__ == "__main__":
                     X += [float(x)]
                     Y += [float(y)]
                 file.close()
-                subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = c)#, alpha = 0.4) #  label = lbl,
+                subfig1.plot(X, Y, lw = 0, ls = "solid", markersize = 5, marker = "o", color = c, label = lbl)#, alpha = 0.4) #  label = lbl,
+
             
             print()
 
             used_N += "_" + N
 
+            subfig1.tick_params(axis="both", which="major", labelsize=25)
+
             subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-            subfig1.set_ylabel(r'$\Delta E = E_1 - E_0$  in $J_2$', fontsize = 25)
-            subfig1.set_title(r'Anregungsenergieren $\Delta E$ mit '  + str(max_n) + " Startvektoren (QT), h = " + linesh, fontsize = 25)
+            subfig1.set_ylabel(r'$\Delta E$ / $J_2$ = $(E_1 - E_0)$ / $J_2$', fontsize = 25)
+            subfig1.set_title(r'Anregungsenergieren $\Delta E$ mit '  + str(max_n) + " Startvektoren (QT)", fontsize = 25)
 
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
@@ -278,6 +305,8 @@ if __name__ == "__main__":
             fig1.savefig("results/" + "excitation_energies_data_with_QT_" + used_N + ".png")
 
             subfigAmp.set_yscale("log")
+
+            subfigAmp.tick_params(axis="both", which="major", labelsize=25)
 
             subfigAmp.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
             subfigAmp.set_ylabel(r'$\sigma_{rel}(A)$ in $J_2$', fontsize = 25)
