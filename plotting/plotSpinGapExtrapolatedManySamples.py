@@ -1,5 +1,6 @@
 import matplotlib
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 matplotlib.use('TkAgg')
 import os
 import sys
@@ -48,8 +49,7 @@ def format_time(start_time: float, end_time: float) -> str:
 
 def shank_Alg(A, n):
     Anp1 = A[n+1]; An = A[n]; Anm1 = A[n-1]
-    return (Anp1 * Anm1 - An * An) / (Anp1 - 2 * An + Anm1)
-    # return Anp1 - ( (Anp1 - An) * (Anp1 - An) ) / ( (Anp1 - An) - (An - Anm1) )
+    return (Anp1 * Anm1 - An * An) / (Anp1 - 2 * An + Anm1) # Anp1 - ( (Anp1 - An) * (Anp1 - An) ) / ( (Anp1 - An) - (An - Anm1) )
 
 def epsilon_Alg(A):
     length = len(A)
@@ -206,7 +206,7 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
 
     return float(A), abs(k)
 
-def getData(N: int, n: int):
+def getDataQT(N: int, n: int):
     X = []; Y = [];  A = []
     for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n) + "/"):
         if filename[len(filename)-6:] != "QT.txt": continue
@@ -218,8 +218,20 @@ def getData(N: int, n: int):
     X, Y, A = sort_data(X, Y, A)
     return X, Y, A
 
-def getExtrapolatedData(N_color):
-    print("getting extrapolating data")
+def getDataED(N: int, n: int):
+    X = []; Y = [];  A = []
+    for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n) + "/"):
+        if filename[len(filename)-6:] != "ED.txt": continue
+        J = filename[len("X_J"):-len("ED.txt")]
+        A, k = get_spin_gap(n, N, J, filename)
+        X += [float(J)]
+        Y += [float(k)]
+        A += [0]
+    X, Y, A = sort_data(X, Y, A)
+    return X, Y, A
+
+def getExtrapolatedDataQT(N_color):
+    print("getting extrapolating data (QT)")
     extrapolated_data = [] * max_n
     for n in range(1, max_n + 1):
         print("n = %i / %i\r" %(n, max_n), end="")
@@ -227,10 +239,13 @@ def getExtrapolatedData(N_color):
         extrapolationArray = []
         used_N = "N"
         for N, C in N_color:
-            X, Y, A = getData(int(N), n)
-            extrapolationArray += [Y]
-            used_N += "_" + N
-            subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 4, marker = "o", color = C, label = "N = " + N)
+            try:
+                X, Y, A = getDataQT(int(N), n)
+                extrapolationArray += [Y]
+                used_N += "_" + N
+                subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 4, marker = "o", color = C, label = "N = " + N)
+            except:
+                print("QT data for N = %s no available" % N)
 
         extrapolated_data[n-1] = extrapolation_alg_raw(extrapolationArray)
 
@@ -245,6 +260,36 @@ def getExtrapolatedData(N_color):
 
         fig1.savefig("results/" + "SE_raw_extrap_QT_" + used_N + ".png")
         plt.close(fig1)
+    return extrapolated_data
+
+def getExtrapolatedDataED(N_color):
+    print("getting extrapolating data (ED)")
+    extrapolated_data = []
+    fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+    extrapolationArray = []
+    used_N = "N"
+    for N, C in N_color:
+        try:
+            X, Y, A = getDataED(int(N), 1)
+            extrapolationArray += [Y]
+            used_N += "_" + N
+            subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 4, marker = "o", color = C, label = "N = " + N)
+        except:
+            print("ED data for N = %s no available" % N)
+
+    extrapolated_data = extrapolation_alg_raw(extrapolationArray)
+
+    subfig1.plot(X, extrapolated_data, lw = line_width, ls = "dashed", markersize = marker_size, marker = "o", color = "black", label = "Extrapolation")
+
+    subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
+    subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
+    subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit einem Startvektor', fontsize = 25)
+
+    subfig1.axhline(0, color = "grey")
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+
+    fig1.savefig("results/" + "SE_raw_extrap_QT_" + used_N + ".png")
+    plt.close(fig1)
     return extrapolated_data
 
 def avgData(samp, inputdata):
@@ -272,24 +317,47 @@ def avgData(samp, inputdata):
 
 def plotExtrapolatedData(N_color):
     print("plotting extrapolating data")
-    extrapolated_data = getExtrapolatedData(N_color)
+    extrapolated_data_QT = getExtrapolatedDataQT(N_color)
+    extrapolated_data_ED = getExtrapolatedDataED(N_color)
     for samp in range(1, max_n / 2 + 1):
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
-        used_N = "N"
+        used_N_QT = "N"; used_N_ED = "N"; N_arr = [0] * 35
 
-        for N, C in N_color:
-            used_N += "_" + N
-            X_arr = [] * max_n, Y_arr = [] * max_n, A_arr = [] * max_n
-            for n in range(max_n):
-                X_arr[n], Y_arr[n], A_arr[n] = getData(int(N), n + 1)
-            X, XErr = avgData(samp, X_arr); X = np.asarray(X)
-            Y, YErr = avgData(samp, Y_arr); Y = np.asarray(Y); YErr = np.asarray(YErr)
-            subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = C, label = "N = " + N)
-            subfig1.fill_between(X, Y - YErr, Y + YErr, color = C, alpha = alph)
-
-        Y_etrap, YErr_etrap = avgData(samp, extrapolated_data)
+        # ED #
+        for N, C in N_color:        
+            try:
+                X_arr = [] * max_n; Y_arr = [] * max_n; A_arr = [] * max_n
+                for n in range(max_n):
+                    X_arr[n], Y_arr[n], A_arr[n] = getDataED(int(N), n + 1)
+                X, XErr = avgData(samp, X_arr); X = np.asarray(X)
+                Y, YErr = avgData(samp, Y_arr); Y = np.asarray(Y); YErr = np.asarray(YErr)
+                subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = C)#, label = "N = " + N)
+                subfig1.fill_between(X, Y - YErr, Y + YErr, color = C, alpha = alph)
+                used_N_ED += "_" + N; N_arr[int(N)] = 1
+            except:
+                print("cannot plot ED data for N = %s" % N)
+        Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_ED)
         Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
-        subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = marker_size, marker = "o", color = "black", label = "Extrapolation")
+        subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black")#, label = "Extrapolation")
+        subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = "black", alpha = alph)
+
+        # QT #
+        for N, C in N_color:        
+            try:
+                X_arr = [] * max_n; Y_arr = [] * max_n; A_arr = [] * max_n
+                for n in range(max_n):
+                    X_arr[n], Y_arr[n], A_arr[n] = getDataQT(int(N), n + 1)
+                X, XErr = avgData(samp, X_arr); X = np.asarray(X)
+                Y, YErr = avgData(samp, Y_arr); Y = np.asarray(Y); YErr = np.asarray(YErr)
+                subfig1.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = C)#, label = "N = " + N)
+                subfig1.fill_between(X, Y - YErr, Y + YErr, color = C, alpha = alph)
+                used_N_QT += "_" + N; N_arr[int(N)] = 1
+            except:
+                print("cannot plot QT data for N = %s" % N)
+
+        Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT)
+        Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
+        subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black")#, label = "Extrapolation")
         subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = "black", alpha = alph)
 
         subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
@@ -298,21 +366,38 @@ def plotExtrapolatedData(N_color):
         else: vec_string = str(samp) + " Startvektoren"
         subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$' + "\nmit " + vec_string + " und je " + str(int(max_n/samp)) + " Mittlungen", fontsize = 25)
 
-        subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        legend = []
+        for i in range(len(N_arr)):
+            N_index = N_arr[i]
+            if N_index == 1:
+                N = str(i)
+                C = ""
+                for n, c in N_color:
+                    if n == N: C = c
+                legend += [Line2D([0], [0], label = "N = " + N, color = C)]
+        legend += [Line2D([0], [0], label = "Extrapolation", color = "black")]
+        handles, labels = plt.gca().get_legend_handles_labels()
+        handles.extend(legend)
 
-        fig1.savefig("results/" + "SE_extrap_QT_" + used_N + ".png")
+        subfig1.axhline(0, color = "grey")
+        subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = 20)
+        subfig1.tick_params(axis="both", which="major", labelsize=25)
+
+        fig1.savefig("results/" + "SE_extrap_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+        fig1.savefig("results/" + "SE_extrap_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
         plt.close(fig1)
 
 if __name__ == "__main__":
     start_time = time.time()
 
-    if len(sys.argv) > 1:
-        regime = sys.argv[1]
-        if regime == "low": N_color = N_color_LOW#; print("low regime")
-        elif regime == "high": N_color = N_color_HIGH; no_ED = True#; print("high regime")
-        else: N_color = N_color_LOW; print("default low (wrong args)")
-    else: print("default (no args)")
+    # if len(sys.argv) > 1:
+    #     regime = sys.argv[1]
+    #     if regime == "low": N_color = N_color_LOW#; print("low regime")
+    #     elif regime == "high": N_color = N_color_HIGH; no_ED = True#; print("high regime")
+    #     else: N_color = N_color_LOW; print("default low (wrong args)")
+    # else: print("default (no args)")
+
+    N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
 
     plotExtrapolatedData(N_color)
     print()
