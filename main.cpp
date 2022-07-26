@@ -118,8 +118,8 @@ int main(int argc, char* argv[]) {
     double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
     T_START = 0.0; T_END = 50.0;
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
-    cores = 1;
-    omp_set_num_threads(cores);
+//    cores = 1;
+//    omp_set_num_threads(cores);
 
 //    SAMPLES = 1;
 ////    if (N >= 22) {SAMPLES = 1;}
@@ -170,19 +170,20 @@ int main(int argc, char* argv[]) {
     }
 */
     /// spin gap ///
-/*
-    for (int n = 6; n <= 16; n += 2) {
-    N = n; SIZE = (int) std::pow(2,N); J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; cores = 1;
-    T_END = 100.0;
+///*
+//    for (int n = 6; n <= 16; n += 2) {
+//    N = n; SIZE = (int) std::pow(2,N); J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; cores = 1;
+//    T_END = 100.0;
+    SAMPLES = 30;
     QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
 //    if (N <= 18) {
-    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
+//    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
 //    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 //    }
-*/
+//*/
 //    }
     /// excitation energies ///
-///*
+/*
     T_END = 2 * T_END;
 
     J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; SAMPLES = 30;
@@ -193,7 +194,7 @@ int main(int argc, char* argv[]) {
 //        ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
 //        ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
 //    }
-//*/
+*/
 #endif
 #ifdef BENCH
     /// benchmarking ///
