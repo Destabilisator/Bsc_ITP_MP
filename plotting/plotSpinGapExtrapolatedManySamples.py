@@ -17,6 +17,7 @@ N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"
 
 N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
 N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
+N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 
 peak_offset = 2000
 fit_samples = 3 # 5
