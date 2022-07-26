@@ -15,6 +15,9 @@ N_color = [("14", "red"), ("16", "blue"), ("18", "green"), ("20", "magenta"), ("
 N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 
+N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
+N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
+
 peak_offset = 2000
 fit_samples = 3 # 5
 search_start_percent = 4/5
@@ -327,12 +330,9 @@ def plotExtrapolatedData(N_color):
         for N, C in N_color:        
             try:
                 X_arr = [] * max_n; Y_arr = [] * max_n; A_arr = [] * max_n
-                for n in range(max_n):
-                    X_arr[n], Y_arr[n], A_arr[n] = getDataED(int(N), n + 1)
-                X, XErr = avgData(samp, X_arr); X = np.asarray(X)
-                Y, YErr = avgData(samp, Y_arr); Y = np.asarray(Y); YErr = np.asarray(YErr)
+                X_arr[n], Y_arr[n], A_arr[n] = getDataED(int(N), n + 1)
+                X = np.asarray(X); Y = np.asarray(Y)
                 subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = C)#, label = "N = " + N)
-                subfig1.fill_between(X, Y - YErr, Y + YErr, color = C, alpha = alph)
                 used_N_ED += "_" + N; N_arr[int(N)] = 1
             except:
                 print("cannot plot ED data for N = %s" % N)
@@ -396,8 +396,6 @@ if __name__ == "__main__":
     #     elif regime == "high": N_color = N_color_HIGH; no_ED = True#; print("high regime")
     #     else: N_color = N_color_LOW; print("default low (wrong args)")
     # else: print("default (no args)")
-
-    N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
 
     plotExtrapolatedData(N_color)
     print()
