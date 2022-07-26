@@ -89,6 +89,7 @@ for N_outer in range(len(N_color)):
         for end in ends:
             subfig3.set_xlim(min(x_min_ED, x_min_QT), end)
             fig3.savefig("results/" + "X_ED_QT_" + N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+            fig3.savefig("results/" + "X_ED_QT_" + N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
             plt.close(fig3)
 
         subfig2.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)
@@ -115,6 +116,7 @@ for N_outer in range(len(N_color)):
     for end in ends:
         subfig1.set_xlim(x_min_ED, end)
         fig1.savefig("results/" + "X_ED_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        fig1.savefig("results/" + "X_ED_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
 
     # subfig1.plot(X_high_T, Y_high_T, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "black", label = "high T")
     # fig1.savefig("results/" + "X_ED_high_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
@@ -139,6 +141,7 @@ for N_outer in range(len(N_color)):
     for end in ends:
         subfig2.set_xlim(x_min_QT, end)
         fig2.savefig("results/" + "X_QT_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        fig2.savefig("results/" + "X_QT_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
 
     # subfig2.plot(X_high_T, Y_high_T, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "black", label = "high T")
     # fig2.savefig("results/" + "X_QT_hight_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
@@ -206,6 +209,7 @@ for N_outer in range(len(N_color)):
                 subfigMultiQT.set_xlim(x_min, end)
                 subfigMultiQT.set_xlim(0.0, end)
                 figMultiQT.savefig("results/" + N +  "/X_QT_N_" + N + "_J_" + J + "_0.0_" + str(end) + ".png")
+                figMultiQT.savefig("results/" + N +  "/X_QT_N_" + N + "_J_" + J + "_0.0_" + str(end) + ".pdf")
                 
         except:
             print("could not plot multiple runs (QT) N = %s, J = %s" %(N, J))

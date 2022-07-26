@@ -191,6 +191,17 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
 
     return float(A), abs(k)
 
+def format_time(start_time: float, end_time: float) -> str:
+    elapsed_time = end_time- start_time
+    hours = int( elapsed_time / 3600 )
+    minutes = int( (elapsed_time - hours * 3600) / 60 )
+    seconds = elapsed_time - hours * 3600 - minutes * 60
+    ret = ""
+    if hours > 0: ret += str(hours) + " hours " + str(minutes) + " minutes "
+    elif minutes > 0: ret += str(minutes) + " minutes "
+    ret += str(seconds) + " seconds"
+    return ret
+
 def QT_extrapolation(N_color):
     print("extrapolating QT ...")
     for max_N in range(len(N_color)+1):
@@ -360,16 +371,6 @@ def ED_extrapolation(N_color):
 
             plt.close(fig1)
 
-def format_time(start_time: float, end_time: float) -> str:
-    elapsed_time = end_time- start_time
-    hours = int( elapsed_time / 3600 )
-    minutes = int( (elapsed_time - hours * 3600) / 60 )
-    seconds = elapsed_time - hours * 3600 - minutes * 60
-    ret = ""
-    if hours > 0: ret += str(hours) + " hours " + str(minutes) + " minutes "
-    elif minutes > 0: ret += str(minutes) + " minutes "
-    ret += str(seconds) + " seconds"
-    return ret
 
 if __name__ == "__main__":
     start_time = time.time()

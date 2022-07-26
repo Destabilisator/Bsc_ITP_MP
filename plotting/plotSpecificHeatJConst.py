@@ -89,6 +89,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
             # subfig3.set_xscale("log")
 
             fig3.savefig("results/" + "C_ED_QT_" + N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".png")
+            fig3.savefig("results/" + "C_ED_QT_" + N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".pdf")
 
             if max(Y) > fig2_y_max: fig2_y_max = max(Y)
 
@@ -113,10 +114,12 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
         # subfig1.set_xscale("log")
 
         fig1.savefig("results/" + "C_ED_" + used_N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".png")
+        fig1.savefig("results/" + "C_ED_" + used_N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".pdf")
 
         subfig1.plot(X_high_T, Y_high_T, lw = 4, ls = "dashed", markersize = 0, marker = "o", color = "black", label = "high T")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
         fig1.savefig("results/highT/" + "C_ED_high_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        fig1.savefig("results/highT/" + "C_ED_high_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
 
 
         #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
@@ -135,11 +138,12 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
         # subfig2.set_xscale("log")
 
         fig2.savefig("results/" + "C_QT_" + used_N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".png")
+        fig2.savefig("results/" + "C_QT_" + used_N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".pdf")
 
         subfig2.plot(X_high_T, Y_high_T, lw = 4, ls = "dashed", markersize = 0, marker = "o", color = "black", label = "high T")
         subfig2.legend(loc = 'best' ,frameon = False, fontsize = 30)
         fig2.savefig("results/highT/" + "C_QT_hight_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
-
+        fig2.savefig("results/highT/" + "C_QT_hight_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
         
         #plt.cla()
         plt.clf()
@@ -216,6 +220,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
                 subfigMultiQT.axhline(0, color = "grey")
                 # subfigMultiQT.legend(loc = 'best' ,frameon = False, fontsize = 30)
                 figMultiQT.savefig("results/" + N +  "/C_QT_N_" + N + "_J_" + J + "_0.0_" + str(end) + ".png")
+                figMultiQT.savefig("results/" + N +  "/C_QT_N_" + N + "_J_" + J + "_0.0_" + str(end) + ".pdf")
             except:
                 print("could not plot multiple runs (QT) N = %s" %N)
             #plt.cla()
@@ -289,6 +294,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
                 subfig4.axhline(0, color = "grey")
                 subfig4.legend(loc = 'best' ,frameon = False, fontsize = 30)
                 fig4.savefig("results/highT/C_J_" + J + "_" + used_N + "_0.0_" + str(end) + ".png")
+                fig4.savefig("results/highT/C_J_" + J + "_" + used_N + "_0.0_" + str(end) + ".pdf")
             
             #plt.cla()
             plt.clf()
