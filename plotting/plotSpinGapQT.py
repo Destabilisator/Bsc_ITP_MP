@@ -20,6 +20,11 @@ search_end_percent = 1/5
 max_n = 5 # min = 1; max = 5
 no_ED = False # True / False
 
+titlefontsize = 40
+labelfontsize = 30
+legendfontsize = 30
+axisfontsize = 25
+
 SAVE_FULL_PLOTS = False # True / False
 
 SCALE_SUM_J = True # True / False
@@ -97,12 +102,12 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
         # Y_fitted = [np.exp(m * x + b) for x in X_fit_range]
         Y_fitted = [expFunc(x, A, k) for x in X_fit_range]
         subfig2.plot(X_fit_range, Y_fitted, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "red", label = "exp fit, R = " + str(R2))
-        subfig2.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
-        subfig2.set_title("$\\chi/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + J, fontsize = 25)
+        subfig2.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = labelfontsize)
+        subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+        subfig2.set_title("$\\chi/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + J, fontsize = titlefontsize)
 
         # subfig2.axhline(0, color = "grey")
-        subfig2.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
         plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
         #subfig2.set_xscale("log")
@@ -271,29 +276,29 @@ if __name__ == "__main__":
 
             used_N += "_" + N
 
-            subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-            if SCALE_SUM_J: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $(J_1 + J_2)$', fontsize = 25)
-            else: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = 25)
-            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = 25)
+            subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
+            if SCALE_SUM_J: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $(J_1 + J_2)$', fontsize = labelfontsize)
+            else: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = titlefontsize)
 
             subfig1.axhline(0, color = "grey")
-            subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+            subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
-            subfig1.tick_params(axis="both", which="major", labelsize=25)
+            subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
             if SCALE_SUM_J: fig1.savefig("results/" + "spin_gap_with_QT_J_sum_scale_" + used_N + ".png")
             else: fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
 
             # subfigAmp.set_yscale("log")
 
-            subfigAmp.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-            subfigAmp.set_ylabel(r'$\sigma_{rel}(A)$ in $J_2$', fontsize = 25)
-            subfigAmp.set_title(r'rel. Standardabweichung Amplituden $\sigma(A)$ der exp. Fits mit ' + str(max_n) + " Startvektoren (QT)", fontsize = 25)
+            subfigAmp.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
+            subfigAmp.set_ylabel(r'$\sigma_{rel}(A)$ in $J_2$', fontsize = labelfontsize)
+            subfigAmp.set_title(r'rel. Standardabweichung Amplituden $\sigma(A)$ der exp. Fits mit ' + str(max_n) + " Startvektoren (QT)", fontsize = titlefontsize)
 
             subfigAmp.axhline(0, color = "grey")
-            subfigAmp.legend(loc = 'best' ,frameon = False, fontsize = 20)
+            subfigAmp.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
-            subfigAmp.tick_params(axis="both", which="major", labelsize=25)
+            subfigAmp.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
             if SCALE_SUM_J: figAmp.savefig("results/" + "spin_gap_with_QT_AMP_J_sum_scale_" + used_N + ".png")
             else: figAmp.savefig("results/" + "spin_gap_with_QT_AMP_" + used_N + ".png")

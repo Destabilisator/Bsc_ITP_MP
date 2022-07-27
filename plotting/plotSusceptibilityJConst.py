@@ -14,6 +14,11 @@ max_n = 5
 
 einheit_x = r'$k_B T$ / $J_2$' #'$T$ in $k_B$ / $J_2$'
 
+titlefontsize = 40
+labelfontsize = 30
+legendfontsize = 30
+axisfontsize = 25
+
 start = 0.0
 ends = [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]#, 20.0, 50.0, 100.0]
 
@@ -73,15 +78,16 @@ for N_outer in range(len(N_color)):
         subfig3.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.20)
 
         # subfig3.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 40)
-        subfig3.set_xlabel(einheit_x, fontsize = 40)
-        subfig3.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
-        subfig3.set_title("Suszeptibilität pro Spin $\\chi/N$ bei N = " + N, fontsize = 40)
+        subfig3.set_xlabel(einheit_x, fontsize = labelfontsize)
+        subfig3.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+        subfig3.set_title("Suszeptibilität pro Spin $\\chi/N$ bei N = " + N, fontsize = titlefontsize)
 
         subfig3.axhline(0, color = "grey")
-        subfig3.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        subfig3.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
-        plt.xticks(fontsize = 25)
-        plt.yticks(fontsize = 25)
+        # plt.xticks(fontsize = axisfontsize)
+        # plt.yticks(fontsize = axisfontsize)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
         # subfig3.set_ylim(0.0, 0.5)
         # subfig3.set_xscale("log")
@@ -98,16 +104,16 @@ for N_outer in range(len(N_color)):
         used_N += "_" + N
 
     # subfig1.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
-    subfig1.set_xlabel(einheit_x, fontsize = 40)
-    subfig1.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
-    subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$', fontsize = 40)
+    subfig1.set_xlabel(einheit_x, fontsize = labelfontsize)
+    subfig1.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+    subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$', fontsize = titlefontsize)
 
     subfig1.axhline(0, color = "grey")
-    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
     # plt.xticks(fontsize = 25)
     # plt.yticks(fontsize = 25)
-    subfig1.tick_params(axis="both", which="major", labelsize=25)
+    subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     #subfig1.tick_params(axis="both", which="major", labelsize=25)
 
     # subfig1.set_ylim(0.0, 0.5)
@@ -125,15 +131,16 @@ for N_outer in range(len(N_color)):
 
 
     #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
-    subfig2.set_xlabel(einheit_x, fontsize = 40)
-    subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
-    subfig2.set_title('Suszeptibilität pro Spin $\\chi/N$ mit einem Startvektor', fontsize = 40)
+    subfig2.set_xlabel(einheit_x, fontsize = labelfontsize)
+    subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+    subfig2.set_title('Suszeptibilität pro Spin $\\chi/N$ mit einem Startvektor', fontsize = titlefontsize)
 
     subfig2.axhline(0, color = "grey")
-    subfig2.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
-    plt.xticks(fontsize = 25)
-    plt.yticks(fontsize = 25)
+    # plt.xticks(fontsize = 25)
+    # plt.yticks(fontsize = 25)
+    subfig2.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
     # subfig2.set_ylim(0.0, 0.5)
     # subfig2.set_xscale("log")
@@ -197,12 +204,13 @@ for N_outer in range(len(N_color)):
                 color_count += 1
                 if min(X) < x_min: x_min = min(X)
 
-            subfigMultiQT.set_xlabel(einheit_x, fontsize = 40)
-            subfigMultiQT.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 40)
-            subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ mit bei unterschiedlichen Startvektoren', fontsize = 40)
+            subfigMultiQT.set_xlabel(einheit_x, fontsize = labelfontsize)
+            subfigMultiQT.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+            subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ mit bei unterschiedlichen Startvektoren', fontsize = titlefontsize)
             subfigMultiQT.axhline(0, color = "grey")
-            plt.xticks(fontsize = 25)
-            plt.yticks(fontsize = 25)
+            # plt.xticks(fontsize = 25)
+            # plt.yticks(fontsize = 25)
+            subfigMultiQT.tick_params(axis="both", which="major", labelsize=axisfontsize)
             # subfigMultiQT.set_xscale("log")
 
             for end in ends:

@@ -37,23 +37,30 @@ results/QT_stats/knowngood_2/*
 
 results/benchmarking/*.txt
 results/benchmarking/*.png
+results/benchmarking/*.pdf
 results/benchmarking/temp/*.txt
 !results/benchmarking/temp/data_placeholder.txt
 results/benchmarking/temp/*.png
+results/benchmarking/temp/*.pdf
 results/benchmarking/runtime/*.txt
 results/benchmarking/runtime/*.png
+results/benchmarking/runtime/*.pdf
 results/benchmarking/runtime/data/*.txt
 results/benchmarking/runtime/data/*.png
+results/benchmarking/runtime/data/*.pdf
 results/benchmarking/runtime/data/old/
 results/benchmarking/memoryusage/*.txt
 results/benchmarking/memoryusage/*.png
+results/benchmarking/memoryusage/*.pdf
 results/benchmarking/memoryusage/data/*.txt
 results/benchmarking/memoryusage/data/*.png
+results/benchmarking/memoryusage/data/*.pdf
 !results/benchmarking/runtime/data/data_placeholder.txt
 !results/benchmarking/memoryusage/data/data_placeholder.txt
 
 results/*.txt
 results/*.png
+results/*.pdf
 !results/data_placeholder.txt
 
 results/*/*.txt
@@ -61,15 +68,18 @@ results/*/*.png
 
 results/*/data/*.txt
 results/*/data/*.png
+results/*/data/*.pdf
 !results/*/data/data_placeholder.txt
 
 results/QT_stats/*/*
 results/QT_stats/*.txt
 results/QT_stats/*.png
+results/QT_stats/*.pdf
 !results/QT_stats/data_placeholder.txt
 
 results/extrapolation_temp/*.txt
 results/extrapolation_temp/*.png
+results/extrapolation_temp/*.pdf
 !results/extrapolation_temp/data_placeholder.txt
 
 results/highT/*
@@ -77,27 +87,33 @@ results/highT/*
 
 results/*/data/step_size_data/*.txt
 results/*/data/step_size_data/*.png
+results/*/data/step_size_data/*.pdf
 !results/*/data/step_size_data/data_placeholder.txt
 
 results/*/data/spin_gap_data/*.txt
 results/*/data/spin_gap_data/*.png
+results/*/data/spin_gap_data/*.pdf
 !results/*/data/spin_gap_data/data_placeholder.txt
 
 results/*/data/spin_gap_data/*/*.txt
 results/*/data/spin_gap_data/*/*.png
+results/*/data/spin_gap_data/*/*.pdf
 !results/*/data/spin_gap_data/*/data_placeholder.txt
 
 results/*/data/excitation_energies_data/*.txt
 results/*/data/excitation_energies_data/*.png
+results/*/data/excitation_energies_data/*.pdf
 !results/*/data/excitation_energies_data/data_placeholder.txt
 
 results/*/data/excitation_energies_data/*/*.txt
 results/*/data/excitation_energies_data/*/*.png
+results/*/data/excitation_energies_data/*/*.pdf
 !results/*/data/excitation_energies_data/*/data_placeholder.txt
 
 results/3DData/*
 results/3DData/*.png
 results/3DData/*.gif
+results/3DData/*.pdf
 results/3DData/*/*/*.txt
 !results/3DData/*/*/dummyFile.txt
 results/3DData/knowngood/

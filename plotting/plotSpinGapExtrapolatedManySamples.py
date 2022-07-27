@@ -28,6 +28,11 @@ max_n = 30 # min = 1; max = 30
 extrapolate_QT = True
 extrapolate_ED = True
 
+titlefontsize = 40
+labelfontsize = 30
+legendfontsize = 30
+axisfontsize = 25
+
 SHANK_ALG = False
 EXP_FIT = False
 ONE_OVER_N_FIT = True
@@ -361,11 +366,11 @@ def plotExtrapolatedData(N_color):
         subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black")#, label = "Extrapolation")
         subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = "black", alpha = alph)
 
-        subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-        subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
+        subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = labelfontsize)
         if samp == 1: vec_string = "einem Startvektor"
         else: vec_string = str(samp) + " Startvektoren"
-        subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$' + "\nmit " + vec_string + " und je " + str(int(max_n/samp)) + " Mittlungen", fontsize = 25)
+        subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$' + "\nmit " + vec_string + " und je " + str(int(max_n/samp)) + " Mittlungen", fontsize = titlefontsize)
 
         legend = []
         for i in range(len(N_arr)):
@@ -381,8 +386,8 @@ def plotExtrapolatedData(N_color):
         handles.extend(legend)
 
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = 20)
-        subfig1.tick_params(axis="both", which="major", labelsize=25)
+        subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
         fig1.savefig("results/" + "SE_extrap_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
         fig1.savefig("results/" + "SE_extrap_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")

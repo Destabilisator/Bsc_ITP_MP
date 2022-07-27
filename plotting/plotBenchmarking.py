@@ -17,6 +17,13 @@ marker_size = 5
 
 counter = 0
 
+titlefontsize = 40
+labelfontsize = 30
+legendfontsize = 30
+axisfontsize = 25
+
+timestepfontsize = 20
+
 SAVE_FULL_PLOTS = True
 ONLY_NEWEST_RUN = True
 
@@ -74,26 +81,26 @@ def add_time_steps(subfig):
     # Namen aus DIN 1355-1
     width = 2; c = "black"; alph = 0.5
     # 1 second
-    subfig.hlines(y = 1, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(4.8, 0.8, "1 Sek.", fontsize = 20)
+    subfig.hlines(y = 1, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(4.8, 0.7, "1 Sek.", fontsize = timestepfontsize)
     # 1 minute
-    subfig.hlines(y = 60, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(4.8, 0.8 * 60, "1 Min.", fontsize = 20)
+    subfig.hlines(y = 60, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(4.8, 0.7 * 60, "1 Min.", fontsize = timestepfontsize)
     # 1 hour
-    subfig.hlines(y = 60 * 60, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(4.8, 0.8 * 60 * 60, "1 Std.", fontsize = 20)
+    subfig.hlines(y = 60 * 60, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(4.8, 0.7 * 60 * 60, "1 Std.", fontsize = timestepfontsize)
     # 1 day
-    subfig.hlines(y = 60 * 60 * 24, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(4.8, 0.8 * 60 * 60 * 24, "1 Tg.", fontsize = 20)
+    subfig.hlines(y = 60 * 60 * 24, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(4.8, 0.7 * 60 * 60 * 24, "1 Tg.", fontsize = timestepfontsize)
     # 1 week
-    subfig.hlines(y = 60 * 60 * 24 * 7, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(4.8, 0.8 * 60 * 60 * 24 * 7, "1 Wo.", fontsize = 20)
+    subfig.hlines(y = 60 * 60 * 24 * 7, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(4.8, 0.7 * 60 * 60 * 24 * 7, "1 Wo.", fontsize = timestepfontsize)
     # 1 month
-    subfig.hlines(y = 60 * 60 * 24 * 31, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(4.8, 0.8 * 60 * 60 * 24 * 31, "31 Tg.", fontsize = 20) # 1 Mon.
+    subfig.hlines(y = 60 * 60 * 24 * 31, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(4.8, 0.7 * 60 * 60 * 24 * 31, "31 Tg.", fontsize = timestepfontsize) # 1 Mon.
     # 1 year
-    subfig.hlines(y = 60 * 60 * 24 * 365, xmin = 6, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(4.8, 0.8 * 60 * 60 * 24 * 365, "1 J.", fontsize = 20)
+    subfig.hlines(y = 60 * 60 * 24 * 365, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(4.8, 0.7 * 60 * 60 * 24 * 365, "1 J.", fontsize = timestepfontsize)
 
 ##### run time, full matrix #####
 def RT_plot_raw_files():
@@ -146,19 +153,22 @@ def RT_plot_raw_files():
                 subfig1.plot(N_QT, T_QT, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
                 subfig1.plot(N_QT_extrap, T_QT_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "QT-fit")
                 color_count += 1
-                subfig1.set_xlabel(r'$N$', fontsize = 40)
-                subfig1.set_ylabel(r'$t$ in $s$', fontsize = 40)
+                subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
+                subfig1.set_ylabel(r'$t$ in $s$', fontsize = labelfontsize)
                 if sample == "1": vec = "Startvektor"
                 else: vec = "Startvektoren"
-                subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$" + "\n" + "Schrittweite (nur Fits) = %.2f, %s %s (nur QT)" % (float(stepsize), sample, vec), fontsize = 40)
+                subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$" + "\n" + "Schrittweite (nur Fits) = %.2f, %s %s (nur QT)" % (float(stepsize), sample, vec), fontsize = titlefontsize)
                 subfig1.axhline(0, color = "grey")
-                subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
-                plt.xticks(fontsize = 25)
-                plt.yticks(fontsize = 25)
+                subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+                # plt.xticks(fontsize = 25)
+                # plt.yticks(fontsize = 25)
+                subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
                 add_time_steps(subfig1)
                 fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_SG_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+                fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_SG_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".pdf")
                 subfig1.set_yscale('log')
                 fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_SG_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+                fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_SG_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".pdf")
                 plt.close(fig1)
 
 def RT_plot_only_ED():
@@ -197,15 +207,18 @@ def RT_plot_only_ED():
             subfig1.plot(N_ED_MJ_extrap, T_ED_MJ_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED-fit: Schrittweite %.2f" % float(stepsize))
             color_count += 1
 
-        subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = 40)
-        subfig1.set_ylabel(r'$t$ in Sekunden', fontsize = 40)
-        subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$", fontsize = 40)
+        subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$t$ in Sekunden', fontsize = labelfontsize)
+        subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$", fontsize = titlefontsize)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
         add_time_steps(subfig1)
         fig1.savefig("./results/benchmarking/runtime/" + "ED_SG_MJ" + "_cores_" + core + ".png")
+        fig1.savefig("./results/benchmarking/runtime/" + "ED_SG_MJ" + "_cores_" + core + ".pdf")
         subfig1.set_yscale('log')
         fig1.savefig("./results/benchmarking/runtime/" + "log_ED_SG_MJ" + "_cores_" + core + ".png")
+        fig1.savefig("./results/benchmarking/runtime/" + "log_ED_SG_MJ" + "_cores_" + core + ".pdf")
         plt.close(fig1)
 
 def RT_plot_step_size_influence():
@@ -245,17 +258,20 @@ def RT_plot_step_size_influence():
                 subfig1.plot(N_QT_extrap, T_QT_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count], label = "QT-fit:  Schrittweite %.2f" % float(stepsize))
                 color_count += 1
     
-            subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = 40)
-            subfig1.set_ylabel(r'$t$ in Sekunden', fontsize = 40)
+            subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = labelfontsize)
+            subfig1.set_ylabel(r'$t$ in Sekunden', fontsize = labelfontsize)
             if sample == "1": vec = "Startvektor"
             else: vec = "Startvektoren"
-            subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$" + "\n" + "mit %s %s bei der QT" % (sample, vec), fontsize = 40)
+            subfig1.set_title(r"Laufzeit $t$ für unterschiedliche Systemgrößen $N$" + "\n" + "mit %s %s bei der QT" % (sample, vec), fontsize = titlefontsize)
             subfig1.axhline(0, color = "grey")
-            subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+            subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+            subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
             add_time_steps(subfig1)
             fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+            fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".pdf")
             subfig1.set_yscale('log')
             fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+            fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_MJ_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".pdf")
             plt.close(fig1)
 
 ##### run time, m_z = 0 block #####
@@ -312,17 +328,20 @@ def RT_plot_raw_files_mag_zero():
                 subfig1.plot(N_QT, T_QT, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
                 subfig1.plot(N_QT_extrap, T_QT_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "QT: MS")
                 color_count += 1
-                subfig1.set_xlabel(r'$N$', fontsize = 40)
-                subfig1.set_ylabel(r'$t$ in $s$', fontsize = 40)
+                subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
+                subfig1.set_ylabel(r'$t$ in $s$', fontsize = labelfontsize)
                 if sample == "1": vec = "Startvektor"
                 else: vec = "Startvektoren"
-                subfig1.set_title(r"Laufzeit $t$ des $m_z = 0$ Blocks für unterschiedliche Systemgrößen $N$" + "\n" + "nur QT: Schrittweite = %.2f, %s %s" % (float(stepsize), sample, vec), fontsize = 40)
+                subfig1.set_title(r"Laufzeit $t$ des $m_z = 0$ Blocks für unterschiedliche Systemgrößen $N$" + "\n" + "nur QT: Schrittweite = %.2f, %s %s" % (float(stepsize), sample, vec), fontsize = titlefontsize)
                 subfig1.axhline(0, color = "grey")
-                subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+                subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+                subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
                 add_time_steps(subfig1)
                 fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_SG_MS_SI_QT_MS_zero_block_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+                fig1.savefig("./results/benchmarking/runtime/" + "QT_ED_SG_MS_SI_QT_MS_zero_block_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".pdf")
                 subfig1.set_yscale('log')
                 fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_SG_MS_SI_QT_MS_zero_block_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".png")
+                fig1.savefig("./results/benchmarking/runtime/" + "log_QT_ED_SG_MS_SI_QT_MS_zero_block_step_" + stepsize + "_SAMPLES_" + sample + "_cores_" + core + ".pdf")
                 plt.close(fig1)
 
 def RT_plot_only_ED_mag_zero():
@@ -359,15 +378,18 @@ def RT_plot_only_ED_mag_zero():
         subfig1.plot(N_ED_SI_extrap, T_ED_SI_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = "ED: SI")
         color_count += 1
 
-        subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = 40)
-        subfig1.set_ylabel(r'$t$ in Sekunden', fontsize = 40)
-        subfig1.set_title(r"Laufzeit $t$ des $m_z = 0$ Blocks für unterschiedliche Systemgrößen $N$", fontsize = 40)
+        subfig1.set_xlabel(r'Gitterplätze $N$', fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$t$ in Sekunden', fontsize = labelfontsize)
+        subfig1.set_title(r"Laufzeit $t$ des $m_z = 0$ Blocks für unterschiedliche Systemgrößen $N$", fontsize = titlefontsize)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
         add_time_steps(subfig1)
         fig1.savefig("./results/benchmarking/runtime/" + "ED_SG_MS_SI_zero_block" + "_cores_" + core + ".png")
+        fig1.savefig("./results/benchmarking/runtime/" + "ED_SG_MS_SI_zero_block" + "_cores_" + core + ".pdf")
         subfig1.set_yscale('log')
         fig1.savefig("./results/benchmarking/runtime/" + "log_ED_SG_MS_SI_zero_block" + "_cores_" + core + ".png")
+        fig1.savefig("./results/benchmarking/runtime/" + "log_ED_SG_MS_SI_zero_block" + "_cores_" + core + ".pdf")
         plt.close(fig1)
 
 ##### memory usage #####
@@ -387,15 +409,18 @@ def MU_plot_raw_files():
     subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
     subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"QT")
     color_count += 1
-    subfig1.set_xlabel(r'$N$', fontsize = 40)
-    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
-    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$ bei der QT", fontsize = 40)
+    subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
+    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
+    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$ bei der QT", fontsize = titlefontsize)
     subfig1.set_xticks(N)
     subfig1.axhline(0, color = "grey")
-    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig1.savefig("./results/benchmarking/memoryusage/QT_H.png")
+    fig1.savefig("./results/benchmarking/memoryusage/QT_H.pdf")
     subfig1.set_yscale("log")
     fig1.savefig("./results/benchmarking/memoryusage/log_QT_H.png")
+    fig1.savefig("./results/benchmarking/memoryusage/log_QT_H.pdf")
     plt.close(fig1)
 
     # QT S2
@@ -412,15 +437,18 @@ def MU_plot_raw_files():
     subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
     subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"QT")
     color_count += 1
-    subfig1.set_xlabel(r'$N$', fontsize = 40)
-    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
-    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Spinmatrix $S^2$ bei der QT", fontsize = 40)
+    subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
+    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
+    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Spinmatrix $S^2$ bei der QT", fontsize = titlefontsize)
     subfig1.set_xticks(N)
     subfig1.axhline(0, color = "grey")
-    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig1.savefig("./results/benchmarking/memoryusage/QT_S2.png")
+    fig1.savefig("./results/benchmarking/memoryusage/QT_S2.pdf")
     subfig1.set_yscale("log")
     fig1.savefig("./results/benchmarking/memoryusage/log_QT_S2.png")
+    fig1.savefig("./results/benchmarking/memoryusage/log_QT_S2.pdf")
     plt.close(fig1)
 
     # ED H S2 MS
@@ -437,15 +465,18 @@ def MU_plot_raw_files():
     subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
     subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"ED")
     color_count += 1
-    subfig1.set_xlabel(r'$N$', fontsize = 40)
-    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
-    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamilton- $H$ \& Spinmatrix $S^2$ bei der ED (Impulszutände)", fontsize = 40)
+    subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
+    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
+    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamilton- $H$ \& Spinmatrix $S^2$ bei der ED (Impulszutände)", fontsize = titlefontsize)
     subfig1.set_xticks(N)
     subfig1.axhline(0, color = "grey")
-    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig1.savefig("./results/benchmarking/memoryusage/ED_H_S2_MS.png")
+    fig1.savefig("./results/benchmarking/memoryusage/ED_H_S2_MS.pdf")
     subfig1.set_yscale("log")
     fig1.savefig("./results/benchmarking/memoryusage/log_ED_H_S2_MS.png")
+    fig1.savefig("./results/benchmarking/memoryusage/log_ED_H_S2_MS.pdf")
     plt.close(fig1)
 
     # ED H SI
@@ -462,15 +493,18 @@ def MU_plot_raw_files():
     subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
     subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count], label = r"ED")
     color_count += 1
-    subfig1.set_xlabel(r'$N$', fontsize = 40)
-    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
-    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$ bei der ED (Spininversion)", fontsize = 40)
+    subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
+    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
+    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$ bei der ED (Spininversion)", fontsize = titlefontsize)
     subfig1.set_xticks(N)
     subfig1.axhline(0, color = "grey")
-    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig1.savefig("./results/benchmarking/memoryusage/ED_H_SI.png")
+    fig1.savefig("./results/benchmarking/memoryusage/ED_H_SI.pdf")
     subfig1.set_yscale("log")
     fig1.savefig("./results/benchmarking/memoryusage/log_ED_H_SI.png")
+    fig1.savefig("./results/benchmarking/memoryusage/log_ED_H_SI.pdf")
     plt.close(fig1)
 
 def MU_plot_only_ED():
@@ -510,9 +544,12 @@ def MU_plot_only_ED():
     subfig1.set_xticks(N)
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig1.savefig("./results/benchmarking/memoryusage/ED_MS_SI.png")
+    fig1.savefig("./results/benchmarking/memoryusage/ED_MS_SI.pdf")
     subfig1.set_yscale("log")
     fig1.savefig("./results/benchmarking/memoryusage/log_ED_MS_SI.png")
+    fig1.savefig("./results/benchmarking/memoryusage/log_ED_MS_SI.pdf")
     plt.close(fig1)
 
 def MU_ED_vs_QT():
@@ -576,40 +613,49 @@ def MU_ED_vs_QT():
     subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"ED: $H$ \& $S^2$")
     color_count3 += 1
 
-    subfig1.set_xlabel(r'$N$', fontsize = 40)
-    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = 40)
-    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$, QT \& ED (Impulszutände)", fontsize = 40)
+    subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
+    subfig1.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
+    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
     subfig1.set_xticks(N)
     subfig1.set_yscale("log")
     subfig1.axhline(0, color = "grey")
-    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig1.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H.png")
+    fig1.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H.pdf")
     subfig1.set_yscale("log")
     fig1.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H.png")
+    fig1.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H.pdf")
     plt.close(fig1)
 
-    subfig2.set_xlabel(r'$N$', fontsize = 40)
-    subfig2.set_ylabel(r'\# Matrixelemente', fontsize = 40)
-    subfig2.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Spinmatrix $S^2$, QT \& ED (Impulszutände)", fontsize = 40)
+    subfig2.set_xlabel(r'$N$', fontsize = labelfontsize)
+    subfig2.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
+    subfig2.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Spinmatrix $S^2$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
     subfig2.set_xticks(N)
     subfig2.set_yscale("log")
     subfig2.axhline(0, color = "grey")
-    subfig2.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig2.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig2.savefig("./results/benchmarking/memoryusage/ED_vs_QT_S2.png")
+    fig2.savefig("./results/benchmarking/memoryusage/ED_vs_QT_S2.pdf")
     subfig2.set_yscale("log")
     fig2.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_S2.png")
+    fig2.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_S2.pdf")
     plt.close(fig2)
 
-    subfig3.set_xlabel(r'$N$', fontsize = 40)
-    subfig3.set_ylabel(r'\# Matrixelemente', fontsize = 40)
-    subfig3.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamilton- $H$ \& Spinmatrix $S^2$, QT \& ED (Impulszutände)", fontsize = 40)
+    subfig3.set_xlabel(r'$N$', fontsize = labelfontsize)
+    subfig3.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
+    subfig3.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamilton- $H$ \& Spinmatrix $S^2$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
     subfig3.set_xticks(N)
     subfig3.set_yscale("log")
     subfig3.axhline(0, color = "grey")
-    subfig3.legend(loc = 'best' ,frameon = False, fontsize = 30)
+    subfig3.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig3.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig3.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H_S2.png")
+    fig3.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H_S2.pdf")
     subfig3.set_yscale("log")
     fig3.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H_S2.png")
+    fig3.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H_S2.pdf")
     plt.close(fig3)
 
 ##### main #####

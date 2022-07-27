@@ -23,6 +23,11 @@ max_n = 1 # min = 1; max = 5
 extrapolate_QT = True
 extrapolate_ED = True
 
+titlefontsize = 40
+labelfontsize = 30
+legendfontsize = 30
+axisfontsize = 25
+
 SHANK_ALG = False
 EXP_FIT = False
 ONE_OVER_N_FIT = True
@@ -261,6 +266,7 @@ def QT_extrapolation(N_color):
                     Y_data += [extrapolationArray[jj][ii]]
                 subfig2.plot(Ns, Y_data, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = str(X[ii]))
                 fig2.savefig("results/" + "extrapolation_temp/QT_" + used_N + "_J_" + str(X[ii]) + ".png")
+                fig2.savefig("results/" + "extrapolation_temp/QT_" + used_N + "_J_" + str(X[ii]) + ".pdf")
                 plt.close(fig2)
 
             print("extrapolating data")
@@ -276,14 +282,17 @@ def QT_extrapolation(N_color):
                 subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = "Extrapolation")
 
 
-            subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-            subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
-            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = 25)
+            subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
+            subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = labelfontsize)
+            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = titlefontsize)
 
             subfig1.axhline(0, color = "grey")
-            subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+            subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+
+            subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
             fig1.savefig("results/" + "spin_gap_extrapolated_QT_" + used_N + ".png")
+            fig1.savefig("results/" + "spin_gap_extrapolated_QT_" + used_N + ".pdf")
 
             plt.close(fig1)
 
@@ -344,6 +353,7 @@ def ED_extrapolation(N_color):
                     Y_data += [extrapolationArray[jj][ii]]
                 subfig2.plot(Ns, Y_data, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = str(X[ii]))
                 fig2.savefig("results/" + "extrapolation_temp/ED_" + used_N + "_J_" + str(X[ii]) + ".png")
+                fig2.savefig("results/" + "extrapolation_temp/ED_" + used_N + "_J_" + str(X[ii]) + ".pdf")
                 plt.close(fig2)
 
             print("extrapolating data")
@@ -358,16 +368,19 @@ def ED_extrapolation(N_color):
                 X = X_new; Y = Y_new
                 subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = "Extrapolation")
 
-            subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = 25)
-            subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = 25)
-            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ED', fontsize = 25)
+            subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
+            subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = labelfontsize)
+            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ED', fontsize = titlefontsize)
 
             subfig1.axhline(0, color = "grey")
-            subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+            subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+
+            subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
             subfig1.set_ylim(0, 0.7)
 
             fig1.savefig("results/" + "spin_gap_extrapolated_ED_" + used_N + ".png")
+            fig1.savefig("results/" + "spin_gap_extrapolated_ED_" + used_N + ".pdf")
 
             plt.close(fig1)
 

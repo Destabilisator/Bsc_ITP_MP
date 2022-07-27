@@ -13,6 +13,11 @@ max_n = 5
 
 einheit_x = r'$k_B T$ / $J_2$' #'$T$ in $k_B$ / $J_2$'
 
+titlefontsize = 40
+labelfontsize = 30
+legendfontsize = 30
+axisfontsize = 25
+
 start = 0.0
 
 print("plotting specific heat (constant J1/J2, funtion of T) ...")
@@ -74,15 +79,16 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
             subfig3.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.20)
 
             # subfig3.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 40)
-            subfig3.set_xlabel(einheit_x, fontsize = 40)
-            subfig3.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
-            subfig3.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei N = " + N, fontsize = 40)
+            subfig3.set_xlabel(einheit_x, fontsize = labelfontsize)
+            subfig3.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+            subfig3.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei N = " + N, fontsize = titlefontsize)
 
             subfig3.axhline(0, color = "grey")
-            subfig3.legend(loc = 'best' ,frameon = False, fontsize = 30)
+            subfig3.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
-            plt.xticks(fontsize = 25)
-            plt.yticks(fontsize = 25)
+            # plt.xticks(fontsize = 25)
+            # plt.yticks(fontsize = 25)
+            subfig3.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
             subfig3.set_xlim(start, end)
             # subfig3.set_ylim(0.0, 0.5)
@@ -99,14 +105,14 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
             used_N += "_" + N
 
         # subfig1.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
-        subfig1.set_xlabel(einheit_x, fontsize = 40)
-        subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
-        subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$", fontsize = 40)
+        subfig1.set_xlabel(einheit_x, fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+        subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$", fontsize = titlefontsize)
 
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
-        subfig1.tick_params(axis="both", which="major", labelsize=25)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
         #subfig1.tick_params(axis="both", which="major", labelsize=25)
 
         subfig1.set_xlim(start, end)
@@ -117,21 +123,22 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
         fig1.savefig("results/" + "C_ED_" + used_N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".pdf")
 
         subfig1.plot(X_high_T, Y_high_T, lw = 4, ls = "dashed", markersize = 0, marker = "o", color = "black", label = "high T")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
         fig1.savefig("results/highT/" + "C_ED_high_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
         fig1.savefig("results/highT/" + "C_ED_high_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
 
 
         #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
-        subfig2.set_xlabel(einheit_x, fontsize = 40)
-        subfig2.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
-        subfig2.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ mit einem Startvektor", fontsize = 40)
+        subfig2.set_xlabel(einheit_x, fontsize = labelfontsize)
+        subfig2.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+        subfig2.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ mit einem Startvektor", fontsize = titlefontsize)
 
         subfig2.axhline(0, color = "grey")
-        subfig2.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
-        plt.xticks(fontsize = 25)
-        plt.yticks(fontsize = 25)
+        # plt.xticks(fontsize = 25)
+        # plt.yticks(fontsize = 25)
+        subfig2.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
         subfig2.set_xlim(min(X), end)
         # subfig2.set_ylim(0.0, fig2_y_max + 0.025)
@@ -141,7 +148,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
         fig2.savefig("results/" + "C_QT_" + used_N + "_J" + linesJ + "_h" + linesh + "_" + str(start) + "_" + str(end) + ".pdf")
 
         subfig2.plot(X_high_T, Y_high_T, lw = 4, ls = "dashed", markersize = 0, marker = "o", color = "black", label = "high T")
-        subfig2.legend(loc = 'best' ,frameon = False, fontsize = 30)
+        subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
         fig2.savefig("results/highT/" + "C_QT_hight_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
         fig2.savefig("results/highT/" + "C_QT_hight_T_" + used_N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
         
@@ -207,15 +214,16 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
                     color_count += 1
                     if min(X) < x_min: x_min = min(X)
 
-                subfigMultiQT.set_xlabel(einheit_x, fontsize = 40)
-                subfigMultiQT.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
-                subfigMultiQT.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "\n" + "bei unterschiedlichen Startvektoren", fontsize = 40)
+                subfigMultiQT.set_xlabel(einheit_x, fontsize = labelfontsize)
+                subfigMultiQT.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+                subfigMultiQT.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "\n" + "bei unterschiedlichen Startvektoren", fontsize = titlefontsize)
 
                 # subfigMultiQT.set_xscale("log")
                 subfigMultiQT.set_xlim(x_min, end)
 
-                plt.xticks(fontsize = 25)
-                plt.yticks(fontsize = 25)
+                # plt.xticks(fontsize = 25)
+                # plt.yticks(fontsize = 25)
+                subfigMultiQT.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
                 subfigMultiQT.axhline(0, color = "grey")
                 # subfigMultiQT.legend(loc = 'best' ,frameon = False, fontsize = 30)
@@ -279,20 +287,21 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
 
                 if N_inner != len(N_color)-1: continue
 
-                subfig4.set_xlabel(einheit_x, fontsize = 40)
-                subfig4.set_ylabel(r'$C/N$ in $J_2$', fontsize = 40)
-                subfig4.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei $J_1/J_2$ = " + J, fontsize = 40)
+                subfig4.set_xlabel(einheit_x, fontsize = labelfontsize)
+                subfig4.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+                subfig4.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei $J_1/J_2$ = " + J, fontsize = titlefontsize)
 
                 # subfig4.set_xscale("log")
                 # subfig4.set_xlim(x_min, end)
                 subfig4.set_xlim(0.0, end)
                 subfig4.set_ylim(0.0, y_max + 0.025)
 
-                plt.xticks(fontsize = 25)
-                plt.yticks(fontsize = 25)
+                # plt.xticks(fontsize = 25)
+                # plt.yticks(fontsize = 25)
+                subfigMultiQT.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
                 subfig4.axhline(0, color = "grey")
-                subfig4.legend(loc = 'best' ,frameon = False, fontsize = 30)
+                subfig4.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
                 fig4.savefig("results/highT/C_J_" + J + "_" + used_N + "_0.0_" + str(end) + ".png")
                 fig4.savefig("results/highT/C_J_" + J + "_" + used_N + "_0.0_" + str(end) + ".pdf")
             
