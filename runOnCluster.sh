@@ -31,11 +31,11 @@ else
 	pth=python3
 fi
 
-# for N in 6 8 10 12 14; do # 
-#     # $pth plotting/deleteData.py $N SG
-# 	# $pth plotting/deleteData.py $N EE
-# 	./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
-# done
+for N in 6 8 10 12 14; do # 
+    # $pth plotting/deleteData.py $N SG
+	# $pth plotting/deleteData.py $N EE
+	./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
+done
 
 # # $pth plotting/plotSpinGapQT.py low && echo "" && echo ""
 # # $pth plotting/plotDeltaEQT.py low && echo "" && echo ""
@@ -52,15 +52,15 @@ fi
 # $pth plotting/deleteData.py $N EE
 # ./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
 
-# N=16
-# $pth plotting/deleteData.py $N SG
+N=16
+$pth plotting/deleteData.py $N SG
 # $pth plotting/deleteData.py $N EE
-# ./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
+./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
 
-# N=18
-# $pth plotting/deleteData.py $N SG
+N=18
+$pth plotting/deleteData.py $N SG
 # $pth plotting/deleteData.py $N EE
-# ./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
+./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
 
 N=20
 $pth plotting/deleteData.py $N SG
