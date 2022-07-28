@@ -21,6 +21,8 @@ namespace bench {
 
     void bench_ED_QT_SG_runtime_mag_zero_block(int N_start, int N_end, int runs);
 
+    void bench_ED_QT_SG_runtime_mag_zero_block_quick(int N_start, int N_end, int runs);
+
     void bench_ED_QT_H_S2_memory_usage(int N_start, int N_end);
 
     /////////////////////////////// saving ///////////////////////////////

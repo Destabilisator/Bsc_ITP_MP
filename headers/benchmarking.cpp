@@ -199,6 +199,68 @@ namespace bench {
 
     }
 
+    void bench_ED_QT_SG_runtime_mag_zero_block_quick(int N_start, int N_end, int runs) {
+
+        auto start_timer = std::chrono::steady_clock::now();
+
+        double J_START = 0.0, J_END = 2.0;
+        int J_COUNT = 1;
+        double T_START = 0.0, T_END = 50.0;
+
+        for (double stepsize: {0.1, 0.01}) {
+            for (int N = N_start; N <= N_end; N += 2) {
+                int SIZE = (int) std::pow(2, N);
+                for (int run = 1; run <= runs; run++) {
+                    int cores = 1;
+                    int T_COUNT = (int) ((T_END - T_START) / stepsize);
+                    int SAMPLES = 1;
+                    // QT
+                    std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << "), stepsize = " << stepsize
+                                      << ", SAMPLES = " << SAMPLES << ", cores = " << cores << ", run " << run << " of " << runs;
+                    auto start_timer_QT = std::chrono::steady_clock::now();
+                    start_calc_spin_gap_mag_zero_block(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N,
+                                                               SIZE, SAMPLES, cores);
+                    auto end_timer_QT = std::chrono::steady_clock::now();
+                    std::chrono::duration<double> elapsed_seconds_QT = end_timer_QT - start_timer_QT;
+                    save_bench_val(
+                                    "runtime/data/QT_SG_zero_block_step_" + std::to_string(stepsize) + "_SAMPLES_" +
+                                    std::to_string(SAMPLES) +
+                                    "_cores_" + std::to_string(cores) + ".txt",
+                                    std::to_string(N) + "\t" + std::to_string(elapsed_seconds_QT.count()));
+
+                    // ED with fit
+                    if (N > 16) { continue; }
+                    if (N % 4 == 0) {
+                        std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
+                                  << " MS ED m_z = 0" << ", run " << run << " of " << runs << std::endl;
+                        auto start_timer_ED_SI = std::chrono::steady_clock::now();
+                        ed_si_getEiValsZeroBlock(1.0, 1.0, N, SIZE);
+                        auto end_timer_ED_SI = std::chrono::steady_clock::now();
+                        std::chrono::duration<double> elapsed_seconds_ED_SI = end_timer_ED_SI - start_timer_ED_SI;
+                        save_bench_val("runtime/data/ED_SI_" + std::to_string(cores) + ".txt",
+                                       std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_SI.count()));
+                    }
+                    if (N > 14) { continue; }
+                    std::cout << "\nBENCHMARKING: N = " << N << " (" << SIZE << ")" << ", cores = " << cores
+                              << " MS ED m_z = 0" << ", run " << run << " of " << runs << std::endl;
+                    auto start_timer_ED_MS = std::chrono::steady_clock::now();
+                    ed_ms_getEiValsZeroBlock(1.0, 1.0, N, SIZE);
+                    auto end_timer_ED_MS = std::chrono::steady_clock::now();
+                    std::chrono::duration<double> elapsed_seconds_ED_MS = end_timer_ED_MS - start_timer_ED_MS;
+                    save_bench_val("runtime/data/ED_MS_" + std::to_string(cores) + ".txt",
+                                   std::to_string(N) + "\t" + std::to_string(elapsed_seconds_ED_MS.count()));
+                }
+            }
+        }
+
+        auto end_timer = std::chrono::steady_clock::now();
+        std::chrono::duration<double> elapsed_seconds = end_timer - start_timer;
+        std::cout << "BENCHMARKING: done\n";
+        std::cout << "this took " + formatTime(elapsed_seconds) << "\n";
+
+    }
+
+
     void bench_ED_QT_H_S2_memory_usage(int N_start, int N_end) {
 
         auto start_timer = std::chrono::steady_clock::now();
