@@ -20,7 +20,7 @@ search_end_percent = 1/5
 max_n = 5 # min = 1; max = 5
 no_ED = False # True / False
 
-titlefontsize = 40
+titlefontsize = 35
 labelfontsize = 30
 legendfontsize = 30
 axisfontsize = 25

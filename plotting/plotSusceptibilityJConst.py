@@ -14,7 +14,7 @@ max_n = 5
 
 einheit_x = r'$k_B T$ / $J_2$' #'$T$ in $k_B$ / $J_2$'
 
-titlefontsize = 40
+titlefontsize = 35
 labelfontsize = 30
 legendfontsize = 30
 axisfontsize = 25
