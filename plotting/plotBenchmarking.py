@@ -17,7 +17,7 @@ marker_size = 5
 
 counter = 0
 
-titlefontsize = 40
+titlefontsize = 35
 labelfontsize = 30
 legendfontsize = 30
 axisfontsize = 25
@@ -58,7 +58,7 @@ def extrap_func(x: float, A: float, k: float, x_0: float, b: float) -> float:
 def extrapolate_data(N, T, title):
     Y_fit = np.log(T)
     N = np.asarray(N)
-    params = poly.polyfit(N, Y_fit, 1) # , w = N + 1/2 * N**2
+    params = poly.polyfit(N, Y_fit, 1, w = N + 1/2 * N**2  + 1/6 * N**3) # , w = N + 1/2 * N**2
     fit_func = poly.Polynomial(params)
     X = np.linspace(6, 32, 1000)
     Y = fit_func(X)
@@ -101,6 +101,24 @@ def add_time_steps(subfig):
     # 1 year
     subfig.hlines(y = 60 * 60 * 24 * 365, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
     subfig.text(4.8, 0.7 * 60 * 60 * 24 * 365, "1 J.", fontsize = timestepfontsize)
+
+def add_size_steps(subfig):
+    width = 2; c = "black"; alph = 0.5
+    # 1 KB
+    # subfig.hlines(y = 1024 ** 1 / 16, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    # subfig.text(5.2, 0.7 * 1024 ** 1 / 16, "1 KB", fontsize = timestepfontsize)
+    # 1 MB
+    subfig.hlines(y = 1024 ** 2 / 16, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5.2, 0.7 * 1024 ** 2 / 16, "1 MB", fontsize = timestepfontsize)
+    # 1 GB
+    subfig.hlines(y = 1024 ** 3 / 16, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5.2, 0.7 * 1024 ** 3 / 16, "1 GB", fontsize = timestepfontsize)
+    # 1 TB
+    subfig.hlines(y = 1024 ** 4 / 16, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5.2, 0.7 * 1024 ** 4 / 16, "1 TB", fontsize = timestepfontsize)
+    # 1 PB
+    subfig.hlines(y = 1024 ** 5 / 16, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
+    subfig.text(5.2, 0.7 * 1024 ** 5 / 16, "1 PT", fontsize = timestepfontsize)
 
 ##### run time, full matrix #####
 def RT_plot_raw_files():
@@ -562,6 +580,49 @@ def MU_ED_vs_QT():
     fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
     color_count3 = 0
 
+    x_start = 5; x_end = 33
+    x_ticks = [6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 32]
+
+    ##### get data & plot #####
+
+    # ED H S2 MS
+    file = open("results/benchmarking/memoryusage/data/ED_H_S2_MS.txt")
+    lines = file.readlines()
+    file.close()
+    N = []; RAM = []
+    for line in lines:
+        n, ram = line.split("\t")
+        N += [int(n)]; RAM += [float(ram)]
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2 ED MS")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"ED (MS)")
+    color_count1 += 1
+    subfig2.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2])
+    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"ED (MS)")
+    color_count2 += 1
+    subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3])
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"ED (MS): $H$ \& $S^2$")
+    color_count3 += 1
+
+    # ED H S2 SI
+    file = open("results/benchmarking/memoryusage/data/ED_H_SI.txt")
+    lines = file.readlines()
+    file.close()
+    N = []; RAM = []
+    for line in lines:
+        n, ram = line.split("\t")
+        N += [int(n)]; RAM += [float(ram)/2.0]
+    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2 ED SI")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"ED (SI)$^*$")
+    color_count1 += 1
+    subfig2.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2])
+    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"ED (SI)$^*$")
+    color_count2 += 1
+    subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3])
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"ED (SI)$^*$: $H$ \& $S^2$")
+    color_count3 += 1
+
     # QT H
     file = open("results/benchmarking/memoryusage/data/QT_H.txt")
     lines = file.readlines()
@@ -571,11 +632,11 @@ def MU_ED_vs_QT():
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
     N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt H")
-    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1])
-    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"QT")
+    subfig1.plot(N, RAM, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count1])
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"QT")
     color_count1 += 1
-    subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3])
-    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"QT: $H$")
+    subfig3.plot(N, RAM, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count3])
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"QT: $H$")
     color_count3 += 1
 
     # QT S2
@@ -587,43 +648,31 @@ def MU_ED_vs_QT():
         n, ram = line.split("\t")
         N += [int(n)]; RAM += [float(ram)]
     N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2")
-    subfig2.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2])
-    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"QT")
+    subfig2.plot(N, RAM, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count2])
+    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"QT")
     color_count2 += 1
-    subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3])
-    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"QT: $S^2$")
+    subfig3.plot(N, RAM, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count3])
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"QT: $S^2$")
     color_count3 += 1
 
-    # ED H S2 MS
-    file = open("results/benchmarking/memoryusage/data/ED_H_S2_MS.txt")
-    lines = file.readlines()
-    file.close()
-    N = []; RAM = []
-    for line in lines:
-        n, ram = line.split("\t")
-        N += [int(n)]; RAM += [float(ram)]
-    N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2")
-    subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1], label = r"ED")
-    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"ED")
-    color_count1 += 1
-    subfig2.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2], label = r"ED")
-    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"ED")
-    color_count2 += 1
-    subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3], label = r"ED: $H$ \& $S^2$")
-    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"ED: $H$ \& $S^2$")
-    color_count3 += 1
+    ##### save plots #####
+
+    add_size_steps(subfig1)
+    add_size_steps(subfig2)
+    add_size_steps(subfig3)
 
     subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
     subfig1.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
     subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
     subfig1.set_xticks(N)
-    subfig1.set_yscale("log")
+    subfig1.set_xlim(x_start, x_end)
+    subfig1.set_xticks(x_ticks)
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
     subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig1.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H.png")
     fig1.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H.pdf")
-    subfig1.set_yscale("log")
+    subfig1.set_yscale('log', base = 2)
     fig1.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H.png")
     fig1.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H.pdf")
     plt.close(fig1)
@@ -632,13 +681,14 @@ def MU_ED_vs_QT():
     subfig2.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
     subfig2.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Spinmatrix $S^2$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
     subfig2.set_xticks(N)
-    subfig2.set_yscale("log")
+    subfig2.set_xlim(x_start, x_end)
+    subfig2.set_xticks(x_ticks)
     subfig2.axhline(0, color = "grey")
     subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
     subfig2.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig2.savefig("./results/benchmarking/memoryusage/ED_vs_QT_S2.png")
     fig2.savefig("./results/benchmarking/memoryusage/ED_vs_QT_S2.pdf")
-    subfig2.set_yscale("log")
+    subfig2.set_yscale('log', base = 2)
     fig2.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_S2.png")
     fig2.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_S2.pdf")
     plt.close(fig2)
@@ -647,13 +697,14 @@ def MU_ED_vs_QT():
     subfig3.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
     subfig3.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamilton- $H$ \& Spinmatrix $S^2$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
     subfig3.set_xticks(N)
-    subfig3.set_yscale("log")
+    subfig3.set_xlim(x_start, x_end)
+    subfig3.set_xticks(x_ticks)
     subfig3.axhline(0, color = "grey")
-    subfig3.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig3.legend(loc = 'lower right' ,frameon = False, fontsize = legendfontsize)
     subfig3.tick_params(axis="both", which="major", labelsize=axisfontsize)
     fig3.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H_S2.png")
     fig3.savefig("./results/benchmarking/memoryusage/ED_vs_QT_H_S2.pdf")
-    subfig3.set_yscale("log")
+    subfig3.set_yscale('log', base =2 )
     fig3.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H_S2.png")
     fig3.savefig("./results/benchmarking/memoryusage/log_ED_vs_QT_H_S2.pdf")
     plt.close(fig3)
@@ -661,14 +712,14 @@ def MU_ED_vs_QT():
 ##### main #####
 if __name__ == "__main__":
 
-    print("plotting bechmarking (run time):")
-    RT_plot_raw_files()
-    RT_plot_only_ED()
-    RT_plot_step_size_influence()
-    RT_plot_raw_files_mag_zero()
-    RT_plot_only_ED_mag_zero()
+    # print("plotting bechmarking (run time):")
+    # RT_plot_raw_files()
+    # RT_plot_only_ED()
+    # RT_plot_step_size_influence()
+    # RT_plot_raw_files_mag_zero()
+    # RT_plot_only_ED_mag_zero()
 
     print("plotting bechmarking (memory usage):")
-    MU_plot_raw_files()
-    MU_plot_only_ED()
+    # MU_plot_raw_files()
+    # MU_plot_only_ED()
     MU_ED_vs_QT()
