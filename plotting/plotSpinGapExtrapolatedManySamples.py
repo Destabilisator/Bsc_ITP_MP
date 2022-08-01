@@ -17,13 +17,13 @@ N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"
 
 N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
 N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
-N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
 
 peak_offset = 2000
 fit_samples = 3 # 5
 search_start_percent = 4/5
 search_end_percent = 1/5
-max_n = 30 # min = 1; max = 30
+max_n = 5 # min = 1; max = 30
 
 extrapolate_QT = True
 extrapolate_ED = True
@@ -37,6 +37,8 @@ SHANK_ALG = False
 EXP_FIT = False
 ONE_OVER_N_FIT = True
 EXPSILON_ALG = False
+
+MAKE_NEW = False
 
 counter = 0
 
@@ -127,7 +129,7 @@ def extrapolation_alg_raw(A_raw):
                 subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
                 # params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
                 # A_param, b_param = params
-                A_param, b_param = np.polyfit(X, A, 1)
+                A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
                 X = np.linspace(0.0, X[0], 100)
                 # Y = one_over_N(X, A_param, b_param)
                 Y = A_param * X + b_param
@@ -163,7 +165,7 @@ def sort_data(X, Y, A):
     return X, Y, A
 
 def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
-    file = open("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + filename, 'r')
+    file = open("results/" + N + "/data/spin_gap_data/" + str(n) + "/" + filename, 'r')
     ED_QT = filename[len(filename)-6:-4]
     lines = file.readlines()
     X = []; Y = []
@@ -215,47 +217,60 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
 
     return float(A), abs(k)
 
-def getDataQT(N: int, n: int):
+def newQTdata(N: str, n: int):
     X = []; Y = [];  A = []
     for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n) + "/"):
         if filename[len(filename)-6:] != "QT.txt": continue
         J = filename[len("X_J"):-len("QT.txt")]
-        A, k = get_spin_gap(n, N, J, filename)
+        amp, k = get_spin_gap(n, N, J, filename)
         X += [float(J)]
         Y += [float(k)]
-        A += [float(A)]
+        A += [float(amp)]
     X, Y, A = sort_data(X, Y, A)
+    file = open("results/" + N + "/data/spin_gap_data/" + str(n) + ".txt", "w")
+    for i in range(len(X)):
+        file.write(f"{X[i]}\t{Y[i]}\t{A[i]}\n")
+    file.close()
     return X, Y, A
 
-def getDataED(N: int, n: int):
-    X = []; Y = [];  A = []
-    for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n) + "/"):
-        if filename[len(filename)-6:] != "ED.txt": continue
-        J = filename[len("X_J"):-len("ED.txt")]
-        A, k = get_spin_gap(n, N, J, filename)
-        X += [float(J)]
-        Y += [float(k)]
-        A += [0]
-    X, Y, A = sort_data(X, Y, A)
+def getDataQT(N: str, n: int):
+    if MAKE_NEW:
+        X = []; Y = [];  A = []
+        X, Y, A = newQTdata(N, n)
+    else:
+        try:
+            file = open("results/" + N + "/data/spin_gap_data/" + str(n) + ".txt", 'r')
+            lines = file.readlines()
+            X = []; Y = [];  A = []
+            for i in range(len(lines)):
+                x, y, a = lines[i].split("\t")
+                X += [float(x)]
+                Y += [float(y)]
+                A += [float(a)]
+            file.close()
+        except:
+            X = []; Y = [];  A = []
+            X, Y, A = newQTdata(N, n)
     return X, Y, A
 
 def getExtrapolatedDataQT(N_color):
-    print("getting extrapolating data (QT)")
-    extrapolated_data = [] * max_n
+    print("getting extrapolated data (QT)")
+    extrapolated_data = [[]] * max_n
     for n in range(1, max_n + 1):
-        print("n = %i / %i\r" %(n, max_n), end="")
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         extrapolationArray = []
         used_N = "N"
         for N, C in N_color:
+            print("n = %i / %i & N = %s (get data)          \r" %(n, max_n, N), end="")
             try:
-                X, Y, A = getDataQT(int(N), n)
+                X, Y, A = getDataQT(N, n)
                 extrapolationArray += [Y]
                 used_N += "_" + N
                 subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 4, marker = "o", color = C, label = "N = " + N)
             except:
-                print("QT data for N = %s no available" % N)
+                print("QT data for N = %s no data available" % N)
 
+        print("n = %i / %i (extrapolating data)          \r" %(n, max_n), end="")
         extrapolated_data[n-1] = extrapolation_alg_raw(extrapolationArray)
 
         subfig1.plot(X, extrapolated_data[n-1], lw = line_width, ls = "dashed", markersize = marker_size, marker = "o", color = "black", label = "Extrapolation")
@@ -267,25 +282,63 @@ def getExtrapolatedDataQT(N_color):
         subfig1.axhline(0, color = "grey")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-        fig1.savefig("results/" + "SE_raw_extrap_QT_" + used_N + ".png")
+        fig1.savefig("results/" + "SG/SG_raw_extrap_QT_" + used_N + "_" + str(n) + ".png")
         plt.close(fig1)
     return extrapolated_data
 
+def newEDdata(N: str):
+    X = []; Y = [];  A = []
+    for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
+        if filename[len(filename)-6:] != "ED.txt": continue
+        J = filename[len("X_J"):-len("ED.txt")]
+        amp, k = get_spin_gap(1, N, J, filename)
+        X += [float(J)]
+        Y += [float(k)]
+        A += [float(amp)]
+    X, Y, A = sort_data(X, Y, A)
+    file = open("results/" + N + "/data/spin_gap_data/ED.txt", "w")
+    for i in range(len(X)):
+        file.write(f"{X[i]}\t{Y[i]}\t{A[i]}\n")
+    file.close()
+    return X, Y, A
+
+def getDataED(N: str):
+    if MAKE_NEW:
+        X = []; Y = [];  A = []
+        X, Y, A = newEDdata(N)
+    else:
+        try:
+            file = open("results/" + N + "/data/spin_gap_data/ED.txt", 'r')
+            lines = file.readlines()
+            X = []; Y = [];  A = []
+            for i in range(len(lines)):
+                x, y, a = lines[i].split("\t")
+                X += [float(x)]
+                Y += [float(y)]
+                A += [float(a)]
+            file.close()
+        except:
+            X = []; Y = [];  A = []
+            X, Y, A = newEDdata(N)
+    return X, Y, A
+
 def getExtrapolatedDataED(N_color):
-    print("getting extrapolating data (ED)")
+    print("getting extrapolated data (ED)")
     extrapolated_data = []
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     extrapolationArray = []
     used_N = "N"
     for N, C in N_color:
+        print("N = %s (get data)          \r" %(N), end="")
         try:
-            X, Y, A = getDataED(int(N), 1)
+            X, Y, A = getDataED(N)
             extrapolationArray += [Y]
             used_N += "_" + N
             subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 4, marker = "o", color = C, label = "N = " + N)
         except:
-            print("ED data for N = %s no available" % N)
+            print("ED data for N = %s no data available" % N)
 
+    print("ED (extrapolating data)          \r", end="")
     extrapolated_data = extrapolation_alg_raw(extrapolationArray)
 
     subfig1.plot(X, extrapolated_data, lw = line_width, ls = "dashed", markersize = marker_size, marker = "o", color = "black", label = "Extrapolation")
@@ -297,7 +350,7 @@ def getExtrapolatedDataED(N_color):
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
 
-    fig1.savefig("results/" + "SE_raw_extrap_QT_" + used_N + ".png")
+    fig1.savefig("results/" + "SG/SG_raw_extrap_ED_" + used_N + ".png")
     plt.close(fig1)
     return extrapolated_data
 
@@ -325,10 +378,11 @@ def avgData(samp, inputdata):
     return Y, YErr
 
 def plotExtrapolatedData(N_color):
-    print("plotting extrapolating data")
+    print("getting extrapolated data")
     extrapolated_data_QT = getExtrapolatedDataQT(N_color)
     extrapolated_data_ED = getExtrapolatedDataED(N_color)
-    for samp in range(1, max_n / 2 + 1):
+    print("plotting extrapolated data")
+    for samp in range(1, int(max_n / 2) + 1):
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         used_N_QT = "N"; used_N_ED = "N"; N_arr = [0] * 35
 
@@ -336,7 +390,7 @@ def plotExtrapolatedData(N_color):
         for N, C in N_color:        
             try:
                 X_arr = [] * max_n; Y_arr = [] * max_n; A_arr = [] * max_n
-                X_arr[n], Y_arr[n], A_arr[n] = getDataED(int(N), n + 1)
+                X_arr[n], Y_arr[n], A_arr[n] = getDataED(int(N))
                 X = np.asarray(X); Y = np.asarray(Y)
                 subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = C)#, label = "N = " + N)
                 used_N_ED += "_" + N; N_arr[int(N)] = 1
@@ -352,7 +406,7 @@ def plotExtrapolatedData(N_color):
             try:
                 X_arr = [] * max_n; Y_arr = [] * max_n; A_arr = [] * max_n
                 for n in range(max_n):
-                    X_arr[n], Y_arr[n], A_arr[n] = getDataQT(int(N), n + 1)
+                    X_arr[n], Y_arr[n], A_arr[n] = getDataQT(int(N), n)
                 X, XErr = avgData(samp, X_arr); X = np.asarray(X)
                 Y, YErr = avgData(samp, Y_arr); Y = np.asarray(Y); YErr = np.asarray(YErr)
                 subfig1.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = C)#, label = "N = " + N)
@@ -389,8 +443,8 @@ def plotExtrapolatedData(N_color):
         subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
         subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
-        fig1.savefig("results/" + "SE_extrap_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
-        fig1.savefig("results/" + "SE_extrap_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+        fig1.savefig("results/" + "SG/SG_extrap_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+        fig1.savefig("results/" + "SG/SG_extrap_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
         plt.close(fig1)
 
 if __name__ == "__main__":
