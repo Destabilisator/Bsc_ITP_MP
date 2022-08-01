@@ -82,6 +82,11 @@ results/extrapolation_temp/*.png
 results/extrapolation_temp/*.pdf
 !results/extrapolation_temp/data_placeholder.txt
 
+results/SG/*.txt
+results/SG/*.png
+results/SG/*.pdf
+!results/SG/data_placeholder.txt
+
 results/highT/*
 !results/highT/data_placeholder.txt
 
