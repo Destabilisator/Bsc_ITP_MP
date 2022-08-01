@@ -7,12 +7,10 @@ Gegenwärtig werden hier einige Ansätze der exakten Diagionalisierung verfolgt.
 Der Sourcecode muss als "Bsc_ITP_MP" im Ordner "cmake-build-release" kompiliert werden.
 Anschließend können über die beiliegenden -sh-Dateien uinterschiedliche Plopts erzeigt werden.
 
-Bis N = 30 liegen bereits alle notwendigen Ordner vor. Das Limit deses Programms liegt be N = 32.
-Allerdings steigen der RAM-Bedarf und die Rechenzeit sehr schnell an.
+Bis N = 32 liegen bereits alle notwendigen Ordner vor. Das Limit deses Programms liegt be N = 32 (int 32 bit). Um größere Systeme zu betrachten müssen sehr viele "int" ind "long" geänder werden, viel Spaß...
 
-Alle entstehenden Plots sind im Ordner "results/" beziehungsweise im Unterordner "results/3DData/" zu finden.
-Plots unterschiedlicher Systemgrößen (N) überschreiben sich nicht gegenseitig.
-Es können die Suszeptibilität, die speziifische Wärmekapazität, die Anregungsenergie und die Energiedispersion
+Alle entstehenden Plots sowie die zu Grunde liegenden Daten werden im Ordner "results/" abgespeichert.
+Es können die Suszeptibilität, die speziifische Wärmekapazität, die Anregungsenergie, die Energiedispersion und Spinlückenenergie
 für unterschiedliche Temperaturen und Kopplungskonstanten dargestellt werden.
 
 
