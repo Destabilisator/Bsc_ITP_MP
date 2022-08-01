@@ -279,7 +279,7 @@ if __name__ == "__main__":
             subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
             if SCALE_SUM_J: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $(J_1 + J_2)$', fontsize = labelfontsize)
             else: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
-            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = titlefontsize)
+            subfig1.set_title(r'Spinlücken Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = titlefontsize)
 
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)

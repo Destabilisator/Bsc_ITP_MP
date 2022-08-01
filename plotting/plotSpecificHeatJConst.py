@@ -80,7 +80,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
 
             # subfig3.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 40)
             subfig3.set_xlabel(einheit_x, fontsize = labelfontsize)
-            subfig3.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+            subfig3.set_ylabel(r'$C/N$ / $J_2$', fontsize = labelfontsize)
             subfig3.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei N = " + N, fontsize = titlefontsize)
 
             subfig3.axhline(0, color = "grey")
@@ -106,7 +106,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
 
         # subfig1.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
         subfig1.set_xlabel(einheit_x, fontsize = labelfontsize)
-        subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$C/N$ / $J_2$', fontsize = labelfontsize)
         subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$", fontsize = titlefontsize)
 
         subfig1.axhline(0, color = "grey")
@@ -130,7 +130,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
 
         #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
         subfig2.set_xlabel(einheit_x, fontsize = labelfontsize)
-        subfig2.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+        subfig2.set_ylabel(r'$C/N$ / $J_2$', fontsize = labelfontsize)
         subfig2.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ mit einem Startvektor", fontsize = titlefontsize)
 
         subfig2.axhline(0, color = "grey")
@@ -215,7 +215,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
                     if min(X) < x_min: x_min = min(X)
 
                 subfigMultiQT.set_xlabel(einheit_x, fontsize = labelfontsize)
-                subfigMultiQT.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+                subfigMultiQT.set_ylabel(r'$C/N$ / $J_2$', fontsize = labelfontsize)
                 subfigMultiQT.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "\n" + "bei unterschiedlichen Startvektoren", fontsize = titlefontsize)
 
                 # subfigMultiQT.set_xscale("log")
@@ -288,7 +288,7 @@ for end in [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0, 20.0, 50.0, 100.0]: # 0.2
                 if N_inner != len(N_color)-1: continue
 
                 subfig4.set_xlabel(einheit_x, fontsize = labelfontsize)
-                subfig4.set_ylabel(r'$C/N$ in $J_2$', fontsize = labelfontsize)
+                subfig4.set_ylabel(r'$C/N$ / $J_2$', fontsize = labelfontsize)
                 subfig4.set_title(r"spezifische Wärmekapazität pro Spin $C/N$ bei $J_1/J_2$ = " + J, fontsize = titlefontsize)
 
                 # subfig4.set_xscale("log")

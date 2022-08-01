@@ -79,7 +79,7 @@ for N_outer in range(len(N_color)):
 
         # subfig3.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 40)
         subfig3.set_xlabel(einheit_x, fontsize = labelfontsize)
-        subfig3.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+        subfig3.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
         subfig3.set_title("Suszeptibilität pro Spin $\\chi/N$ bei N = " + N, fontsize = titlefontsize)
 
         subfig3.axhline(0, color = "grey")
@@ -105,7 +105,7 @@ for N_outer in range(len(N_color)):
 
     # subfig1.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
     subfig1.set_xlabel(einheit_x, fontsize = labelfontsize)
-    subfig1.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+    subfig1.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
     subfig1.set_title('Suszeptibilität pro Spin $\\chi/N$', fontsize = titlefontsize)
 
     subfig1.axhline(0, color = "grey")
@@ -132,7 +132,7 @@ for N_outer in range(len(N_color)):
 
     #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
     subfig2.set_xlabel(einheit_x, fontsize = labelfontsize)
-    subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+    subfig2.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
     subfig2.set_title('Suszeptibilität pro Spin $\\chi/N$ mit einem Startvektor', fontsize = titlefontsize)
 
     subfig2.axhline(0, color = "grey")
@@ -205,7 +205,7 @@ for N_outer in range(len(N_color)):
                 if min(X) < x_min: x_min = min(X)
 
             subfigMultiQT.set_xlabel(einheit_x, fontsize = labelfontsize)
-            subfigMultiQT.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+            subfigMultiQT.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
             subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ mit bei unterschiedlichen Startvektoren', fontsize = titlefontsize)
             subfigMultiQT.axhline(0, color = "grey")
             # plt.xticks(fontsize = 25)
