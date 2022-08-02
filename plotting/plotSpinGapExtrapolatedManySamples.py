@@ -723,6 +723,24 @@ def different_extrapolations(N_color):
                 Y, YErr = avgData(samp, Y_arr); Y = np.asarray(Y); YErr = np.asarray(YErr)
                 subfig1.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
                 subfig1.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                if SHOW_EXP_FIT:
+                    subfigExp.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
+                    subfigExp.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                if SHOW_ONE_OVER_SQRTN_FIT:
+                    subfigSqrt.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
+                    subfigSqrt.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                if SHOW_ONE_OVER_N_FIT:
+                    subfigN.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
+                    subfigN.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                if SHOW_ONE_OVER_N2_FIT:
+                    subfigN2.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
+                    subfigN2.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                if SHOW_SHANK_ALG:
+                    subfigShank.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
+                    subfigShank.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                if SHOW_EXPSILON_ALG:
+                    subfigEpsilon.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
+                    subfigEpsilon.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
                 used_N_QT += "_" + N; N_arr[int(N)] = 1
             except:
                 print("cannot plot QT data for N = %s          " % N)
