@@ -624,7 +624,7 @@ def plotExtrapolatedData(N_color):
         subfig1.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
         if samp == 1: vec_string = "einen Startvektor"
         else: vec_string = str(samp) + " Startvektoren"
-        subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittlungen über " + vec_string, fontsize = titlefontsize)
+        subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
 
         legend = []
         for i in range(len(N_arr)):
@@ -841,7 +841,7 @@ def different_extrapolations(N_color):
         subfig1.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
         if samp == 1: vec_string = "einen Startvektor"
         else: vec_string = str(samp) + " Startvektoren"
-        subfig1.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittlungen über " + vec_string, fontsize = titlefontsize)
+        subfig1.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
 
         legend = []
         color_count = 0
@@ -870,7 +870,7 @@ def different_extrapolations(N_color):
             subfigExp.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigExp.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittlungen über " + vec_string, fontsize = titlefontsize)
+            subfigExp.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = "exp-Fit", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -887,7 +887,7 @@ def different_extrapolations(N_color):
             subfigSqrt.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigSqrt.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittlungen über " + vec_string, fontsize = titlefontsize)
+            subfigSqrt.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = r"1/$\sqrt{N}$", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -904,7 +904,7 @@ def different_extrapolations(N_color):
             subfigN.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigN.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittlungen über " + vec_string, fontsize = titlefontsize)
+            subfigN.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = r"1/$N$", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -921,7 +921,7 @@ def different_extrapolations(N_color):
             subfigN2.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigN2.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittlungen über " + vec_string, fontsize = titlefontsize)
+            subfigN2.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = r"1/$N^2$", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -938,7 +938,7 @@ def different_extrapolations(N_color):
             subfigShank.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigShank.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittlungen über " + vec_string, fontsize = titlefontsize)
+            subfigShank.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = "Shanks-Tranformation", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -955,7 +955,7 @@ def different_extrapolations(N_color):
             subfigEpsilon.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigEpsilon.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittlungen über " + vec_string, fontsize = titlefontsize)
+            subfigEpsilon.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = r"$\varepsilon$-Algorithmus", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1

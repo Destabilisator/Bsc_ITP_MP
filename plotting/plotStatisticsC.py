@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 import sys
 import os
@@ -9,6 +10,28 @@ N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), 
 N_color_HIGH = [("18", "tomato"), ("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 n_color = [("1", "red"), ("2", "blue"), ("3", "green"), ("4", "tomato")]
 colors = ["red", "blue", "green", "magenta", "tomato", "brown", "purple"]
+
+titlefontsize = 35
+labelfontsize = 30
+legendfontsize = 30
+axisfontsize = 25
+
+line_width = 4
+marker_size = 0
+alph = 0.1
+
+valid_step_sizes = [0.1, 0.01, 0.001]
+start = 0.0
+ends = [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+
+def sort_step_sizes(X):
+    length = len(X)
+    for i in range(length-1):
+        for j in range(0, length-i-1):
+            x1 = X[j][0]; x2 = X[j+1][0]
+            if x1 > x2:
+                X[j], X[j+1] = X[j+1], X[j]
+    return X
 
 def plot_n_for_each_N(start: float, end: float):
     print("plotting dependance of n for fixed N (as error bands) ...")
@@ -319,7 +342,7 @@ def plot_delta_ED(start: float, end: float):
     plt.savefig("results/QT_stats/C_delta_ED_QT_" + used_N + "_J" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
     plt.close(fig1)
 
-def plot_step_size(start: float, end: float):
+def plot_step_size():
     print("plotting step size dependance for fixed N ...")
     for N, NC in N_color:
         print("N = " + N)
@@ -335,54 +358,70 @@ def plot_step_size(start: float, end: float):
             Y = []
             for i in range(9,len(lines)):
                 x, y = lines[i].split("\t")
-                if float(x) < start or float(x) > end: continue
-                X += [float(x)]
+                if float(x) <= 0: continue
+                X += [1.0/float(x)]
                 Y += [float(y)]
             file.close()
-            subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "black", label = lbl)
+            subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = "black")#, label = lbl)
             # QT results
             filenum = 0
             used_step_sizes = ""
+            step_sizes = []
             for filename in os.listdir("results/" + N + "/data/step_size_data/"):
                 if n + "_data_specific_heat_J_const_QT_step" in filename:# and "_data_specific_heat_J_const_QT_step" not in filename:
                     # print(filename)
                     stepsize = filename[len(n + "_data_specific_heat_J_const_QT_step"): - len(".txt")]
+                    if float(stepsize) not in valid_step_sizes: continue
+                    step_sizes += [(float(stepsize), colors[filenum])]
                     file = open("results/" + N + "/data/step_size_data/" + n + "_data_specific_heat_J_const_QT_step" + stepsize + ".txt", 'r')
                     lines = file.readlines()
                     X = []; Y = []; YErr = []
                     for i in range(7,len(lines)):
                         x, y, yErr = lines[i].split("\t")
-                        if float(x) < start or float(x) > end: continue
-                        X += [float(x)]
+                        if float(x) <= 0: continue
+                        X += [1.0/float(x)]
                         Y += [float(y)]
                         YErr += [float(yErr)]
                     file.close()
-                    subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = colors[filenum], label = "QT: " + str(float(stepsize)))
+                    subfig1.plot(X, Y, lw = line_width, ls = "dashed", markersize = marker_size, marker = "o", color = colors[filenum])#, label = "QT: " + str(float(stepsize)))
                     X = np.asarray(X)
                     Y = np.asarray(Y)
                     YErr = np.asarray(YErr)
-                    subfig1.fill_between(X, Y - YErr, Y + YErr, color = colors[filenum], alpha = 0.1)
+                    subfig1.fill_between(X, Y - YErr, Y + YErr, color = colors[filenum], alpha = alph)
                     filenum += 1
                     used_step_sizes += "_" + str(float(stepsize))
             # saving
-            subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-            subfig1.set_ylabel(r'$C/N$ in $J_2$', fontsize = 25)
-            subfig1.set_title(r"Abhängigkeit von $C/N$ von der Schrittweite in RK4 mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
+            subfig1.set_xlabel(r'$k_B T$ / $J_2$', fontsize = labelfontsize)
+            subfig1.set_ylabel(r'$C/N$ / $J_2$', fontsize = labelfontsize)
+            subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "\nbei unterschiedlichen Schrittweiten und 5 Mittelungen über einen Startvektor", fontsize = titlefontsize)
             subfig1.axhline(0, color = "grey")
-            subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
-            plt.savefig("results/QT_stats/C_N_" + N + "_n_" + n + "_step_size" + used_step_sizes + "_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+            legend = []
+            color_count = 0
+            legend += [Line2D([0], [0], label = "ED: N = " + N, color = "black", ls = "solid", lw = line_width)]
+            step_sizes = sort_step_sizes(step_sizes)
+            for sz, c in step_sizes:
+                legend += [Line2D([0], [0], label = "QT: " + str(sz), color = c, ls = "dashed", lw = line_width)]
+            handles, labels = plt.gca().get_legend_handles_labels()
+            handles.extend(legend)
+            subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+            subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
+            for end in ends:
+                subfig1.set_xlim(start, end)
+                plt.savefig("results/QT_stats/C_N_" + N + "_n_" + n + "_step_size" + used_step_sizes + "_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+                plt.savefig("results/QT_stats/C_N_" + N + "_n_" + n + "_step_size" + used_step_sizes + "_J_" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
             plt.close(fig1)
         print()
 
 if __name__ == "__main__":
     print("plotting specific heat (constant J1/J2, funtion of T):")
-    start = float(sys.argv[1])
-    end = float(sys.argv[2])
-    regime = sys.argv[3]
+    N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
+    # start = float(sys.argv[1])
+    # end = float(sys.argv[2])
+    # regime = sys.argv[3]
 
-    if regime == "low": N_color = N_color_LOW
-    elif regime == "high": N_color = N_color_HIGH
-    else: exit()
+    # if regime == "low": N_color = N_color_LOW
+    # elif regime == "high": N_color = N_color_HIGH
+    # else: exit()
 
     # plot_n_for_each_N(start, end)
     # print()
@@ -398,5 +437,5 @@ if __name__ == "__main__":
     # print()
     # plot_delta_ED(start, end)
     # print()
-    plot_step_size(start, end)
+    plot_step_size()
     print()

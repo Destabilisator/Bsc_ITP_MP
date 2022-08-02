@@ -16,7 +16,7 @@ N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"
 peak_offset = 2000
 fit_samples = 5 # 5
 search_start_percent = 4/5
-search_end_percent = 1/5
+search_end_percent = 3/5
 max_n = 5 # min = 1; max = 5
 no_ED = False # True / False
 
@@ -25,7 +25,7 @@ labelfontsize = 30
 legendfontsize = 30
 axisfontsize = 25
 
-SAVE_FULL_PLOTS = False # True / False
+SAVE_FULL_PLOTS = True # True / False
 
 SCALE_SUM_J = True # True / False
 
@@ -96,23 +96,31 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
         fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
 
         # Y_fitted_range = np.exp(Y_fit_range)
-        subfig2.plot(X_fit_range, Y_fit_range, lw = 1, ls = "solid", markersize = 5, marker = "o", color = "green", label = "range")
+        X_fit_range = 1 / X_fit_range
+        subfig2.plot(X_fit_range, Y_fit_range, lw = 8, ls = "solid", markersize = 0, marker = "o", color = "green", label = "Intervall")
 
-        subfig2.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "blue", label = "QT data")
+        X = np.array(X)
+        X = 1 / X
+        subfig2.plot(X, Y, lw = 5, ls = "solid", markersize = 0, marker = "o", color = "blue", label = ED_QT + " Daten")
         # Y_fitted = [np.exp(m * x + b) for x in X_fit_range]
-        Y_fitted = [expFunc(x, A, k) for x in X_fit_range]
-        subfig2.plot(X_fit_range, Y_fitted, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "red", label = "exp fit, R = " + str(R2))
-        subfig2.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = labelfontsize)
-        subfig2.set_ylabel('$\\chi/N$ in $J_2$', fontsize = labelfontsize)
+        X = np.linspace(0.001, 0.101, 10000)
+        X = np.array(X)
+        Y_fitted = [expFunc(x, A, k) for x in 1 / X]
+        subfig2.plot(X, Y_fitted, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "red", label = "$R^2$ = " + str(R2))
+        subfig2.set_xlabel(r'$k_B T$ / $J_2$', fontsize = labelfontsize) # r'$k_B T$ / $J_2$' or r'$\beta$ in $J_2$ / $k_B$'
+        subfig2.set_ylabel('$\\chi/N$ /$J_2$', fontsize = labelfontsize)
         subfig2.set_title("$\\chi/N$ für N = " + N + r" mit $J_1$ / $J_2$ = " + J, fontsize = titlefontsize)
 
         # subfig2.axhline(0, color = "grey")
         subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+        subfig2.set_xlim(0.0, 0.1)
 
         plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
+        plt.axvline(x=X_fit_range[0], color='black', linestyle='--')
         #subfig2.set_xscale("log")
-        subfig2.set_yscale("log")
+        # subfig2.set_yscale("log")
         fig2.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".png")
+        fig2.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + "X_J" + J + "_" + ED_QT + ".pdf")
         plt.cla()
         plt.clf()
         plt.close(fig2)
@@ -174,6 +182,18 @@ def save_spin_gap_data(N, X, Y, YErr, A, AErr) -> None:
 
 
 if __name__ == "__main__":
+
+    N_color = [("18", "tomato")] # ("16", "purple"), 
+
+    for N, C in N_color:
+        for n in range(5):
+            for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/"):
+                if filename[len(filename)-6:] != "QT.txt" and filename[len(filename)-6:] != "ED.txt": continue
+                J = filename[len("X_J"):-len("QT.txt")]
+                print("N = %s, n = %i, J = %s          \r" %(N, n+1, J), end = "")
+                A, k = get_spin_gap(n, N, J, filename)
+
+    exit(1)
 
     if len(sys.argv) > 1:
         regime = sys.argv[1]

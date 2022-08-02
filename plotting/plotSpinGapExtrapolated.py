@@ -34,6 +34,7 @@ ONE_OVER_N_FIT = True
 EXPSILON_ALG = False
 
 counter = 0
+SGcounter = 0
 
 
 def shank_Alg(A, n):
@@ -191,8 +192,27 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
             A = A_new
             k = k_new
             X_fit_range = X_fit; Y_fit_range = Y_fit
+        # gc.collect()
 
-        gc.collect()
+    figFit, subfigFit = plt.subplots(1,1,figsize=(16,9))
+    X = np.array(X)
+    subfigFit.plot(1/X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5, label = "N = " + N + " (" + ED_QT + ")")
+    subfigFit.plot(1/X_fit_range, Y_fit_range, lw = 10, ls = "solid", markersize = 0, marker = "o", color = "green", alpha = 0.5, label = "Anpassungsbereich")
+    X = np.linspace(min(X), max(X), 10000)
+    X = np.array(X)
+    X = 1/X
+    subfigFit.plot(X, expFunc(X, A, k), lw = 4, ls = "solid", markersize = 0, marker = "o", color = "blue", alpha = 0.5, label = "Anpassungsfunktion")
+    subfigFit.set_yscale('log')
+    subfigFit.set_xlim(0.0, 0.5)
+    subfigFit.set_xlabel(r'$k_B T$ / $J_2$', fontsize = labelfontsize)
+    subfigFit.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
+    subfigFit.set_title('Suszeptibilität pro Spin $\\chi/N$', fontsize = titlefontsize)
+    figFit.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + ED_QT + "_" + J + "_" + ".png")
+    figFit.savefig("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + ED_QT + "_" + J + "_" + ".pdf")
+    figFit.clear()
+    plt.close(figFit)
+    figFit.clf()
+    gc.collect()
 
     return float(A), abs(k)
 
@@ -388,17 +408,28 @@ def ED_extrapolation(N_color):
 if __name__ == "__main__":
     start_time = time.time()
 
-    if len(sys.argv) > 1:
-        regime = sys.argv[1]
-        if regime == "low": N_color = N_color_LOW#; print("low regime")
-        elif regime == "high": N_color = N_color_HIGH; no_ED = True#; print("high regime")
-        else: N_color = N_color_LOW; print("default low (wrong args)")
-    else: print("default (no args)")
+    # if len(sys.argv) > 1:
+    #     regime = sys.argv[1]
+    #     if regime == "low": N_color = N_color_LOW#; print("low regime")
+    #     elif regime == "high": N_color = N_color_HIGH; no_ED = True#; print("high regime")
+    #     else: N_color = N_color_LOW; print("default low (wrong args)")
+    # else: print("default (no args)")
 
-    QT_extrapolation(N_color)
-    print()
-    ED_extrapolation(N_color_LOW)
-    print()
+    N_color = [("16", "purple"), ("18", "tomato")] # ("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), 
+
+    # QT_extrapolation(N_color)
+    # print()
+    # ED_extrapolation(N_color)
+    # print()
+
+    for N, C in N_color:
+        for n in range(5):
+            for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/"):
+                if filename[len(filename)-6:] != "QT.txt" and filename[len(filename)-6:] != "ED.txt": continue
+                J = filename[len("X_J"):-len("QT.txt")]
+                print("N = %s, n = %i, J = %s          \r" %(N, n+1, J), end = "")
+                A, k = get_spin_gap(n, N, J, filename)
+
 
     end_time = time.time()
 
