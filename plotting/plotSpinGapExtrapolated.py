@@ -23,10 +23,10 @@ max_n = 1 # min = 1; max = 5
 extrapolate_QT = True
 extrapolate_ED = True
 
-titlefontsize = 35
-labelfontsize = 30
-legendfontsize = 30
-axisfontsize = 25
+titlefontsize = 40
+labelfontsize = 35
+legendfontsize = 35
+axisfontsize = 30
 
 SHANK_ALG = False
 EXP_FIT = False

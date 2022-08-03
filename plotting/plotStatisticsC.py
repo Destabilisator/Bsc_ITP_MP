@@ -347,6 +347,7 @@ def plot_step_size():
     for N, NC in N_color:
         print("N = " + N)
         for n, nc in n_color:
+            if n != "1": continue
             print("n = " + n)
             fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
             # ED results
@@ -414,7 +415,7 @@ def plot_step_size():
 
 if __name__ == "__main__":
     print("plotting specific heat (constant J1/J2, funtion of T):")
-    N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
+    N_color = [("16", "purple"), ("18", "tomato")] # ("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), 
     # start = float(sys.argv[1])
     # end = float(sys.argv[2])
     # regime = sys.argv[3]

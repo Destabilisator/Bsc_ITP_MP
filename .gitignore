@@ -65,6 +65,7 @@ results/*.pdf
 
 results/*/*.txt
 results/*/*.png
+results/*/*.pdf
 
 results/*/data/*.txt
 results/*/data/*.png

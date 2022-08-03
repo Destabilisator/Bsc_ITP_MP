@@ -20,12 +20,12 @@ search_end_percent = 3/5
 max_n = 5 # min = 1; max = 5
 no_ED = False # True / False
 
-titlefontsize = 35
-labelfontsize = 30
-legendfontsize = 30
-axisfontsize = 25
+titlefontsize = 40
+labelfontsize = 35
+legendfontsize = 35
+axisfontsize = 30
 
-SAVE_FULL_PLOTS = True # True / False
+SAVE_FULL_PLOTS = False # True / False
 
 SCALE_SUM_J = True # True / False
 
@@ -183,24 +183,24 @@ def save_spin_gap_data(N, X, Y, YErr, A, AErr) -> None:
 
 if __name__ == "__main__":
 
-    N_color = [("18", "tomato")] # ("16", "purple"), 
+    # N_color = [("18", "tomato")] # ("16", "purple"), 
 
-    for N, C in N_color:
-        for n in range(5):
-            for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/"):
-                if filename[len(filename)-6:] != "QT.txt" and filename[len(filename)-6:] != "ED.txt": continue
-                J = filename[len("X_J"):-len("QT.txt")]
-                print("N = %s, n = %i, J = %s          \r" %(N, n+1, J), end = "")
-                A, k = get_spin_gap(n, N, J, filename)
+    # for N, C in N_color:
+    #     for n in range(5):
+    #         for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/"):
+    #             if filename[len(filename)-6:] != "QT.txt" and filename[len(filename)-6:] != "ED.txt": continue
+    #             J = filename[len("X_J"):-len("QT.txt")]
+    #             print("N = %s, n = %i, J = %s          \r" %(N, n+1, J), end = "")
+    #             A, k = get_spin_gap(n, N, J, filename)
 
-    exit(1)
+    # exit(1)
 
-    if len(sys.argv) > 1:
-        regime = sys.argv[1]
-        if regime == "low": N_color = N_color_LOW#; print("low regime")
-        elif regime == "high": N_color = N_color_HIGH; no_ED = True#; print("high regime")
-        else: N_color = N_color_LOW; print("default low (wrong args)")
-    else: N_color = N_color_LOW; print("default low (no args)")
+    # if len(sys.argv) > 1:
+    #     regime = sys.argv[1]
+    #     if regime == "low": N_color = N_color_LOW#; print("low regime")
+    #     elif regime == "high": N_color = N_color_HIGH; no_ED = True#; print("high regime")
+    #     else: N_color = N_color_LOW; print("default low (wrong args)")
+    # else: N_color = N_color_LOW; print("default low (no args)")
 
     N_color = [("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
 
@@ -306,8 +306,12 @@ if __name__ == "__main__":
 
             subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
-            if SCALE_SUM_J: fig1.savefig("results/" + "spin_gap_with_QT_J_sum_scale_" + used_N + ".png")
-            else: fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
+            if SCALE_SUM_J:
+                fig1.savefig("results/" + "spin_gap_with_QT_J_sum_scale_" + used_N + ".png")
+                fig1.savefig("results/" + "spin_gap_with_QT_J_sum_scale_" + used_N + ".pdf")
+            else:
+                fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".png")
+                fig1.savefig("results/" + "spin_gap_with_QT_" + used_N + ".pdf")
 
             # subfigAmp.set_yscale("log")
 

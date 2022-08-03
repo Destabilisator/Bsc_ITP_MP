@@ -14,10 +14,10 @@ max_n = 5
 
 einheit_x = r'$k_B T$ / $J_2$' #'$T$ in $k_B$ / $J_2$'
 
-titlefontsize = 35
-labelfontsize = 30
-legendfontsize = 30
-axisfontsize = 25
+titlefontsize = 40
+labelfontsize = 35
+legendfontsize = 35
+axisfontsize = 30
 
 start = 0.0
 ends = [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]#, 20.0, 50.0, 100.0]
@@ -80,7 +80,7 @@ for N_outer in range(len(N_color)):
         # subfig3.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 40)
         subfig3.set_xlabel(einheit_x, fontsize = labelfontsize)
         subfig3.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
-        subfig3.set_title("Suszeptibilität pro Spin $\\chi/N$ bei N = " + N, fontsize = titlefontsize)
+        subfig3.set_title("Suszeptibilität pro Spin $\\chi/N$ bei N = " + N + "\nbei 12 Mittelungen über einen Startvektor", fontsize = titlefontsize)
 
         subfig3.axhline(0, color = "grey")
         subfig3.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
@@ -96,7 +96,7 @@ for N_outer in range(len(N_color)):
             subfig3.set_xlim(min(x_min_ED, x_min_QT), end)
             fig3.savefig("results/" + "X_ED_QT_" + N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
             fig3.savefig("results/" + "X_ED_QT_" + N + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
-            plt.close(fig3)
+        plt.close(fig3)
 
         subfig2.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = c, label = lbl)
         subfig2.fill_between(X, Y - YErr, Y + YErr, color = c, alpha = 0.15)
@@ -133,7 +133,7 @@ for N_outer in range(len(N_color)):
     #subfig2.set_xlabel(r'$\beta$ in $k_B$ / $J_2$', fontsize = 40)
     subfig2.set_xlabel(einheit_x, fontsize = labelfontsize)
     subfig2.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
-    subfig2.set_title('Suszeptibilität pro Spin $\\chi/N$ mit einem Startvektor', fontsize = titlefontsize)
+    subfig2.set_title('Suszeptibilität pro Spin $\\chi/N$' + "\nmit 12 Mittelungen über einen Startvektor", fontsize = titlefontsize)
 
     subfig2.axhline(0, color = "grey")
     subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
@@ -155,12 +155,14 @@ for N_outer in range(len(N_color)):
 
     plt.close(fig2)
 
+N_color = [("16", "purple"), ("18", "tomato")]
 
 for N_outer in range(len(N_color)):
 
     N, C = N_color[N_outer]
     print("multiple runs (QT)")
     for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
+        if ".png" in filename or ".pdf" in filename: continue
         if "ED" in filename: continue
         if "placeholder" in filename: continue
         figMultiQT, subfigMultiQT = plt.subplots(1,1,figsize=(16,9))
