@@ -17,7 +17,7 @@ marker_size = 5
 
 counter = 0
 
-titlefontsize = 40
+titlefontsize = 39
 labelfontsize = 35
 legendfontsize = 35
 axisfontsize = 30
@@ -28,7 +28,7 @@ SAVE_FULL_PLOTS = True
 ONLY_NEWEST_RUN = False
 
 samples = ["1"]#, "2", "3"]
-stepsizes = ["0.100000", "0.010000"]
+stepsizes = ["0.100000"] # ["0.100000", "0.010000"]
 cores = ["1"] # ["1", "2", "5", "10"]
 
 def strip_data(N,T):
@@ -720,6 +720,6 @@ if __name__ == "__main__":
     RT_plot_only_ED_mag_zero()
 
     print("plotting bechmarking (memory usage):")
-    # MU_plot_raw_files()
-    # MU_plot_only_ED()
-    # MU_ED_vs_QT()
+    MU_plot_raw_files()
+    MU_plot_only_ED()
+    MU_ED_vs_QT()

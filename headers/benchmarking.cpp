@@ -207,7 +207,7 @@ namespace bench {
         int J_COUNT = 1;
         double T_START = 0.0, T_END = 50.0;
 
-        for (double stepsize: {0.1, 0.01}) {
+        for (double stepsize: {0.1}) { // , 0.01
             for (int N = N_start; N <= N_end; N += 2) {
                 int SIZE = (int) std::pow(2, N);
                 for (int run = 1; run <= runs; run++) {
