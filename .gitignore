@@ -45,6 +45,9 @@ results/benchmarking/temp/*.pdf
 results/benchmarking/runtime/*.txt
 results/benchmarking/runtime/*.png
 results/benchmarking/runtime/*.pdf
+results/benchmarking/runtime/data/*/*.txt
+results/benchmarking/runtime/data/*/*.png
+results/benchmarking/runtime/data/*/*.pdf
 results/benchmarking/runtime/data/*.txt
 results/benchmarking/runtime/data/*.png
 results/benchmarking/runtime/data/*.pdf

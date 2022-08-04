@@ -30,7 +30,7 @@ max_n = 5 # min = 1; max = 30
 extrapolate_QT = True
 extrapolate_ED = True
 
-titlefontsize = 40
+titlefontsize = 39
 labelfontsize = 35
 legendfontsize = 35
 axisfontsize = 30
@@ -619,6 +619,7 @@ def plotExtrapolatedData(N_color):
                     else: YEV += [float(y)]
                 file.close()
                 subfig1.plot(XEV, YEV, lw = 0, ls = "solid", markersize = marker_size, marker = "o", color = C)#, alpha = 0.4) #  label = lbl,
+                subfigNoExtrap.plot(XEV, YEV, lw = 0, ls = "solid", markersize = marker_size, marker = "o", color = C)
                 used_N_ED += "_" + N; N_arr[int(N)] = 1
             except:
                 print("cannot plot ED data for N = %s" % N)
@@ -686,9 +687,8 @@ def plotExtrapolatedData(N_color):
                 for n, c in N_color:
                     if n == N: C = c
                 legendNoExtrap += [Line2D([0], [0], label = "N = " + N, color = C, ls = "solid", lw = line_width)]
-        legendNoExtrap += [Line2D([0], [0], label = "Extrapolation", color = "black", ls = "solid", lw = line_width)]
         handlesNoExtrap, labels = plt.gca().get_legend_handles_labels()
-        handlesNoExtrap.extend(legend)
+        handlesNoExtrap.extend(legendNoExtrap)
 
         subfigNoExtrap.axhline(0, color = "grey")
         subfigNoExtrap.legend(handles = handlesNoExtrap, loc = 'best' ,frameon = False, fontsize = legendfontsize)
@@ -733,7 +733,6 @@ def different_extrapolations(N_color):
                 X = np.asarray(X); Y = np.asarray(Y)
                 if J_SUM_SCALE: Y = Y / (1.0 + X)
                 extrapolationArray += [Y]
-                X = np.asarray(X); Y = np.asarray(Y)
                 subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
                 if SHOW_EXP_FIT: subfigExp.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
                 if SHOW_ONE_OVER_SQRTN_FIT: subfigSqrt.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
@@ -749,31 +748,37 @@ def different_extrapolations(N_color):
         if SHOW_EXP_FIT:
             print("ED extrapolating with exp          \r", end = "")
             extrapolated_data_ED_EXP_FIT = exp_fit_extrap(extrapolationArray)
+            # if J_SUM_SCALE: extrapolated_data_ED_EXP_FIT = extrapolated_data_ED_EXP_FIT / (1.0 + X)
             subfigExp.plot(X, extrapolated_data_ED_EXP_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfig1.plot(X, extrapolated_data_ED_EXP_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
         if SHOW_ONE_OVER_SQRTN_FIT:
             print("ED extrapolating with sqrt          \r", end = "")
             extrapolated_data_ED_ONE_OVER_SQRTN_FIT = sqrtN_fit_extrap(extrapolationArray)
+            # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_SQRTN_FIT = extrapolated_data_ED_ONE_OVER_SQRTN_FIT / (1.0 + X)
             subfigSqrt.plot(X, extrapolated_data_ED_ONE_OVER_SQRTN_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfig1.plot(X, extrapolated_data_ED_ONE_OVER_SQRTN_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
         if SHOW_ONE_OVER_N_FIT:
             print("ED extrapolating with N          \r", end = "")
             extrapolated_data_ED_ONE_OVER_N_FIT = N_fit_extrap(extrapolationArray)
+            # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_N_FIT = extrapolated_data_ED_ONE_OVER_N_FIT / (1.0 + X)
             subfigN.plot(X, extrapolated_data_ED_ONE_OVER_N_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfig1.plot(X, extrapolated_data_ED_ONE_OVER_N_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
         if SHOW_ONE_OVER_N2_FIT:
             print("ED extrapolating with N^2          \r", end = "")
             extrapolated_data_ED_ONE_OVER_N2_FIT = N2_fit_extrap(extrapolationArray)
+            # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_N2_FIT = extrapolated_data_ED_ONE_OVER_N2_FIT / (1.0 + X)
             subfigN2.plot(X, extrapolated_data_ED_ONE_OVER_N2_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfig1.plot(X, extrapolated_data_ED_ONE_OVER_N2_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
         if SHOW_SHANK_ALG:
             print("ED extrapolating with shank          \r", end = "")
             extrapolated_data_ED_SHANK_ALG = shank_extrap(extrapolationArray)
+            # if J_SUM_SCALE: extrapolated_data_ED_SHANK_ALG = extrapolated_data_ED_SHANK_ALG / (1.0 + X)
             subfigShank.plot(X, extrapolated_data_ED_SHANK_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfig1.plot(X, extrapolated_data_ED_SHANK_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
         if SHOW_EXPSILON_ALG:
             print("ED extrapolating with epsilon          \r", end = "")
             extrapolated_data_ED_EPSILON_ALG = expsilon_extrap(extrapolationArray)
+            # if J_SUM_SCALE: extrapolated_data_ED_EPSILON_ALG = extrapolated_data_ED_EPSILON_ALG / (1.0 + X)
             subfigEpsilon.plot(X, extrapolated_data_ED_EPSILON_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfig1.plot(X, extrapolated_data_ED_EPSILON_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
         print("ED extrapolation done          \r", end = "")
@@ -826,6 +831,7 @@ def different_extrapolations(N_color):
                 print("n = %i / %i & N = %s (get data)          \r" %(n, max_n, N), end="")
                 try:
                     X, Y, A = getDataQT(N, n)
+                    if J_SUM_SCALE: Y = np.asarray(Y); X = np.asarray(X); Y = Y / (1.0 + X)
                     extrapolationArray += [Y]
                     used_N += "_" + N
                 except:
@@ -853,11 +859,13 @@ def different_extrapolations(N_color):
                 extrapolated_data_QT_EPSILON_ALG += [expsilon_extrap(extrapolationArray)]
         print("QT extrapolation done          \r", end = "")
 
+        X = np.asarray(X)
         color_count = 0
         if SHOW_EXP_FIT:
             print("plotting QT extrapolating with exp          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_EXP)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
+            # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
             subfigExp.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfigExp.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
             subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
@@ -866,6 +874,7 @@ def different_extrapolations(N_color):
             print("plotting QT QT extrapolating with sqrt          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_ONE_OVER_SQRTN_FIT)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
+            # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
             subfigSqrt.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfigSqrt.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
             subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
@@ -874,6 +883,7 @@ def different_extrapolations(N_color):
             print("plotting QT QT extrapolating with N          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_OVER_N_FIT)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
+            # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
             subfigN.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfigN.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
             subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
@@ -882,6 +892,7 @@ def different_extrapolations(N_color):
             print("plotting QT QT extrapolating with N**2          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_OVER_N2_FIT)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
+            # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
             subfigN2.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfigN2.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
             subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
@@ -890,6 +901,7 @@ def different_extrapolations(N_color):
             print("plotting QT QT extrapolating with shank          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_SHANK_ALG)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
+            # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
             subfigShank.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfigShank.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
             subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
@@ -898,6 +910,7 @@ def different_extrapolations(N_color):
             print("plotting QT QT extrapolating with epsilon          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_EPSILON_ALG)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
+            # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
             subfigEpsilon.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
             subfigEpsilon.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
             subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
@@ -935,7 +948,8 @@ def different_extrapolations(N_color):
         color_count = 0
         if SHOW_EXP_FIT:
             subfigExp.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            subfigExp.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigExp.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigExp.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
             subfigExp.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
@@ -947,12 +961,17 @@ def different_extrapolations(N_color):
             subfigExp.axhline(0, color = "grey")
             subfigExp.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfigExp.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
-            figExp.savefig("results/" + "SG/SG_extrap_exp_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
-            figExp.savefig("results/" + "SG/SG_extrap_exp_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            if J_SUM_SCALE:
+                figExp.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_exp_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figExp.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_exp_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            else:
+                figExp.savefig("results/" + "SG/SG_extrap_exp_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figExp.savefig("results/" + "SG/SG_extrap_exp_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
             plt.close(figExp)
         if SHOW_ONE_OVER_SQRTN_FIT:
             subfigSqrt.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            subfigSqrt.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigSqrt.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigSqrt.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
             subfigSqrt.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
@@ -964,12 +983,17 @@ def different_extrapolations(N_color):
             subfigSqrt.axhline(0, color = "grey")
             subfigSqrt.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfigSqrt.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
-            figSqrt.savefig("results/" + "SG/SG_extrap_sqrt_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
-            figSqrt.savefig("results/" + "SG/SG_extrap_sqrt_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            if J_SUM_SCALE:
+                figSqrt.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_sqrt_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figSqrt.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_sqrt_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            else:
+                figSqrt.savefig("results/" + "SG/SG_extrap_sqrt_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figSqrt.savefig("results/" + "SG/SG_extrap_sqrt_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
             plt.close(figSqrt)
         if SHOW_ONE_OVER_N_FIT:
             subfigN.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            subfigN.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigN.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigN.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
             subfigN.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
@@ -981,12 +1005,17 @@ def different_extrapolations(N_color):
             subfigN.axhline(0, color = "grey")
             subfigN.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfigN.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
-            figN.savefig("results/" + "SG/SG_extrap_N_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
-            figN.savefig("results/" + "SG/SG_extrap_N_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            if J_SUM_SCALE:
+                figN.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_N_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figN.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_N_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            else:
+                figN.savefig("results/" + "SG/SG_extrap_N_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figN.savefig("results/" + "SG/SG_extrap_N_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
             plt.close(figN)
         if SHOW_ONE_OVER_N2_FIT:
             subfigN2.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            subfigN2.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigN2.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigN2.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
             subfigN2.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
@@ -998,12 +1027,17 @@ def different_extrapolations(N_color):
             subfigN2.axhline(0, color = "grey")
             subfigN2.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfigN2.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
-            figN2.savefig("results/" + "SG/SG_extrap_N2_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
-            figN2.savefig("results/" + "SG/SG_extrap_N2_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            if J_SUM_SCALE:
+                figN2.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_N2_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figN2.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_N2_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            else:
+                figN2.savefig("results/" + "SG/SG_extrap_N2_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figN2.savefig("results/" + "SG/SG_extrap_N2_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
             plt.close(figN2)
         if SHOW_SHANK_ALG:
             subfigShank.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            subfigShank.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigShank.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigShank.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
             subfigShank.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
@@ -1015,12 +1049,17 @@ def different_extrapolations(N_color):
             subfigShank.axhline(0, color = "grey")
             subfigShank.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfigShank.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
-            figShank.savefig("results/" + "SG/SG_extrap_shank_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
-            figShank.savefig("results/" + "SG/SG_extrap_shank_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            if J_SUM_SCALE:
+                figShank.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_shank_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figShank.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_shank_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            else:
+                figShank.savefig("results/" + "SG/SG_extrap_shank_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figShank.savefig("results/" + "SG/SG_extrap_shank_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
             plt.close(figShank)
         if SHOW_EXPSILON_ALG:
             subfigEpsilon.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            subfigEpsilon.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigEpsilon.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigEpsilon.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
             subfigEpsilon.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
@@ -1032,13 +1071,19 @@ def different_extrapolations(N_color):
             subfigEpsilon.axhline(0, color = "grey")
             subfigEpsilon.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfigEpsilon.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
-            figEpsilon.savefig("results/" + "SG/SG_extrap_epsilon_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
-            figEpsilon.savefig("results/" + "SG/SG_extrap_epsilon_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            if J_SUM_SCALE:
+                figEpsilon.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_epsilon_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figEpsilon.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_epsilon_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+            else:
+                figEpsilon.savefig("results/" + "SG/SG_extrap_epsilon_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+                figEpsilon.savefig("results/" + "SG/SG_extrap_epsilon_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
             plt.close(figEpsilon)
 
 
 if __name__ == "__main__":
     start_time = time.time()
+
+    if J_SUM_SCALE: print("J SUM SCALE")
 
     # plotExtrapolatedData(N_color)
     # print()

@@ -17,15 +17,15 @@ marker_size = 5
 
 counter = 0
 
-titlefontsize = 35
-labelfontsize = 30
-legendfontsize = 30
-axisfontsize = 25
+titlefontsize = 40
+labelfontsize = 35
+legendfontsize = 35
+axisfontsize = 30
 
 timestepfontsize = 20
 
 SAVE_FULL_PLOTS = True
-ONLY_NEWEST_RUN = True
+ONLY_NEWEST_RUN = False
 
 samples = ["1"]#, "2", "3"]
 stepsizes = ["0.100000", "0.010000"]
@@ -58,7 +58,7 @@ def extrap_func(x: float, A: float, k: float, x_0: float, b: float) -> float:
 def extrapolate_data(N, T, title):
     Y_fit = np.log(T)
     N = np.asarray(N)
-    params = poly.polyfit(N, Y_fit, 1, w = N + 1/2 * N**2  + 1/6 * N**3) # , w = N + 1/2 * N**2
+    params = poly.polyfit(N, Y_fit, 1, w = N)# + 1/2 * N**2)#  + 1/6 * N**3) # , w = N + 1/2 * N**2
     fit_func = poly.Polynomial(params)
     X = np.linspace(6, 32, 1000)
     Y = fit_func(X)
@@ -716,10 +716,10 @@ if __name__ == "__main__":
     # RT_plot_raw_files()
     # RT_plot_only_ED()
     # RT_plot_step_size_influence()
-    # RT_plot_raw_files_mag_zero()
-    # RT_plot_only_ED_mag_zero()
+    RT_plot_raw_files_mag_zero()
+    RT_plot_only_ED_mag_zero()
 
     print("plotting bechmarking (memory usage):")
     # MU_plot_raw_files()
     # MU_plot_only_ED()
-    MU_ED_vs_QT()
+    # MU_ED_vs_QT()
