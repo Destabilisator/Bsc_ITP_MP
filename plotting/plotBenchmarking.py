@@ -595,13 +595,13 @@ def MU_ED_vs_QT():
         N += [int(n)]; RAM += [float(ram)]
     N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2 ED MS")
     subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1])
-    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"ED (MS)")
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"\textit{dense} (MS)")
     color_count1 += 1
     subfig2.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2])
-    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"ED (MS)")
+    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"\textit{dense} (MS)")
     color_count2 += 1
     subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3])
-    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"ED (MS): $H$ \& $S^2$")
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"\textit{dense} (MS): $H$ \& $S^2$")
     color_count3 += 1
 
     # ED H S2 SI
@@ -614,13 +614,13 @@ def MU_ED_vs_QT():
         N += [int(n)]; RAM += [float(ram)/2.0]
     N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2 ED SI")
     subfig1.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count1])
-    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"ED (SI)$^*$")
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"\textit{dense} (SI)$^*$")
     color_count1 += 1
     subfig2.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count2])
-    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"ED (SI)$^*$")
+    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"\textit{dense} (SI)$^*$")
     color_count2 += 1
     subfig3.plot(N, RAM, lw = 0.0, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count3])
-    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"ED (SI)$^*$: $H$ \& $S^2$")
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "solid", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"\textit{dense} (SI)$^*$: $H$ \& $S^2$")
     color_count3 += 1
 
     # QT H
@@ -633,10 +633,10 @@ def MU_ED_vs_QT():
         N += [int(n)]; RAM += [float(ram)]
     N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt H")
     subfig1.plot(N, RAM, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count1])
-    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"QT")
+    subfig1.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count1], label = r"\textit{sparse} (MS)")
     color_count1 += 1
     subfig3.plot(N, RAM, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count3])
-    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"QT: $H$")
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"\textit{sparse} (MS): $H$")
     color_count3 += 1
 
     # QT S2
@@ -649,10 +649,10 @@ def MU_ED_vs_QT():
         N += [int(n)]; RAM += [float(ram)]
     N_extrap, RAM_extrap = extrapolate_data(N, RAM, "ED QT comp qt S2")
     subfig2.plot(N, RAM, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count2])
-    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"QT")
+    subfig2.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count2], label = r"\textit{sparse} (MS)")
     color_count2 += 1
     subfig3.plot(N, RAM, lw = 0.0, ls = "dashed", markersize = marker_size, marker = "o", color = colors[color_count3])
-    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"QT: $S^2$")
+    subfig3.plot(N_extrap, RAM_extrap, lw = line_width, ls = "dashed", markersize = 0.0, marker = "o", color = colors[color_count3], label = r"\textit{sparse} (MS): $S^2$")
     color_count3 += 1
 
     ##### save plots #####
@@ -663,7 +663,7 @@ def MU_ED_vs_QT():
 
     subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
     subfig1.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
-    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
+    subfig1.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamiltonmatrix $H$, \textit{dense}- \& \textit{sparse}-Matrizen", fontsize = titlefontsize)
     subfig1.set_xticks(N)
     subfig1.set_xlim(x_start, x_end)
     subfig1.set_xticks(x_ticks)
@@ -679,7 +679,7 @@ def MU_ED_vs_QT():
 
     subfig2.set_xlabel(r'$N$', fontsize = labelfontsize)
     subfig2.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
-    subfig2.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Spinmatrix $S^2$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
+    subfig2.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Spinmatrix $S^2$, \textit{dense}- \& \textit{sparse}-Matrizen", fontsize = titlefontsize)
     subfig2.set_xticks(N)
     subfig2.set_xlim(x_start, x_end)
     subfig2.set_xticks(x_ticks)
@@ -695,7 +695,7 @@ def MU_ED_vs_QT():
 
     subfig3.set_xlabel(r'$N$', fontsize = labelfontsize)
     subfig3.set_ylabel(r'\# Matrixelemente', fontsize = labelfontsize)
-    subfig3.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamilton- $H$ \& Spinmatrix $S^2$, QT \& ED (Impulszutände)", fontsize = titlefontsize)
+    subfig3.set_title(r"Anzahl der zu speichernden Matrixelemente" + "\n" + r"Hamilton- $H$ \& Spinmatrix $S^2$, \textit{dense}- \& \textit{sparse}-Matrizen", fontsize = titlefontsize)
     subfig3.set_xticks(N)
     subfig3.set_xlim(x_start, x_end)
     subfig3.set_xticks(x_ticks)

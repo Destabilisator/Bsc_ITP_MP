@@ -11,10 +11,10 @@ N_color_HIGH = [("18", "tomato"), ("20", "red"), ("22", "blue"), ("24", "green")
 n_color = [("1", "red"), ("2", "blue"), ("3", "green"), ("4", "tomato")]
 colors = ["red", "blue", "green", "magenta", "tomato", "brown", "purple"]
 
-titlefontsize = 35
-labelfontsize = 30
-legendfontsize = 30
-axisfontsize = 25
+titlefontsize = 39
+labelfontsize = 35
+legendfontsize = 35
+axisfontsize = 30
 
 line_width = 4
 marker_size = 0
@@ -23,6 +23,12 @@ alph = 0.1
 valid_step_sizes = [0.1, 0.01, 0.001]
 start = 0.0
 ends = [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]
+
+def get_set_size_index(stepsize):
+    for i in range(len(valid_step_sizes)):
+        if stepsize == valid_step_sizes[i]:
+            return i
+    else: return -1
 
 def sort_step_sizes(X):
     length = len(X)
@@ -370,9 +376,9 @@ def plot_step_size():
             step_sizes = []
             for filename in os.listdir("results/" + N + "/data/step_size_data/"):
                 if n + "_data_specific_heat_J_const_QT_step" in filename:# and "_data_specific_heat_J_const_QT_step" not in filename:
-                    # print(filename)
                     stepsize = filename[len(n + "_data_specific_heat_J_const_QT_step"): - len(".txt")]
                     if float(stepsize) not in valid_step_sizes: continue
+                    filenum = get_set_size_index(float(stepsize))
                     step_sizes += [(float(stepsize), colors[filenum])]
                     file = open("results/" + N + "/data/step_size_data/" + n + "_data_specific_heat_J_const_QT_step" + stepsize + ".txt", 'r')
                     lines = file.readlines()
@@ -394,7 +400,7 @@ def plot_step_size():
             # saving
             subfig1.set_xlabel(r'$k_B T$ / $J_2$', fontsize = labelfontsize)
             subfig1.set_ylabel(r'$C/N$ / $J_2$', fontsize = labelfontsize)
-            subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "\nbei unterschiedlichen Schrittweiten und 5 Mittelungen über einen Startvektor", fontsize = titlefontsize)
+            subfig1.set_title(r"spezifische Wärmekapazität pro Spin $C/N$" + "bei unterschiedlichen\nSchrittweiten und 12 Mittelungen über einen Startvektor", fontsize = titlefontsize)
             subfig1.axhline(0, color = "grey")
             legend = []
             color_count = 0
