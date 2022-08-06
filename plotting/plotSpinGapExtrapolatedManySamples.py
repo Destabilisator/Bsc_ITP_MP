@@ -566,27 +566,52 @@ def getExtrapolatedDataED(N_color):
     plt.close(fig1)
     return extrapolated_data
 
+# def avgData(samp, inputdata):
+#     data_to_avg = []
+#     for i in range(0, max_n - samp, samp):
+#         data_raw = []
+#         for j in range(i, i + samp):
+#             data_raw += [inputdata[j]]
+#         Y_data = []
+#         for k in range(0, len(data_raw[0])):
+#             Y_data_raw = []
+#             for Yd in data_raw:
+#                 Y_data_raw += [Yd[k]]
+#             Y_data_raw = np.array(Y_data_raw)
+#             Y_data += [Y_data_raw.mean()]
+#         data_to_avg += [Y_data]
+#     Y = []; YErr = []
+#     for k in range(0, len(data_to_avg[0])):
+#         Y_data_raw = []
+#         for Yd in data_to_avg:
+#             Y_data_raw += [Yd[k]]
+#         Y_data_raw = np.array(Y_data_raw)
+#         Y += [Y_data_raw.mean()]; YErr +=[Y_data_raw.std()]
+#     return Y, YErr
+
 def avgData(samp, inputdata):
     data_to_avg = []
-    for i in range(0, max_n - samp, samp):
+    for i in range(0, max_n - samp + 1, samp):
+        # print("%i, %i, %i, %i" % (max_n, len(inputdata), samp, i))
         data_raw = []
         for j in range(i, i + samp):
             data_raw += [inputdata[j]]
         Y_data = []
         for k in range(0, len(data_raw[0])):
-            Y_data_raw = []
+            y = []
             for Yd in data_raw:
-                Y_data_raw += [Yd[k]]
-            Y_data_raw = np.array(Y_data_raw)
-            Y_data += [Y_data_raw.mean()]
+                y += [Yd[k]]
+            y = np.asarray(y)
+            Y_data += [y.mean()]
         data_to_avg += [Y_data]
     Y = []; YErr = []
     for k in range(0, len(data_to_avg[0])):
-        Y_data_raw = []
+        y = []
         for Yd in data_to_avg:
-            Y_data_raw += [Yd[k]]
-        Y_data_raw = np.array(Y_data_raw)
-        Y += [Y_data_raw.mean()]; YErr +=[Y_data_raw.std()]
+            y += [Yd[k]]
+        y = np.asarray(y)
+        # print("%f, %f" % (y.mean(), y.std()))
+        Y += [y.mean()]; YErr +=[y.std()]
     return Y, YErr
 
 def plotExtrapolatedData(N_color):

@@ -39,7 +39,7 @@ def sort_step_sizes(X):
                 X[j], X[j+1] = X[j+1], X[j]
     return X
 
-def plot_n_for_each_N(start: float, end: float):
+def plot_n_for_each_N():
     print("plotting dependance of n for fixed N (as error bands) ...")
     for N, NC in N_color:
         print("N = " + N)
@@ -53,8 +53,8 @@ def plot_n_for_each_N(start: float, end: float):
         Y = []
         for i in range(8,len(lines)):
             x, y = lines[i].split("\t")
-            if float(x) < start or float(x) > end: continue
-            X += [float(x)]
+            if float(x) <= 0: continue
+            X += [1.0/float(x)]
             Y += [float(y)]
         subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = "black", label = lbl)
         # QT results
@@ -69,8 +69,8 @@ def plot_n_for_each_N(start: float, end: float):
             YErr = []
             for i in range(6,len(lines)):
                 x, y, yErr = lines[i].split("\t")
-                if float(x) < start or float(x) > end: continue
-                X += [float(x)]
+                if float(x) <= 0: continue
+                X += [1.0/float(x)]
                 Y += [float(y)]
                 YErr += [float(yErr)]
             subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = nc, label = "QT: n = " + n, alpha = 1.0)
@@ -87,14 +87,17 @@ def plot_n_for_each_N(start: float, end: float):
         filename = "N_" + N + "_n"
         for n, nc in n_color:
             filename += "_" + n
-        plt.savefig("results/QT_stats/X_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        for end in ends:
+            subfig1.set_xlim(start, end)
+            plt.savefig("results/QT_stats/X_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
         plt.close(fig1)
 
-def plot_n_for_each_N_sigma_abs(start: float, end: float): 
+def plot_n_for_each_N_sigma_abs(): 
     print("plotting dependance of n for fixed N (plotting only sigma abs) ...")
     for N, NC in N_color:
         print("N = " + N)
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+        x_min = 42069
         # QT results
         for n, nc in n_color:
             file = open("results/" + N + "/data/" + n +"_data_susceptibility_J_const_QT.txt", 'r')
@@ -105,31 +108,37 @@ def plot_n_for_each_N_sigma_abs(start: float, end: float):
             YErr = []
             for i in range(6,len(lines)):
                 x, y, yErr = lines[i].split("\t")
-                if float(x) < start or float(x) > end: continue
-                X += [float(x)]
+                if float(x) <= 0: continue
+                X += [1.0/float(x)]
                 Y += [float(y)]
                 YErr += [float(yErr)]
-            subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = nc, label = "QT: n = " + n)
+            subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = nc, label = "QT: n = " + n)
+            if min(X) < x_min: x_min = min(X)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel(r'$\sigma_{abs}$ in $J_2$', fontsize = 25)
-        subfig1.set_title("abs. $\sigma$ von $\\chi/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = 25)
+        subfig1.set_xlabel(r'$k_B T$ / $J_2$', fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$\sigma_{abs}$ / $J_2$', fontsize = labelfontsize)
+        subfig1.set_title(r"$\sigma_{abs}$" + " von $\\chi/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = titlefontsize)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
         filename = "N_" + N + "_n"
         for n, nc in n_color:
             filename += "_" + n
-        plt.savefig("results/QT_stats/X_sigma_abs_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        for end in ends:
+            subfig1.set_xlim(x_min, end)
+            plt.savefig("results/QT_stats/X_sigma_abs_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+            plt.savefig("results/QT_stats/X_sigma_abs_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
         plt.close(fig1)
 
-def plot_n_for_each_N_sigma_rel(start: float, end: float): 
+def plot_n_for_each_N_sigma_rel(): 
     print("plotting dependance of n for fixed N (plotting only sigma rel) ...")
     for N, NC in N_color:
         print("N = " + N)
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+        x_min = 42069
         # QT results
         for n, nc in n_color:
-            file = open("results/" + N + "/data/" + n +"_data_susceptibility_J_const_QT.txt", 'r')
+            file = open("results/" + N + "/data/" + n + "_data_susceptibility_J_const_QT.txt", 'r')
             lines = file.readlines()
             linesJ = lines[1][len("J1/J2: "):-1]
             X = []
@@ -137,25 +146,30 @@ def plot_n_for_each_N_sigma_rel(start: float, end: float):
             YErr = []
             for i in range(6,len(lines)):
                 x, y, yErr = lines[i].split("\t")
-                if float(x) < start or float(x) > end: continue
+                if float(x) <= 0: continue
                 if not float(y) > 0.0: continue
-                X += [float(x)]
+                X += [1.0/float(x)]
                 Y += [float(y)]
                 YErr += [float(yErr)/float(y)]
-            subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = nc, label = "QT: n = " + n)
+            subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = nc, label = "QT: n = " + n)
+            if min(X) < x_min: x_min = min(X)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel(r'$\sigma_{rel}$ in $J_2$', fontsize = 25)
-        subfig1.set_title("rel. $\sigma$ von $\\chi/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = 25)
+        subfig1.set_xlabel(r'$k_B T$ / $J_2$', fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$\sigma_{rel}$ / $J_2$', fontsize = labelfontsize)
+        subfig1.set_title(r"$\sigma_{rel}$" + " von $\\chi/N$ bei der QT mit N = " + N + r" und $J_1$ / $J_2$ = " + linesJ, fontsize = titlefontsize)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
         filename = "N_" + N + "_n"
         for n, nc in n_color:
             filename += "_" + n
-        plt.savefig("results/QT_stats/X_sigma_rel_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        for end in ends:
+            subfig1.set_xlim(x_min, end)
+            plt.savefig("results/QT_stats/X_sigma_rel_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+            plt.savefig("results/QT_stats/X_sigma_rel_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
         plt.close(fig1)
 
-def plot_N_for_each_n(start: float, end: float):
+def plot_N_for_each_n():
     print("plotting dependance of N for fixed n (as error bands) ...")
     for n, nc in n_color:
         print("n = " + n)
@@ -170,8 +184,8 @@ def plot_N_for_each_n(start: float, end: float):
             Y = []
             for i in range(8,len(lines)):
                 x, y = lines[i].split("\t")
-                if float(x) < start or float(x) > end: continue
-                X += [float(x)]
+                if float(x) <= 0: continue
+                X += [1.0/float(x)]
                 Y += [float(y)]
             subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 1, marker = "o", color = NC, label = lbl)
             # QT results
@@ -184,8 +198,8 @@ def plot_N_for_each_n(start: float, end: float):
             YErr = []
             for i in range(6,len(lines)):
                 x, y, yErr = lines[i].split("\t")
-                if float(x) < start or float(x) > end: continue
-                X += [float(x)]
+                if float(x) <= 0: continue
+                X += [1.0/float(x)]
                 Y += [float(y)]
                 YErr += [float(yErr)]
             subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 0, marker = "o", color = NC, label = "QT: N = " + N, alpha = 1.0)
@@ -194,22 +208,27 @@ def plot_N_for_each_n(start: float, end: float):
             YErr = np.asarray(YErr)
             subfig1.fill_between(X, Y - YErr, Y + YErr, color = NC, alpha = 0.1)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel('$\\chi/N$ in $J_2$', fontsize = 25)
-        subfig1.set_title("$\\chi/N$ bei der QT mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
+        subfig1.set_xlabel(r'$k_B T$ / $J_2$', fontsize = 25)
+        subfig1.set_ylabel('$\\chi/N$ / $J_2$', fontsize = 25)
+        vec = "einem Startvektor"
+        if int(n) > 1: vec = n + " Startvektoren"
+        subfig1.set_title("$\\chi/N$ bei der QT mit $J_1$ / $J_2$ = " + linesJ + " und " + vec, fontsize = 25)
         subfig1.axhline(0, color = "grey")
         subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
         filename = "n_" + n + "_N"
         for N, NC in N_color:
             filename += "_" + N
-        plt.savefig("results/QT_stats/X_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        for end in ends:
+            subfig1.set_xlim(0.0, end)
+            plt.savefig("results/QT_stats/X_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
         plt.close(fig1)
 
-def plot_N_for_each_n_sigma_abs(start: float, end: float):
+def plot_N_for_each_n_sigma_abs():
     print("plotting dependance of N for fixed n (plotting only sigma abs) ...")
     for n, nc in n_color:
         print("n = " + n)
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+        x_min = 42069
         # QT results
         for N, NC in N_color:
             # QT results
@@ -221,28 +240,36 @@ def plot_N_for_each_n_sigma_abs(start: float, end: float):
             YErr = []
             for i in range(6,len(lines)):
                 x, y, yErr = lines[i].split("\t")
-                if float(x) < start or float(x) > end: continue
-                X += [float(x)]
+                if float(x) <= 0: continue
+                X += [1.0/float(x)]
                 Y += [float(y)]
                 YErr += [float(yErr)]
-            subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT: N = " + N, alpha = 1.0)
+            subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = NC, label = "QT: N = " + N, alpha = 1.0)
+            if min(X) < x_min: x_min = min(X)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel(r'$\sigma_{abs}$ in $J_2$', fontsize = 25)
-        subfig1.set_title("abs. $\sigma$ von $\\chi/N$ mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
+        subfig1.set_xlabel(r'$k_B T$ / $J_2$ / $k_B$', fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$\sigma_{abs}$ / $J_2$', fontsize = labelfontsize)
+        vec = "einem Startvektor"
+        if int(n) > 1: vec = n + " Startvektoren"
+        subfig1.set_title(r"$\sigma_{abs}$" + " von $\\chi/N$ mit $J_1$ / $J_2$ = " + linesJ + " und " + vec, fontsize = titlefontsize)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
         filename = "n_" + n + "_N"
         for N, NC in N_color:
             filename += "_" + N
-        plt.savefig("results/QT_stats/X_sigma_abs_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        for end in ends:
+            subfig1.set_xlim(x_min, end)
+            plt.savefig("results/QT_stats/X_sigma_abs_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+            plt.savefig("results/QT_stats/X_sigma_abs_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
         plt.close(fig1)
 
-def plot_N_for_each_n_sigma_rel(start: float, end: float):
+def plot_N_for_each_n_sigma_rel():
     print("plotting dependance of N for fixed n (plotting only sigma rel) ...")
     for n, nc in n_color:
         print("n = " + n)
         fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+        x_min = 42069
         # QT results
         for N, NC in N_color:
             # QT results
@@ -254,25 +281,32 @@ def plot_N_for_each_n_sigma_rel(start: float, end: float):
             YErr = []
             for i in range(6,len(lines)):
                 x, y, yErr = lines[i].split("\t")
-                if float(x) < start or float(x) > end: continue
+                if float(x) <= 0: continue
                 if not float(y) > 0.0: continue
-                X += [float(x)]
+                X += [1.0/float(x)]
                 Y += [float(y)]
                 YErr += [float(yErr)/float(y)]
-            subfig1.plot(X, YErr, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT: N = " + N, alpha = 1.0)
+            subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = NC, label = "QT: N = " + N, alpha = 1.0)
+            if min(X) < x_min: x_min = min(X)
         # saving
-        subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-        subfig1.set_ylabel(r'$\sigma_{rel}$ in $J_2$', fontsize = 25)
-        subfig1.set_title("rel. $\sigma$ von $\\chi/N$ mit $J_1$ / $J_2$ = " + linesJ + " und " + n + " Startvektoren", fontsize = 25)
+        subfig1.set_xlabel(r'$k_B T$ / $J_2$ / $k_B$', fontsize = labelfontsize)
+        subfig1.set_ylabel(r'$\sigma_{rel}$ / $J_2$', fontsize = labelfontsize)
+        vec = "einem Startvektor"
+        if int(n) > 1: vec = n + " Startvektoren"
+        subfig1.set_title(r"$\sigma_{rel}$" + " von $\\chi/N$ mit $J_1$ / $J_2$ = " + linesJ + " und " + vec, fontsize = titlefontsize)
+        subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+        subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
         filename = "n_" + n + "_N"
         for N, NC in N_color:
             filename += "_" + N
-        plt.savefig("results/QT_stats/X_sigma_rel_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+        for end in ends:
+            subfig1.set_xlim(x_min, end)
+            plt.savefig("results/QT_stats/X_sigma_rel_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".png")
+            plt.savefig("results/QT_stats/X_sigma_rel_" + filename + "_J" + linesJ + "_" + str(start) + "_" + str(end) + ".pdf")
         plt.close(fig1)
 
-def plot_delta_ED(start: float, end: float):
+def plot_delta_ED():
     print("plotting \Delta E ED - QT for fixed N ...")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     used_N = "N"
@@ -288,7 +322,7 @@ def plot_delta_ED(start: float, end: float):
         Y_QT = []
         for i in range(6,len(linesQT)):
             x, y, yErr = linesQT[i].split("\t")
-            if float(x) < start or float(x) > end: continue
+            if float(x) <= 0: continue
             X_QT += [float(x)]
             Y_QT += [float(y)]
         # ED results
@@ -301,7 +335,7 @@ def plot_delta_ED(start: float, end: float):
         Y_ED = []
         for i in range(8,len(linesED)):
             x, y = linesED[i].split("\t")
-            if float(x) < start or float(x) > end: continue
+            if float(x) <= 0: continue
             X_ED += [float(x)]
             Y_ED += [float(y)]
 
@@ -327,7 +361,9 @@ def plot_delta_ED(start: float, end: float):
     subfig1.set_title("Abweichung von $\\chi/N$ zwischen ED und QT mit $J_1$ / $J_2$ = " + linesJQT, fontsize = 25)
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
-    plt.savefig("results/QT_stats/X_delta_ED_QT_" + used_N + "_J" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
+    for end in ends:
+        subfig1.set_xlim(start, end)
+        plt.savefig("results/QT_stats/X_delta_ED_QT_" + used_N + "_J" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
     plt.close(fig1)
 
 def plot_step_size():
@@ -403,7 +439,7 @@ def plot_step_size():
 
 if __name__ == "__main__":
     print("plotting susceptibility (constant J1/J2, funtion of T):")
-    N_color = [("16", "purple"), ("18", "tomato")] # ("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), 
+    N_color = [("16", "purple"), ("18", "tomato")] # ("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"),
     # start = float(sys.argv[1])
     # end = float(sys.argv[2])
     # regime = sys.argv[3]
@@ -412,19 +448,20 @@ if __name__ == "__main__":
     # elif regime == "high": N_color = N_color_HIGH
     # else: exit()
 
-    # plot_n_for_each_N(start, end)
+    # plot_n_for_each_N()
     # print()
-    # plot_n_for_each_N_sigma_abs(start, end)
-    # print()
-    # plot_n_for_each_N_sigma_rel(start, end)
-    # print()
-    # plot_N_for_each_n(start, end)
-    # print()
-    # plot_N_for_each_n_sigma_abs(start, end)
-    # print()
-    # plot_N_for_each_n_sigma_rel(start, end)
-    # print()
-    # plot_delta_ED(start, end)
-    # print()
-    plot_step_size()
+    plot_n_for_each_N_sigma_abs()
     print()
+    plot_n_for_each_N_sigma_rel()
+    print()
+    # plot_N_for_each_n()
+    # print()
+    N_color = [("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+    plot_N_for_each_n_sigma_abs()
+    print()
+    plot_N_for_each_n_sigma_rel()
+    print()
+    # plot_delta_ED()
+    # print()
+    # plot_step_size()
+    # print()

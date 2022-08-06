@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
 import numpy as np
 import os
 import gc
@@ -14,7 +15,7 @@ max_n = 5
 
 einheit_x = r'$k_B T$ / $J_2$' #'$T$ in $k_B$ / $J_2$'
 
-titlefontsize = 40
+titlefontsize = 39
 labelfontsize = 35
 legendfontsize = 35
 axisfontsize = 30
@@ -23,9 +24,9 @@ start = 0.0
 ends = [0.1, 0.15, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0]#, 20.0, 50.0, 100.0]
 
 print("plotting susceptibility (constant J1/J2, funtion of T) ...")
-
+N_color = [("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 for N_outer in range(len(N_color)):
-    # continue
+    continue
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     fig2, subfig2 = plt.subplots(1,1,figsize=(16,9))
     # X_high_T = np.linspace(0.01, end, 5000)
@@ -155,12 +156,10 @@ for N_outer in range(len(N_color)):
 
     plt.close(fig2)
 
+print("multiple runs (QT)")
 N_color = [("16", "purple"), ("18", "tomato")]
-
 for N_outer in range(len(N_color)):
-
     N, C = N_color[N_outer]
-    print("multiple runs (QT)")
     for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
         if ".png" in filename or ".pdf" in filename: continue
         if "ED" in filename: continue
@@ -168,8 +167,8 @@ for N_outer in range(len(N_color)):
         figMultiQT, subfigMultiQT = plt.subplots(1,1,figsize=(16,9))
         J = filename[len("X_J"):-len("QT.txt")]
         print("N: %s, J: %s" % (N_color[N_outer][0], str(J)))
-        color_count = 0
         x_min = 42069
+        legend = []
         try:
             filenameED = filename[:-len("QT.txt")] + "ED.txt"
             file = open("results/" + N + "/data/spin_gap_data/1/" + filenameED, 'r')
@@ -184,39 +183,63 @@ for N_outer in range(len(N_color)):
                 X += [1/float(x)]
                 Y += [float(y)]
             file.close()
-            subfigMultiQT.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "black", label = "ED")
+            subfigMultiQT.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "black")
             if min(X) < x_min: x_min = min(X)
+            legend += [Line2D([0], [0], label = "ED", color = "black", ls = "solid", lw = 4)]
         except:
             print("could not plot multiple runs (ED ref) N = %s, J = %s" %(N, J))
         try:
+            X_arr = [[]] * max_n; Y_arr = [[]] * max_n
             for n in range(1, max_n+1):
                 file = open("results/" + N + "/data/spin_gap_data/" + str(n) + "/" + filename, 'r')
                 lines = file.readlines()
                 X = []
                 Y = []
                 YErr = []
+                X_arr[n-1] = []; Y_arr[n-1] = []
                 for i in range(5,len(lines)):
                     x, y= lines[i].split("\t")
                     #if float(x) < start or float(x) > end: continue
                     if float(x) <= 0.0: continue
-                    X += [1/float(x)]
-                    Y += [float(y)]
+                    X += [1/float(x)]; X_arr[n-1] += [1/float(x)]
+                    Y += [float(y)]; Y_arr[n-1] += [float(y)]
                 file.close()
-                subfigMultiQT.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = colors[color_count])
-                color_count += 1
+                subfigMultiQT.plot(X, Y, lw = 4, ls = "solid", markersize = 0, marker = "o", color = "blue")
                 if min(X) < x_min: x_min = min(X)
+            
+            X = []; Y = []; YErr = []
+            for pos in range(len(X_arr[0])):
+                y = []
+                for n in range(max_n):
+                    if len(X_arr[n]) == 0: continue
+                    y += [Y_arr[n][pos]]
+                y = np.array(y)
+                X += [X_arr[0][pos]]; Y += [y.mean()]; YErr += [y.std()]
+
+            subfigMultiQT.plot(X, Y, lw = 4, ls = "dashed", markersize = 0, marker = "o", color = "red")
+            X = np.asarray(X)
+            Y = np.asarray(Y)
+            YErr = np.asarray(YErr)
+            subfigMultiQT.fill_between(X, Y - YErr, Y + YErr, color = "red", alpha = 0.2)
 
             subfigMultiQT.set_xlabel(einheit_x, fontsize = labelfontsize)
             subfigMultiQT.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
             subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ mit bei unterschiedlichen Startvektoren', fontsize = titlefontsize)
-            subfigMultiQT.axhline(0, color = "grey")
             # plt.xticks(fontsize = 25)
             # plt.yticks(fontsize = 25)
             subfigMultiQT.tick_params(axis="both", which="major", labelsize=axisfontsize)
             # subfigMultiQT.set_xscale("log")
 
+            legend += [Line2D([0], [0], label = "QT: " + str(max_n) + "Durchläufe", color = "blue", ls = "solid", lw = 2)]
+            legend += [Line2D([0], [0], label = "QT-Mittelung", color = "red", ls = "solid", lw = 4)]
+
+            handles, labels = plt.gca().get_legend_handles_labels()
+            handles.extend(legend)
+
+            subfigMultiQT.axhline(0, color = "grey")
+            subfigMultiQT.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+
             for end in ends:
-                subfigMultiQT.set_xlim(x_min, end)
                 subfigMultiQT.set_xlim(0.0, end)
                 figMultiQT.savefig("results/" + N +  "/X_QT_N_" + N + "_J_" + J + "_0.0_" + str(end) + ".png")
                 figMultiQT.savefig("results/" + N +  "/X_QT_N_" + N + "_J_" + J + "_0.0_" + str(end) + ".pdf")
