@@ -230,7 +230,7 @@ for N_outer in range(len(N_color)):
             subfigMultiQT.tick_params(axis="both", which="major", labelsize=axisfontsize)
             # subfigMultiQT.set_xscale("log")
 
-            legend += [Line2D([0], [0], label = "QT: " + str(max_n) + "Durchläufe", color = "blue", ls = "solid", lw = 2)]
+            legend += [Line2D([0], [0], label = "QT: " + str(max_n) + " Durchläufe", color = "blue", ls = "solid", lw = 2)]
             legend += [Line2D([0], [0], label = "QT-Mittelung", color = "red", ls = "solid", lw = 4)]
 
             handles, labels = plt.gca().get_legend_handles_labels()

@@ -98,6 +98,11 @@ results/SG/*.txt
 results/SG/*.png
 results/SG/*.pdf
 !results/SG/data_placeholder.txt
+results/SG/raw/*.txt
+results/SG/raw/*.png
+results/SG/raw/*.pdf
+!results/SG/raw/data_placeholder.txt
+results/SG/old/
 
 results/highT/*
 !results/highT/data_placeholder.txt
