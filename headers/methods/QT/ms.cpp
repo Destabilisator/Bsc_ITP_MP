@@ -628,8 +628,6 @@ namespace QT::MS {
         curr++;
         coutMutex.unlock();
 
-
-
 //#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, S2_List, beta_Data, curr, prgbar_segm, std::cout, J_vals)
         for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
             double J = J_vals.at(J_pos); //J_START + (J_END - J_START) * J_pos / J_COUNT;
@@ -677,14 +675,6 @@ namespace QT::MS {
         auto start_timer = std::chrono::steady_clock::now();
         std::cout << "\n" << "excitation energies, QT, momentum states, N: " << N << ", step size: " << BETA_STEP << " ..." << std::endl;
 
-        ///// gather x-data /////
-        std::vector<double> beta_Data;
-        double beta = BETA_START - BETA_STEP;
-        while (beta <= BETA_END) {
-            beta += BETA_STEP;
-            beta_Data.emplace_back(beta);
-        } beta_Data.shrink_to_fit();
-
         // init progressbar
         int prgbar_segm = 50;
         int curr = 0;
@@ -700,9 +690,35 @@ namespace QT::MS {
         curr++;
         coutMutex.unlock();
 
-//#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, beta_Data, curr, prgbar_segm, std::cout)
-        for (int J_pos = 0; J_pos <= J_COUNT; J_pos++) {
-            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+        ///// gather x-data /////
+        std::vector<double> beta_Data;
+        double beta = BETA_START - BETA_STEP;
+        while (beta <= BETA_END) {
+            beta += BETA_STEP;
+            beta_Data.emplace_back(beta);
+        } beta_Data.shrink_to_fit();
+
+        ///// init J vals /////
+#ifdef SG_EE_EVEN_J_DIST
+        std::vector<double> J_vals;
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        } J_vals.shrink_to_fit();
+#else
+        std::vector<double> J_vals;
+        double J_init = J_START;
+        while (J_init <= J_END) {
+            J_vals.emplace_back(J_init);
+//            std::cout << "pushing back J = " << J_init << "\n";
+            if (J_init >= 0.6 && J_init < 1.25) {
+                J_init += 0.04;
+            } else {J_init += 0.1;}
+        } J_vals.shrink_to_fit();
+#endif
+
+//#pragma omp parallel for default(none) num_threads(cores) shared(J_COUNT, J_START, J_END, N, SIZE, SAMPLES, coutMutex, BETA_START, BETA_END, BETA_STEP, beta_Data, curr, prgbar_segm, std::cout, J_vals)
+        for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+            double J = J_vals.at(J_pos); //J_START + (J_END - J_START) * J_pos / J_COUNT;
         //for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
 //            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
 

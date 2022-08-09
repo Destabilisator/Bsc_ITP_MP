@@ -3,7 +3,7 @@
 //#define DEBUG
 //#define ED_METHODS
 #define CLUSTER
-#define BENCH
+//#define BENCH
 
 int main(int argc, char* argv[]) {
 
@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 ///// Abweichungen als Funktion der Systemgröße, Mittlungen und Temperatur (nur Rohdaten) /////
 
     double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
-    T_START = 0.0; T_END = 50.0;
+    T_START = 0.0; T_END = 100.0;
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
 //    cores = 1;
 //    omp_set_num_threads(cores);
