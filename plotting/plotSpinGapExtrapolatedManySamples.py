@@ -17,7 +17,7 @@ N_color_HIGH = [("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"
 
 N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
 N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
-N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
+# N_color = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
 
 colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato"]
 
@@ -25,7 +25,7 @@ peak_offset = 2000
 fit_samples = 3 # 5
 search_start_percent = 4/5
 search_end_percent = 1/5
-max_n = 5 # min = 1; max = 30
+max_n = 30 # min = 1; max = 30
 
 extrapolate_QT = True
 extrapolate_ED = True
@@ -1110,10 +1110,12 @@ if __name__ == "__main__":
 
     if J_SUM_SCALE: print("J SUM SCALE")
 
-    # plotExtrapolatedData(N_color)
-    # print()
+    plotExtrapolatedData(N_color)
+    print()
 
-    N_color = [("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
+    exit(1)
+
+    # N_color = [("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
 
     # plotExtrapolatedData(N_color)
     # print()

@@ -67,6 +67,7 @@ results/benchmarking/memoryusage/data/*.pdf
 results/*.txt
 results/*.png
 results/*.pdf
+results/*.tar.xz
 !results/data_placeholder.txt
 
 results/*/*.txt
