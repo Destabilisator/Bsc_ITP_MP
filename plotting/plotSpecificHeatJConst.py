@@ -10,7 +10,7 @@ N_color = [("14", "brown"), ("16", "purple")]#, ("18", "tomato")]
 
 colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato", "cyan"]
 
-max_n = 5
+max_n = 30
 
 einheit_x = r'$k_B T$ / $J_2$' #'$T$ in $k_B$ / $J_2$'
 
@@ -23,6 +23,7 @@ start = 0.0
 
 print("plotting specific heat (constant J1/J2, funtion of T) ...")
 N_color = [("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+N_color = [("16", "purple")]
 for N_outer in range(len(N_color)):
     continue
     # if N_outer != 0: continue
@@ -218,7 +219,7 @@ for N_outer in range(len(N_color)):
                     X += [1/float(x)]; X_arr[n-1] += [1/float(x)]
                     Y += [float(y)]; Y_arr[n-1] += [float(y)]
                 file.close()
-                subfigMultiQT.plot(X, Y, lw = 2, ls = "solid", markersize = 0, marker = "o", color = "blue")
+                subfigMultiQT.plot(X, Y, lw = 2, ls = "solid", markersize = 0, marker = "o", color = "blue", alpha = 0.75)
                 if min(X) < x_min: x_min = min(X)
 
             X = []; Y = []; YErr = []

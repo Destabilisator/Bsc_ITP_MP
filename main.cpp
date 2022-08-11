@@ -116,7 +116,7 @@ int main(int argc, char* argv[]) {
 ///// Abweichungen als Funktion der Systemgröße, Mittlungen und Temperatur (nur Rohdaten) /////
 
     double stepsize = step_size;//(T_END - T_START) / (double) T_COUNT; // 0.01
-    T_START = 0.0; T_END = 100.0;
+    T_START = 0.0; T_END = 50.0;
     T_COUNT =  (int) ( (T_END - T_START) / stepsize );
 //    cores = 1;
 //    omp_set_num_threads(cores);
@@ -175,31 +175,40 @@ int main(int argc, char* argv[]) {
 //    N = n; SIZE = (int) std::pow(2,N); J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; cores = 1;
 //    T_END = 100.0;
     SAMPLES = 30;
-    J_START = 1.006;
-    J_END = J_START;
-    J_COUNT = 1;
-    N = 16;
-    SIZE = (int) std::pow(2, N);
-    QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+    for (double start : {0.001, 0.3586, 1.006, 1.753}) {
+        J_START = start;
+        J_END = J_START;
+        J_COUNT = 1;
+        N = 16;
+        SIZE = (int) std::pow(2, N);
+        QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+    }
 //    if (N <= 18) {
-    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
+//    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
 //    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 //    }
 //*/
 //    }
     /// excitation energies ///
-/*
-    T_END = 2 * T_END;
+///*
+//    T_END = 2 * T_END;
 
-    J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; SAMPLES = 30;
-    QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+//    J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; SAMPLES = 30;
+    for (double start : {0.001, 0.3586, 1.006, 1.753}) {
+        J_START = start;
+        J_END = J_START;
+        J_COUNT = 1;
+        N = 16;
+        SIZE = (int) std::pow(2, N);
+        QT::MS::start_calc_excitation_energies(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
+    }
 //    ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
 //    if (N <= 18) {
 //        N = 18; SIZE = (int) std::pow(2,N); J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; cores = 1;
 //        ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
 //        ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
 //    }
-*/
+//*/
 #endif
 #ifdef BENCH
     /// benchmarking ///

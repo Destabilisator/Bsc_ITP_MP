@@ -46,7 +46,7 @@ SHANK_ALG = False
 EXPSILON_ALG = False
 
 # output
-PLOT_EXTRAPOLATED_SPIN_GAP = True
+PLOT_EXTRAPOLATED_SPIN_GAP = False
 PLOT_DIFFERENT_EXTRAPOLATIONS = True
 
 # in multiple extrapolations output
@@ -54,14 +54,14 @@ SHOW_EXP_FIT = False
 SHOW_ONE_OVER_N_FIT = True
 SHOW_ONE_OVER_N2_FIT = True
 SHOW_ONE_OVER_SQRTN_FIT = True
-SHOW_SHANK_ALG = False
-SHOW_EXPSILON_ALG = False
+SHOW_SHANK_ALG = True
+SHOW_EXPSILON_ALG = True
 
 # force generate new data
 MAKE_NEW = False
 
 # scale data with J1 + J2
-J_SUM_SCALE = True
+J_SUM_SCALE = False
 
 # plot raw data (from QT runs)
 PLOT_RAW = False
