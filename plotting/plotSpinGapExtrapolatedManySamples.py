@@ -72,8 +72,12 @@ PLOT_TEMP = False
 counter = 0
 
 line_width = 4
-marker_size = 5
-alph = 0.1
+marker_size = 7
+
+alph_extr = 0.9
+alph_extr_err = 0.2
+alph_dat = 0.6
+alph_err = 0.1
 
 x_lim_min = 0.0
 x_lim_max = 2.0
@@ -664,8 +668,8 @@ def plotExtrapolatedData(N_color):
                 X, Y, A = getDataED(N)
                 X = np.asarray(X); Y = np.asarray(Y)
                 if J_SUM_SCALE: Y = Y / (1.0 + X)
-                subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = C, alpha = 0.5)#, label = "N = " + N)
-                subfigNoExtrap.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = C, alpha = 0.5)#, label = "N = " + N)
+                subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = C, alpha = alph_dat)#, label = "N = " + N)
+                subfigNoExtrap.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = C, alpha = alph_dat)#, label = "N = " + N)
                 file = open("results/" + N + "/data/data_spin_gap.txt", 'r') # _data_spin_gap / _data_spin_gap_with_index
                 lines = file.readlines()
                 XEV = []; YEV = []
@@ -682,7 +686,7 @@ def plotExtrapolatedData(N_color):
                 used_N_ED += "_" + N; N_arr[int(N)] = 1
             except:
                 print("cannot plot ED data for N = %s" % N)
-        subfig1.plot(X, extrapolated_data_ED, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.75)#, label = "Extrapolation")
+        subfig1.plot(X, extrapolated_data_ED, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_extr)#, label = "Extrapolation")
         
         # QT #
         for N, C in N_color:        
@@ -693,17 +697,17 @@ def plotExtrapolatedData(N_color):
                 X, XErr = avgData(samp, X_arr); X = np.asarray(X)
                 Y, YErr = avgData(samp, Y_arr); Y = np.asarray(Y); YErr = np.asarray(YErr)
                 if J_SUM_SCALE: Y = Y / (1.0 + X); YErr = YErr / (1.0 + X)
-                subfig1.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = C, alpha = 0.5)#, label = "N = " + N)
-                subfig1.fill_between(X, Y - YErr, Y + YErr, color = C, alpha = alph)
-                subfigNoExtrap.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = C, alpha = 0.5)#, label = "N = " + N)
-                subfigNoExtrap.fill_between(X, Y - YErr, Y + YErr, color = C, alpha = alph)
+                subfig1.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = C, alpha = alph_dat)#, label = "N = " + N)
+                subfig1.fill_between(X, Y - YErr, Y + YErr, color = C, alpha = alph_err)
+                subfigNoExtrap.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = C, alpha = alph_dat)#, label = "N = " + N)
+                subfigNoExtrap.fill_between(X, Y - YErr, Y + YErr, color = C, alpha = alph_err)
                 used_N_QT += "_" + N; N_arr[int(N)] = 1
             except:
                 print("cannot plot QT data for N = %s" % N)
         Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT)
         Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
-        subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.75)#, label = "Extrapolation")
-        subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = "black", alpha = alph)
+        subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = alph_extr)#, label = "Extrapolation")
+        subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = "black", alpha = alph_extr_err)
 
         # saving plots #
         subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
@@ -795,13 +799,13 @@ def different_extrapolations(N_color):
                 X = np.asarray(X); Y = np.asarray(Y)
                 if J_SUM_SCALE: Y = Y / (1.0 + X)
                 extrapolationArray += [Y]
-                subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
-                if SHOW_EXP_FIT: subfigExp.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
-                if SHOW_ONE_OVER_SQRTN_FIT: subfigSqrt.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
-                if SHOW_ONE_OVER_N_FIT: subfigN.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
-                if SHOW_ONE_OVER_N2_FIT: subfigN2.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
-                if SHOW_SHANK_ALG: subfigShank.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
-                if SHOW_EXPSILON_ALG: subfigEpsilon.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = 0.5)
+                subfig1.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_dat)
+                if SHOW_EXP_FIT: subfigExp.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_dat)
+                if SHOW_ONE_OVER_SQRTN_FIT: subfigSqrt.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_dat)
+                if SHOW_ONE_OVER_N_FIT: subfigN.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_dat)
+                if SHOW_ONE_OVER_N2_FIT: subfigN2.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_dat)
+                if SHOW_SHANK_ALG: subfigShank.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_dat)
+                if SHOW_EXPSILON_ALG: subfigEpsilon.plot(X, Y, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_dat)
                 used_N_ED += "_" + N; N_arr[int(N)] = 1
             except:
                 print("cannot plot ED data for N = %s" % N)
@@ -811,38 +815,38 @@ def different_extrapolations(N_color):
             print("ED extrapolating with exp          \r", end = "")
             extrapolated_data_ED_EXP_FIT = exp_fit_extrap(extrapolationArray)
             # if J_SUM_SCALE: extrapolated_data_ED_EXP_FIT = extrapolated_data_ED_EXP_FIT / (1.0 + X)
-            subfigExp.plot(X, extrapolated_data_ED_EXP_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.plot(X, extrapolated_data_ED_EXP_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
+            subfigExp.plot(X, extrapolated_data_ED_EXP_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.plot(X, extrapolated_data_ED_EXP_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         if SHOW_ONE_OVER_SQRTN_FIT:
             print("ED extrapolating with sqrt          \r", end = "")
             extrapolated_data_ED_ONE_OVER_SQRTN_FIT = sqrtN_fit_extrap(extrapolationArray)
             # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_SQRTN_FIT = extrapolated_data_ED_ONE_OVER_SQRTN_FIT / (1.0 + X)
-            subfigSqrt.plot(X, extrapolated_data_ED_ONE_OVER_SQRTN_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.plot(X, extrapolated_data_ED_ONE_OVER_SQRTN_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
+            subfigSqrt.plot(X, extrapolated_data_ED_ONE_OVER_SQRTN_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.plot(X, extrapolated_data_ED_ONE_OVER_SQRTN_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         if SHOW_ONE_OVER_N_FIT:
             print("ED extrapolating with N          \r", end = "")
             extrapolated_data_ED_ONE_OVER_N_FIT = N_fit_extrap(extrapolationArray)
             # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_N_FIT = extrapolated_data_ED_ONE_OVER_N_FIT / (1.0 + X)
-            subfigN.plot(X, extrapolated_data_ED_ONE_OVER_N_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.plot(X, extrapolated_data_ED_ONE_OVER_N_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
+            subfigN.plot(X, extrapolated_data_ED_ONE_OVER_N_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.plot(X, extrapolated_data_ED_ONE_OVER_N_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         if SHOW_ONE_OVER_N2_FIT:
             print("ED extrapolating with N^2          \r", end = "")
             extrapolated_data_ED_ONE_OVER_N2_FIT = N2_fit_extrap(extrapolationArray)
             # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_N2_FIT = extrapolated_data_ED_ONE_OVER_N2_FIT / (1.0 + X)
-            subfigN2.plot(X, extrapolated_data_ED_ONE_OVER_N2_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.plot(X, extrapolated_data_ED_ONE_OVER_N2_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
+            subfigN2.plot(X, extrapolated_data_ED_ONE_OVER_N2_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.plot(X, extrapolated_data_ED_ONE_OVER_N2_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         if SHOW_SHANK_ALG:
             print("ED extrapolating with shank          \r", end = "")
             extrapolated_data_ED_SHANK_ALG = shank_extrap(extrapolationArray)
             # if J_SUM_SCALE: extrapolated_data_ED_SHANK_ALG = extrapolated_data_ED_SHANK_ALG / (1.0 + X)
-            subfigShank.plot(X, extrapolated_data_ED_SHANK_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.plot(X, extrapolated_data_ED_SHANK_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
+            subfigShank.plot(X, extrapolated_data_ED_SHANK_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.plot(X, extrapolated_data_ED_SHANK_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         if SHOW_EXPSILON_ALG:
             print("ED extrapolating with epsilon          \r", end = "")
             extrapolated_data_ED_EPSILON_ALG = expsilon_extrap(extrapolationArray)
             # if J_SUM_SCALE: extrapolated_data_ED_EPSILON_ALG = extrapolated_data_ED_EPSILON_ALG / (1.0 + X)
-            subfigEpsilon.plot(X, extrapolated_data_ED_EPSILON_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.plot(X, extrapolated_data_ED_EPSILON_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75); color_count += 1
+            subfigEpsilon.plot(X, extrapolated_data_ED_EPSILON_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.plot(X, extrapolated_data_ED_EPSILON_ALG, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         print("ED extrapolation done          \r", end = "")
 
         # QT #
@@ -855,26 +859,26 @@ def different_extrapolations(N_color):
                 X, XErr = avgData(samp, X_arr); X = np.asarray(X)
                 Y, YErr = avgData(samp, Y_arr); Y = np.asarray(Y); YErr = np.asarray(YErr)
                 if J_SUM_SCALE: Y = Y / (1.0 + X); YErr = YErr / (1.0 + X)
-                subfig1.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
-                subfig1.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                subfig1.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = alph_dat)#, label = "N = " + N)
+                subfig1.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph_err)
                 if SHOW_EXP_FIT:
-                    subfigExp.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
-                    subfigExp.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                    subfigExp.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = alph_dat)#, label = "N = " + N)
+                    subfigExp.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph_err)
                 if SHOW_ONE_OVER_SQRTN_FIT:
-                    subfigSqrt.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
-                    subfigSqrt.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                    subfigSqrt.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = alph_dat)#, label = "N = " + N)
+                    subfigSqrt.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph_err)
                 if SHOW_ONE_OVER_N_FIT:
-                    subfigN.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
-                    subfigN.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                    subfigN.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = alph_dat)#, label = "N = " + N)
+                    subfigN.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph_err)
                 if SHOW_ONE_OVER_N2_FIT:
-                    subfigN2.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
-                    subfigN2.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                    subfigN2.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = alph_dat)#, label = "N = " + N)
+                    subfigN2.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph_err)
                 if SHOW_SHANK_ALG:
-                    subfigShank.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
-                    subfigShank.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                    subfigShank.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = alph_dat)#, label = "N = " + N)
+                    subfigShank.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph_err)
                 if SHOW_EXPSILON_ALG:
-                    subfigEpsilon.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = 0.5)#, label = "N = " + N)
-                    subfigEpsilon.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph)
+                    subfigEpsilon.plot(X, Y, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", alpha = alph_dat)#, label = "N = " + N)
+                    subfigEpsilon.fill_between(X, Y - YErr, Y + YErr, color = "black", alpha = alph_err)
                 used_N_QT += "_" + N; N_arr[int(N)] = 1
             except:
                 print("cannot plot QT data for N = %s          " % N)
@@ -928,55 +932,55 @@ def different_extrapolations(N_color):
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_EXP)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
             # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
-            subfigExp.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfigExp.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
-            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph); color_count += 1
+            subfigExp.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfigExp.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err)
+            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err); color_count += 1
         if SHOW_ONE_OVER_SQRTN_FIT:
             print("plotting QT QT extrapolating with sqrt          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_ONE_OVER_SQRTN_FIT)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
             # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
-            subfigSqrt.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfigSqrt.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
-            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph); color_count += 1
+            subfigSqrt.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfigSqrt.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err)
+            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err); color_count += 1
         if SHOW_ONE_OVER_N_FIT:
             print("plotting QT QT extrapolating with N          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_OVER_N_FIT)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
             # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
-            subfigN.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfigN.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
-            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph); color_count += 1
+            subfigN.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfigN.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err)
+            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err); color_count += 1
         if SHOW_ONE_OVER_N2_FIT:
             print("plotting QT QT extrapolating with N**2          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_OVER_N2_FIT)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
             # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
-            subfigN2.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfigN2.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
-            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph); color_count += 1
+            subfigN2.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfigN2.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err)
+            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err); color_count += 1
         if SHOW_SHANK_ALG:
             print("plotting QT QT extrapolating with shank          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_SHANK_ALG)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
             # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
-            subfigShank.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfigShank.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
-            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph); color_count += 1
+            subfigShank.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfigShank.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err)
+            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err); color_count += 1
         if SHOW_EXPSILON_ALG:
             print("plotting QT QT extrapolating with epsilon          \r", end = "")
             Y_etrap, YErr_etrap = avgData(samp, extrapolated_data_QT_EPSILON_ALG)
             Y_etrap = np.asarray(Y_etrap); YErr_etrap = np.asarray(YErr_etrap)
             # if J_SUM_SCALE: Y_etrap = Y_etrap / (1.0 + X); YErr_etrap = YErr_etrap / (1.0 + X)
-            subfigEpsilon.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfigEpsilon.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph)
-            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = 0.75)
-            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph); color_count += 1
+            subfigEpsilon.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfigEpsilon.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err)
+            subfig1.plot(X, Y_etrap, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
+            subfig1.fill_between(X, Y_etrap - YErr_etrap, Y_etrap + YErr_etrap, color = colors[color_count], alpha = alph_extr_err); color_count += 1
 
         # saving plots final output#
         subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)

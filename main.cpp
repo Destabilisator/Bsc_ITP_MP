@@ -175,11 +175,14 @@ int main(int argc, char* argv[]) {
 //    N = n; SIZE = (int) std::pow(2,N); J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; cores = 1;
 //    T_END = 100.0;
     SAMPLES = 30;
-//    J_START = 1.006;
-//    J_END = J_START;
+    J_START = 1.006;
+    J_END = J_START;
+    J_COUNT = 1;
+    N = 16;
+    SIZE = (int) std::pow(2, N);
     QT::MS::start_calc_spin_gap(J_START, J_END, J_COUNT, T_START, T_END, stepsize, N, SIZE, SAMPLES, cores);
 //    if (N <= 18) {
-//    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
+    ED::multi::startSusceptibilityMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, cores);
 //    ED::multi::start_SpinGap(J_COUNT, J_START, J_END, cores, N, SIZE);
 //    }
 //*/
