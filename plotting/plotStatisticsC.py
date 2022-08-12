@@ -327,6 +327,7 @@ def plot_delta_ED():
     print("plotting \Delta E ED - QT for fixed N ...")
     fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     used_N = "N"
+    x_min = 0
     for N, NC in N_color:
         print("N = " + N)
         # QT results
@@ -340,7 +341,7 @@ def plot_delta_ED():
         for i in range(7,len(linesQT)):
             x, y, yErr = linesQT[i].split("\t")
             if float(x) <= 0: continue
-            X_QT += [float(x)]
+            X_QT += [1.0/float(x)]
             Y_QT += [float(y)]
         # ED results
         fileED = open("results/" + N + "/data/data_specific_heat_J_const.txt", 'r')
@@ -353,11 +354,11 @@ def plot_delta_ED():
         for i in range(9,len(linesED)):
             x, y = linesED[i].split("\t")
             if float(x) <= 0: continue
-            X_ED += [float(x)]
+            X_ED += [1.0/float(x)]
             Y_ED += [float(y)]
 
         X = []
-        Y = []
+        Y_abs = []; Y_rel = []
 
         # print(len(X_QT))
         # print(len(Y_QT))
@@ -365,23 +366,34 @@ def plot_delta_ED():
         # print(len(Y_ED))
 
         for i in range(0,len(X_QT)):
-            X += [X_QT[i]] # [(X_QT[i] + X_ED[i])/2]
-            Y += [Y_QT[i] - Y_ED[i]]
+            try:
+                if X_QT[i] > 0.5: continue
+                if X_QT[i] != X_ED[i]: continue
+                Y_abs += [abs(Y_QT[i] - Y_ED[i])]
+                Y_rel += [abs(Y_QT[i] - Y_ED[i]) / Y_ED[i]]
+                X += [X_QT[i]]
+            except:
+                pass
 
-        subfig1.plot(X, Y, lw = 1, ls = "solid", markersize = 0, marker = "o", color = NC, label = "QT-ED: N = " + N, alpha = 1.0)
+        if min(X) > x_min: x_min = min(X)
+
+        subfig1.plot(X, Y_abs, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = NC, label = r"N = " + N, alpha = 1.0) # label = r"$\vert$QT-ED$\vert$: N = " + N
+        subfig1.plot(X, Y_rel, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = NC)
 
         used_N += "_" + N
 
     # saving
-    subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = 25)
-    subfig1.set_ylabel(r'Abweichung in $J_2$', fontsize = 25)
+    subfig1.set_xlabel(r'$k_B T$ / $J_2$', fontsize = labelfontsize)
+    subfig1.set_ylabel(r'$\Delta_{QT-ED}$ / $J_2$', fontsize = labelfontsize)
     #subfig1.set_title(r'spezifische Wärmekapazität pro Spin $C/N$ mit $J_1$ / $J_2$ = ' + linesJ + r", h = " + linesh + r" und $k_B$ = 1", fontsize = 18)
-    subfig1.set_title(r"Abweichung von $C/N$ zwischen ED und QT mit $J_1$ / $J_2$ = " + linesJQT, fontsize = 25)
+    subfig1.set_title(r"$\Delta_{QT-ED}$ von $C/N$ bei $J_1$ / $J_2$ = " + linesJQT, fontsize = titlefontsize)
     subfig1.axhline(0, color = "grey")
-    subfig1.legend(loc = 'best' ,frameon = False, fontsize = 20)
+    subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
+    subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     for end in ends:
-        subfig1.set_xlim(start, end)
+        subfig1.set_xlim(x_min, end)
         plt.savefig("results/QT_stats/C_delta_ED_QT_" + used_N + "_J" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
+        plt.savefig("results/QT_stats/C_delta_ED_QT_" + used_N + "_J" + linesJQT + "_" + str(start) + "_" + str(end) + ".pdf")
     plt.close(fig1)
 
 def plot_step_size():
@@ -457,7 +469,7 @@ def plot_step_size():
 
 if __name__ == "__main__":
     print("plotting specific heat (constant J1/J2, funtion of T):")
-    N_color = [("16", "purple"), ("18", "tomato")] # ("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), 
+    N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "purple"), ("18", "tomato")] # ("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), 
     # start = float(sys.argv[1])
     # end = float(sys.argv[2])
     # regime = sys.argv[3]
@@ -468,18 +480,19 @@ if __name__ == "__main__":
 
     # plot_n_for_each_N()
     # print()
-    plot_n_for_each_N_sigma_abs()
-    print()
-    plot_n_for_each_N_sigma_rel()
-    print()
+    # plot_n_for_each_N_sigma_abs()
+    # print()
+    # plot_n_for_each_N_sigma_rel()
+    # print()
     # plot_N_for_each_n()
     # print()
-    N_color = [("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
-    plot_N_for_each_n_sigma_abs()
-    print()
-    plot_N_for_each_n_sigma_rel()
-    print()
-    # plot_delta_ED()
+    # N_color = [("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
+    # plot_N_for_each_n_sigma_abs()
     # print()
+    # plot_N_for_each_n_sigma_rel()
+    # print()
+    # N_color_HIGH = [("18", "red"), ("20", "blue"), ("22", "green")]
+    plot_delta_ED()
+    print()
     # plot_step_size()
     # print()

@@ -170,7 +170,7 @@ int main(int argc, char* argv[]) {
     }
 */
     /// spin gap ///
-///*
+/*
 //    for (int n = 6; n <= 16; n += 2) {
 //    N = n; SIZE = (int) std::pow(2,N); J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; cores = 1;
 //    T_END = 100.0;
@@ -190,7 +190,7 @@ int main(int argc, char* argv[]) {
 //*/
 //    }
     /// excitation energies ///
-///*
+/*
 //    T_END = 2 * T_END;
 
 //    J_START = 0.01; J_END = 2.0; J_COUNT = 50; h = 0.0; SAMPLES = 30;
@@ -208,7 +208,20 @@ int main(int argc, char* argv[]) {
 //        ED::multi::startSpecificHeatMultiJ(J_START, J_END, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, h);
 //        ED::multi::start_DeltaE_CT_const(J_COUNT, J_START, J_END, h, cores, T, N, SIZE);
 //    }
-//*/
+*/
+    for (int n : {10, 12, 14, 16, 18}) {
+        N = n;
+        SIZE = (int) std::pow(2, N);
+        T_COUNT =  (int) ( (0.0 - 100.0) / 0.01 );
+        if (N%4 == 0) {
+            ED::spinInversion::startSpecificHeat(1.0, 1.0, 0.0, N, SIZE, 0.0, 100.0, T_COUNT);
+        } else {
+            ED::momentumStates::startSpecificHeat(1.0, 1.0, 0.0, N, SIZE, 0.0, 100.0, T_COUNT);
+        }
+        QT::MS::start_calculation_C_J_const(0.0, 100.0, 0.01, 1.0, 1.0, 0.0, N, SIZE, 12);
+    }
+
+
 #endif
 #ifdef BENCH
     /// benchmarking ///

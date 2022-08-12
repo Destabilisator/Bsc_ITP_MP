@@ -84,6 +84,7 @@ results/QT_stats/*.txt
 results/QT_stats/*.png
 results/QT_stats/*.pdf
 !results/QT_stats/data_placeholder.txt
+results/QT_stats/sigma/*
 results/QT_stats/sigma/*.txt
 results/QT_stats/sigma/*.png
 results/QT_stats/sigma/*.pdf
