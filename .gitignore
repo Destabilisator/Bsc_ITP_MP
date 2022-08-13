@@ -3,7 +3,7 @@
 cmake-build-debug/
 /build/*
 !build/compile.sh
-!build/history.txt
+#!build/history.txt
 cmake-build-release/
 .vscode/
 
