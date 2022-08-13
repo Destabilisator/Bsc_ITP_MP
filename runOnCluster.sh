@@ -31,9 +31,9 @@ else
 	pth=python3
 fi
 
-for N in 6 8 10 12 14; do # 
+for N in 6 8 10 12; do # 6 8 10 12 14
     $pth plotting/deleteData.py $N SG
-	# $pth plotting/deleteData.py $N EE
+	$pth plotting/deleteData.py $N EE
 	./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
 done
 
@@ -47,40 +47,40 @@ done
 # done
 
 
-# N=14
-# $pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-# ./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
+N=14
+$pth plotting/deleteData.py $N SG
+$pth plotting/deleteData.py $N EE
+./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
 
 N=16
 $pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
+$pth plotting/deleteData.py $N EE
 ./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
 
 N=18
 $pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
+$pth plotting/deleteData.py $N EE
 ./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
 
-N=20
-$pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
+# N=20
+# $pth plotting/deleteData.py $N SG
+# # $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
 
-N=22
-$pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 5 $noX silent && echo ""
+# N=22
+# $pth plotting/deleteData.py $N SG
+# # $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 5 $noX silent && echo ""
 
-N=24
-$pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 5 $noX silent && echo ""
+# N=24
+# $pth plotting/deleteData.py $N SG
+# # $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 5 $noX silent && echo ""
 
-N=26
-$pth plotting/deleteData.py $N SG
-# $pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 5 $noX silent && echo ""
+# N=26
+# $pth plotting/deleteData.py $N SG
+# # $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 5 $noX silent && echo ""
 
 # N=28
 # $pth plotting/deleteData.py $N SG

@@ -104,15 +104,33 @@ namespace ED::multi {
         std::vector<std::tuple<double, double>> outDataDeltaE;
         std::vector<std::tuple<double, double>> outDataSpecificHeat_C;
 
+        ///// init J vals /////
+#ifdef SG_EE_EVEN_J_DIST
+        std::vector<double> J_vals;
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        } J_vals.shrink_to_fit();
+#else
+        std::vector<double> J_vals;
+        double J_init = START;
+        while (J_init <= END) {
+            J_vals.emplace_back(J_init);
+//            std::cout << "pushing back J = " << J_init << "\n";
+            if (J_init >= 0.6 && J_init < 1.25) {
+                J_init += 0.04;
+            } else {J_init += 0.1;}
+        } J_vals.shrink_to_fit();
+#endif
+
         std::cout << " (" << cores << ") cores";
 
         if (N%4 == 0) {
 //            if (N >= 12) {
                 std::cout << ", spin inversion\n";
                 int curr = 0;
-#pragma omp parallel for default(none)  num_threads(cores) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, temp, N, SIZE, coutMutex, std::cout, curr, h)
-                for (int i = 0; i <= COUNT; i++) {
-                    double J = START + (END - START) * i / COUNT;
+#pragma omp parallel for default(none)  num_threads(cores) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, temp, N, SIZE, coutMutex, std::cout, curr, h, J_vals)
+                for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+                    double J = J_vals.at(J_pos); // double J = START + (END - START) * i / COUNT;
                     coutMutex.lock();
                     int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
                     std::cout << "\r[";
@@ -133,9 +151,9 @@ namespace ED::multi {
 //            } else {
 //                std::cout << ", parity states\n";
 //                int curr = 0;
-//#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr)
-//                for (int i = 0; i <= COUNT; i++) {
-//                    double J = START + (END - START) * i / COUNT;
+//#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, T, N, SIZE, coutMutex, std::cout, curr, J_vals)
+//                for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+//                    double J = J_vals.at(J_pos); // double J = START + (END - START) * i / COUNT;
 //                    coutMutex.lock();
 //                    int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
 //                    std::cout << "\r[";
@@ -157,9 +175,9 @@ namespace ED::multi {
         } else {
             std::cout << ", momentum states\n";
             int curr = 0;
-#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, temp, N, SIZE, coutMutex, std::cout, curr, h)
-            for (int i = 0; i <= COUNT; i++) {
-                double J = START + (END - START) * i / COUNT;
+#pragma omp parallel for default(none) shared(START, END, COUNT, outDataDeltaE, outDataSpecificHeat_C, temp, N, SIZE, coutMutex, std::cout, curr, h, J_vals)
+            for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+                double J = J_vals.at(J_pos); // double J = START + (END - START) * i / COUNT;
                 coutMutex.lock();
                 int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
                 std::cout << "\r[";
@@ -461,6 +479,24 @@ namespace ED::multi {
 
         std::cout << "\n" << "spin gap: calculating:...";
 
+        ///// init J vals /////
+#ifdef SG_EE_EVEN_J_DIST
+        std::vector<double> J_vals;
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        } J_vals.shrink_to_fit();
+#else
+        std::vector<double> J_vals;
+        double J_init = START;
+        while (J_init <= END) {
+            J_vals.emplace_back(J_init);
+//            std::cout << "pushing back J = " << J_init << "\n";
+            if (J_init >= 0.6 && J_init < 1.25) {
+                J_init += 0.04;
+            } else {J_init += 0.1;}
+        } J_vals.shrink_to_fit();
+#endif
+
         std::vector<std::tuple<double, double>> outDataSpinGap;
 
         std::cout << " (" << cores << ") cores";
@@ -468,9 +504,9 @@ namespace ED::multi {
         if (N%4 == 0) {
             std::cout << ", spin inversion\n";
             int curr = 0;
-#pragma omp parallel for num_threads(cores) default(none) shared(START, END, COUNT, outDataSpinGap, N, SIZE, coutMutex, std::cout, curr)
-            for (int i = 0; i <= COUNT; i++) {
-                double J = START + (END - START) * i / COUNT;
+#pragma omp parallel for num_threads(cores) default(none) shared(START, END, COUNT, outDataSpinGap, N, SIZE, coutMutex, std::cout, curr, J_vals)
+            for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+                double J = J_vals.at(J_pos); //double J = START + (END - START) * i / COUNT;
                 coutMutex.lock();
                 int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
                 std::cout << "\r[";
@@ -491,9 +527,9 @@ namespace ED::multi {
         } else {
             std::cout << ", momentum states\n";
             int curr = 0;
-#pragma omp parallel for num_threads(cores) default(none) shared(START, END, COUNT, outDataSpinGap, N, SIZE, coutMutex, std::cout, curr)
-            for (int i = 0; i <= COUNT; i++) {
-                double J = START + (END - START) * i / COUNT;
+#pragma omp parallel for num_threads(cores) default(none) shared(START, END, COUNT, outDataSpinGap, N, SIZE, coutMutex, std::cout, curr, J_vals)
+            for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+                double J = J_vals.at(J_pos); //double J = START + (END - START) * i / COUNT;
                 coutMutex.lock();
                 int p = (int) ((float) curr / (float) (COUNT) * (float) PROGRESSBAR_SEGMENTS);
                 std::cout << "\r[";
@@ -605,6 +641,24 @@ namespace ED::multi {
             beta_Data.emplace_back(current);
         } beta_Data.shrink_to_fit();
 
+        ///// init J vals /////
+#ifdef SG_EE_EVEN_J_DIST
+        std::vector<double> J_vals;
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        } J_vals.shrink_to_fit();
+#else
+        std::vector<double> J_vals;
+        double J_init = J_START;
+        while (J_init <= J_END) {
+            J_vals.emplace_back(J_init);
+//            std::cout << "pushing back J = " << J_init << "\n";
+            if (J_init >= 0.6 && J_init < 1.25) {
+                J_init += 0.04;
+            } else {J_init += 0.1;}
+        } J_vals.shrink_to_fit();
+#endif
+
         // init progressbar
         int prgbar_segm = 50;
         int curr = 0;
@@ -622,10 +676,9 @@ namespace ED::multi {
 
         ///// susceptibility /////
 
-#pragma omp parallel for num_threads(cores) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, coutMutex, BETA_START, BETA_END, BETA_COUNT, curr, prgbar_segm, std::cout, beta_Data)
-        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
-
-            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+#pragma omp parallel for num_threads(cores) default(none) shared(J_COUNT, J_START, J_END, N, SIZE, coutMutex, BETA_START, BETA_END, BETA_COUNT, curr, prgbar_segm, std::cout, beta_Data, J_vals)
+        for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+            double J = J_vals.at(J_pos); //double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
 
             std::vector<std::vector<std::complex<double>>> eiVals;
             std::vector<Eigen::MatrixXcd> matrixBlockU;
@@ -687,6 +740,24 @@ namespace ED::multi {
             beta_Data.emplace_back(current);
         } beta_Data.shrink_to_fit();
 
+        ///// init J vals /////
+#ifdef SG_EE_EVEN_J_DIST
+        std::vector<double> J_vals;
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        } J_vals.shrink_to_fit();
+#else
+        std::vector<double> J_vals;
+        double J_init = J_START;
+        while (J_init <= J_END) {
+            J_vals.emplace_back(J_init);
+//            std::cout << "pushing back J = " << J_init << "\n";
+            if (J_init >= 0.6 && J_init < 1.25) {
+                J_init += 0.04;
+            } else {J_init += 0.1;}
+        } J_vals.shrink_to_fit();
+#endif
+
         // init progressbar
         int prgbar_segm = 50;
         int curr = 0;
@@ -704,10 +775,9 @@ namespace ED::multi {
 
         ///// specific heat /////
 
-#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, h, coutMutex, BETA_START, BETA_END, BETA_COUNT, curr, prgbar_segm, std::cout, beta_Data)
-        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
-
-            double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
+#pragma omp parallel for default(none) shared(J_COUNT, J_START, J_END, N, SIZE, h, coutMutex, BETA_START, BETA_END, BETA_COUNT, curr, prgbar_segm, std::cout, beta_Data, J_vals)
+        for (int J_pos = 0; J_pos < J_vals.size(); J_pos++) {
+            double J = J_vals.at(J_pos); // double J = J_START + (J_END - J_START) * J_pos / J_COUNT;
 
             if (N%4 == 0) {
                 std::vector<double> eiVals;
