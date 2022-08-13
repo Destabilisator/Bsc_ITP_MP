@@ -169,6 +169,17 @@ int main(int argc, char* argv[]) {
         QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
     }
 */
+
+    T_COUNT =  (int) ( 100.0 / 0.01 );
+    if (N%4 == 0) {
+        ED::spinInversion::startSpecificHeat(1.0, 1.0, 0.0, N, SIZE, 0.0, 100.0, T_COUNT);
+    } else {
+        ED::momentumStates::startSpecificHeat(1.0, 1.0, 0.0, N, SIZE, 0.0, 100.0, T_COUNT);
+    }
+    QT::MS::start_calculation_C_J_const(0.0, 0.0, 0.01, 1.0, 1.0, 0.0, N, SIZE, 12);
+    ED::momentumStates::startSusceptibility(1.0, 1.0, N, SIZE, 0.0, 100.0, T_COUNT);
+    QT::MS::start_calculation_X_J_const(0.0, 0.0, 0.01, 1.0, 1.0, N, SIZE, 12);
+
     /// spin gap ///
 ///*
 //    for (int n = 6; n <= 16; n += 2) {

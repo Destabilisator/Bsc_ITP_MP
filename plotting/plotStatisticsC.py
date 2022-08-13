@@ -366,14 +366,14 @@ def plot_delta_ED():
         # print(len(Y_ED))
 
         for i in range(0,len(X_QT)):
-            try:
-                if X_QT[i] > 0.5: continue
-                if X_QT[i] != X_ED[i]: continue
-                Y_abs += [abs(Y_QT[i] - Y_ED[i])]
-                Y_rel += [abs(Y_QT[i] - Y_ED[i]) / Y_ED[i]]
-                X += [X_QT[i]]
-            except:
-                pass
+            # try:
+            if X_QT[i] > 0.5: continue
+            # if X_QT[i] != X_ED[i]: continue
+            Y_abs += [abs(Y_QT[i] - Y_ED[i])]
+            Y_rel += [abs(Y_QT[i] - Y_ED[i]) / Y_ED[i]]
+            X += [X_QT[i]]
+            # except:
+            #     pass
 
         if min(X) > x_min: x_min = min(X)
 
