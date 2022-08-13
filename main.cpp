@@ -19,6 +19,7 @@ int main(int argc, char* argv[]) {
                   silent, cores, plotsIn3D, true, J1, J2, noX);
 
 //    omp_set_num_threads(cpu_cnt);
+    cores = 1;
     omp_set_num_threads(cores);
     //omp_set_num_threads(OUTERMOST_NESTED_THREADS * OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
     omp_set_nested(1);
@@ -169,6 +170,25 @@ int main(int argc, char* argv[]) {
         QT::MS::start_calculation_CX_J_const(T_START, T_END, stepsize, J1, J2, N, SIZE, 12);
     }
 */
+
+#ifdef SG_EE_EVEN_J_DIST
+    std::vector<double> J_vals;
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        } J_vals.shrink_to_fit();
+#else
+    std::vector<double> J_vals;
+    double J_init = J_START;
+    while (J_init <= J_END) {
+        J_vals.emplace_back(J_init);
+//            std::cout << "pushing back J = " << J_init << "\n";
+        if (J_init >= 0.6 && J_init < 1.25) {
+            J_init += 0.04;
+        } else {J_init += 0.1;}
+    } J_vals.shrink_to_fit();
+#endif
+
+    J_COUNT = J_vals.size();
 
     T_COUNT =  (int) ( 100.0 / 0.01 );
     if (N%4 == 0) {
