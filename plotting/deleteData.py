@@ -27,7 +27,7 @@ elif which == "SG":
     print("removing old spin gap data (" + N + ") ...")
     for i in range(1,30+1):
         for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(i) + "/"):
-            if filename == "dummyFile.txt" or filename == "data_placeholder.txt":
+            if filename == "dummyFile.txt" or filename == "data_placeholder.txt" or "QT" in filename:
                 continue
             try:
                 shutil.rmtree("results/" + N + "/data/spin_gap_data/" + str(i) + "/" + filename, ignore_errors=False, onerror=False)
@@ -37,7 +37,7 @@ elif which == "EE":
     print("removing old excitation energy data (" + N + ") ...")
     for i in range(1,30+1):
         for filename in os.listdir("results/" + N + "/data/excitation_energies_data/" + str(i) + "/"):
-            if filename == "dummyFile.txt" or filename == "data_placeholder.txt":
+            if filename == "dummyFile.txt" or filename == "data_placeholder.txt" or "QT" in filename:
                 continue
             try:
                 shutil.rmtree("results/" + N + "/data/excitation_energies_data/" + str(i) + "/" + filename, ignore_errors=False, onerror=False)
