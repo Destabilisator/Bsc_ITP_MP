@@ -68,6 +68,7 @@ results/*.txt
 results/*.png
 results/*.pdf
 results/*.tar.xz
+results/*.zip
 !results/data_placeholder.txt
 
 results/*/*.txt
@@ -78,6 +79,8 @@ results/*/data/*.txt
 results/*/data/*.png
 results/*/data/*.pdf
 !results/*/data/data_placeholder.txt
+
+results/saveED/*
 
 results/QT_stats/*/*
 results/QT_stats/*.txt
