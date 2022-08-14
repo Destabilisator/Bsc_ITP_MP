@@ -190,15 +190,15 @@ int main(int argc, char* argv[]) {
 
     J_COUNT = J_vals.size();
 
-    T_COUNT =  (int) ( 100.0 / 0.01 );
+    T_COUNT =  (int) ( 100.0 / step_size );
     if (N%4 == 0) {
         ED::spinInversion::startSpecificHeat(1.0, 1.0, 0.0, N, SIZE, 0.0, 100.0, T_COUNT);
     } else {
         ED::momentumStates::startSpecificHeat(1.0, 1.0, 0.0, N, SIZE, 0.0, 100.0, T_COUNT);
     }
-    QT::MS::start_calculation_C_J_const(0.0, 0.0, 0.01, 1.0, 1.0, 0.0, N, SIZE, 12);
+    QT::MS::start_calculation_C_J_const(0.0, 100.0, step_size, 1.0, 1.0, 0.0, N, SIZE, 12);
     ED::momentumStates::startSusceptibility(1.0, 1.0, N, SIZE, 0.0, 100.0, T_COUNT);
-    QT::MS::start_calculation_X_J_const(0.0, 0.0, 0.01, 1.0, 1.0, N, SIZE, 12);
+    QT::MS::start_calculation_X_J_const(0.0, 100.0, step_size, 1.0, 1.0, N, SIZE, 12);
 
     /// spin gap ///
 ///*
