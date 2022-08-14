@@ -16,7 +16,7 @@ N_color = []
 N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
 N_color_HIGH = [("18", "tomato"), ("20", "red"), ("22", "blue"), ("24", "green"), ("26", "magenta"), ("28", "brown"), ("30", "purple"), ("32", "tomato")]
 n_color = [("1", "red"), ("2", "blue"), ("3", "green"), ("4", "tomato")]
-colors = ["red", "blue", "green", "magenta", "tomato", "brown", "purple"]#, "cyan"]
+colors = ["red", "blue", "green", "magenta", "tomato", "brown", "purple", "cyan"]
 N_Array = []
 
 titlefontsize = 39
@@ -241,7 +241,7 @@ def C_plot_n_for_each_N_sigma():
                 Y = np.asarray(Y); YErr = np.asarray(YErr)
                 # ploting
                 if ABS:
-                    subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                    subfig1.plot(X, YErr * 10, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
                 if REL: 
                     Xrel, Yrel, YErrrel = getRel(X, Y, YErr)
                     if min(Xrel) > x_min: x_min = min(Xrel)
@@ -334,7 +334,8 @@ def C_plot_N_for_each_n_sigma():
                 YErr = N_SAMP[N][samp]
                 # ploting
                 if ABS:
-                    subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                    YErr = np.asarray(YErr)
+                    subfig1.plot(X, YErr * 10, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
                 if REL: 
                     Xrel, Yrel, YErrrel = getRel(X, Y, YErr)
                     if min(Xrel) > x_min: x_min = min(Xrel)
@@ -416,7 +417,7 @@ def X_plot_n_for_each_N_sigma():
                 Y = np.asarray(Y); YErr = np.asarray(YErr)
                 # ploting
                 if ABS:
-                    subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                    subfig1.plot(X, YErr * 10, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
                 if REL: 
                     Xrel, Yrel, YErrrel = getRel(X, Y, YErr)
                     if min(Xrel) > x_min: x_min = min(Xrel)
@@ -510,7 +511,8 @@ def X_plot_N_for_each_n_sigma():
                 YErr = N_SAMP[N][samp]
                 # ploting
                 if ABS:
-                    subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                    YErr = np.asarray(YErr)
+                    subfig1.plot(X, YErr * 10, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
                 if REL: 
                     Xrel, Yrel, YErrrel = getRel(X, Y, YErr)
                     if min(Xrel) > x_min: x_min = min(Xrel)
@@ -585,8 +587,12 @@ def spin_gap_sigma():
         handles.extend(legend)
         subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
         subfig2.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-        subfig1.set_ylabel(r'$\sigma$ / $J_2$', fontsize = labelfontsize)
-        subfig2.set_ylabel(r'$\sigma$ / $J_2$', fontsize = labelfontsize)
+        if J_SUM_SCALE:
+            subfig1.set_ylabel(r'$\sigma$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            subfig2.set_ylabel(r'$\sigma$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+        else:
+            subfig1.set_ylabel(r'$\sigma$ / $J_2$', fontsize = labelfontsize)
+            subfig2.set_ylabel(r'$\sigma$ / $J_2$', fontsize = labelfontsize)
         vec = "einen Startvektor"
         if int(samp) > 1: vec = str(samp) + " Startvektoren"
         subfig1.set_title(r"$\sigma(\Delta_{SG})$" + " der Spinlückenenergie bei Mittelung über " + vec, fontsize = titlefontsize)
@@ -600,7 +606,7 @@ def spin_gap_sigma():
         subfig1.axvline(x=1.0, color='black', linestyle='--')
         subfig2.axvline(x=1.0, color='black', linestyle='--')
         if J_SUM_SCALE: filename = "J_SUM_SCALE_" + filename
-        for end in [2.0, 2.5]:
+        for end in [2.0]: # , 2.5
             subfig1.set_xlim(0.0, end)
             subfig1.set_yscale('log')
             fig1.savefig("results/QT_stats/sigma/SG_k_sigma_" + abs_rel + "_samp_" + str(samp) + "_" + filename + "_" + str(start) + "_" + str(end) + ".png")
@@ -621,13 +627,13 @@ def spin_gap_sigma():
 
 if __name__ == "__main__":
     N_Array = [10, 12, 14, 16, 18, 20, 22]
-    C_plot_n_for_each_N_sigma()
-    print()
+    # C_plot_n_for_each_N_sigma()
+    # print()
     # C_plot_N_for_each_n_sigma()
     # print()
-    X_plot_n_for_each_N_sigma()
-    print()
+    # X_plot_n_for_each_N_sigma()
+    # print()
     # X_plot_N_for_each_n_sigma()
     # print()
-    # spin_gap_sigma()
-    # print()
+    spin_gap_sigma()
+    print()

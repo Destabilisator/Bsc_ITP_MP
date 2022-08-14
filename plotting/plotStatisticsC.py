@@ -340,7 +340,7 @@ def plot_delta_ED():
         Y_QT = []
         for i in range(7,len(linesQT)):
             x, y, yErr = linesQT[i].split("\t")
-            if float(x) <= 0: continue
+            if float(x) <= 0 or float(x) > 100.0: continue
             X_QT += [1.0/float(x)]
             Y_QT += [float(y)]
         # ED results
@@ -353,7 +353,7 @@ def plot_delta_ED():
         Y_ED = []
         for i in range(9,len(linesED)):
             x, y = linesED[i].split("\t")
-            if float(x) <= 0: continue
+            if float(x) <= 0 or float(x) > 100.0: continue
             X_ED += [1.0/float(x)]
             Y_ED += [float(y)]
 
@@ -367,7 +367,7 @@ def plot_delta_ED():
 
         for i in range(0,len(X_QT)):
             # try:
-            if X_QT[i] > 0.5: continue
+            # if X_QT[i] > 0.5: continue
             # if X_QT[i] != X_ED[i]: continue
             Y_abs += [abs(Y_QT[i] - Y_ED[i])]
             Y_rel += [abs(Y_QT[i] - Y_ED[i]) / Y_ED[i]]
@@ -376,6 +376,9 @@ def plot_delta_ED():
             #     pass
 
         if min(X) > x_min: x_min = min(X)
+
+        Y_abs = np.asarray(Y_abs)
+        Y_abs = Y_abs * 10
 
         subfig1.plot(X, Y_abs, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = NC, label = r"N = " + N, alpha = 1.0) # label = r"$\vert$QT-ED$\vert$: N = " + N
         subfig1.plot(X, Y_rel, lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = NC)
@@ -391,7 +394,7 @@ def plot_delta_ED():
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
     subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
     for end in ends:
-        subfig1.set_xlim(x_min, end)
+        subfig1.set_xlim(x_min + 0.002, end)
         plt.savefig("results/QT_stats/C_delta_ED_QT_" + used_N + "_J" + linesJQT + "_" + str(start) + "_" + str(end) + ".png")
         plt.savefig("results/QT_stats/C_delta_ED_QT_" + used_N + "_J" + linesJQT + "_" + str(start) + "_" + str(end) + ".pdf")
     plt.close(fig1)
@@ -469,7 +472,7 @@ def plot_step_size():
 
 if __name__ == "__main__":
     print("plotting specific heat (constant J1/J2, funtion of T):")
-    N_color = [("10", "red"), ("12", "blue"), ("14", "green")]# ("16", "purple"), ("18", "tomato")] # ("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), 
+    N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "purple")]#, ("18", "tomato")] # ("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), 
     # start = float(sys.argv[1])
     # end = float(sys.argv[2])
     # regime = sys.argv[3]

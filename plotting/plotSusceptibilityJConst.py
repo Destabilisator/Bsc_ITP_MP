@@ -205,7 +205,7 @@ for N_outer in range(len(N_color)):
                     X += [1/float(x)]; X_arr[n-1] += [1/float(x)]
                     Y += [float(y)]; Y_arr[n-1] += [float(y)]
                 file.close()
-                subfigMultiQT.plot(X, Y, lw = 2, ls = "solid", markersize = 0, marker = "o", color = "blue", alpha = 0.75)
+                subfigMultiQT.plot(X, Y, lw = 2, ls = "solid", markersize = 0, marker = "o", color = "blue", alpha = 0.5)
                 if min(X) < x_min: x_min = min(X)
             
             X = []; Y = []; YErr = []

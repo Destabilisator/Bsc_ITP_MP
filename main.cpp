@@ -188,7 +188,7 @@ int main(int argc, char* argv[]) {
     } J_vals.shrink_to_fit();
 #endif
 
-    J_COUNT = J_vals.size();
+    J_COUNT = (int) J_vals.size();
 
     T_COUNT =  (int) ( 100.0 / step_size );
     if (N%4 == 0) {
