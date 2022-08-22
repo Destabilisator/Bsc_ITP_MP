@@ -2,7 +2,7 @@
 
 //#define DEBUG
 //#define ED_METHODS
-#define CLUSTER
+//#define CLUSTER
 //#define BENCH
 
 int main(int argc, char* argv[]) {
@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
                   silent, cores, plotsIn3D, true, J1, J2, noX);
 
 //    omp_set_num_threads(cpu_cnt);
-    cores = 1;
+    cores = 10;
     omp_set_num_threads(cores);
     //omp_set_num_threads(OUTERMOST_NESTED_THREADS * OUTER_NESTED_THREADS * INNER_NESTED_THREADS);
     omp_set_nested(1);
@@ -271,6 +271,35 @@ int main(int argc, char* argv[]) {
 #endif
 #endif
 #endif
+
+#ifdef SG_EE_EVEN_J_DIST
+    std::vector<double> J_vals;
+        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        } J_vals.shrink_to_fit();
+#else
+    std::vector<double> J_vals;
+    double J_init = J_START;
+    while (J_init <= J_END) {
+        J_vals.emplace_back(J_init);
+//            std::cout << "pushing back J = " << J_init << "\n";
+        if (J_init >= 0.6 && J_init < 1.25) {
+            J_init += 0.04;
+        } else {J_init += 0.1;}
+    } J_vals.shrink_to_fit();
+#endif
+
+    N = 16;
+    SIZE = (int) std::pow(2, N);
+
+    J_COUNT = (int) J_vals.size();
+
+    T_START = 0.0; T_END = 100.0;
+    T_COUNT =  (int) ( (T_END - T_START) / 0.01 );
+
+//    ED::multi::startSusceptibilityMultiJ(0.01, 2.0, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, 1);
+//    ED::multi::startSpecificHeatMultiJ(0.01, 2.0, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, 0.0);
+    QT::MS::start_calc_excitation_energies(0.01, 2.0, J_COUNT, T_START, T_END, 0.1, N, SIZE, 30, cores);
 
     std::cout << std::endl;
 

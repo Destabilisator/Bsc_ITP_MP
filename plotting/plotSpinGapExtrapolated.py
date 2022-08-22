@@ -303,8 +303,8 @@ def QT_extrapolation(N_color):
 
 
             subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = labelfontsize)
-            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = titlefontsize)
+            subfig1.set_ylabel(r'$\Delta_{SG}$  in $J_2$', fontsize = labelfontsize)
+            subfig1.set_title(r'Spingap Energien $\Delta_{SG}$ mit ' + str(max_n) + " Startvektoren (QT)", fontsize = titlefontsize)
 
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
@@ -389,8 +389,8 @@ def ED_extrapolation(N_color):
                 subfig1.plot(X, Y, lw = 1, ls = "dashed", markersize = 5, marker = "o", color = "black", label = "Extrapolation")
 
             subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            subfig1.set_ylabel(r'$\Delta E_{gap}$  in $J_2$', fontsize = labelfontsize)
-            subfig1.set_title(r'Spingap Energien $\Delta E_{gap}$ mit ED', fontsize = titlefontsize)
+            subfig1.set_ylabel(r'$\Delta_{SG}$  in $J_2$', fontsize = labelfontsize)
+            subfig1.set_title(r'Spingap Energien $\Delta_{SG}$ mit ED', fontsize = titlefontsize)
 
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)

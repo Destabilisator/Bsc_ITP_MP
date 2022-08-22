@@ -7,7 +7,7 @@ legendfontsize = 35
 axisfontsize = 30
 
 N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta")]
-N_color = [("8", "purple"), ("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta")]
+# N_color = [("8", "purple"), ("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta")]
 # N_color = [("6", "brown"), ("8", "purple"), ("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta")]
 
 print("plotting Delta E ...")
@@ -31,11 +31,12 @@ for N, c in N_color:
 subfig1.tick_params(axis="both", which="major", labelsize=axisfontsize)
 
 subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-subfig1.set_ylabel(r'$\Delta E$ / $J_2$ = $(E_1 - E_0)$ / $J_2$', fontsize = labelfontsize)
-subfig1.set_title(r'Anregungsenergieren $\Delta E$', fontsize = titlefontsize)
+subfig1.set_ylabel(r'$\Delta_{EE}$ / $J_2$ = $(E_1 - E_0)$ / $J_2$', fontsize = labelfontsize)
+subfig1.set_title(r'Anregungsenergieren $\Delta_{EE}$', fontsize = titlefontsize)
 
 subfig1.axhline(0, color = "grey")
 subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
 
 plt.savefig("results/" + "delta_E" + used_N + "_.png")
+plt.savefig("results/" + "delta_E" + used_N + "_.pdf")
 #plt.show()

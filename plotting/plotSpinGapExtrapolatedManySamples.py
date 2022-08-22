@@ -19,7 +19,7 @@ N_color_FULL = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"),
 
 N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
 N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
-N_color = [("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
+# N_color = [("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
 
 colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato"]
 
@@ -39,14 +39,14 @@ axisfontsize = 30
 
 # in final output
 EXP_FIT = False
-ONE_OVER_N_FIT = True
+ONE_OVER_N_FIT = False
 ONE_OVER_N2_FIT = False
-ONE_OVER_SQRTN_FIT = False
+ONE_OVER_SQRTN_FIT = True
 SHANK_ALG = False
 EXPSILON_ALG = False
 
 # output
-PLOT_EXTRAPOLATED_SPIN_GAP = False
+PLOT_EXTRAPOLATED_SPIN_GAP = True
 PLOT_DIFFERENT_EXTRAPOLATIONS = True
 
 # in multiple extrapolations output
@@ -61,7 +61,7 @@ SHOW_EXPSILON_ALG = True
 MAKE_NEW = False
 
 # scale data with J1 + J2
-J_SUM_SCALE = False
+J_SUM_SCALE = True
 
 # plot raw data (from QT runs)
 PLOT_RAW = False
@@ -75,9 +75,9 @@ line_width = 4
 marker_size = 7
 
 alph_extr = 0.9
-alph_extr_err = 0.2
-alph_dat = 0.6
-alph_err = 0.1
+alph_extr_err = 0.25
+alph_dat = 0.5
+alph_err = 0.25
 
 x_lim_min = 0.0
 x_lim_max = 2.0
@@ -120,9 +120,6 @@ def epsilon_Alg(A):
 def expFunc_offset(x: float, A: float, k: float, x_0: float) -> float:
     return A * np.exp(k * x) + x_0
 
-def one_over_N(x: float, A: float, b: float) -> float:
-    return A / x + b
-
 def expFunc(x: float, A: float, k: float) -> float:
     return x * A * np.exp(k * x)
 
@@ -156,6 +153,12 @@ def exp_fit_extrap(A_raw):
             plt.close(fig3)
     return outdata
 
+def one_over_sqrtN(x: float, A: float, b: float) -> float:
+    return A / np.sqrt(x) + b
+
+def one_over_sqrtN_offset(x: float, A: float, b: float, x0: float) -> float:
+    return A / np.sqrt(x - x0) + b
+
 def sqrtN_fit_extrap(A_raw):
     global counter
     len_N = len(A_raw); len_Y = len(A_raw[0])
@@ -170,11 +173,12 @@ def sqrtN_fit_extrap(A_raw):
             counter += 1
         try:
             X = np.array(X); A = np.array(A)
-            X = 1 / np.sqrt(X)
+            # X = 1 / np.sqrt(X)
             if PLOT_TEMP: subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-            # params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
-            # A_param, b_param = params
-            A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
+            params, cv = scipy.optimize.curve_fit(one_over_sqrtN, X, A, (0.1, 0.1))
+            # params, cv = scipy.optimize.curve_fit(one_over_sqrtN_offset, X, A, (0.1, 0.1, -0.1))
+            A_param, b_param = params
+            # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
             if PLOT_TEMP:
                 X = np.linspace(0.0, X[0], 100)
                 # Y = one_over_N(X, A_param, b_param)
@@ -188,6 +192,12 @@ def sqrtN_fit_extrap(A_raw):
             fig3.savefig("results/" + "extrapolation_temp/data_" + str(counter) + "_.png")
             plt.close(fig3)
     return outdata
+
+def one_over_N(x: float, A: float, b: float) -> float:
+    return A / x + b
+
+def one_over_N_offset(x: float, A: float, b: float, x0: float) -> float:
+    return A / (x - x0) + b
 
 def N_fit_extrap(A_raw):
     global counter
@@ -203,11 +213,12 @@ def N_fit_extrap(A_raw):
             counter += 1
         try:
             X = np.array(X); A = np.array(A)
-            X = 1 / X
+            # X = 1 / X
             if PLOT_TEMP: subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-            # params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
-            # A_param, b_param = params
-            A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
+            params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
+            # params, cv = scipy.optimize.curve_fit(one_over_N_offset, X, A, (0.1, 0.1, -0.1))
+            A_param, b_param = params
+            # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
             if PLOT_TEMP:
                 X = np.linspace(0.0, X[0], 100)
                 # Y = one_over_N(X, A_param, b_param)
@@ -221,6 +232,12 @@ def N_fit_extrap(A_raw):
             fig3.savefig("results/" + "extrapolation_temp/data_" + str(counter) + "_.png")
             plt.close(fig3)
     return outdata
+
+def one_over_N2(x: float, A: float, b: float) -> float:
+    return A / x**2 + b
+
+def one_over_N2_offset(x: float, A: float, b: float, x0: float) -> float:
+    return A / (x - x0)**2 + b
 
 def N2_fit_extrap(A_raw):
     global counter
@@ -236,11 +253,12 @@ def N2_fit_extrap(A_raw):
             counter += 1
         try:
             X = np.array(X); A = np.array(A)
-            X = 1 / X**2
+            # X = 1 / X**2
             if PLOT_TEMP: subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-            # params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
-            # A_param, b_param = params
-            A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
+            params, cv = scipy.optimize.curve_fit(one_over_N2, X, A, (0.1, 0.1))
+            # params, cv = scipy.optimize.curve_fit(one_over_N2_offset, X, A, (0.1, 0.1, -0.1))
+            A_param, b_param = params
+            # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
             if PLOT_TEMP:
                 X = np.linspace(0.0, X[0], 100)
                 # Y = one_over_N(X, A_param, b_param)
@@ -711,18 +729,18 @@ def plotExtrapolatedData(N_color):
 
         # saving plots #
         subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-        if J_SUM_SCALE: subfig1.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-        else: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+        if J_SUM_SCALE: subfig1.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+        else: subfig1.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
         if samp == 1: vec_string = "einen Startvektor"
         else: vec_string = str(samp) + " Startvektoren"
-        subfig1.set_title(r'Spinlückenenergien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+        subfig1.set_title(r'Spinlückenenergien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
 
         subfigNoExtrap.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-        if J_SUM_SCALE: subfigNoExtrap.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-        else: subfigNoExtrap.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+        if J_SUM_SCALE: subfigNoExtrap.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+        else: subfigNoExtrap.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
         if samp == 1: vec_string = "einen Startvektor"
         else: vec_string = str(samp) + " Startvektoren"
-        subfigNoExtrap.set_title(r'Spinlückenenergien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+        subfigNoExtrap.set_title(r'Spinlückenenergien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
 
         legend = []
         for i in range(len(N_arr)):
@@ -984,11 +1002,11 @@ def different_extrapolations(N_color):
 
         # saving plots final output#
         subfig1.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-        if J_SUM_SCALE: subfig1.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-        else: subfig1.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+        if J_SUM_SCALE: subfig1.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+        else: subfig1.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
         if samp == 1: vec_string = "einen Startvektor"
         else: vec_string = str(samp) + " Startvektoren"
-        subfig1.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+        subfig1.set_title(r'Spinlücken-Energien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
 
         legend = []
         color_count = 0
@@ -1014,11 +1032,11 @@ def different_extrapolations(N_color):
         color_count = 0
         if SHOW_EXP_FIT:
             subfigExp.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            if J_SUM_SCALE: subfigExp.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-            else: subfigExp.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigExp.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigExp.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigExp.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+            subfigExp.set_title(r'Spinlücken-Energien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = "exp-Fit", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -1060,11 +1078,11 @@ def different_extrapolations(N_color):
             plt.close(figSqrt)
         if SHOW_ONE_OVER_N_FIT:
             subfigN.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            if J_SUM_SCALE: subfigN.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-            else: subfigN.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigN.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigN.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigN.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+            subfigN.set_title(r'Spinlücken-Energien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = r"1/$N$", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -1083,11 +1101,11 @@ def different_extrapolations(N_color):
             plt.close(figN)
         if SHOW_ONE_OVER_N2_FIT:
             subfigN2.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            if J_SUM_SCALE: subfigN2.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-            else: subfigN2.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigN2.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigN2.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigN2.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+            subfigN2.set_title(r'Spinlücken-Energien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = r"1/$N^2$", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -1106,11 +1124,11 @@ def different_extrapolations(N_color):
             plt.close(figN2)
         if SHOW_SHANK_ALG:
             subfigShank.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            if J_SUM_SCALE: subfigShank.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-            else: subfigShank.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigShank.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigShank.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigShank.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+            subfigShank.set_title(r'Spinlücken-Energien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = "Shanks-Tranformation", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -1129,11 +1147,11 @@ def different_extrapolations(N_color):
             plt.close(figShank)
         if SHOW_EXPSILON_ALG:
             subfigEpsilon.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            if J_SUM_SCALE: subfigEpsilon.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-            else: subfigEpsilon.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigEpsilon.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigEpsilon.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigEpsilon.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+            subfigEpsilon.set_title(r'Spinlücken-Energien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = r"$\varepsilon$-Algorithmus", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
@@ -1155,6 +1173,16 @@ def different_extrapolations(N_color):
 if __name__ == "__main__":
     start_time = time.time()
 
+    try:
+        J_SUM_SCALE = bool(sys.argv[1] == "JSUM")
+        if sys.argv[2] == "long":
+            N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
+        else:
+            N_color = [("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
+    except:
+        J_SUM_SCALE = True
+        N_color = [("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
+
     if J_SUM_SCALE: print("J SUM SCALE")
 
     if MAKE_NEW: generateSGDataQT(N_color_FULL); generateSGDataED(N_color_FULL)
@@ -1169,3 +1197,4 @@ if __name__ == "__main__":
 
     end_time = time.time()
     print("done; this took %s" % format_time(start_time, end_time))
+    print()

@@ -158,7 +158,7 @@ for N_outer in range(len(N_color)):
     plt.close(fig2)
 
 print("multiple runs (QT)")
-N_color = [("16", "purple"), ("18", "tomato")]
+N_color = [("16", "purple")]#, ("18", "tomato")]
 for N_outer in range(len(N_color)):
     N, C = N_color[N_outer]
     for filename in os.listdir("results/" + N + "/data/spin_gap_data/1/"):
@@ -205,7 +205,7 @@ for N_outer in range(len(N_color)):
                     X += [1/float(x)]; X_arr[n-1] += [1/float(x)]
                     Y += [float(y)]; Y_arr[n-1] += [float(y)]
                 file.close()
-                subfigMultiQT.plot(X, Y, lw = 2, ls = "solid", markersize = 0, marker = "o", color = "blue", alpha = 0.5)
+                subfigMultiQT.plot(X, Y, lw = 1.5, ls = "solid", markersize = 0, marker = "o", color = "blue", alpha = 0.5)
                 if min(X) < x_min: x_min = min(X)
             
             X = []; Y = []; YErr = []
@@ -221,7 +221,7 @@ for N_outer in range(len(N_color)):
             X = np.asarray(X)
             Y = np.asarray(Y)
             YErr = np.asarray(YErr)
-            subfigMultiQT.fill_between(X, Y - YErr, Y + YErr, color = "red", alpha = 0.2)
+            subfigMultiQT.fill_between(X, Y - YErr, Y + YErr, color = "red", alpha = 0.4)
 
             subfigMultiQT.set_xlabel(einheit_x, fontsize = labelfontsize)
             subfigMultiQT.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
