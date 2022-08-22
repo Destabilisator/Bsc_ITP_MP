@@ -46,7 +46,7 @@ SHANK_ALG = False
 EXPSILON_ALG = False
 
 # output
-PLOT_EXTRAPOLATED_SPIN_GAP = True
+PLOT_EXTRAPOLATED_SPIN_GAP = False
 PLOT_DIFFERENT_EXTRAPOLATIONS = True
 
 # in multiple extrapolations output
@@ -1055,11 +1055,11 @@ def different_extrapolations(N_color):
             plt.close(figExp)
         if SHOW_ONE_OVER_SQRTN_FIT:
             subfigSqrt.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
-            if J_SUM_SCALE: subfigSqrt.set_ylabel(r'$\Delta E_{gap}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
-            else: subfigSqrt.set_ylabel(r'$\Delta E_{gap}$ / $J_2$', fontsize = labelfontsize)
+            if J_SUM_SCALE: subfigSqrt.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
+            else: subfigSqrt.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
             if samp == 1: vec_string = "einen Startvektor"
             else: vec_string = str(samp) + " Startvektoren"
-            subfigSqrt.set_title(r'Spinlücken-Energien $\Delta E_{gap}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+            subfigSqrt.set_title(r'Spinlücken-Energien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
             legend = []
             legend += [Line2D([0], [0], label = "Daten", color = "black", ls = "solid", lw = line_width, alpha = 0.5)]
             legend += [Line2D([0], [0], label = r"1/$\sqrt{N}$", color = colors[color_count], ls = "solid", lw = line_width)]; color_count += 1
