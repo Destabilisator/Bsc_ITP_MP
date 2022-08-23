@@ -274,9 +274,9 @@ int main(int argc, char* argv[]) {
 
 #ifdef SG_EE_EVEN_J_DIST
     std::vector<double> J_vals;
-        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
-            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
-        } J_vals.shrink_to_fit();
+    for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
+        J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+    } J_vals.shrink_to_fit();
 #else
     std::vector<double> J_vals;
     double J_init = J_START;
@@ -289,17 +289,17 @@ int main(int argc, char* argv[]) {
     } J_vals.shrink_to_fit();
 #endif
 
-    N = 16;
-    SIZE = (int) std::pow(2, N);
+//    N = 16;
+//    SIZE = (int) std::pow(2, N);
 
     J_COUNT = (int) J_vals.size();
 
     T_START = 0.0; T_END = 100.0;
     T_COUNT =  (int) ( (T_END - T_START) / 0.01 );
 
-//    ED::multi::startSusceptibilityMultiJ(0.01, 2.0, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, 1);
+    ED::multi::startSusceptibilityMultiJ(0.01, 2.5, 50, T_START, T_END, T_COUNT, N, SIZE, 1);
 //    ED::multi::startSpecificHeatMultiJ(0.01, 2.0, J_COUNT, T_START, T_END, T_COUNT, N, SIZE, 0.0);
-    QT::MS::start_calc_excitation_energies(0.01, 2.0, J_COUNT, T_START, T_END, 0.1, N, SIZE, 30, cores);
+//    QT::MS::start_calc_excitation_energies(0.01, 2.0, J_COUNT, T_START, T_END, 0.1, N, SIZE, 30, cores);
 
     std::cout << std::endl;
 

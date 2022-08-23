@@ -107,8 +107,8 @@ namespace ED::multi {
         ///// init J vals /////
 #ifdef SG_EE_EVEN_J_DIST
         std::vector<double> J_vals;
-        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
-            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        for (int J_pos = 0; J_pos < COUNT; J_pos++) {
+            J_vals.emplace_back(START + (END - START) * J_pos / COUNT);
         } J_vals.shrink_to_fit();
 #else
         std::vector<double> J_vals;
@@ -482,8 +482,8 @@ namespace ED::multi {
         ///// init J vals /////
 #ifdef SG_EE_EVEN_J_DIST
         std::vector<double> J_vals;
-        for (int J_pos = 0; J_pos < J_COUNT; J_pos++) {
-            J_vals.emplace_back(J_START + (J_END - J_START) * J_pos / J_COUNT);
+        for (int J_pos = 0; J_pos < COUNT; J_pos++) {
+            J_vals.emplace_back(START + (END - START) * J_pos / COUNT);
         } J_vals.shrink_to_fit();
 #else
         std::vector<double> J_vals;

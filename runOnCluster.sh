@@ -31,10 +31,10 @@ else
 	pth=python3
 fi
 
-for N in 6 8 10 12; do # 6 8 10 12 14
+for N in 6 8 10 12 14; do # 6 8 10 12 14
     $pth plotting/deleteData.py $N SG
-	$pth plotting/deleteData.py $N EE
-	./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
+	# $pth plotting/deleteData.py $N EE
+	./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
 done
 
 # # $pth plotting/plotSpinGapQT.py low && echo "" && echo ""
@@ -47,20 +47,20 @@ done
 # done
 
 
-N=14
-$pth plotting/deleteData.py $N SG
-$pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 25 $noX silent && echo ""
+# N=14
+# # $pth plotting/deleteData.py $N SG
+# # $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
 
-N=16
-$pth plotting/deleteData.py $N SG
-$pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
+# N=16
+# # $pth plotting/deleteData.py $N SG
+# # $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 1 $noX silent && echo ""
 
-N=18
-$pth plotting/deleteData.py $N SG
-$pth plotting/deleteData.py $N EE
-./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
+# N=18
+# $pth plotting/deleteData.py $N SG
+# $pth plotting/deleteData.py $N EE
+# ./$build/$prgm $N $start $end 50 $h 10 $noX silent && echo ""
 
 # N=20
 # $pth plotting/deleteData.py $N SG
