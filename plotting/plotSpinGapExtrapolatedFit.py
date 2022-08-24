@@ -331,7 +331,7 @@ if __name__ == "__main__":
             subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
             fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_linear" + ".png")
-            # fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_linear" + ".pdf")
+            fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_linear" + ".pdf")
             plt.close(fig1)
 
         if ONE_OVER_SQRTN_FIT:
@@ -380,7 +380,7 @@ if __name__ == "__main__":
             subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
             fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_sqrt" + ".png")
-            # fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_sqrt" + ".pdf")
+            fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_sqrt" + ".pdf")
             plt.close(fig1)
 
         if ONE_OVER_N_FIT:
@@ -429,7 +429,7 @@ if __name__ == "__main__":
             subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
             fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_N" + ".png")
-            # fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_N" + ".pdf")
+            fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_N" + ".pdf")
             plt.close(fig1)
 
         if ONE_OVER_N2_FIT:
@@ -478,7 +478,7 @@ if __name__ == "__main__":
             subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
             fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_N2" + ".png")
-            # fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_N2" + ".pdf")
+            fig1.savefig("results/" + "SGExtrapFit/J_" + J_val + "_N2" + ".pdf")
             plt.close(fig1)
 
     end_time = time.time()

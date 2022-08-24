@@ -109,11 +109,14 @@ results/SG/raw/*.pdf
 results/SG/old/
 results/SG/clear_for_redo/
 results/SG/clear_for_redo2/
+results/SG/clear_for_redo3/
+results/SG/clear_for_redo4/
 
 results/SGExtrapFit/*.txt
 results/SGExtrapFit/*.png
 results/SGExtrapFit/*.pdf
 !results/SGExtrapFit/data_placeholder.txt
+results/SGExtrapFit/save/
 
 results/highT/*
 !results/highT/data_placeholder.txt

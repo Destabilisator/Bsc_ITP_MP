@@ -1,3 +1,4 @@
+from traceback import print_tb
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
@@ -20,7 +21,11 @@ N_color_FULL = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"),
 N_color = [("12", "red"), ("14", "blue"), ("16", "green"), ("18", "magenta"), ("20", "brown"), ("22", "purple"), ("24", "tomato")]
 # N_color = [("10", "red"), ("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
 N_color = [("12", "blue"), ("14", "green"), ("16", "magenta"), ("18", "brown"), ("20", "purple"), ("22", "tomato")]
-N_color = [("6", "blue"), ("8", "green"), ("10", "magenta"), ("12", "brown"), ("14", "purple"), ("16", "tomato"), ("18", "olive"), ("20", "midnightblue"), ("22", "pink")]
+N_color = [("6", "blue"), ("8", "green"), ("10", "magenta"), ("12", "brown"), ("14", "purple"), ("16", "tomato"), ("18", "olive"), ("20", "midnightblue"), ("22", "darkorchid")] # 
+
+N_color_ED = [("6", "blue"), ("8", "green"), ("10", "magenta"), ("12", "brown"), ("14", "purple"), ("16", "tomato")] #         , ("18", "olive"), ("20", "midnightblue"), ("22", "chocolate")
+N_color_QT = [("12", "brown"), ("14", "purple"), ("16", "tomato"), ("18", "olive"), ("20", "midnightblue"), ("22", "darkorchid")] # ("6", "blue"), ("8", "green"), ("10", "magenta"), 
+N_color_QT_show_only = [("6", "blue"), ("8", "green"), ("10", "magenta"), ("12", "brown"), ("14", "purple"), ("16", "tomato"), ("18", "olive"), ("20", "midnightblue"), ("22", "darkorchid")]
 
 colors = ["red", "blue", "green", "magenta", "brown", "purple", "tomato"]
 
@@ -30,7 +35,7 @@ search_start_percent = 4/5
 search_end_percent = 1/5
 max_n = 30 # min = 1; max = 30
 epsilon = 10**(-7)
-
+epsilonFit = 0.01
 
 extrapolate_QT = True
 extrapolate_ED = True
@@ -49,16 +54,16 @@ SHANK_ALG = False
 EXPSILON_ALG = False
 
 # output
-PLOT_EXTRAPOLATED_SPIN_GAP = True
-PLOT_DIFFERENT_EXTRAPOLATIONS = False
+PLOT_EXTRAPOLATED_SPIN_GAP = False
+PLOT_DIFFERENT_EXTRAPOLATIONS = True
 
 # in multiple extrapolations output
 SHOW_EXP_FIT = False
-SHOW_ONE_OVER_N_FIT = True
-SHOW_ONE_OVER_N2_FIT = True
-SHOW_ONE_OVER_SQRTN_FIT = True
-SHOW_SHANK_ALG = False
-SHOW_EXPSILON_ALG = False
+SHOW_ONE_OVER_N_FIT = False
+SHOW_ONE_OVER_N2_FIT = False
+SHOW_ONE_OVER_SQRTN_FIT = False
+SHOW_SHANK_ALG = True
+SHOW_EXPSILON_ALG = True
 
 # force generate new data
 MAKE_NEW = False
@@ -120,13 +125,25 @@ def epsilon_Alg(A):
     #print(epslim)
     return epslim
 
+def tooSmall(A):
+    if J_SUM_SCALE:
+        if A[-1] < epsilonFit or A[-2] < epsilonFit:# and A[-3] < epsilonFit:
+            return True
+        else:
+            return False
+    else:
+        if A[-1] < 2.5 * epsilonFit or A[-2] < 2.5 * epsilonFit:# and A[-3] < epsilonFit:
+            return True
+        else:
+            return False
+
 def expFunc_offset(x: float, A: float, k: float, x_0: float) -> float:
     return A * np.exp(k * x) + x_0
 
 def expFunc(x: float, A: float, k: float) -> float:
     return x * A * np.exp(k * x)
 
-def exp_fit_extrap(A_raw):
+def exp_fit_extrap(A_raw, NC):
     global counter
     len_N = len(A_raw); len_Y = len(A_raw[0])
     outdata = []
@@ -134,12 +151,18 @@ def exp_fit_extrap(A_raw):
         A = []
         for j in range(len_N): A += [A_raw[j][i]]
         # fitting exp to data
-        X = [x for x in range(1, len(A)+1)]
+        #X = [x for x in range(1, len(A)+1)]
+        X = []
+        for N, C in NC:
+            X += [int(N)]
         if PLOT_TEMP:
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
             subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
             counter += 1
         try:
+            if tooSmall(A):
+                outdata += [0.0]
+                continue
             X = np.array(X); A = np.array(A)
             params, cv = scipy.optimize.curve_fit(expFunc_offset, X, A, (1.0, 0.1, 0.1))
             A_param, k_param, x_0_param = params
@@ -162,7 +185,7 @@ def one_over_sqrtN(x: float, A: float, b: float) -> float:
 def one_over_sqrtN_offset(x: float, A: float, b: float, x0: float) -> float:
     return A / np.sqrt(x - x0) + b
 
-def sqrtN_fit_extrap(A_raw):
+def sqrtN_fit_extrap(A_raw, NC):
     global counter
     len_N = len(A_raw); len_Y = len(A_raw[0])
     outdata = []
@@ -172,16 +195,21 @@ def sqrtN_fit_extrap(A_raw):
         # fitting 1/sqrt(N) to data
         #X = [x for x in range(1, len(A)+1)]
         X = []
-        for i in range(len(A)):
-            X += [int(N_color[i][0])]
+        for N, C in NC:
+            X += [int(N)]
         if PLOT_TEMP:
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
             counter += 1
         try:
+            if tooSmall(A):
+                outdata += [0.0]
+                continue
             X = np.array(X); A = np.array(A)
             # X = 1 / np.sqrt(X)
+            # print(X)
             if PLOT_TEMP: subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-            params, cv = scipy.optimize.curve_fit(one_over_sqrtN, X, A, (0.1, 0.1))
+            uncertainties = 1 / X
+            params, cv = scipy.optimize.curve_fit(one_over_sqrtN, X, A, (0.1, 0.1), sigma = uncertainties, absolute_sigma = False)
             # params, cv = scipy.optimize.curve_fit(one_over_sqrtN_offset, X, A, (0.1, 0.1, -0.1))
             A_param, b_param = params
             # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
@@ -206,7 +234,7 @@ def one_over_N(x: float, A: float, b: float) -> float:
 def one_over_N_offset(x: float, A: float, b: float, x0: float) -> float:
     return A / (x - x0) + b
 
-def N_fit_extrap(A_raw):
+def N_fit_extrap(A_raw, NC):
     global counter
     len_N = len(A_raw); len_Y = len(A_raw[0])
     outdata = []
@@ -216,16 +244,20 @@ def N_fit_extrap(A_raw):
         # fitting 1/N to data
         #X = [x for x in range(1, len(A)+1)]
         X = []
-        for i in range(len(A)):
-            X += [int(N_color[i][0])]
+        for N, C in NC:
+            X += [int(N)]
         if PLOT_TEMP:
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
             counter += 1
         try:
+            if tooSmall(A):
+                outdata += [0.0]
+                continue
             X = np.array(X); A = np.array(A)
             # X = 1 / X
             if PLOT_TEMP: subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-            params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
+            uncertainties =  1 / X
+            params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1), sigma = uncertainties, absolute_sigma = False)
             # params, cv = scipy.optimize.curve_fit(one_over_N_offset, X, A, (0.1, 0.1, -0.1))
             A_param, b_param = params
             # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
@@ -250,7 +282,7 @@ def one_over_N2(x: float, A: float, b: float) -> float:
 def one_over_N2_offset(x: float, A: float, b: float, x0: float) -> float:
     return A / (x - x0)**2 + b
 
-def N2_fit_extrap(A_raw):
+def N2_fit_extrap(A_raw, NC):
     global counter
     len_N = len(A_raw); len_Y = len(A_raw[0])
     outdata = []
@@ -260,16 +292,20 @@ def N2_fit_extrap(A_raw):
         # fitting 1/N**2 to data
         #X = [x for x in range(1, len(A)+1)]
         X = []
-        for i in range(len(A)):
-            X += [int(N_color[i][0])]
+        for N, C in NC:
+            X += [int(N)]
         if PLOT_TEMP:
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
             counter += 1
         try:
+            if tooSmall(A):
+                outdata += [0.0]
+                continue
             X = np.array(X); A = np.array(A)
             # X = 1 / X**2
             if PLOT_TEMP: subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-            params, cv = scipy.optimize.curve_fit(one_over_N2, X, A, (0.1, 0.1))
+            uncertainties = 1 / X
+            params, cv = scipy.optimize.curve_fit(one_over_N2, X, A, (0.1, 0.1), sigma = uncertainties, absolute_sigma = False)
             # params, cv = scipy.optimize.curve_fit(one_over_N2_offset, X, A, (0.1, 0.1, -0.1))
             A_param, b_param = params
             # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
@@ -312,7 +348,7 @@ def shank_extrap(A_raw):
         outdata += [S[-1]]
     return outdata
 
-def extrapolation_alg_raw(A_raw):
+def extrapolation_alg_raw(A_raw, NC):
     global counter
     len_N = len(A_raw); len_Y = len(A_raw[0])
     outdata = []
@@ -325,14 +361,18 @@ def extrapolation_alg_raw(A_raw):
             #X = [x for x in range(1, len(A)+1)]
             # X = [int(N) for N, C in N_color]
             X = []
-            for i in range(len(A)):
-                X += [int(N_color[i][0])]
+            for N, C in NC:
+                X += [int(N)]
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
             subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
             counter += 1
             try:
+                if tooSmall(A):
+                    outdata += [0.0]
+                    continue
                 X = np.array(X); A = np.array(A)
-                params, cv = scipy.optimize.curve_fit(expFunc_offset, X, A, (1.0, 0.1, 0.1))
+                uncertainties = 1 / X
+                params, cv = scipy.optimize.curve_fit(expFunc_offset, X, A, (1.0, 0.1, 0.1), sigma = uncertainties, absolute_sigma = False)
                 A_param, k_param, x_0_param = params
                 X = np.linspace(0, X[-1], 100)
                 Y = expFunc_offset(X, A_param, k_param, x_0_param)
@@ -349,17 +389,21 @@ def extrapolation_alg_raw(A_raw):
             #X = [x for x in range(1, len(A)+1)]
             # X = [int(N) for N, C in N_color]
             X = []
-            for i in range(len(A)):
-                X += [int(N_color[i][0])]
+            for N, C in NC:
+                X += [int(N)]
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
             counter += 1
             try:
+                if tooSmall(A):
+                    outdata += [0.0]
+                    continue
                 X = np.array(X); A = np.array(A)
-                X = 1 / X
+                # X = 1 / X
                 subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-                # params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
-                # A_param, b_param = params
-                A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
+                uncertainties = 1 / X
+                params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1), sigma = uncertainties, absolute_sigma = False)
+                A_param, b_param = params
+                # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
                 X = np.linspace(0.0, X[0], 100)
                 # Y = one_over_N(X, A_param, b_param)
                 Y = A_param * X + b_param
@@ -376,17 +420,21 @@ def extrapolation_alg_raw(A_raw):
             #X = [x for x in range(1, len(A)+1)]
             # X = [int(N) for N, C in N_color]
             X = []
-            for i in range(len(A)):
-                X += [int(N_color[i][0])]
+            for N, C in NC:
+                X += [int(N)]
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
             counter += 1
             try:
+                if tooSmall(A):
+                    outdata += [0.0]
+                    continue
                 X = np.array(X); A = np.array(A)
                 X = 1 / X**2
                 subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-                # params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
-                # A_param, b_param = params
-                A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
+                uncertainties = 1 / X
+                params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1), sigma = uncertainties, absolute_sigma = False)
+                A_param, b_param = params
+                # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
                 X = np.linspace(0.0, X[0], 100)
                 # Y = one_over_N(X, A_param, b_param)
                 Y = A_param * X + b_param
@@ -403,17 +451,21 @@ def extrapolation_alg_raw(A_raw):
             #X = [x for x in range(1, len(A)+1)]
             # X = [int(N) for N, C in N_color]
             X = []
-            for i in range(len(A)):
-                X += [int(N_color[i][0])]
+            for N, C in NC:
+                X += [int(N)]
             fig3, subfig3 = plt.subplots(1,1,figsize=(16,9))
             counter += 1
             try:
+                if tooSmall(A):
+                    outdata += [0.0]
+                    continue
                 X = np.array(X); A = np.array(A)
                 X = 1 / np.sqrt(X)
                 subfig3.plot(X, A, lw = 0, ls = "dashed", markersize = 5, marker = "o", color = "black")
-                # params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1))
-                # A_param, b_param = params
-                A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
+                uncertainties = 1 / X
+                params, cv = scipy.optimize.curve_fit(one_over_N, X, A, (0.1, 0.1), sigma = uncertainties, absolute_sigma = False)
+                A_param, b_param = params
+                # A_param, b_param = np.polyfit(X, A, 1)# , w = 1/X + 1/2 * 1/X**2  + 1/6 * 1/X**3
                 X = np.linspace(0.0, X[0], 100)
                 # Y = one_over_N(X, A_param, b_param)
                 Y = A_param * X + b_param
@@ -539,14 +591,14 @@ def getDataQT(N: str, n: int):
             X, Y, A = newQTdata(N, n)
     return X, Y, A
 
-def getExtrapolatedDataQT(N_color):
+def getExtrapolatedDataQT(): # N_color_QT
     print("getting extrapolated data (QT)          ")
     extrapolated_data = [[]] * max_n
     for n in range(1, max_n + 1):
         if PLOT_RAW and PLOT_RAW_QT: fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
         extrapolationArray = []
         used_N = "N"
-        for N, C in N_color:
+        for N, C in N_color_QT:
             print("n = %i / %i & N = %s (get data)          \r" %(n, max_n, N), end="")
             try:
                 X, Y, A = getDataQT(N, n)
@@ -559,7 +611,7 @@ def getExtrapolatedDataQT(N_color):
                 print("QT data for N = %s no data available" % N)
 
         print("n = %i / %i (extrapolating data)          \r" %(n, max_n), end="")
-        extrapolated_data[n-1] = extrapolation_alg_raw(extrapolationArray)
+        extrapolated_data[n-1] = extrapolation_alg_raw(extrapolationArray, N_color_QT)
 
         if PLOT_RAW and PLOT_RAW_QT: 
             subfig1.plot(X, extrapolated_data[n-1], lw = line_width, ls = "dashed", markersize = 0, marker = "o", color = "black", label = "Extrapolation")
@@ -627,13 +679,13 @@ def getDataED(N: str):
             X, Y, A = newEDdata(N)
     return X, Y, A
 
-def getExtrapolatedDataED(N_color):
+def getExtrapolatedDataED(): # N_color_ED
     print("getting extrapolated data (ED)          ")
     extrapolated_data = []
     if PLOT_RAW and PLOT_RAW_ED: fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
     extrapolationArray = []
     used_N = "N"
-    for N, C in N_color:
+    for N, C in N_color_ED:
         print("N = %s (get data)          \r" %(N), end="")
         try:
             X, Y, A = getDataED(N)
@@ -646,7 +698,7 @@ def getExtrapolatedDataED(N_color):
             print("ED data for N = %s no data available" % N)
 
     print("ED (extrapolating data)          \r", end="")
-    extrapolated_data = extrapolation_alg_raw(extrapolationArray)
+    extrapolated_data = extrapolation_alg_raw(extrapolationArray, N_color_ED)
 
     if PLOT_RAW and PLOT_RAW_ED: 
         subfig1.plot(X, extrapolated_data, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", label = "Extrapolation")
@@ -703,8 +755,8 @@ def avgData(samp, inputdata):
 
 def plotExtrapolatedData(N_color):
     print("getting extrapolated data          ")
-    extrapolated_data_QT = getExtrapolatedDataQT(N_color)
-    extrapolated_data_ED = getExtrapolatedDataED(N_color)
+    extrapolated_data_QT = getExtrapolatedDataQT() # N_color
+    extrapolated_data_ED = getExtrapolatedDataED() # N_color
     print("plotting extrapolated data          ")
     for samp in range(1, int(max_n / 2) + 1):
         if samp != 1: continue
@@ -713,7 +765,7 @@ def plotExtrapolatedData(N_color):
         used_N_QT = "N"; used_N_ED = "N"; N_arr = [0] * 35
 
         # ED #
-        for N, C in N_color:        
+        for N, C in N_color_ED:        
             try:
                 X, Y, A = getDataED(N)
                 X = np.asarray(X); Y = np.asarray(Y)
@@ -742,7 +794,7 @@ def plotExtrapolatedData(N_color):
         subfig1.plot(X, extrapolated_data_ED, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = "black", alpha = alph_extr)#, label = "Extrapolation")
         
         # QT #
-        for N, C in N_color:        
+        for N, C in N_color_QT_show_only:        
             try:
                 X_arr = [[]] * max_n; Y_arr = [[]] * max_n; A_arr = [[]] * max_n
                 for n in range(max_n):
@@ -791,7 +843,7 @@ def plotExtrapolatedData(N_color):
         handles.extend(legend)
 
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+        subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize, ncol = 2)
         subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
         legendNoExtrap = []
@@ -807,7 +859,7 @@ def plotExtrapolatedData(N_color):
         handlesNoExtrap.extend(legendNoExtrap)
 
         subfigNoExtrap.axhline(0, color = "grey")
-        subfigNoExtrap.legend(handles = handlesNoExtrap, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+        subfigNoExtrap.legend(handles = handlesNoExtrap, loc = 'best' ,frameon = False, fontsize = legendfontsize, ncol = 2)
         subfigNoExtrap.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
         subfig1.set_xlim(x_lim_min, x_lim_max)
@@ -846,7 +898,7 @@ def different_extrapolations(N_color):
         # ED #
         print("ED getting data          ")
         extrapolationArray = []
-        for N, C in N_color:        
+        for N, C in N_color_ED:        
             try:
                 X, Y, A = getDataED(N)
                 X = np.asarray(X); Y = np.asarray(Y)
@@ -867,25 +919,25 @@ def different_extrapolations(N_color):
         color_count = 0
         if SHOW_EXP_FIT:
             print("ED extrapolating with exp          \r", end = "")
-            extrapolated_data_ED_EXP_FIT = exp_fit_extrap(extrapolationArray)
+            extrapolated_data_ED_EXP_FIT = exp_fit_extrap(extrapolationArray, N_color_ED)
             # if J_SUM_SCALE: extrapolated_data_ED_EXP_FIT = extrapolated_data_ED_EXP_FIT / (1.0 + X)
             subfigExp.plot(X, extrapolated_data_ED_EXP_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
             subfig1.plot(X, extrapolated_data_ED_EXP_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         if SHOW_ONE_OVER_SQRTN_FIT:
             print("ED extrapolating with sqrt          \r", end = "")
-            extrapolated_data_ED_ONE_OVER_SQRTN_FIT = sqrtN_fit_extrap(extrapolationArray)
+            extrapolated_data_ED_ONE_OVER_SQRTN_FIT = sqrtN_fit_extrap(extrapolationArray, N_color_ED)
             # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_SQRTN_FIT = extrapolated_data_ED_ONE_OVER_SQRTN_FIT / (1.0 + X)
             subfigSqrt.plot(X, extrapolated_data_ED_ONE_OVER_SQRTN_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
             subfig1.plot(X, extrapolated_data_ED_ONE_OVER_SQRTN_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         if SHOW_ONE_OVER_N_FIT:
             print("ED extrapolating with N          \r", end = "")
-            extrapolated_data_ED_ONE_OVER_N_FIT = N_fit_extrap(extrapolationArray)
+            extrapolated_data_ED_ONE_OVER_N_FIT = N_fit_extrap(extrapolationArray, N_color_ED)
             # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_N_FIT = extrapolated_data_ED_ONE_OVER_N_FIT / (1.0 + X)
             subfigN.plot(X, extrapolated_data_ED_ONE_OVER_N_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
             subfig1.plot(X, extrapolated_data_ED_ONE_OVER_N_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
         if SHOW_ONE_OVER_N2_FIT:
             print("ED extrapolating with N^2          \r", end = "")
-            extrapolated_data_ED_ONE_OVER_N2_FIT = N2_fit_extrap(extrapolationArray)
+            extrapolated_data_ED_ONE_OVER_N2_FIT = N2_fit_extrap(extrapolationArray, N_color_ED)
             # if J_SUM_SCALE: extrapolated_data_ED_ONE_OVER_N2_FIT = extrapolated_data_ED_ONE_OVER_N2_FIT / (1.0 + X)
             subfigN2.plot(X, extrapolated_data_ED_ONE_OVER_N2_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr)
             subfig1.plot(X, extrapolated_data_ED_ONE_OVER_N2_FIT, lw = line_width, ls = "solid", markersize = 0, marker = "o", color = colors[color_count], alpha = alph_extr); color_count += 1
@@ -905,7 +957,7 @@ def different_extrapolations(N_color):
 
         # QT #
         print("QT getting data          ")
-        for N, C in N_color:        
+        for N, C in N_color_QT:        
             try:
                 X_arr = [[]] * max_n; Y_arr = [[]] * max_n; A_arr = [[]] * max_n
                 for n in range(max_n):
@@ -947,7 +999,7 @@ def different_extrapolations(N_color):
         for n in range(1, max_n + 1):
             extrapolationArray = []
             used_N = "N"
-            for N, C in N_color:
+            for N, C in N_color_QT:
                 print("n = %i / %i & N = %s (get data)          \r" %(n, max_n, N), end="")
                 try:
                     X, Y, A = getDataQT(N, n)
@@ -961,16 +1013,16 @@ def different_extrapolations(N_color):
             
             if SHOW_EXP_FIT:
                 print("n = %i / %i extrapolating with exp          \r", end = "")
-                extrapolated_data_QT_EXP += [exp_fit_extrap(extrapolationArray)]
+                extrapolated_data_QT_EXP += [exp_fit_extrap(extrapolationArray, N_color_QT)]
             if SHOW_ONE_OVER_SQRTN_FIT:
                 print("n = %i / %i extrapolating with sqrt          \r" %(n, max_n), end = "")
-                extrapolated_data_QT_ONE_OVER_SQRTN_FIT += [sqrtN_fit_extrap(extrapolationArray)]
+                extrapolated_data_QT_ONE_OVER_SQRTN_FIT += [sqrtN_fit_extrap(extrapolationArray, N_color_QT)]
             if SHOW_ONE_OVER_N_FIT:
                 print("n = %i / %i extrapolating with N          \r" %(n, max_n), end = "")
-                extrapolated_data_QT_OVER_N_FIT += [N_fit_extrap(extrapolationArray)]
+                extrapolated_data_QT_OVER_N_FIT += [N_fit_extrap(extrapolationArray, N_color_QT)]
             if SHOW_ONE_OVER_N2_FIT:
                 print("n = %i / %i extrapolating with N^2          \r" %(n, max_n), end = "")
-                extrapolated_data_QT_OVER_N2_FIT += [N2_fit_extrap(extrapolationArray)]
+                extrapolated_data_QT_OVER_N2_FIT += [N2_fit_extrap(extrapolationArray, N_color_QT)]
             if SHOW_SHANK_ALG:
                 print("n = %i / %i extrapolating with shank          \r" %(n, max_n), end = "")
                 extrapolated_data_QT_SHANK_ALG += [shank_extrap(extrapolationArray)]
@@ -1057,13 +1109,16 @@ def different_extrapolations(N_color):
         handles.extend(legend)
 
         subfig1.axhline(0, color = "grey")
-        subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+        subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)#, ncol = 2)
         subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
         subfig1.set_xlim(x_lim_min, x_lim_max)
-
-        fig1.savefig("results/" + "SG/SG_extrap_methods_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
-        fig1.savefig("results/" + "SG/SG_extrap_methods_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+        if J_SUM_SCALE:
+            fig1.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_methods_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+            fig1.savefig("results/" + "SG/SG_J_SUM_SCALE_extrap_methods_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
+        else:
+            fig1.savefig("results/" + "SG/SG_extrap_methods_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".png")
+            fig1.savefig("results/" + "SG/SG_extrap_methods_ED_" + used_N_ED + "_QT_" + used_N_QT  + "_max_" + str(max_n) + "_samp_" + str(samp) + ".pdf")
         plt.close(fig1)
 
         # multiple extrapolations output #
@@ -1081,7 +1136,7 @@ def different_extrapolations(N_color):
             handles, labels = plt.gca().get_legend_handles_labels()
             handles.extend(legend)
             subfigExp.axhline(0, color = "grey")
-            subfigExp.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+            subfigExp.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)#, ncol = 2)
             subfigExp.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
             subfigExp.set_xlim(x_lim_min, x_lim_max)
             if J_SUM_SCALE:
@@ -1104,7 +1159,7 @@ def different_extrapolations(N_color):
             handles, labels = plt.gca().get_legend_handles_labels()
             handles.extend(legend)
             subfigSqrt.axhline(0, color = "grey")
-            subfigSqrt.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+            subfigSqrt.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)#, ncol = 2)
             subfigSqrt.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
             subfigSqrt.set_xlim(x_lim_min, x_lim_max)
             if J_SUM_SCALE:
@@ -1127,7 +1182,7 @@ def different_extrapolations(N_color):
             handles, labels = plt.gca().get_legend_handles_labels()
             handles.extend(legend)
             subfigN.axhline(0, color = "grey")
-            subfigN.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+            subfigN.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)#, ncol = 2)
             subfigN.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
             subfigN.set_xlim(x_lim_min, x_lim_max)
             if J_SUM_SCALE:
@@ -1150,7 +1205,7 @@ def different_extrapolations(N_color):
             handles, labels = plt.gca().get_legend_handles_labels()
             handles.extend(legend)
             subfigN2.axhline(0, color = "grey")
-            subfigN2.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+            subfigN2.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)#, ncol = 2)
             subfigN2.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
             subfigN2.set_xlim(x_lim_min, x_lim_max)
             if J_SUM_SCALE:
@@ -1173,7 +1228,7 @@ def different_extrapolations(N_color):
             handles, labels = plt.gca().get_legend_handles_labels()
             handles.extend(legend)
             subfigShank.axhline(0, color = "grey")
-            subfigShank.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+            subfigShank.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)#, ncol = 2)
             subfigShank.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
             subfigShank.set_xlim(x_lim_min, x_lim_max)
             if J_SUM_SCALE:
@@ -1196,7 +1251,7 @@ def different_extrapolations(N_color):
             handles, labels = plt.gca().get_legend_handles_labels()
             handles.extend(legend)
             subfigEpsilon.axhline(0, color = "grey")
-            subfigEpsilon.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)
+            subfigEpsilon.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize)#, ncol = 2)
             subfigEpsilon.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
             subfigEpsilon.set_xlim(x_lim_min, x_lim_max)
             if J_SUM_SCALE:
