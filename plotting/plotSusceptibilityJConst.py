@@ -225,7 +225,7 @@ for N_outer in range(len(N_color)):
 
             subfigMultiQT.set_xlabel(einheit_x, fontsize = labelfontsize)
             subfigMultiQT.set_ylabel('$\\chi/N$ / $J_2$', fontsize = labelfontsize)
-            subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ mit bei unterschiedlichen Startvektoren', fontsize = titlefontsize)
+            subfigMultiQT.set_title('Suszeptibilität pro Spin $\\chi/N$ bei unterschiedlichen Startvektoren', fontsize = titlefontsize)
             # plt.xticks(fontsize = 25)
             # plt.yticks(fontsize = 25)
             subfigMultiQT.tick_params(axis="both", which="major", labelsize=axisfontsize)
