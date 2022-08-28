@@ -17,7 +17,7 @@ split_index = [("6", 0.96, 1.05), ("8", 0.96, 1.05), ("10", 0.96, 400), ("10QT",
 peak_offset = 2000 #1500 # 1000
 fit_samples = 5 # 5
 search_start_percent = 4/5
-search_end_percent = 3/5
+search_end_percent = 1/5
 max_n = 5 # min = 1; max = 5
 no_ED = False
 
@@ -128,6 +128,7 @@ def get_excitation_energie(n, N, J, filename) -> Tuple[float, float]:
         # subfig2.axhline(0, color = "grey")
         subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
         subfig2.set_xlim(0.0, 0.1)
+        subfig2.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
         plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
         plt.axvline(x=X_fit_range[0], color='black', linestyle='--')
@@ -197,10 +198,10 @@ def save_excitation_energy_data(N, X, Y, YErr, A, AErr) -> None:
 
 if __name__ == "__main__":
 
-    N_color = [("18", "tomato")] # ("16", "purple"), 
+    N_color = [("18", "tomato")] # , 
 
     for N, C in N_color:
-        for n in range(5):
+        for n in range(1):
             for filename in os.listdir("results/" + N + "/data/excitation_energies_data/" + str(n+1) + "/"):
                 if filename[len(filename)-6:] != "QT.txt" and filename[len(filename)-6:] != "ED.txt": continue
                 J = filename[len("X_J"):-len("QT.txt")]

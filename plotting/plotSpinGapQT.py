@@ -19,13 +19,14 @@ search_start_percent = 4/5
 search_end_percent = 3/5
 max_n = 5 # min = 1; max = 5
 no_ED = False # True / False
+epsilon = 10**(-7)
 
 titlefontsize = 40
 labelfontsize = 35
 legendfontsize = 35
 axisfontsize = 30
 
-SAVE_FULL_PLOTS = False # True / False
+SAVE_FULL_PLOTS = True # True / False
 
 SCALE_SUM_J = True # True / False
 
@@ -45,6 +46,7 @@ def expFunc(x: float, A: float, k: float) -> float:
 
 def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
     file = open("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/" + filename, 'r')
+    # print(J)
     ED_QT = filename[len(filename)-6:-4]
     lines = file.readlines()
     X = []; Y = []
@@ -52,6 +54,7 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
         arr = lines[i].split("\t")
         x = arr[0]
         y = arr[1]
+        if float(y) < epsilon or "inf" in y.lower() or "nan" in y.lower(): continue
         X += [float(x)] # beta -> T
         Y += [float(y)]
     file.close()
@@ -59,6 +62,7 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
 
     X_fit = X[0:int(len(X)*search_start_percent)]; Y_fit = Y[0:int(len(X)*search_start_percent)]
     X_fit = np.array(X_fit); Y_fit = np.array(Y_fit)
+    # print(Y_fit)
     params, cv = scipy.optimize.curve_fit(expFunc, X_fit, Y_fit, (1.0, 0.1))
     A, k = params
     # calc R2
@@ -114,6 +118,7 @@ def get_spin_gap(n: int, N: int, J: str, filename: str) -> Tuple[float, float]:
         # subfig2.axhline(0, color = "grey")
         subfig2.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
         subfig2.set_xlim(0.0, 0.1)
+        subfig2.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
         plt.axvline(x=X_fit_range[len(X_fit_range)-1], color='black', linestyle='--')
         plt.axvline(x=X_fit_range[0], color='black', linestyle='--')
@@ -182,6 +187,19 @@ def save_spin_gap_data(N, X, Y, YErr, A, AErr) -> None:
 
 
 if __name__ == "__main__":
+
+    N_color = [("16", "purple"), ("18", "tomato")] # , 
+
+    for N, C in N_color:
+        for n in range(1):
+            for filename in os.listdir("results/" + N + "/data/spin_gap_data/" + str(n+1) + "/"):
+                if filename[len(filename)-6:] != "QT.txt" and filename[len(filename)-6:] != "ED.txt": continue
+                J = filename[len("X_J"):-len("QT.txt")]
+                print("N = %s, n = %i, J = %s          \r" %(N, n+1, J), end = "")
+                # print()
+                A, k = get_spin_gap(n, N, J, filename)
+
+    exit(1)
 
     # N_color = [("18", "tomato")] # ("16", "purple"), 
 
