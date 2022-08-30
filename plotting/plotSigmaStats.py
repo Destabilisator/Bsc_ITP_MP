@@ -512,7 +512,7 @@ def X_plot_N_for_each_n_sigma():
                 # ploting
                 if ABS:
                     YErr = np.asarray(YErr)
-                    subfig1.plot(X, YErr * 10, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count])
+                    subfig1.plot(X, YErr, lw = line_width, ls = "solid", markersize = marker_size, marker = "o", color = colors[color_count]) # YErr * 10
                 if REL: 
                     Xrel, Yrel, YErrrel = getRel(X, Y, YErr)
                     if min(Xrel) > x_min: x_min = min(Xrel)
@@ -633,7 +633,7 @@ if __name__ == "__main__":
     # print()
     # X_plot_n_for_each_N_sigma()
     # print()
-    # X_plot_N_for_each_n_sigma()
-    # print()
-    spin_gap_sigma()
+    X_plot_N_for_each_n_sigma()
     print()
+    # spin_gap_sigma()
+    # print()

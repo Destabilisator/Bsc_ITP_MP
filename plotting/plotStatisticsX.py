@@ -369,8 +369,8 @@ def plot_delta_ED():
         used_N += "_" + N
 
     # saving
-    subfig1.set_xlabel(r'$\beta$ in $J_2$ / $k_B$', fontsize = labelfontsize)
-    subfig1.set_ylabel(r'Abweichung in $J_2$', fontsize = labelfontsize)
+    subfig1.set_xlabel(r'$k_B T$ / $J_2$', fontsize = labelfontsize)
+    subfig1.set_ylabel(r'$\Delta_{QT-ED}$ / $J_2$', fontsize = labelfontsize)
     subfig1.set_title("$\Delta_{QT-ED}$ von $\\chi/N$ bei $J_1$ / $J_2$ = " + linesJQT, fontsize = titlefontsize)
     subfig1.axhline(0, color = "grey")
     subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
