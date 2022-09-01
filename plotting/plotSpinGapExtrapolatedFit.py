@@ -11,6 +11,7 @@ from typing import Tuple
 import gc
 import time
 plt.rcParams['text.usetex'] = True
+plt.rcParams['axes.linewidth'] = 5
 
 N_color = [("14", "red"), ("16", "blue"), ("18", "green"), ("20", "magenta"), ("22", "brown"), ("24", "purple"), ("26", "tomato")]
 N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
@@ -34,10 +35,20 @@ search_end_percent = 1/5
 max_n = 30 # min = 1; max = 30
 epsilon = 10**(-7)
 
-titlefontsize = 39
-labelfontsize = 35
-legendfontsize = 35
-axisfontsize = 30
+titlefontsize = 165
+labelfontsize = 115
+legendfontsize = 100
+axisfontsize = 110
+
+aspect = (16,9) # (16,9), (34,27)
+
+line_width = 15 # 4
+marker_size = 40 # 7
+
+# titlefontsize = 39
+# labelfontsize = 35
+# legendfontsize = 35
+# axisfontsize = 30
 
 # force generate new data
 MAKE_NEW = False
@@ -46,10 +57,10 @@ MAKE_NEW = False
 J_SUM_SCALE = True
 
 # change output
-LINEAR_FIT = True
+LINEAR_FIT = False
 ONE_OVER_N_FIT = True
-ONE_OVER_N2_FIT = True
-ONE_OVER_SQRTN_FIT = True
+ONE_OVER_N2_FIT = False
+ONE_OVER_SQRTN_FIT = False
 
 # fehlerbalken der QT ausblenden
 QT_WITH_ERROR = False
@@ -292,7 +303,7 @@ if __name__ == "__main__":
         figData_ED_X = np.asarray(figData_ED_X); figData_ED_Y = np.asarray(figData_ED_Y)
 
         if LINEAR_FIT:
-            fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+            fig1, subfig1 = plt.subplots(1,1,figsize=aspect)
 
             X_fit = np.linspace(min(figData_QT_X), max(figData_QT_X), 10000)
 
@@ -325,7 +336,7 @@ if __name__ == "__main__":
             subfig1.set_xlabel(r'$N$', fontsize = labelfontsize)
             if J_SUM_SCALE: subfig1.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
             else: subfig1.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
-            subfig1.set_title(r'Spingap Energien $\Delta_{SG}$ bei $J_1 / J_2$ = ' + J_val, fontsize = titlefontsize)
+            subfig1.set_title(r'$\Delta_{SG}$ bei $J_1 / J_2$ = ' + J_val, fontsize = titlefontsize)
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
@@ -340,7 +351,7 @@ if __name__ == "__main__":
             figData_ED_X_fit = np.asarray(figData_ED_X)
             figData_ED_X_fit = 1 / np.sqrt(figData_ED_X_fit)
 
-            fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+            fig1, subfig1 = plt.subplots(1,1,figsize=aspect)
 
             #X_fit = np.linspace(min(figData_QT_X), max(figData_QT_X_fit), 10000)
             X_fit = np.linspace(0, max(figData_QT_X_fit), 10000)
@@ -374,7 +385,7 @@ if __name__ == "__main__":
             subfig1.set_xlabel(r'$1/\sqrt{N}$', fontsize = labelfontsize)
             if J_SUM_SCALE: subfig1.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
             else: subfig1.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
-            subfig1.set_title(r'Spingap Energien $\Delta_{SG}$ bei $J_1 / J_2$ = ' + J_val, fontsize = titlefontsize)
+            subfig1.set_title(r'$\Delta_{SG}$ bei $J_1 / J_2$ = ' + J_val, fontsize = titlefontsize)
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
@@ -389,7 +400,7 @@ if __name__ == "__main__":
             figData_ED_X_fit = np.asarray(figData_ED_X)
             figData_ED_X_fit = 1 / figData_ED_X_fit
 
-            fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+            fig1, subfig1 = plt.subplots(1,1,figsize=aspect)
 
             #X_fit = np.linspace(min(figData_QT_X), max(figData_QT_X_fit), 10000)
             X_fit = np.linspace(0, max(figData_QT_X_fit), 10000)
@@ -413,17 +424,17 @@ if __name__ == "__main__":
             SST = square_diff.sum()
             R2_QT = 1 - SSE/SST
 
-            subfig1.plot(X_fit,  linFunc(X_fit, mED, bED), lw = 4, ls = "solid", markersize = 0, marker = "h", color = "blue", label = r"ED: $R^2 = %f$" % R2_ED)
-            subfig1.plot(X_fit,  linFunc(X_fit, mQT, bQT), lw = 4, ls = "dashed", markersize = 0, marker = "s", color = "red", label = r"QT: $R^2 = %f$" % R2_QT)
+            subfig1.plot(X_fit,  linFunc(X_fit, mED, bED), lw = line_width, ls = "solid", markersize = 0, marker = "h", color = "blue", label = r"ED: $R^2 = %f$" % R2_ED)
+            subfig1.plot(X_fit,  linFunc(X_fit, mQT, bQT), lw = line_width, ls = "dashed", markersize = 0, marker = "s", color = "red", label = r"QT: $R^2 = %f$" % R2_QT)
 
-            subfig1.plot(figData_ED_X_fit, figData_ED_Y, lw = 0, ls = "solid", markersize = 16, marker = "h", color = "blue", label = "ED")
+            subfig1.plot(figData_ED_X_fit, figData_ED_Y, lw = 0, ls = "solid", markersize = marker_size, marker = "h", color = "blue", label = "ED")
             if QT_WITH_ERROR: subfig1.errorbar(figData_QT_X_fit, figData_QT_Y, yerr = figData_QT_YErr, lw = 0, ls = "dashed", markersize = 8, elinewidth = 3, fmt = "s", color = "red", label = "QT: Werte")
-            else: subfig1.plot(figData_QT_X_fit, figData_QT_Y, lw = 0, ls = "dashed", markersize = 8, marker = "s", color = "red", label = "QT: Werte")
+            else: subfig1.plot(figData_QT_X_fit, figData_QT_Y, lw = 0, ls = "dashed", markersize = marker_size, marker = "s", color = "red", label = "QT: Werte")
 
             subfig1.set_xlabel(r'$1/N$', fontsize = labelfontsize)
             if J_SUM_SCALE: subfig1.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
             else: subfig1.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
-            subfig1.set_title(r'Spingap Energien $\Delta_{SG}$ bei $J_1 / J_2$ = ' + J_val, fontsize = titlefontsize)
+            subfig1.set_title(r'$\Delta_{SG}$ bei $J_1 / J_2$ = ' + J_val, fontsize = titlefontsize)
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
@@ -438,7 +449,7 @@ if __name__ == "__main__":
             figData_ED_X_fit = np.asarray(figData_ED_X)
             figData_ED_X_fit = 1 / figData_ED_X_fit**2
 
-            fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
+            fig1, subfig1 = plt.subplots(1,1,figsize=aspect)
 
             #X_fit = np.linspace(min(figData_QT_X), max(figData_QT_X_fit), 10000)
             X_fit = np.linspace(0, max(figData_QT_X_fit), 10000)
@@ -472,7 +483,7 @@ if __name__ == "__main__":
             subfig1.set_xlabel(r'$1/N^2$', fontsize = labelfontsize)
             if J_SUM_SCALE: subfig1.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
             else: subfig1.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
-            subfig1.set_title(r'Spingap Energien $\Delta_{SG}$ bei $J_1 / J_2$ = ' + J_val, fontsize = titlefontsize)
+            subfig1.set_title(r'$\Delta_{SG}$ bei $J_1 / J_2$ = ' + J_val, fontsize = titlefontsize)
             subfig1.axhline(0, color = "grey")
             subfig1.legend(loc = 'best' ,frameon = False, fontsize = legendfontsize)
             subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)

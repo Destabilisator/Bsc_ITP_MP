@@ -11,6 +11,7 @@ from typing import Tuple
 import gc
 import time
 plt.rcParams['text.usetex'] = True
+plt.rcParams['axes.linewidth'] = 5
 
 N_color = [("14", "red"), ("16", "blue"), ("18", "green"), ("20", "magenta"), ("22", "brown"), ("24", "purple"), ("26", "tomato")]
 N_color_LOW = [("6", "red"), ("8", "blue"), ("10", "green"), ("12", "magenta"), ("14", "brown"), ("16", "purple"), ("18", "tomato")]
@@ -40,10 +41,17 @@ epsilonFit = 0.01
 extrapolate_QT = True
 extrapolate_ED = True
 
-titlefontsize = 39
-labelfontsize = 35
-legendfontsize = 35
-axisfontsize = 30
+titlefontsize = 165
+labelfontsize = 115
+legendfontsize = 100
+axisfontsize = 110
+
+aspect = (32,18) # (16,9), (34,27)
+
+# titlefontsize = 39
+# labelfontsize = 35
+# legendfontsize = 35
+# axisfontsize = 30
 
 # in final output
 EXP_FIT = False
@@ -54,8 +62,8 @@ SHANK_ALG = False
 EXPSILON_ALG = False
 
 # output
-PLOT_EXTRAPOLATED_SPIN_GAP = False
-PLOT_DIFFERENT_EXTRAPOLATIONS = True
+PLOT_EXTRAPOLATED_SPIN_GAP = True
+PLOT_DIFFERENT_EXTRAPOLATIONS = False
 
 # in multiple extrapolations output
 SHOW_EXP_FIT = False
@@ -79,8 +87,8 @@ PLOT_TEMP = False
 
 counter = 0
 
-line_width = 4
-marker_size = 7
+line_width = 15 # 4
+marker_size = 25 # 7
 
 alph_extr = 0.9
 alph_extr_err = 0.25
@@ -760,8 +768,8 @@ def plotExtrapolatedData(N_color):
     print("plotting extrapolated data          ")
     for samp in range(1, int(max_n / 2) + 1):
         if samp != 1: continue
-        fig1, subfig1 = plt.subplots(1,1,figsize=(16,9))
-        figNoExtrap, subfigNoExtrap = plt.subplots(1,1,figsize=(16,9))
+        fig1, subfig1 = plt.subplots(1,1,figsize=aspect)
+        figNoExtrap, subfigNoExtrap = plt.subplots(1,1,figsize=aspect)
         used_N_QT = "N"; used_N_ED = "N"; N_arr = [0] * 35
 
         # ED #
@@ -820,14 +828,14 @@ def plotExtrapolatedData(N_color):
         else: subfig1.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
         if samp == 1: vec_string = "einen Startvektor"
         else: vec_string = str(samp) + " Startvektoren"
-        subfig1.set_title(r'Spinlückenenergien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+        subfig1.set_title(r'Spinlückenenergien $\Delta_{SG}$', fontsize = titlefontsize) #  + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string
 
         subfigNoExtrap.set_xlabel(r'$J_1$ / $J_2$', fontsize = labelfontsize)
         if J_SUM_SCALE: subfigNoExtrap.set_ylabel(r'$\Delta_{SG}$ / ($J_1 + J_2$)', fontsize = labelfontsize)
         else: subfigNoExtrap.set_ylabel(r'$\Delta_{SG}$ / $J_2$', fontsize = labelfontsize)
         if samp == 1: vec_string = "einen Startvektor"
         else: vec_string = str(samp) + " Startvektoren"
-        subfigNoExtrap.set_title(r'Spinlückenenergien $\Delta_{SG}$' + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string, fontsize = titlefontsize)
+        subfigNoExtrap.set_title(r'Spinlückenenergien $\Delta_{SG}$', fontsize = titlefontsize) #  + "\nmit " + str(int(max_n/samp)) + " Mittelungen über " + vec_string
 
         legend = []
         for i in range(len(N_arr)):
@@ -842,8 +850,10 @@ def plotExtrapolatedData(N_color):
         handles, labels = plt.gca().get_legend_handles_labels()
         handles.extend(legend)
 
-        subfig1.axhline(0, color = "grey")
+        subfig1.axhline(0, color = "grey", lw = 5)
         subfig1.legend(handles = handles, loc = 'best' ,frameon = False, fontsize = legendfontsize, ncol = 2)
+        subfig1.xaxis.set_ticks(np.arange(0.0, 2.1, 0.4))
+        subfig1.yaxis.set_ticks(np.arange(0.0, 0.8, 0.1))
         subfig1.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
         legendNoExtrap = []
@@ -858,8 +868,10 @@ def plotExtrapolatedData(N_color):
         handlesNoExtrap, labels = plt.gca().get_legend_handles_labels()
         handlesNoExtrap.extend(legendNoExtrap)
 
-        subfigNoExtrap.axhline(0, color = "grey")
+        subfigNoExtrap.axhline(0, color = "grey", lw = 5)
         subfigNoExtrap.legend(handles = handlesNoExtrap, loc = 'best' ,frameon = False, fontsize = legendfontsize, ncol = 2)
+        subfigNoExtrap.xaxis.set_ticks(np.arange(0.0, 2.1, 0.4))
+        subfigNoExtrap.yaxis.set_ticks(np.arange(0.0, 0.8, 0.1))
         subfigNoExtrap.tick_params(axis = "both", which = "major", labelsize = axisfontsize)
 
         subfig1.set_xlim(x_lim_min, x_lim_max)
