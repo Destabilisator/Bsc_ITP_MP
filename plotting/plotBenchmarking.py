@@ -118,7 +118,7 @@ def add_size_steps(subfig):
     subfig.text(5.2, 0.7 * 1024 ** 4 / 16, "1 TB", fontsize = timestepfontsize)
     # 1 PB
     subfig.hlines(y = 1024 ** 5 / 16, xmin = 6.5, xmax = 32, lw = width, color = c, ls = "dashed", alpha = alph)
-    subfig.text(5.2, 0.7 * 1024 ** 5 / 16, "1 PT", fontsize = timestepfontsize)
+    subfig.text(5.2, 0.7 * 1024 ** 5 / 16, "1 PB", fontsize = timestepfontsize)
 
 ##### run time, full matrix #####
 def RT_plot_raw_files():
